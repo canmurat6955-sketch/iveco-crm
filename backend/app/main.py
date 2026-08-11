@@ -30,11 +30,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration (handles * wildcard dynamically)
-origins = settings.cors_origins_list
-allow_credentials = True
-if "*" in origins or "" in origins:
-    allow_credentials = False
+# CORS configuration (hardcoded to * for zero-config production deploy)
+origins = ["*"]
+allow_credentials = False
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,6 +41,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # ── Register Routers ─────────────────────────────────────────────
