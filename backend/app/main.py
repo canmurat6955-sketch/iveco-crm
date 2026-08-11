@@ -66,19 +66,6 @@ app.include_router(campaigns_router)
 app.include_router(sales_router)
 app.include_router(dashboard_router)
 
-@app.get("/api/db-debug")
-def db_debug():
-    try:
-        from app.core.database import SessionLocal
-        db = SessionLocal()
-        from sqlalchemy import text
-        res = db.execute(text("SELECT 1")).fetchone()
-        db.close()
-        return {"status": "connected", "result": res[0]}
-    except Exception as e:
-        import traceback
-        return {"status": "error", "error": str(e), "traceback": traceback.format_exc()}
-
 
 
 @app.get("/api/health")
