@@ -64,6 +64,8 @@ app.include_router(notifications_router)
 app.include_router(campaigns_router)
 app.include_router(sales_router)
 app.include_router(dashboard_router)
+app.include_router(scanner_router)
+
 
 
 
