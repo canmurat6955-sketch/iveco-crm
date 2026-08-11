@@ -20,25 +20,42 @@ from app.modules.auth.schemas import (
 router = APIRouter(prefix="/api/auth", tags=["Kimlik Doğrulama"])
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     """Kullanıcı girişi — JWT token alır."""
-    service = AuthService(db)
-    user = service.authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="E-posta veya şifre hatalı",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    token = create_access_token(data={"sub": str(user.id)})
-    return TokenResponse(
-        access_token=token,
-        user=UserResponse.model_validate(user),
-    )
+    try:
+        service = AuthService(db)
+        user = service.authenticate_user(form_data.username, form_data.password)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="E-posta veya şifre hatalı",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        token = create_access_token(data={"sub": str(user.id)})
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role,
+                "is_active": user.is_active,
+                "created_at": user.created_at.isoformat() if user.created_at else None
+            }
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
+
 
 
 @router.post("/register", response_model=UserResponse)
