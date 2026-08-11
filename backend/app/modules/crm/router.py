@@ -31,6 +31,12 @@ def list_customers(
     return CRMService(db).get_customers(pagination, filters)
 
 
+@router.get("/customers/map-markers", response_model=List[dict])
+def get_map_markers(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Harita üzerinde gösterilecek tüm müşteri koordinatlarını hafif biçimde döner."""
+    return CRMService(db).get_map_markers()
+
+
 @router.get("/customers/{customer_id}", response_model=CustomerResponse)
 def get_customer(customer_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """Müşteri detayı."""
