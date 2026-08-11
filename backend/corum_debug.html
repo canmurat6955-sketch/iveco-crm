@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Borsa &#xDC;yeleri - &#xC7;orum Ticaret Borsas&#x131;</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="/css/site.css?v=183" rel="stylesheet" />
+    <style id="gtLoaderStyle">
+    /* Sayfa yüklenirken loading ekranı */
+    .gt-loader-overlay{position:fixed;inset:0;z-index:999999;background:#0e1a3a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s ease}
+    .gt-loader-overlay.hide{opacity:0;pointer-events:none}
+    .gt-loader-logo{width:100px;height:100px;animation:gtPulse 1.5s ease-in-out infinite}
+    .gt-loader-ring{width:120px;height:120px;border-radius:50%;position:absolute;border:3px solid transparent;border-top-color:#d4a843;animation:gtSpin 1.2s linear infinite}
+    .gt-loader-ring2{width:140px;height:140px;border-radius:50%;position:absolute;border:3px solid transparent;border-bottom-color:rgba(212,168,67,.3);animation:gtSpin 1.8s linear infinite reverse}
+    .gt-loader-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:140px;height:140px}
+    @keyframes gtPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
+    @keyframes gtSpin{to{transform:rotate(360deg)}}
+    </style>
+    <script>
+    (function(){
+        var lang=sessionStorage.getItem('_gtLang')||'tr';
+        var hn=location.hostname;
+        // ÖNCE: Tüm eski cookie'leri agresif sil
+        ['',hn,'.'+hn].forEach(function(d){
+            ['/',''].forEach(function(p){
+                var c='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                if(p)c+=';path='+p;
+                if(d)c+=';domain='+d;
+                document.cookie=c;
+            });
+        });
+        // SONRA: Hedef dil TR değilse yeni cookie set et
+        if(lang!=='tr'){
+            document.cookie='googtrans=/tr/'+lang+';path=/';
+            document.cookie='googtrans=/tr/'+lang+';path=/;domain='+hn;
+            document.cookie='googtrans=/tr/'+lang+';path=/;domain=.'+hn;
+        }
+    })();
+    </script>
+    
+</head>
+<body>
+    <!-- Loading Ekranı -->
+    <div class="gt-loader-overlay" id="gtLoader">
+        <div class="gt-loader-wrap">
+            <div class="gt-loader-ring"></div>
+            <div class="gt-loader-ring2"></div>
+            <img src="/images/borsalogo300.png" alt="" class="gt-loader-logo" />
+        </div>
+    </div>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="top-info notranslate">
+                        <span><i class="bi bi-telephone-fill"></i> 0 364 224 09 50</span>
+                        <span class="ms-3"><i class="bi bi-envelope-fill"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89eae6fbfce4fdebc9fde6ebeba7e6fbeea7fdfb">[email&#160;protected]</a></span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="top-links d-flex align-items-center justify-content-end gap-2">
+                        <!-- Dil Seçimi -->
+                        <div class="lang-switcher me-2">
+                            <button class="lang-btn active" onclick="switchLang('tr')" title="Türkçe">
+                                <img src="https://flagcdn.com/w20/tr.png" alt="TR" width="20" height="14" />
+                            </button>
+                            <button class="lang-btn" onclick="switchLang('en')" title="English">
+                                <img src="https://flagcdn.com/w20/gb.png" alt="EN" width="20" height="14" />
+                            </button>
+                        </div>
+                        <a href="https://uye.tobb.org.tr/hizliaidatodeme.jsp" target="_blank" class="btn btn-sm btn-outline-light me-1 d-none d-md-inline-flex">
+                            <i class="bi bi-credit-card"></i> Online Tahsilat
+                        </a>
+                        <a href="https://uye.tobb.org.tr/organizasyon/firma-index.jsp" target="_blank" class="btn btn-sm btn-outline-light me-1 d-none d-md-inline-flex">
+                            <i class="bi bi-file-earmark-text"></i> Online Belge
+                        </a>
+                        <a href="https://ihale.corumtb.org.tr" target="_blank" class="btn btn-sm btn-outline-light d-none d-md-inline-flex">
+                            <i class="bi bi-hammer"></i> Online İhale
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-xl navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center notranslate" href="/">
+                <img src="/images/corum_ticaret_borsasi_logo.png" alt="Çorum Ticaret Borsası" class="navbar-logo" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/" >Anasayfa</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Kurumsal</a>
+                                <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/hakkimizda">Hakk&#x131;m&#x131;zda</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/misyon-vizyonumuz">Misyon &amp; Vizyonumuz</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/temel-degerlerimiz">Temel De&#x11F;erlerimiz </a></li>  <li><a class="dropdown-item" href="/Pages/Detail/eski-baskanlarimiz">Eski Ba&#x15F;kanlar&#x131;m&#x131;z </a></li>  <li><a class="dropdown-item" href="/Pages/Detail/istirak-ve-uyelikler">&#x130;&#x15F;tirak ve &#xDC;yelikler</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/belgelerimiz">Belgelerimiz</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kurumsal-kimlik">Kurumsal Kimlik</a></li>  <li><hr class="dropdown-divider" /></li>                                         <li><a class="dropdown-item" href="/Pages/Category/kurumsal"><i class="bi bi-building me-1"></i>Tümünü Gör</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Borsam&#x131;z</a>
+                                <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Board?type=2"><i class="bi bi-people me-1"></i>Meclis &#xDC;yeleri</a></li>  <li><a class="dropdown-item" href="/Board?type=1"><i class="bi bi-briefcase me-1"></i>Y&#xF6;netim Kurulu</a></li>  <li><a class="dropdown-item" href="/Board?type=3"><i class="bi bi-shield-check me-1"></i>Disiplin Kurulu</a></li>  <li><a class="dropdown-item" href="/Board?type=4"><i class="bi bi-search me-1"></i>Hesaplar&#x131; &#x130;nceleme Komisyonu</a></li>  <li><a class="dropdown-item" href="/Board?type=5"><i class="bi bi-award me-1"></i>Akreditasyon &#x130;zleme Komitesi</a></li>  <li><a class="dropdown-item" href="/Board?type=6"><i class="bi bi-person-gear me-1"></i>Genel Sekreterlik</a></li>                                         <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item" href="/Board/OrgChart"><i class="bi bi-diagram-3 me-1"></i>Organizasyon Şeması</a></li>
+ <li><hr class="dropdown-divider" /></li>                                             <li>
+                                                <a class="dropdown-item" href="/Pages/Detail/organizasyon-semasi-tablo" target=&quot;_blank&quot;>
+ <i class="bi bi-diagram-3 me-1"></i> Organizasyon &#x15E;emas&#x131; Tablosu
+                                                </a>
+                                            </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">&#xDC;yeler</a>
+                                <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/TradeMembers"><i class="bi bi-list-ul me-1"></i>Üye Listesi</a></li>
+                                        <li><a class="dropdown-item" href="/TradeMembers/Apply"><i class="bi bi-person-plus me-1"></i>Üyelik Başvurusu</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Hizmetlerimiz</a>
+                                <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/uye-kayit">&#xDC;ye Kay&#x131;t</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/uye-kayit-kapanis-islemleri">&#xDC;ye Kay&#x131;t - Kapan&#x131;&#x15F; &#x130;&#x15F;lemleri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kayit-ucretleri-ve-aidat-cizelgesi">Kay&#x131;t &#xDC;cretleri ve Aidat &#xC7;izelgesi</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/tescil-islemleri">Tescil &#x130;&#x15F;lemleri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kotasyon-listesi">Kotasyon Listesi</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/salon-satis">Salon Sat&#x131;&#x15F;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/laboratuvar">Laboratuvar</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/borsamiz-tescil-hizmetleri-is-akis-semasi">Borsam&#x131;z Tescil Hizmetleri &#x130;&#x15F; Ak&#x131;&#x15F; &#x15E;emas&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/hizmet-standartlari-tablosu">Hizmet Standartlar&#x131; Tablosu</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/fire-ve-zayiat-oranlari">Fire ve Zayiat Oranlar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/ihracat-yapan-uyelerimiz">&#x130;hracat Yapan &#xDC;yelerimiz</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/uyulmasi-zorunlu-mesleki-kararlar">Uyulmas&#x131; Zorunlu Mesleki Kararlar</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/turib-islemleri">T&#xDC;R&#x130;B &#x130;&#x15F;lemleri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/veteriner-teknik-destek-hizmet-birimi">Veteriner Teknik Destek Hizmet Birimi</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/toprak-analiz-hizmeti">Toprak Analiz Hizmeti</a></li>  <li><hr class="dropdown-divider" /></li>                                         <li><a class="dropdown-item" href="/Pages/Category/hizmetlerimiz"><i class="bi bi-gear me-1"></i>Tümünü Gör</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Politikalar</a>
+                                <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/kalite-politikamiz">Kalite Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/mali-politikamiz">Mali Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/basin-yayin-politikasi">Bas&#x131;n Yay&#x131;n Politikas&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/bilgi-islem-politikamiz">Bilgi &#x130;&#x15F;lem Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/haberlesme-ve-iletisim-politikamiz">Haberle&#x15F;me ve &#x130;leti&#x15F;im Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/insan-kaynaklari-politikamiz">&#x130;nsan Kaynaklar&#x131; Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/uye-iliskileri-politikamiz">&#xDC;ye &#x130;li&#x15F;kileri Politikam&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kvkk-aydinlatma-metni">KVKK - Ayd&#x131;nlatma Metni</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kvkk-acik-riza-beyani">KVKK - A&#xE7;&#x131;k R&#x131;za Beyan&#x131;</a></li>  <li><hr class="dropdown-divider" /></li>                                         <li><a class="dropdown-item" href="/Pages/Category/politikalar"><i class="bi bi-file-earmark-text me-1"></i>Tümünü Gör</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Medya</a>
+                                <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/News?type=1"><i class="bi bi-newspaper me-1"></i>Haberler</a></li>
+                                        <li><a class="dropdown-item" href="/News?type=2"><i class="bi bi-megaphone me-1"></i>Duyurular</a></li>
+                                        <li><a class="dropdown-item" href="/News?type=4"><i class="bi bi-chat-left-text me-1"></i>Bizden Haberler</a></li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item" href="/Bulten"><i class="bi bi-graph-up-arrow me-1"></i>Bültenler</a></li>
+ <li><hr class="dropdown-divider" /></li>                                             <li>
+                                                <a class="dropdown-item" href="/Bulletins" >
+ <i class="bi bi-graph-up-arrow me-1"></i> Tescil B&#xFC;ltenleri
+                                                </a>
+                                            </li>
+                                                    <li class="dropdown-submenu">
+                                                        <a class="dropdown-item dropdown-toggle" href="/Pages/Category/raporlar-istatistikler">
+ <i class="bi bi-bar-chart-line me-1"></i> Raporlar/&#x130;statistikler
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/faaliyet-raporlari">Faaliyet Raporlar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/hizmet-standartlarimiz">Hizmet Standartlar&#x131;m&#x131;z</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/ctb-dergileri">&#xC7;TB Dergileri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/stratejik-plan">Stratejik Plan</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/yillik-is-planlari">Y&#x131;ll&#x131;k &#x130;&#x15F; Planlar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/kurulankapanan-sirket-istatistikleri">Kurulan/Kapanan &#x15E;irket &#x130;statistikleri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/ekonomik-raporlar">Ekonomik Raporlar</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/tobb-haftalik-ekonomi-bultenleri">TOBB Haftal&#x131;k Ekonomi B&#xFC;ltenleri</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/turib-piyasa-verileri">T&#xDC;R&#x130;B Piyasa Verileri  </a></li>                                                             <li><hr class="dropdown-divider" /></li>
+                                                            <li><a class="dropdown-item text-muted" href="/Pages/Category/raporlar-istatistikler"><small>Tümünü Gör →</small></a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="dropdown-submenu">
+                                                        <a class="dropdown-item dropdown-toggle" href="/Pages/Category/bilgi-bankasi">
+ <i class="bi bi-building me-1"></i> Bilgi Bankas&#x131;
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/borsaciligin-tarihi">Borsac&#x131;l&#x131;&#x11F;&#x131;n Tarihi</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/borsalarin-gorev-ve-sorumluluklari">Borsalar&#x131;n G&#xF6;rev ve Sorumluluklar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/urun-ve-ihtisas-borsaciligi">&#xDC;r&#xFC;n ve &#x130;htisas Borsac&#x131;l&#x131;&#x11F;&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/vadeli-islem-borsalari">Vadeli &#x130;&#x15F;lem Borsalar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/borsalarin-faydalari">Borsalar&#x131;n Faydalar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/neden-tescil-yaptirmaliyim">Neden Tescil Yapt&#x131;rmal&#x131;y&#x131;m ?</a></li>                                                             <li><hr class="dropdown-divider" /></li>
+                                                            <li><a class="dropdown-item text-muted" href="/Pages/Category/bilgi-bankasi"><small>Tümünü Gör →</small></a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="dropdown-submenu">
+                                                        <a class="dropdown-item dropdown-toggle" href="/Pages/Category/bilgi-edinme">
+ <i class="bi bi-info-circle me-1"></i> Bilgi Edinme
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/bilgi-edinme-kanunu">Bilgi Edinme Kanunu</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/bilgi-edinme-yonetmeligi">Bilgi Edinme Y&#xF6;netmeli&#x11F;i</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/basvuru-ayrintilari">Ba&#x15F;vuru Ayr&#x131;nt&#x131;lar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/sikca-sorulan-sorular">S&#x131;k&#xE7;a Sorulan Sorular</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/onemli-linkler">&#xD6;nemli Linkler</a></li>                                                             <li><hr class="dropdown-divider" /></li>
+                                                            <li><a class="dropdown-item text-muted" href="/Pages/Category/bilgi-edinme"><small>Tümünü Gör →</small></a></li>
+                                                        </ul>
+                                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Online &#x130;&#x15F;lemler</a>
+                                <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="https://uye.tobb.org.tr/hizliaidatodeme.jsp" target=&quot;_blank&quot;>
+ <i class="bi bi-credit-card me-1"></i> Online Tahsilat
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="https://uye.tobb.org.tr/organizasyon/firma-index.jsp" target=&quot;_blank&quot;>
+ <i class="bi bi-file-earmark-check me-1"></i> Online Belge
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="https://ihale.corumtb.org.tr" target=&quot;_blank&quot;>
+ <i class="bi bi-hammer me-1"></i> Online &#x130;hale
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="/Contact" >
+ <i class="bi bi-envelope me-1"></i> Dilek &#x15E;ikayet Formu
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="/Survey/corum-ticaret-borsasi-uye-memnuniyeti-olcme-ve-beklentileri-belirleme-anketi" >
+ <i class="bi bi-bar-chart-line me-1"></i> Memnuniyet Anketi
+                                                </a>
+                                            </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">&#xC7;orum</a>
+                                <ul class="dropdown-menu">
+ <li><a class="dropdown-item" href="/Pages/Detail/alacahoyuk-sfenksli-kapi">Alacah&#xF6;y&#xFC;k Sfenksli Kap&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/corum-muzesi">&#xC7;orum M&#xFC;zesi</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/hitit-surlari">Hitit Surlar&#x131;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/incesu-kanyonu">&#x130;ncesu Kanyonu</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/koyunbaba-koprusu">Koyunbaba K&#xF6;pr&#xFC;s&#xFC;</a></li>  <li><a class="dropdown-item" href="/Pages/Detail/ulu-cami">Ulu Cami</a></li>  <li><hr class="dropdown-divider" /></li>                                         <li><a class="dropdown-item" href="/Pages/Category/corum"><i class="bi bi-geo-alt me-1"></i>Tümünü Gör</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Contact" >&#x130;leti&#x15F;im</a>
+                            </li>
+                    <!-- Mobil Dil Seçimi -->
+                    <li class="nav-item d-lg-none">
+                        <div class="d-flex align-items-center gap-2 px-3 py-2">
+                            <span class="text-muted small me-2">Dil:</span>
+                            <button class="lang-btn-mobile active" onclick="switchLang('tr')"><img src="https://flagcdn.com/w20/tr.png" width="20" height="14" alt="TR" /> TR</button>
+                            <button class="lang-btn-mobile" onclick="switchLang('en')"><img src="https://flagcdn.com/w20/gb.png" width="20" height="14" alt="EN" /> EN</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+<div class="page-header">
+    <div class="container">
+        <h1>Borsa Üyeleri</h1>
+        <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/">Anasayfa</a></li><li class="breadcrumb-item active">Üyeler</li></ol></nav>
+    </div>
+</div>
+
+<div class="section">
+    <div class="container">
+        <div class="content-area mb-4">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Arama</label>
+                    <input name="q" class="form-control" placeholder="Ad, firma adı ile ara..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Üye Türü</label>
+                    <select name="type" class="form-select">
+                        <option value="">Tümü</option>
+                        <option value="1">Gerçek Kişi</option>
+                        <option value="2">Tüzel Kişi</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Faaliyet Alanı</label>
+                    <select name="group" class="form-select">
+                        <option value="">Tümü</option>
+                        <option value="1">Hububat</option>
+                        <option value="2">Bakliyat</option>
+                        <option value="3">Yağlı Tohumlar</option>
+                        <option value="5">Yumurtacılar</option>
+                        <option value="6">Bitkisel Yağlar</option>
+                        <option value="7">Hayvansal Yağlar</option>
+                        <option value="8">Çeşitli Gıda Maddeleri</option>
+                        <option value="9">Kasaplık Canlı Hayvanlar</option>
+                        <option value="10">Ham Deri ve Bağırsaklar</option>
+                        <option value="11">Yaş Sebze ve Meyveler</option>
+                        <option value="12">Kotasyon Dışı Ürünler</option>
+                        <option value="4">Diğer</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">NACE Kodu</label>
+                    <input name="nace" class="form-control" placeholder="Ör: 01.11, 46.21..." />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Ara</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p class="text-muted mb-0"><strong>438</strong> kayıtlı üye bulundu.</p>
+            <a href="/TradeMembers/Apply" class="btn btn-sm btn-outline-primary"><i class="bi bi-person-plus me-1"></i>Üyelik Başvurusu</a>
+        </div>
+
+        <div style="background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden;">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background:#f8f9fa;">
+                        <tr>
+                            <th>Ad / Firma</th>
+                            <th>NACE Kodları</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;2326 SAYILI OSMANCIK TARIM KRED&#x130; KOOPERAT&#x130;F&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;ACIRLAR TAVUK&#xC7;ULUK OTOMOT&#x130;V NAKL&#x130;YE TELEKOM&#x130;N&#x130;KASYON SANAY&#x130; T&#x130;CARET &#x130;THALAT &#x130;HRACAT</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.23.02</span> Canl&#x131; k&#xFC;mes hayvanlar&#x131; toptan ticareti</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;AHMET SONER BOYRAZ</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.01</span> Hayvan yemi toptan ticareti</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;AKKAYA T&#x130;CARET CEMAL AKKAYA</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;AKTA&#x15E; UN GIDA SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.38.04</span> Un, ni&#x15F;asta, makarna, &#x15F;ehriye vb. &#xFC;r&#xFC;nler ile haz&#x131;r g&#x131;dalar&#x131;n toptan ticareti</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;ALICILAR TARIM &#xDC;R&#xDC;NLER&#x130; T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;ARAS &#xC7;&#x130;LEK&#xC7;&#x130;L&#x130;K GIDA SANAY&#x130; T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.31.04</span> Di&#x11F;er taze meyve sebze toptan ticareti (patates dahil)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;ARKADA&#x15E; TARIM HAYVANCILIK GIDA &#x130;N&#x15E;AAT NAKL&#x130;YAT ELEKTRON&#x130;K SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.33.02</span> Yumurta ve yumurta &#xFC;r&#xFC;nleri toptan ticareti</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;BARLA ZAH&#x130;REC&#x130;L&#x130;K T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;BEK TARIM L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;BE&#x15E;G&#xD6;Z SO&#x11E;UK HAVA TARIM SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.31.04</span> Di&#x11F;er taze meyve sebze toptan ticareti (patates dahil)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;B&#x130;LAL G&#xDC;RKAN SAYLAN</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;&#xC7;A&#x11E;PA GIDA TARIM HAYVANCILIK &#x130;N&#x15E;AAT TAAHH&#xDC;T VE TUR&#x130;ZM SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.31.08</span> Kuru bakliyat &#xFC;r&#xFC;nleri toptan ticareti (fasulye, mercimek, nohut, vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;CANA UN GIDA SANAY&#x130; VE T&#x130;CARET ANON&#x130;M &#x15E;&#x130;RKET&#x130; &#xC7;ORUM &#x15E;UBES&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">10.61.02</span> Tah&#x131;llar&#x131;n &#xF6;&#x11F;&#xFC;t&#xFC;lmesi ve un imalat&#x131;</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;CANCAN TAVUK&#xC7;ULUK TARIM L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.33.02</span> Yumurta ve yumurta &#xFC;r&#xFC;nleri toptan ticareti</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;CEYLAN UN SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;&#xC7;ORUM SAKATAT VE ET T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.32.02</span> Et toptan ticareti (av hayvanlar&#x131; ve k&#xFC;mes hayvanlar&#x131; etleri hari&#xE7;)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;DEMS&#xDC;T TARIM &#xDC;R&#xDC;NLER&#x130; HAYVANCILIK NAKL&#x130;YE SANAY&#x130; VE T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.33.01</span> S&#xFC;t &#xFC;r&#xFC;nleri toptan ticareti (i&#x15F;lenmi&#x15F; s&#xFC;t, s&#xFC;t tozu, yo&#x11F;urt, peynir, kaymak, tereya&#x11F;&#x131; vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;DEN&#x130;Z DEPOLAMA TARIM GIDA NAKL&#x130;YAT SANAY&#x130; T&#x130;CARET L&#x130;M&#x130;TED &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">46.21.02</span> Tah&#x131;l toptan ticareti (bu&#x11F;day, arpa, &#xE7;avdar, yulaf, m&#x131;s&#x131;r, &#xE7;eltik vb.)</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="min-width:200px;">
+                                    <strong>&#x9;DORA T&#x130;CAR&#x130; VE SANAY&#x130; YATIRIMLARI ANON&#x130;M &#x15E;&#x130;RKET&#x130;</strong>
+                                </td>
+                                <td>
+                                            <div class="mb-1" style="font-size:.78rem;"><span class="badge bg-dark me-1" style="font-size:.68rem;">01.41.31</span> S&#xFC;t&#xFC; sa&#x11F;&#x131;lan b&#xFC;y&#xFC;kba&#x15F; hayvan yeti&#x15F;tiricili&#x11F;i (s&#xFC;t&#xFC; i&#xE7;in inek ve manda yeti&#x15F;tiricili&#x11F;i)</div>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <nav class="mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=0"><i class="bi bi-chevron-left"></i></a>
+                    </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=1">1</a>
+                            </li>
+                            <li class="page-item ">
+                                <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=2">2</a>
+                            </li>
+                            <li class="page-item ">
+                                <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=3">3</a>
+                            </li>
+ <li class="page-item disabled"><span class="page-link">…</span></li>                             <li class="page-item ">
+                                <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=22">22</a>
+                            </li>
+                    <li class="page-item ">
+                        <a class="page-link" href="/TradeMembers?q=&amp;group=&amp;type=&amp;nace=&page=2"><i class="bi bi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+    </div>
+</div>
+</main>
+
+    <!-- Member Organizations Bar -->
+    <div class="member-orgs-bar">
+        <div class="container">
+            <h6 class="text-center mb-3 text-muted"><i class="bi bi-award me-1"></i>Paydaşlarımız</h6>
+            <div class="member-orgs-row">
+                <a href="https://www.tobb.org.tr" target="_blank" class="member-org-item" title="TOBB">
+ <img src="/uploads/logos/84986903-2a09-4f40-831c-87ef8ed631d1.jpg" alt="TOBB" />                 </a>
+                <a href="https://www.icc.tobb.org.tr" target="_blank" class="member-org-item" title="ICC T&#xFC;rkiye">
+ <img src="/uploads/logos/294c5b7e-b796-4a5c-a5fd-a8d539779df4.png" alt="ICC T&#xFC;rkiye" />                 </a>
+                <a href="https://anadoluupak.com.tr/" target="_blank" class="member-org-item" title=" ANADOLU &#xDC;R&#xDC;N P&#x130;YASASI ARACI KURUMU AON&#x130;M &#x15E;&#x130;RKET&#x130; (ANADOLU &#xDC;PAK)">
+ <img src="/uploads/logos/f9bc42d5-9fc2-4609-9b55-11a32e976472.png" alt=" ANADOLU &#xDC;R&#xDC;N P&#x130;YASASI ARACI KURUMU AON&#x130;M &#x15E;&#x130;RKET&#x130; (ANADOLU &#xDC;PAK)" />                 </a>
+                <a href="https://kosgeb.gov.tr/" target="_blank" class="member-org-item" title="KOSGEB">
+ <img src="/uploads/logos/2c9fa95d-5c06-4fbe-8f61-9b09ecc089e1.png" alt="KOSGEB" />                 </a>
+                <a href="https://www.turib.com.tr/" target="_blank" class="member-org-item" title=" T&#xDC;RK&#x130;YE &#xDC;R&#xDC;N &#x130;HT&#x130;SAS BORSASI A.&#x15E;. ">
+ <img src="/uploads/logos/d76f767f-74ed-49b3-985d-309aa3d487fd.png" alt=" T&#xDC;RK&#x130;YE &#xDC;R&#xDC;N &#x130;HT&#x130;SAS BORSASI A.&#x15E;. " />                 </a>
+                <a href="http://www.tmo-tobblidas.com.tr/" target="_blank" class="member-org-item" title="TMO-TOBB TARIM &#xDC;R&#xDC;NLER&#x130; L&#x130;SANSLI DEPOCULUK SAN. VE T&#x130;C. A.&#x15E;.">
+ <img src="/uploads/logos/d228f937-c570-458a-bb78-8c95a914ab26.png" alt="TMO-TOBB TARIM &#xDC;R&#xDC;NLER&#x130; L&#x130;SANSLI DEPOCULUK SAN. VE T&#x130;C. A.&#x15E;." />                 </a>
+                <a href="https://turkiye.ahk.de/tr" target="_blank" class="member-org-item" title="T&#xDC;RK ALMAN T&#x130;CARET VE SANAY&#x130; ODASI (TATSO)">
+ <img src="/uploads/logos/7596cc85-0221-4359-8617-a5296ccdfe6d.svg" alt="T&#xDC;RK ALMAN T&#x130;CARET VE SANAY&#x130; ODASI (TATSO)" />                 </a>
+                <a href="https://www.uhk.org.tr/tr/" target="_blank" class="member-org-item" title="ULUSAL HUBUBAT KONSEY&#x130;">
+ <img src="/uploads/logos/1b7c0ee2-c313-4197-ba11-e7b43ffce3da.png" alt="ULUSAL HUBUBAT KONSEY&#x130;" />                 </a>
+                <a href="http://ubk.org.tr/" target="_blank" class="member-org-item" title="ULUSAL BAKLAG&#x130;L KONSEY&#x130;">
+ <img src="/uploads/logos/65294cb3-16ed-4fcf-9677-c8e3d5a93591.bmp" alt="ULUSAL BAKLAG&#x130;L KONSEY&#x130;" />                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5>Çorum Ticaret Borsası</h5>
+                    <p class="text-light opacity-75">Çorum ilinde tarımsal ürünlerin ticaretine aracılık eden, bölge ekonomisine katkı sağlayan köklü bir meslek kuruluşudur.</p>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/corumticaretborsasi" target="_blank"><i class="bi bi-facebook"></i></a>
+                        <a href="https://twitter.com/CorumBorsa" target="_blank"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.instagram.com/corumtb" target="_blank"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Hızlı Erişim</h5>
+                    <ul class="footer-links">
+                        <li><a href="/Pages/Detail/hakkimizda">Hakkımızda</a></li>
+                        <li><a href="/News?type=1">Haberler</a></li>
+                        <li><a href="/News?type=2">Duyurular</a></li>
+                        <li><a href="/Gallery">Foto Galeri</a></li>
+                        <li><a href="/Contact">İletişim</a></li>
+                        <li><a href="/Sitemap">Site Haritası</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>İletişim</h5>
+                    <ul class="footer-contact notranslate">
+                        <li><i class="bi bi-geo-alt"></i> Akkent Mah.Borsa Kompleksi Sitesi K&#xFC;meevler / &#xC7;ORUM</li>
+                        <li><i class="bi bi-telephone"></i> 0 364 224 09 50</li>
+                        <li><i class="bi bi-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="83e0ecf1f6eef7e1c3f7ece1e1adecf1e4adf7f1">[email&#160;protected]</a></li>
+                        <li><i class="bi bi-printer"></i> 0 364 212 46 70</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-light opacity-25 my-4" />
+            <!-- Ziyaretçi İstatistikleri -->
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="visitor-stats d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                        <span class="visitor-stat"><i class="bi bi-circle-fill text-success"></i> Online: <strong>59</strong></span>
+                        <span class="visitor-stat">Bugün: <strong>905</strong></span>
+                        <span class="visitor-stat">Bu Hafta: <strong>11.517</strong></span>
+                        <span class="visitor-stat">Bu Ay: <strong>14.215</strong></span>
+                        <span class="visitor-stat">Bu Yıl: <strong>85.998</strong></span>
+                        <span class="visitor-stat">Toplam: <strong>85.998</strong></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end mt-2 mt-lg-0">
+                    <small class="opacity-75">&#xA9; 2026 &#xC7;orum Ticaret Borsas&#x131;. T&#xFC;m Haklar&#x131; Sakl&#x131;d&#x131;r.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Yukarı Çık Butonu -->
+    <button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Yukarı Çık">
+        <i class="bi bi-chevron-up"></i>
+    </button>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="/js/site.js"></script>
+    <script>
+    // ===== Haftalik Chart =====
+    var haftalikChart=null;
+    var currentHaftalikIdx=0;
+    function switchChart(idx){
+        var data=window._haftalikData;
+        if(!data||!data.length)return;
+        currentHaftalikIdx=idx;
+        var tabs=document.querySelectorAll('.haftalik-tab');
+        tabs.forEach(function(t,i){t.classList.toggle('active',i===idx);});
+        var d=data[idx];if(!d)return;
+        // Update label
+        var lbl=document.getElementById('chartTabLabel');
+        if(lbl)lbl.textContent=d.name+' ('+(idx+1)+'/'+data.length+')';
+        var ctx=document.getElementById('haftalikChart');
+        if(!ctx)return;
+        if(haftalikChart)haftalikChart.destroy();
+        haftalikChart=new Chart(ctx,{
+            type:'line',
+            data:{labels:d.labels,datasets:[
+                {label:'Ortalama',data:d.avg,borderColor:'#1a365d',backgroundColor:'rgba(26,54,93,0.1)',fill:true,tension:0.3,pointRadius:5,pointBackgroundColor:'#1a365d',borderWidth:2.5},
+                {label:'En Az',data:d.min,borderColor:'#e53e3e',borderDash:[5,5],pointRadius:3,pointBackgroundColor:'#e53e3e',borderWidth:1.5,fill:false},
+                {label:'En Çok',data:d.max,borderColor:'#38a169',borderDash:[5,5],pointRadius:3,pointBackgroundColor:'#38a169',borderWidth:1.5,fill:false}
+            ]},
+            options:{responsive:true,maintainAspectRatio:false,
+                plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:15,font:{size:11}}}},
+                scales:{y:{beginAtZero:false,ticks:{callback:function(v){return v.toFixed(2)+' \u20BA'},font:{size:11}},grid:{color:'rgba(0,0,0,.06)'}},x:{grid:{display:false},ticks:{font:{size:10}}}},
+                interaction:{intersect:false,mode:'index'}
+            }
+        });
+    }
+
+    function chartNav(dir){
+        var data=window._haftalikData;
+        if(!data||!data.length)return;
+        var idx=currentHaftalikIdx+dir;
+        if(idx<0)idx=data.length-1;
+        if(idx>=data.length)idx=0;
+        switchChart(idx);
+        // Haftalık işlemleri de senkronize et
+        var bloks=document.querySelectorAll('.haftalik-urun-blok');
+        bloks.forEach(function(b,i){b.style.display=i===idx?'block':'none';});
+        window._haftalikIdx=idx;
+        var cnt=document.getElementById('haftalikCounter');
+        if(cnt)cnt.textContent=(idx+1)+' / '+bloks.length;
+    }
+
+    // ===== News Slider =====
+    var newsPage=0;
+    function newsSlider(dir){
+        var slides=document.querySelectorAll('.news-slide');
+        if(!slides.length)return;
+        var total=slides.length;
+        slides[newsPage].classList.remove('active');
+        newsPage=(newsPage+dir+total)%total;
+        slides[newsPage].classList.add('active');
+        var c=document.getElementById('newsCounter');
+        if(c)c.textContent=(newsPage+1)+' / '+total;
+    }
+    setInterval(function(){if(document.querySelector('.news-slide'))newsSlider(1);},6000);
+
+    document.addEventListener('DOMContentLoaded',function(){
+        // Submenu toggle (mobil)
+        document.querySelectorAll('.dropdown-submenu > .dropdown-toggle').forEach(function(el){
+            el.addEventListener('click',function(e){
+                if(window.innerWidth<1200){
+                    e.preventDefault();e.stopPropagation();
+                    this.parentElement.classList.toggle('show');
+                }
+            });
+        });
+        // News counter init
+        var t=document.querySelectorAll('.news-slide').length;
+        var c=document.getElementById('newsCounter');
+        if(c&&t)c.textContent='1 / '+t;
+        // Duyuru yükseklik eşitle
+        var newsSec=document.querySelector('.news-slider-wrap');
+        var annList=document.getElementById('announcementList');
+        if(newsSec&&annList){
+            var h=newsSec.offsetHeight;
+            if(h>100)annList.style.maxHeight=h+'px';
+        }
+        // Marquee (AJAX tarafından yönetilir)
+
+        // Scroll to top button
+        var scrollBtn=document.getElementById('scrollTopBtn');
+        if(scrollBtn){
+            window.addEventListener('scroll',function(){
+                scrollBtn.classList.toggle('show',window.scrollY>300);
+            });
+        }
+    });
+
+    // Trio sayfalama (Etkinlik/Bülten/Link kutuları)
+    var _trioPages={events:0,bulletins:0,links:0};
+    function _trioShow(key){
+        var body=document.getElementById(key+'Body');
+        if(!body)return;
+        var items=body.querySelectorAll('[data-trio-idx]');
+        var total=parseInt(document.getElementById(key+'Total')?.value||0);
+        var maxPage=Math.max(0,Math.ceil(total/5)-1);
+        if(_trioPages[key]>maxPage)_trioPages[key]=maxPage;
+        if(_trioPages[key]<0)_trioPages[key]=0;
+        var start=_trioPages[key]*5, end=start+5;
+        items.forEach(function(el){
+            var idx=parseInt(el.getAttribute('data-trio-idx'));
+            el.style.display=(idx>=start&&idx<end)?'':'none';
+        });
+        var pageEl=document.getElementById(key+'Page');
+        if(pageEl)pageEl.textContent=(_trioPages[key]+1)+'/'+Math.max(1,maxPage+1);
+    }
+    function trioPrev(key){_trioPages[key]--;_trioShow(key);}
+    function trioNext(key){_trioPages[key]++;_trioShow(key);}
+    // Init
+    _trioShow('events');_trioShow('bulletins');_trioShow('links');
+    </script>
+
+    <!-- Google Translate -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <script>
+    var _gtLang=sessionStorage.getItem('_gtLang')||'tr';
+
+    function googleTranslateElementInit(){
+        new google.translate.TranslateElement({
+            pageLanguage:'tr',
+            includedLanguages:'en',
+            autoDisplay:false,
+            layout:google.translate.TranslateElement.InlineLayout.SIMPLE
+        },'google_translate_element');
+
+        // Çeviri tamamlanınca loader'ı kaldır
+        var lastFontCount=0;
+        var stableCount=0;
+        var attempts=0;
+        var iv=setInterval(function(){
+            var hasTranslated=document.documentElement.classList.contains('translated-ltr')||document.documentElement.classList.contains('translated-rtl');
+            var currentFonts=document.querySelectorAll('font').length;
+
+            if(hasTranslated && currentFonts>0){
+                if(currentFonts===lastFontCount){
+                    stableCount++;
+                } else {
+                    stableCount=0;
+                    lastFontCount=currentFonts;
+                }
+                // Font sayısı 3 ardışık kontrol boyunca (600ms) değişmediyse → çeviri bitti
+                if(stableCount>=3){
+                    clearInterval(iv);
+                    _hideLoader();
+                    _killGTEffects();
+                }
+            }
+            if(++attempts>80){
+                // 16 saniye geçtiyse ne olursa olsun kaldır
+                clearInterval(iv);
+                _hideLoader();
+            }
+        },200);
+    }
+
+    function _killGTEffects(){
+        var observer=new MutationObserver(function(){
+            var tt=document.getElementById('goog-gt-tt');
+            if(tt)tt.style.display='none';
+            document.querySelectorAll('.goog-te-balloon-frame,.VIpgJd-ZVi9od-ORHb-OEVmcd,.VIpgJd-yAWNEb-L7lbkb').forEach(function(el){el.style.display='none';});
+            document.querySelectorAll('.goog-text-highlight').forEach(function(el){
+                el.style.backgroundColor='transparent';
+                el.style.boxShadow='none';
+                el.style.border='none';
+            });
+        });
+        observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
+    }
+
+    function _clearAllCookies(){
+        ['',location.hostname,'.'+location.hostname].forEach(function(d){
+            ['/',''].forEach(function(p){
+                document.cookie='googtrans='+(p?';path='+p:'')+(d?';domain='+d:'')+';expires=Thu, 01 Jan 1970 00:00:00 UTC';
+            });
+        });
+    }
+
+    function _hideLoader(){
+        var loader=document.getElementById('gtLoader');
+        if(loader&&!loader.classList.contains('hide')){
+            loader.classList.add('hide');
+            setTimeout(function(){loader.style.display='none';},400);
+        }
+    }
+
+    function switchLang(lang){
+        // 1) SessionStorage güncelle
+        sessionStorage.setItem('_gtLang',lang);
+
+        // 2) Tüm googtrans cookie'lerini sil
+        var hn=location.hostname;
+        ['','/','/;domain='+hn,'/;domain=.'+hn].forEach(function(s){
+            document.cookie='googtrans=;path='+((s.indexOf(';')>-1)?s.split(';')[0]||'/':'/')+((s.indexOf('domain')>-1)?';domain='+s.split('domain=')[1]:'')+';expires=Thu, 01 Jan 1970 00:00:00 UTC';
+        });
+        // Agresif silme - tüm kombinasyonlar
+        ['',hn,'.'+hn].forEach(function(d){
+            ['/',''].forEach(function(p){
+                var c='googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                if(p)c+=';path='+p;
+                if(d)c+=';domain='+d;
+                document.cookie=c;
+            });
+        });
+
+        // 3) Yeni cookie set et (TR dışı diller için)
+        if(lang!=='tr'){
+            document.cookie='googtrans=/tr/'+lang+';path=/';
+            document.cookie='googtrans=/tr/'+lang+';path=/;domain='+hn;
+            document.cookie='googtrans=/tr/'+lang+';path=/;domain=.'+hn;
+        }
+
+        // 4) Sayfayı tamamen yeniden yükle
+        // Mevcut URL'den _gtl parametresini temizle, yeni ekle
+        var url=location.pathname;
+        // Benzersiz timestamp - tarayıcı cache bypass
+        window.location.href=url+'?_gtl='+lang+'&_='+Date.now();
+    }
+
+    function _updateLangButtons(lang){
+        var idx={'tr':0,'en':1};
+        document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});
+        var btn=document.querySelectorAll('.lang-btn')[idx[lang]];
+        if(btn)btn.classList.add('active');
+        document.querySelectorAll('.lang-btn-mobile').forEach(function(b){b.classList.remove('active');});
+        var mBtn=document.querySelectorAll('.lang-btn-mobile')[idx[lang]];
+        if(mBtn)mBtn.classList.add('active');
+    }
+
+    // Sayfa yüklendiğinde dil butonunu güncelle
+    document.addEventListener('DOMContentLoaded',function(){
+        if(_gtLang!=='tr') _updateLangButtons(_gtLang);
+    });
+
+    // Türkçe sayfalar: window load'da loader kaldır
+    // Çeviri sayfaları: GT callback kaldıracak, ama güvenlik olarak 8sn timeout
+    window.addEventListener('load',function(){
+        if(!sessionStorage.getItem('_gtLang')||sessionStorage.getItem('_gtLang')==='tr'){
+            _hideLoader();
+        } else {
+            // GT çevirisi için max 8sn bekle
+            setTimeout(_hideLoader,8000);
+        }
+    });
+    </script>
+    <script>
+    // GT script'i sadece çeviri aktifken yükle
+    if(sessionStorage.getItem('_gtLang') && sessionStorage.getItem('_gtLang')!=='tr'){
+        var s=document.createElement('script');
+        s.src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(s);
+    }
+    </script>
+
+    <style>
+    /* Google Translate çubuğunu, frame'i ve tüm görsel efektleri tamamen gizle */
+    .goog-te-banner-frame,.goog-te-balloon-frame{display:none!important}
+    #goog-gt-tt,.goog-te-balloon-frame{display:none!important}
+    .goog-text-highlight{background:none!important;box-shadow:none!important;border:none!important;padding:0!important;margin:0!important}
+    .goog-te-gadget{display:none!important}
+    body{top:0!important;position:static!important}
+    .skiptranslate{display:none!important}
+    body>.skiptranslate{display:none!important}
+    iframe.goog-te-banner-frame{display:none!important}
+    /* Google Translate tooltip ve hover efektlerini kapat */
+    #goog-gt-tt{display:none!important}
+    .goog-te-menu-value{display:none!important}
+    .goog-tooltip,.goog-tooltip *{display:none!important}
+    .goog-text-highlight{background-color:transparent!important;border:none!important;box-shadow:none!important}
+    font[style]{background-color:transparent!important;box-shadow:none!important;border-bottom:none!important}
+    font>font{background-color:transparent!important;box-shadow:none!important}
+    span[lang]{background:none!important;border:none!important;box-shadow:none!important}
+    .translated-ltr,.translated-rtl{background:none!important}
+    *[style*="background-color: rgb(231, 233, 235)"]{background-color:transparent!important}
+    .VIpgJd-ZVi9od-ORHb-OEVmcd{display:none!important}
+    .VIpgJd-ZVi9od-SmfZ-OEVmcd{display:none!important}
+    .VIpgJd-ZVi9od-xl07Ob-OEVmcd{display:none!important}
+    .VIpgJd-yAWNEb-L7lbkb{display:none!important}
+
+    /* Dil Değiştirici */
+    .lang-switcher{display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.1);border-radius:20px;padding:2px}
+    .lang-btn{display:inline-flex;align-items:center;gap:0;background:transparent;border:none;color:rgba(255,255,255,.6);padding:4px 7px;border-radius:16px;cursor:pointer;transition:all .2s;line-height:1}
+    .lang-btn:hover{background:rgba(255,255,255,.15)}
+    .lang-btn.active{background:rgba(255,255,255,.22);box-shadow:0 0 0 1px rgba(255,255,255,.3)}
+    .lang-btn img{border-radius:2px;display:block}
+    </style>
+
+    
+</body>
+</html>
