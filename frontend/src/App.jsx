@@ -14,6 +14,8 @@ import DiscoveryList from './pages/Discovery/DiscoveryList';
 import RoutePlanner from './pages/Sales/RoutePlanner';
 import CardScanner from './pages/CRM/CardScanner';
 import Login from './pages/Login';
+import MapPage from './pages/CRM/Map';
+
 
 
 
@@ -51,6 +53,8 @@ export default function App() {
             <Route path="discovery" element={<DiscoveryList />} />
             <Route path="routes" element={<RoutePlanner />} />
             <Route path="scan-card" element={<CardScanner />} />
+            <Route path="map" element={<MapPage />} />
+
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
