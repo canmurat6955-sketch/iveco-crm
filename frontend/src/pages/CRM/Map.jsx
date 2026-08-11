@@ -24,10 +24,10 @@ export default function MapPage() {
   const [sectors, setSectors] = useState([]);
 
   useEffect(() => {
-    // Tüm müşterileri koordinatlarıyla çek
-    crmApi.getCustomers({ page: 1, page_size: 5000 })
+    // Tüm müşterileri hafif koordinat API'sinden çek
+    crmApi.getMapMarkers()
       .then(res => {
-        const items = res.data.items || [];
+        const items = res.data || [];
         // Sadece koordinatı olan müşterileri filtrele
         const withCoords = items.filter(c => c.latitude && c.longitude);
         setCustomers(withCoords);

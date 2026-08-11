@@ -60,6 +60,26 @@ class CRMService:
             total_pages=math.ceil(total / pagination.page_size) if total > 0 else 1,
         )
 
+    def get_map_markers(self) -> List[dict]:
+        customers = self.db.query(Customer).filter(
+            Customer.is_active == True,
+            Customer.latitude != None,
+            Customer.longitude != None,
+            Customer.latitude != "",
+            Customer.longitude != ""
+        ).all()
+        return [
+            {
+                "id": c.id,
+                "company_name": c.company_name,
+                "latitude": str(c.latitude),
+                "longitude": str(c.longitude),
+                "city": c.city,
+                "sector": c.sector
+            }
+            for c in customers
+        ]
+
     def get_customer(self, customer_id: int) -> Customer:
         c = self.db.query(Customer).filter(Customer.id == customer_id).first()
         if not c:

@@ -1518,5 +1518,12 @@ a:hover { text-decoration: underline; }
   to { transform: translateY(0); }
 }
 
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+
 
 

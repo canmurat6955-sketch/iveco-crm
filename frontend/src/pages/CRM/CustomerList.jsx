@@ -174,17 +174,16 @@ export default function CustomerList() {
       </div>
 
       {/* Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div className="card" style={{ padding: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <table className="data-table">
           <thead>
             <tr>
               <th style={{ width: 40, cursor: 'pointer', textAlign: 'center' }} onClick={toggleAll}>
                 {allChecked ? <FiCheckSquare size={16} style={{ color: 'var(--accent-blue-light)' }} /> : <FiSquare size={16} />}
               </th>
-              <th>Firma Adı</th><th>Şehir</th><th>Sektör</th><th>Telefon</th>
-              <th>Segment</th><th>Öncelik</th><th>Potansiyel</th><th>Skor</th><th>Kaynak</th>
+              <th>Firma Adı</th><th>Şehir</th><th>Sektör</th><th className="hide-on-mobile">Telefon</th>
+              <th>Segment</th><th className="hide-on-mobile">Öncelik</th><th>Potansiyel</th><th className="hide-on-mobile">Skor</th><th className="hide-on-mobile">Kaynak</th>
               <th style={{ width: 50 }}></th>
-
             </tr>
           </thead>
           <tbody>
@@ -197,9 +196,9 @@ export default function CustomerList() {
                 <td className="font-semibold">{c.company_name}</td>
                 <td>{c.city || '—'} {c.district ? `/ ${c.district}` : ''}</td>
                 <td className="text-muted">{c.sector || '—'}</td>
-                <td>{c.phone || '—'}</td>
+                <td className="hide-on-mobile">{c.phone || '—'}</td>
                 <td><span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>{c.segment}</span></td>
-                <td>
+                <td className="hide-on-mobile">
                   <span className="badge" style={{
                     background: c.priority_score >= 70 ? 'rgba(239, 68, 68, 0.12)' : c.priority_score >= 40 ? 'rgba(245, 158, 11, 0.12)' : 'rgba(156, 163, 175, 0.12)',
                     color: c.priority_score >= 70 ? '#f87171' : c.priority_score >= 40 ? '#fbbf24' : '#9ca3af',
@@ -210,8 +209,7 @@ export default function CustomerList() {
                   </span>
                 </td>
                 <td><span className="text-sm">{POTENTIALS[c.potential_level] || c.potential_level}</span></td>
-
-                <td>
+                <td className="hide-on-mobile">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{c.potential_score}</span>
                     <div className="score-bar" style={{ width: 50 }}>
@@ -220,7 +218,7 @@ export default function CustomerList() {
                     </div>
                   </div>
                 </td>
-                <td><span className="badge badge-blue">{c.source}</span></td>
+                <td className="hide-on-mobile"><span className="badge badge-blue">{c.source}</span></td>
                 <td onClick={e => e.stopPropagation()}>
                   <button onClick={e => deleteSingle(c.id, c.company_name, e)} title="Sil"
                     style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, borderRadius: 4, transition: 'color 0.2s' }}

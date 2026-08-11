@@ -62,6 +62,7 @@ export const authApi = {
 // ── CRM API ─────────────────────────────────────────────────────
 export const crmApi = {
   getCustomers: (params) => api.get('/crm/customers', { params }),
+  getMapMarkers: () => api.get('/crm/customers/map-markers'),
   getNearbyCustomers: (params) => api.get('/crm/nearby', { params }),
   searchRouteAlong: (params) => api.get('/crm/route-search', { params }),
 
