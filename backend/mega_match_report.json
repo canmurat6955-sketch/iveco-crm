@@ -1,0 +1,1244 @@
+{
+  "vcf_total": 4927,
+  "vcf_with_phone": 4033,
+  "vcf_deduped": 2497,
+  "matches_phone": 676,
+  "matches_name_high": 256,
+  "matches_name_med": 863,
+  "unmatched": 702,
+  "updated_phone": 44,
+  "updated_notes": 359,
+  "new_records": 17,
+  "duplicates_merged": 48,
+  "crm_total": 4181,
+  "crm_with_phone": 1180,
+  "phone_matches_detail": [
+    {
+      "contact": "Abdul Samed Candan Süt",
+      "customer": "Abdul Samed Candan Süt",
+      "phone": "05434459255",
+      "score": 1.0
+    },
+    {
+      "contact": "Abdullah Aydınoğlu Nakliyat Hatay Maket",
+      "customer": "Abdullah Aydınoğlu Nakliyat Hatay Maket",
+      "phone": "05368342681",
+      "score": 1.0
+    },
+    {
+      "contact": "Adem Abi Samsun Ürünleri",
+      "customer": "Adem Abi Samsun Ürünleri",
+      "phone": "05359521772",
+      "score": 1.0
+    },
+    {
+      "contact": "Adem Abi Aydın Tekstil",
+      "customer": "Adem Abi Aydın Tekstil",
+      "phone": "05327902287",
+      "score": 1.0
+    },
+    {
+      "contact": "Abdurrahman Sert Dorse",
+      "customer": "Abdurrahman Sert Dorse",
+      "phone": "05323275352",
+      "score": 1.0
+    },
+    {
+      "contact": "Adnan Bilgin Bahar Uluslararası Nakliye Kavak",
+      "customer": "Adnan Bilgin Bahar Uluslararası Nakliye Kavak",
+      "phone": "05343979437",
+      "score": 1.0
+    },
+    {
+      "contact": "Adil Kaya Tekstil",
+      "customer": "Adil Kaya Tekstil",
+      "phone": "05326578143",
+      "score": 1.0
+    },
+    {
+      "contact": "Adem Elektrikçi",
+      "customer": "Adem Elektrikçi",
+      "phone": "05438933523",
+      "score": 1.0
+    },
+    {
+      "contact": "Ağcagüney petrol",
+      "customer": "Ağcagüney petrol",
+      "phone": "05327795785",
+      "score": 1.0
+    },
+    {
+      "contact": "Adnan Uzun Müşteri",
+      "customer": "Adnan Uzun Müşteri",
+      "phone": "+905368265518",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Can Özdemir Panelvan",
+      "customer": "Ahmet Can Özdemir Panelvan",
+      "phone": "05362132237",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Emre Lastik",
+      "customer": "Ahmet Emre Lastik",
+      "phone": "05365933996",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Girgin Uğur Galeri Dorse",
+      "customer": "Ahmet Girgin Uğur Galeri Dorse",
+      "phone": "05325668216",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Cargocar",
+      "customer": "Ahmet Cargocar",
+      "phone": "+905414885561",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Şen Gıda",
+      "customer": "Ahmet Şen Gıda",
+      "phone": "05342792386",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Kurt Boyabat Mobilya",
+      "customer": "Ahmet Kurt Boyabat Mobilya",
+      "phone": "+905321378350",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Kocatepe Apex Nakliye Alaçam",
+      "customer": "Ahmet Kocatepe Apex Nakliye Alaçam",
+      "phone": "05331606865",
+      "score": 1.0
+    },
+    {
+      "contact": "Ahmet Yavuz Öztürk Lojistik",
+      "customer": "Ahmet Yavuz Öztürk Lojistik",
+      "phone": "05442015161",
+      "score": 1.0
+    },
+    {
+      "contact": "Aks Enerji Mücahit",
+      "customer": "Aks Enerji Mücahit",
+      "phone": "05424907237",
+      "score": 1.0
+    },
+    {
+      "contact": "Alaettin Ali Gündoğdu Lead Samsun",
+      "customer": "Alaettin Ali Gündoğdu Lead Samsun",
+      "phone": "05330215819",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali Adıyaman Panelvan",
+      "customer": "Ali Adıyaman Panelvan",
+      "phone": "+905350609221",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali Lojistik",
+      "customer": "Ali Lojistik",
+      "phone": "05336864072",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali Panelvan",
+      "customer": "Ali Panelvan",
+      "phone": "+905336516493",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali Bey Algida",
+      "customer": "Ali Bey Algida",
+      "phone": "05333520599",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali kocatepe Alsa Nakliye Bafra",
+      "customer": "Alsa Nakliyat",
+      "phone": "05323169636",
+      "score": 1.0
+    },
+    {
+      "contact": "Ali Ok Pazarlama",
+      "customer": "Ali Ok Pazarlama",
+      "phone": "+905385119837",
+      "score": 1.0
+    },
+    {
+      "contact": "Almodi Sigortacı",
+      "customer": "Almodi Sigortacı",
+      "phone": "+905427926513",
+      "score": 1.0
+    },
+    {
+      "contact": "Alperen İveco",
+      "customer": "ALPEREN DURUAKAN",
+      "phone": "+905532123517",
+      "score": 1.0
+    },
+    {
+      "contact": "Arda Koçtaş",
+      "customer": "Arda Koçtaş",
+      "phone": "05319977253",
+      "score": 1.0
+    },
+    {
+      "contact": "Aran Nakliyat BarışDüzgün",
+      "customer": "Aran Nakliyat BarışDüzgün",
+      "phone": "+905438219999",
+      "score": 1.0
+    },
+    {
+      "contact": "Ant Süleyman",
+      "customer": "SÜLEYMAN ÇALIŞKAN",
+      "phone": "+905433117373",
+      "score": 1.0
+    },
+    {
+      "contact": "Armutçuoğlu Otomotiv Satış Destek",
+      "customer": "Armutçuoğlu Otomotiv Satış Destek",
+      "phone": "+905359779875",
+      "score": 1.0
+    },
+    {
+      "contact": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+      "customer": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+      "phone": "03622284834",
+      "score": 1.0
+    },
+    {
+      "contact": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+      "customer": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+      "phone": "05068668504",
+      "score": 1.0
+    },
+    {
+      "contact": "Armutçuoğlu Otomotiv",
+      "customer": "Armutçuoğlu Otomotiv",
+      "phone": "+905300739983",
+      "score": 1.0
+    },
+    {
+      "contact": "Atilla Özkan Lojistik",
+      "customer": "Atilla Özkan Lojistik",
+      "phone": "05323180577",
+      "score": 1.0
+    },
+    {
+      "contact": "Aydın Deniz Samsun Ürünleei",
+      "customer": "Aydın Deniz Samsun Ürünleei",
+      "phone": "05365752890",
+      "score": 1.0
+    },
+    {
+      "contact": "Aydınoglu Nakliyat Lojistik Model",
+      "customer": "Aydınoglu Nakliyat Lojistik Model",
+      "phone": "05322877601",
+      "score": 1.0
+    },
+    {
+      "contact": "Ayhan Dayıoğlu Aday Uluslararası Nakliye Samsun",
+      "customer": "Ayhan Dayıoğlu Aday Uluslararası Nakliye Samsun",
+      "phone": "05077479927",
+      "score": 1.0
+    },
+    {
+      "contact": "Aysun",
+      "customer": "Aysun",
+      "phone": "+905392043751",
+      "score": 1.0
+    },
+    {
+      "contact": "Ayşenur",
+      "customer": "AYŞENUR ÖZARSLAN",
+      "phone": "+905457942511",
+      "score": 1.0
+    },
+    {
+      "contact": "Aytuğ Şahin Yiğit Samsun",
+      "customer": "Aytuğ Şahin Yiğit Samsun",
+      "phone": "05324786303",
+      "score": 1.0
+    },
+    {
+      "contact": "Bahri İstanbul Nakliyeci Albayraktan Gelen 4100 3. Motor",
+      "customer": "Bahri İstanbul Nakliyeci Albayraktan Gelen 4100 3. Motor",
+      "phone": "05344244189",
+      "score": 1.0
+    },
+    {
+      "contact": "Bartu Bey Samsun 70",
+      "customer": "Bartu Bey Samsun 70",
+      "phone": "05309403989",
+      "score": 1.0
+    },
+    {
+      "contact": "Bahattin Güler Fırın Yapan Nakliye Samsun",
+      "customer": "Bahattin Güler Fırın Yapan Nakliye Samsun",
+      "phone": "05325160327",
+      "score": 1.0
+    },
+    {
+      "contact": "Bahadır Nakliyat",
+      "customer": "Bahadır Nakliyat",
+      "phone": "05076819125",
+      "score": 1.0
+    },
+    {
+      "contact": "Behnan Demirci",
+      "customer": "Behnan Demirci",
+      "phone": "05541755454",
+      "score": 1.0
+    },
+    {
+      "contact": "Bedir Vurat Nakliye Sinop",
+      "customer": "Bedir Vurat Nakliye Sinop",
+      "phone": "05424178973",
+      "score": 1.0
+    },
+    {
+      "contact": "Bayram Albaraka Sanayi Şubesi",
+      "customer": "Bayram Albaraka Sanayi Şubesi",
+      "phone": "+905053160758",
+      "score": 1.0
+    },
+    {
+      "contact": "Bayram Abi Nakliyat",
+      "customer": "Bayram Abi Nakliyat",
+      "phone": "05464887412",
+      "score": 1.0
+    }
+  ],
+  "name_matches_high_detail": [
+    {
+      "contact": "Abdullah Sinop",
+      "customer": "ABDULLAH YAYLA SİNOP ŞUBESİ",
+      "phone": "05444587093",
+      "score": 0.75,
+      "common": [
+        "abdullah",
+        "sinop"
+      ]
+    },
+    {
+      "contact": "Adeka İlaç",
+      "customer": "ADEKA İLAÇ SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "phone": "05446074096",
+      "score": 0.8,
+      "common": [
+        "adeka",
+        "ilaç"
+      ]
+    },
+    {
+      "contact": "Acar Ramazan",
+      "customer": "ALİ ACAR",
+      "phone": "+905469593810",
+      "score": 0.6,
+      "common": [
+        "acar"
+      ]
+    },
+    {
+      "contact": "Ahmet Erc",
+      "customer": "AHMET SOYSAL",
+      "phone": "+905332416966",
+      "score": 0.6,
+      "common": [
+        "ahmet"
+      ]
+    },
+    {
+      "contact": "Ahmet Can Şahin",
+      "customer": "AHMET ŞAHİN-SİGORTA ACENTELİĞİ",
+      "phone": "05439725182",
+      "score": 0.62,
+      "common": [
+        "ahmet",
+        "şahin"
+      ]
+    },
+    {
+      "contact": "Ali Akyürek",
+      "customer": "Oktay Akyürek Gıda",
+      "phone": "+905398577454",
+      "score": 0.675,
+      "common": [
+        "akyürek"
+      ]
+    },
+    {
+      "contact": "Ali Sandıkçı",
+      "customer": "Sandıkçı Otomotiv",
+      "phone": "03624475820",
+      "score": 0.7,
+      "common": [
+        "sandıkçı"
+      ]
+    },
+    {
+      "contact": "Ali Sandıkçı",
+      "customer": "Sandıkçı Otomotiv",
+      "phone": "05424346700",
+      "score": 0.7,
+      "common": [
+        "sandıkçı"
+      ]
+    },
+    {
+      "contact": "Arif Kır",
+      "customer": "ARİF SUNGUR",
+      "phone": "05349606734",
+      "score": 0.6,
+      "common": [
+        "arif"
+      ]
+    },
+    {
+      "contact": "Arel Traktör",
+      "customer": "Efe Traktör",
+      "phone": "05458179435",
+      "score": 0.7,
+      "common": [
+        "traktör"
+      ]
+    },
+    {
+      "contact": "Ayhan Bld",
+      "customer": "Ayhan Martaş",
+      "phone": "05448080501",
+      "score": 0.6,
+      "common": [
+        "ayhan"
+      ]
+    },
+    {
+      "contact": "Aylin Şubesi",
+      "customer": "ŞUBESİ",
+      "phone": "05498370383",
+      "score": 0.75,
+      "common": [
+        "şubesi"
+      ]
+    },
+    {
+      "contact": "Aziz Sezgin Ürünleri",
+      "customer": "HANİFE SEZGİN SEZGİN ORMAN ÜRÜNLERİ",
+      "phone": "05337303852",
+      "score": 0.653,
+      "common": [
+        "sezgin",
+        "ürünleri"
+      ]
+    },
+    {
+      "contact": "Bak İçecek Bey",
+      "customer": "Samsun İçecek Ltd.",
+      "phone": "05426937300",
+      "score": 0.675,
+      "common": [
+        "içecek"
+      ]
+    },
+    {
+      "contact": "Burak Laz",
+      "customer": "Burak Panelvan",
+      "phone": "05301125792",
+      "score": 0.6,
+      "common": [
+        "burak"
+      ]
+    },
+    {
+      "contact": "By Maddeleri",
+      "customer": "Birlik Tüketim Maddeleri",
+      "phone": "05064678950",
+      "score": 0.675,
+      "common": [
+        "maddeleri"
+      ]
+    },
+    {
+      "contact": "Cem Aykut Vey Kolombo Ürünleri",
+      "customer": "KOLOMBO SU ÜRÜNLERİ SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "phone": "05327101153",
+      "score": 0.8,
+      "common": [
+        "kolombo",
+        "ürünleri"
+      ]
+    },
+    {
+      "contact": "Cem Otokar",
+      "customer": "Otokar Aş",
+      "phone": "+905336415446",
+      "score": 0.75,
+      "common": [
+        "otokar"
+      ]
+    },
+    {
+      "contact": "Derindere Koçak",
+      "customer": "DERİNDERE KOÇAK OTOMOTİV SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "phone": "+905491709400",
+      "score": 0.8,
+      "common": [
+        "koçak",
+        "derindere"
+      ]
+    },
+    {
+      "contact": "EKO TAŞIMACILIK",
+      "customer": "Dağlı Taşımacılık",
+      "phone": "+905432660262",
+      "score": 0.7,
+      "common": [
+        "taşımacılık"
+      ]
+    },
+    {
+      "contact": "Emre Abi",
+      "customer": "Emre Panelvan",
+      "phone": "05535355602",
+      "score": 0.6,
+      "common": [
+        "emre"
+      ]
+    },
+    {
+      "contact": "Ercan No",
+      "customer": "ERCAN İNCEKARA",
+      "phone": "05417251955",
+      "score": 0.6,
+      "common": [
+        "ercan"
+      ]
+    },
+    {
+      "contact": "Fatih Köksal Kurtarıcı",
+      "customer": "FATİH KÖKSAL",
+      "phone": "05436025919",
+      "score": 0.8,
+      "common": [
+        "fatih",
+        "köksal"
+      ]
+    },
+    {
+      "contact": "Fuat İnşaat",
+      "customer": "FUAT AYDIN-AYDIN İNŞAAT",
+      "phone": "05325931710",
+      "score": 0.8,
+      "common": [
+        "fuat",
+        "inşaat"
+      ]
+    },
+    {
+      "contact": "Fotokopi",
+      "customer": "SİNOP FOTOKOPİ ÇEKİM MERKEZİ TİCARET LİMİTED ŞİRKETİ",
+      "phone": "05334789865",
+      "score": 0.66,
+      "common": [
+        "fotokopi"
+      ]
+    },
+    {
+      "contact": "Furkan Karahanlar Kurtarma",
+      "customer": "Öz Şen Oto Kurtarma",
+      "phone": "05055815001",
+      "score": 0.65,
+      "common": [
+        "kurtarma"
+      ]
+    },
+    {
+      "contact": "Güven Abi",
+      "customer": "GÜVEN YEM SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "phone": "05428458822",
+      "score": 0.6,
+      "common": [
+        "güven"
+      ]
+    },
+    {
+      "contact": "Güvenlik Erc Hüseyin Uşak",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905375747255",
+      "score": 0.66,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hakan Çalışkan",
+      "customer": "Hakan Oto",
+      "phone": "05346276997",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hakan Çakır",
+      "customer": "Hakan Oto",
+      "phone": "05419163369",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hakan Gadis",
+      "customer": "Hakan Oto",
+      "phone": "05446968496",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hakan Akbolat",
+      "customer": "Hakan Oto",
+      "phone": "05427210205",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hakan Merzifon",
+      "customer": "Hakan Oto",
+      "phone": "05547144136",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hakan Tüvekçi",
+      "customer": "Hakan Oto",
+      "phone": "05423021088",
+      "score": 0.6,
+      "common": [
+        "hakan"
+      ]
+    },
+    {
+      "contact": "Hasan Acın Kavak Kurtarma",
+      "customer": "Öz Şen Oto Kurtarma",
+      "phone": "05362606540",
+      "score": 0.643,
+      "common": [
+        "kurtarma"
+      ]
+    },
+    {
+      "contact": "Hilmi Yazıcı Eylül Sandalye",
+      "customer": "EKREM YAZICI EYLÜL MASA SANDALYE",
+      "phone": "+905448913991",
+      "score": 0.8,
+      "common": [
+        "sandalye",
+        "eylül",
+        "masa",
+        "yazıcı"
+      ]
+    },
+    {
+      "contact": "Hüseyin Dökümcü",
+      "customer": "HÜSEYİN BEK",
+      "phone": "05321322526",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Traktörcü",
+      "customer": "HÜSEYİN BEK",
+      "phone": "05465640655",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Şamata",
+      "customer": "HÜSEYİN BEK",
+      "phone": "05335707362",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Günaydın",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905324717501",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Mocık",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905336357520",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Kapkara",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905306001794",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Karavan",
+      "customer": "HÜSEYİN BEK",
+      "phone": "05326980313",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Tepe",
+      "customer": "HÜSEYİN BEK",
+      "phone": "05416219974",
+      "score": 0.7,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Tuğra Şamata",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905444364057",
+      "score": 0.675,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "Hüseyin Uzman Jandarma",
+      "customer": "HÜSEYİN BEK",
+      "phone": "+905387481847",
+      "score": 0.675,
+      "common": [
+        "hüseyin"
+      ]
+    },
+    {
+      "contact": "İbrahim Abi",
+      "customer": "İBRAHİM BAKIŞ",
+      "phone": "05322981023",
+      "score": 0.7,
+      "common": [
+        "ibrahim"
+      ]
+    },
+    {
+      "contact": "İbrahim Bafra Cam",
+      "customer": "İbrahim Bafra Panelvan",
+      "phone": "+905323825558",
+      "score": 0.75,
+      "common": [
+        "ibrahim",
+        "bafra"
+      ]
+    },
+    {
+      "contact": "İbrahim HD Kurtarma",
+      "customer": "Öz Şen Oto Kurtarma",
+      "phone": "+905324247299",
+      "score": 0.65,
+      "common": [
+        "kurtarma"
+      ]
+    },
+    {
+      "contact": "İbrahim Ün İnşaat",
+      "customer": "İBRAHİM ÖZ ÖZ KALİTE YAPI İNŞAAT",
+      "phone": "05362921710",
+      "score": 0.8,
+      "common": [
+        "ibrahim",
+        "inşaat"
+      ]
+    },
+    {
+      "contact": "İsmail Ymc",
+      "customer": "İSMAİL KAYTAN",
+      "phone": "05446570202",
+      "score": 0.7,
+      "common": [
+        "ismail"
+      ]
+    },
+    {
+      "contact": "İsmail Profil",
+      "customer": "AS SAC PROFİL SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "phone": "+905540042581",
+      "score": 0.675,
+      "common": [
+        "profil"
+      ]
+    },
+    {
+      "contact": "Kerim Aca",
+      "customer": "Kerim Demirgü",
+      "phone": "+905425827644",
+      "score": 0.6,
+      "common": [
+        "kerim"
+      ]
+    },
+    {
+      "contact": "Kerim Yılmaz Fındık Ürünleri",
+      "customer": "KERİM YILMAZ",
+      "phone": "05358476293",
+      "score": 0.75,
+      "common": [
+        "kerim",
+        "yılmaz"
+      ]
+    },
+    {
+      "contact": "Life Prodüksiyon",
+      "customer": "YKC PRODÜKSİYON LİMİTED ŞİRKETİ",
+      "phone": "+905442640182",
+      "score": 0.7,
+      "common": [
+        "prodüksiyon"
+      ]
+    },
+    {
+      "contact": "Mehmet Taşkaya",
+      "customer": "Salih Taşkaya Mehmet Abinin Eltaş",
+      "phone": "+905304179600",
+      "score": 0.82,
+      "common": [
+        "taşkaya",
+        "mehmet"
+      ]
+    },
+    {
+      "contact": "Mercan Hüseyin",
+      "customer": "Mercan Plastik Hüseyin Abi",
+      "phone": "05422386446",
+      "score": 0.85,
+      "common": [
+        "hüseyin",
+        "mercan"
+      ]
+    },
+    {
+      "contact": "Merve Hat",
+      "customer": "Merve Noter",
+      "phone": "05424696451",
+      "score": 0.6,
+      "common": [
+        "merve"
+      ]
+    },
+    {
+      "contact": "Mesut Md",
+      "customer": "Mesut Mobilya",
+      "phone": "+905464564204",
+      "score": 0.6,
+      "common": [
+        "mesut"
+      ]
+    },
+    {
+      "contact": "Mesut Kuzu Fındık",
+      "customer": "55 Fındık",
+      "phone": "05367010155",
+      "score": 0.675,
+      "common": [
+        "fındık"
+      ]
+    },
+    {
+      "contact": "Metin Zahire",
+      "customer": "Şen Zahire",
+      "phone": "05357606436",
+      "score": 0.7,
+      "common": [
+        "zahire"
+      ]
+    },
+    {
+      "contact": "Muhammet Fil",
+      "customer": "Muhammet Sigortacı",
+      "phone": "+905315118855",
+      "score": 0.7,
+      "common": [
+        "muhammet"
+      ]
+    },
+    {
+      "contact": "Muhammet Ali",
+      "customer": "Muhammet Sigortacı",
+      "phone": "05427814380",
+      "score": 0.7,
+      "common": [
+        "muhammet"
+      ]
+    },
+    {
+      "contact": "Murat Salıpazarı",
+      "customer": "Murat Oto",
+      "phone": "+905374945548",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Abi Grup",
+      "customer": "Murat Abi Oto",
+      "phone": "+905422959494",
+      "score": 0.65,
+      "common": [
+        "abi",
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Kırbıyık",
+      "customer": "Murat Oto",
+      "phone": "05424375219",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Boyacı",
+      "customer": "Murat Oto",
+      "phone": "05446443064",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Samplast",
+      "customer": "Murat Oto",
+      "phone": "+905464673677",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Abi Paşabahçe",
+      "customer": "Murat Abi Oto",
+      "phone": "05434546465",
+      "score": 0.65,
+      "common": [
+        "abi",
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Mahalleden",
+      "customer": "Murat Oto",
+      "phone": "+905442491753",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Lacoste",
+      "customer": "Murat Oto",
+      "phone": "05335255150",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Aksesuar",
+      "customer": "Murat Oto",
+      "phone": "05423998342",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Soğutma",
+      "customer": "Murat Oto",
+      "phone": "05322117332",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Gülşen",
+      "customer": "Murat Oto",
+      "phone": "+905308241353",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Murat Onay",
+      "customer": "Murat Oto",
+      "phone": "05427924450",
+      "score": 0.6,
+      "common": [
+        "murat"
+      ]
+    },
+    {
+      "contact": "Mustafa Armutçuoğlu",
+      "customer": "Mustafa Baş",
+      "phone": "05359779874",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Abi sakarya Bayisi",
+      "customer": "Mustafa Baş",
+      "phone": "+905446464232",
+      "score": 0.66,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Abi Çekici",
+      "customer": "Mustafa Baş",
+      "phone": "+905064875450",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Abi Şöfor",
+      "customer": "Mustafa Baş",
+      "phone": "+905079920818",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Şahsi",
+      "customer": "Mustafa Baş",
+      "phone": "+905330853882",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Musa Özdin Profil",
+      "customer": "AS SAC PROFİL SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "phone": "05428372303",
+      "score": 0.66,
+      "common": [
+        "profil"
+      ]
+    },
+    {
+      "contact": "Mustafa Akçay Sebzeci",
+      "customer": "Mustafa Baş",
+      "phone": "05359215969",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Bey",
+      "customer": "Mustafa Bey Panelvan",
+      "phone": "+905327340989",
+      "score": 0.8,
+      "common": [
+        "bey",
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Balaç Balaç Uluslararası Rehberim",
+      "customer": "Mustafa Baş",
+      "phone": "05326973760",
+      "score": 0.66,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Bey Merzifon",
+      "customer": "Mustafa Baş",
+      "phone": "05300635390",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Muhasebeci",
+      "customer": "Mustafa Baş",
+      "phone": "05326586705",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Bahçeci",
+      "customer": "Mustafa Baş",
+      "phone": "+905368699843",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Bey Hakkı Albayraktan Numara",
+      "customer": "Mustafa Baş",
+      "phone": "05425898361",
+      "score": 0.65,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Bayraktar",
+      "customer": "Mustafa Baş",
+      "phone": "05324224264",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Öğüten",
+      "customer": "Mustafa Baş",
+      "phone": "05537558855",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Mss Ambalaj",
+      "customer": "Mustafa Baş",
+      "phone": "+905434514249",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Eren Lead",
+      "customer": "Mustafa Baş",
+      "phone": "05423175657",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Mermer İçin",
+      "customer": "Mustafa Baş",
+      "phone": "+905323720170",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Sametin Elemanı",
+      "customer": "Mustafa Baş",
+      "phone": "+905551069456",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Er",
+      "customer": "MUSTAFA GEÇMİŞ",
+      "phone": "+905492252022",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Onay",
+      "customer": "Mustafa Baş",
+      "phone": "+905304133793",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Formen",
+      "customer": "Mustafa Baş",
+      "phone": "05343319469",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Öğütenler Rehberim",
+      "customer": "Mustafa Baş",
+      "phone": "05464999999",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Boyabat",
+      "customer": "Mustafa Baş",
+      "phone": "05424125578",
+      "score": 0.7,
+      "common": [
+        "mustafa"
+      ]
+    },
+    {
+      "contact": "Mustafa Sultan Feyiz",
+      "customer": "Mustafa Baş",
+      "phone": "+905532397296",
+      "score": 0.675,
+      "common": [
+        "mustafa"
+      ]
+    }
+  ],
+  "unmatched_firma": [
+    {
+      "name": "Aşkın Fotocu",
+      "phone": "+905324005684"
+    }
+  ]
+}

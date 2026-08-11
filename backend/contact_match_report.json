@@ -1,0 +1,2713 @@
+{
+  "total_contacts": 4927,
+  "with_phone": 4033,
+  "matched": 2288,
+  "high_confidence": 329,
+  "medium_confidence": 1959,
+  "updated": 108,
+  "already_had_phone": 221,
+  "matches": [
+    {
+      "contact_name": "Adeka İlaç",
+      "contact_org": "",
+      "phones": [
+        "05446074096"
+      ],
+      "customer_id": 360,
+      "customer_name": "ADEKA İLAÇ SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 1.0,
+      "matched_via": "Adeka İlaç"
+    },
+    {
+      "contact_name": "Adeka İlaç",
+      "contact_org": "",
+      "phones": [
+        "05446074096"
+      ],
+      "customer_id": 360,
+      "customer_name": "ADEKA İLAÇ SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 1.0,
+      "matched_via": "Adeka İlaç"
+    },
+    {
+      "contact_name": "Adeka İlaç",
+      "contact_org": "",
+      "phones": [
+        "05446074096"
+      ],
+      "customer_id": 360,
+      "customer_name": "ADEKA İLAÇ SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 1.0,
+      "matched_via": "Adeka İlaç"
+    },
+    {
+      "contact_name": "AHMET UYSAL",
+      "contact_org": "",
+      "phones": [
+        "+905415434099"
+      ],
+      "customer_id": 2747,
+      "customer_name": "AHMET UYSAL",
+      "score": 1.0,
+      "matched_via": "AHMET UYSAL"
+    },
+    {
+      "contact_name": "Saray Tarım",
+      "contact_org": "",
+      "phones": [
+        "+905323628469"
+      ],
+      "customer_id": 3022,
+      "customer_name": "SARAY PETROL TURİZM GIDA SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 1.0,
+      "matched_via": "Saray Tarım"
+    },
+    {
+      "contact_name": "Ahmet Can Şahin",
+      "contact_org": "",
+      "phones": [
+        "05439725182"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.867,
+      "matched_via": "Ahmet Can Şahin"
+    },
+    {
+      "contact_name": "Ahmet Can Şahin",
+      "contact_org": "",
+      "phones": [
+        "05439725182"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.867,
+      "matched_via": "Ahmet Can Şahin"
+    },
+    {
+      "contact_name": "Özcan Yapı",
+      "contact_org": "",
+      "phones": [
+        "05418323757"
+      ],
+      "customer_id": 2290,
+      "customer_name": "SİNOP ÖZCAN YAPI SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.867,
+      "matched_via": "Özcan Yapı"
+    },
+    {
+      "contact_name": "Özcan Yapı",
+      "contact_org": "",
+      "phones": [
+        "05418323757"
+      ],
+      "customer_id": 2290,
+      "customer_name": "SİNOP ÖZCAN YAPI SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.867,
+      "matched_via": "Özcan Yapı"
+    },
+    {
+      "contact_name": "Yunus Emre",
+      "contact_org": "",
+      "phones": [
+        "05424538936"
+      ],
+      "customer_id": 3096,
+      "customer_name": "YUNUS EMRE UYSAL",
+      "score": 0.867,
+      "matched_via": "Yunus Emre"
+    },
+    {
+      "contact_name": "Yunus Emre",
+      "contact_org": "",
+      "phones": [
+        "05424538936"
+      ],
+      "customer_id": 3096,
+      "customer_name": "YUNUS EMRE UYSAL",
+      "score": 0.867,
+      "matched_via": "Yunus Emre"
+    },
+    {
+      "contact_name": "Yunus Emre",
+      "contact_org": "",
+      "phones": [
+        "05424538936"
+      ],
+      "customer_id": 3096,
+      "customer_name": "YUNUS EMRE UYSAL",
+      "score": 0.867,
+      "matched_via": "Yunus Emre"
+    },
+    {
+      "contact_name": "Özcan Yapı",
+      "contact_org": "",
+      "phones": [
+        "05418323757"
+      ],
+      "customer_id": 2290,
+      "customer_name": "SİNOP ÖZCAN YAPI SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.867,
+      "matched_via": "Özcan Yapı"
+    },
+    {
+      "contact_name": "Hasan Lojistik Albayrak",
+      "contact_org": "",
+      "phones": [
+        "+905345715448"
+      ],
+      "customer_id": 2146,
+      "customer_name": "HASAN ALBAYRAK-ALBAYRAK İNŞAAT",
+      "score": 0.867,
+      "matched_via": "Hasan Lojistik Albayrak"
+    },
+    {
+      "contact_name": "yunus emre",
+      "contact_org": "",
+      "phones": [
+        "+905378837946"
+      ],
+      "customer_id": 3096,
+      "customer_name": "YUNUS EMRE UYSAL",
+      "score": 0.867,
+      "matched_via": "yunus emre"
+    },
+    {
+      "contact_name": "Ahmet Can Özdemir Panelvan",
+      "contact_org": "",
+      "phones": [
+        "05362132237"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.8,
+      "matched_via": "Ahmet Can Özdemir Panelvan"
+    },
+    {
+      "contact_name": "Ahmet Can Özdemir Panelvan",
+      "contact_org": "",
+      "phones": [
+        "05362132237"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.8,
+      "matched_via": "Ahmet Can Özdemir Panelvan"
+    },
+    {
+      "contact_name": "Ayşenur",
+      "contact_org": "",
+      "phones": [
+        "+905457942511"
+      ],
+      "customer_id": 2778,
+      "customer_name": "AYŞENUR ÖZARSLAN",
+      "score": 0.8,
+      "matched_via": "Ayşenur"
+    },
+    {
+      "contact_name": "Fatma",
+      "contact_org": "",
+      "phones": [
+        "+905383881890"
+      ],
+      "customer_id": 2843,
+      "customer_name": "FATMA YILDIRIM",
+      "score": 0.8,
+      "matched_via": "Fatma"
+    },
+    {
+      "contact_name": "Fırat",
+      "contact_org": "",
+      "phones": [
+        "05531088165"
+      ],
+      "customer_id": 2848,
+      "customer_name": "FIRAT YILDIZ",
+      "score": 0.8,
+      "matched_via": "Fırat"
+    },
+    {
+      "contact_name": "Fırat",
+      "contact_org": "",
+      "phones": [
+        "05531088165"
+      ],
+      "customer_id": 2848,
+      "customer_name": "FIRAT YILDIZ",
+      "score": 0.8,
+      "matched_via": "Fırat"
+    },
+    {
+      "contact_name": "Fuat İnşaat",
+      "contact_org": "",
+      "phones": [
+        "05325931710"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.8,
+      "matched_via": "Fuat İnşaat"
+    },
+    {
+      "contact_name": "Hamza Tarım",
+      "contact_org": "",
+      "phones": [
+        "05325859543"
+      ],
+      "customer_id": 2507,
+      "customer_name": "HAMZA DANIŞMAZ",
+      "score": 0.8,
+      "matched_via": "Hamza Tarım"
+    },
+    {
+      "contact_name": "Hamza Tarım",
+      "contact_org": "",
+      "phones": [
+        "05325859543"
+      ],
+      "customer_id": 2507,
+      "customer_name": "HAMZA DANIŞMAZ",
+      "score": 0.8,
+      "matched_via": "Hamza Tarım"
+    },
+    {
+      "contact_name": "Muharrem İnşaat",
+      "contact_org": "",
+      "phones": [
+        "+905547214596"
+      ],
+      "customer_id": 1075,
+      "customer_name": "MUHARREM ERŞAHİN",
+      "score": 0.8,
+      "matched_via": "Muharrem İnşaat"
+    },
+    {
+      "contact_name": "Muharrem Tarım",
+      "contact_org": "",
+      "phones": [
+        "05325632977"
+      ],
+      "customer_id": 1075,
+      "customer_name": "MUHARREM ERŞAHİN",
+      "score": 0.8,
+      "matched_via": "Muharrem Tarım"
+    },
+    {
+      "contact_name": "Murat Gıda",
+      "contact_org": "",
+      "phones": [
+        "05558707075"
+      ],
+      "customer_id": 2927,
+      "customer_name": "MURAT AYDEMİR",
+      "score": 0.8,
+      "matched_via": "Murat Gıda"
+    },
+    {
+      "contact_name": "Murat Gıda",
+      "contact_org": "",
+      "phones": [
+        "05558707075"
+      ],
+      "customer_id": 2927,
+      "customer_name": "MURAT AYDEMİR",
+      "score": 0.8,
+      "matched_via": "Murat Gıda"
+    },
+    {
+      "contact_name": "Onur Kambal",
+      "contact_org": "",
+      "phones": [
+        "05462032451"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Kambal"
+    },
+    {
+      "contact_name": "Onur Kambal",
+      "contact_org": "",
+      "phones": [
+        "05462032451"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Kambal"
+    },
+    {
+      "contact_name": "Onur Tekstil",
+      "contact_org": "",
+      "phones": [
+        "05445880614"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Tekstil"
+    },
+    {
+      "contact_name": "Onur Tekstil",
+      "contact_org": "",
+      "phones": [
+        "05445880614"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Tekstil"
+    },
+    {
+      "contact_name": "Onur Can Giresun Kabin",
+      "contact_org": "",
+      "phones": [
+        "05350509728"
+      ],
+      "customer_id": 1615,
+      "customer_name": "ONUR CAN GIDA PAZARLAMA SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Can Giresun Kabin"
+    },
+    {
+      "contact_name": "Sigorta Onur",
+      "contact_org": "",
+      "phones": [
+        "+905332422000"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Sigorta Onur"
+    },
+    {
+      "contact_name": "Yalçın Yalçın",
+      "contact_org": "",
+      "phones": [
+        "+905071383833"
+      ],
+      "customer_id": 2113,
+      "customer_name": "ERDOĞAN YALÇIN",
+      "score": 0.8,
+      "matched_via": "Yalçın Yalçın"
+    },
+    {
+      "contact_name": "Yılmaz İnşaat",
+      "contact_org": "",
+      "phones": [
+        "05443932542"
+      ],
+      "customer_id": 2157,
+      "customer_name": "HÜSEYİN YILMAZ",
+      "score": 0.8,
+      "matched_via": "Yılmaz İnşaat"
+    },
+    {
+      "contact_name": "Yılmaz İnşaat",
+      "contact_org": "",
+      "phones": [
+        "05443932542"
+      ],
+      "customer_id": 2157,
+      "customer_name": "HÜSEYİN YILMAZ",
+      "score": 0.8,
+      "matched_via": "Yılmaz İnşaat"
+    },
+    {
+      "contact_name": "Onur Kambal",
+      "contact_org": "",
+      "phones": [
+        "05462032451"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Kambal"
+    },
+    {
+      "contact_name": "Muharrem İnşaat",
+      "contact_org": "",
+      "phones": [
+        "+905547214596"
+      ],
+      "customer_id": 1075,
+      "customer_name": "MUHARREM ERŞAHİN",
+      "score": 0.8,
+      "matched_via": "Muharrem İnşaat"
+    },
+    {
+      "contact_name": "Onur Tekstil",
+      "contact_org": "",
+      "phones": [
+        "05445880614"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Onur Tekstil"
+    },
+    {
+      "contact_name": "Hamza Tarım",
+      "contact_org": "",
+      "phones": [
+        "05325859543"
+      ],
+      "customer_id": 2507,
+      "customer_name": "HAMZA DANIŞMAZ",
+      "score": 0.8,
+      "matched_via": "Hamza Tarım"
+    },
+    {
+      "contact_name": "Ahmet Can Özdemir Panelvan",
+      "contact_org": "",
+      "phones": [
+        "05362132237"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.8,
+      "matched_via": "Ahmet Can Özdemir Panelvan"
+    },
+    {
+      "contact_name": "Gökhan",
+      "contact_org": "",
+      "phones": [
+        "05447231721"
+      ],
+      "customer_id": 2852,
+      "customer_name": "GÖKHAN GÜNGÖR",
+      "score": 0.8,
+      "matched_via": "Gökhan"
+    },
+    {
+      "contact_name": "Ayşenur",
+      "contact_org": "",
+      "phones": [
+        "+905457942511"
+      ],
+      "customer_id": 2778,
+      "customer_name": "AYŞENUR ÖZARSLAN",
+      "score": 0.8,
+      "matched_via": "Ayşenur"
+    },
+    {
+      "contact_name": "Fırat",
+      "contact_org": "",
+      "phones": [
+        "05531088165"
+      ],
+      "customer_id": 2848,
+      "customer_name": "FIRAT YILDIZ",
+      "score": 0.8,
+      "matched_via": "Fırat"
+    },
+    {
+      "contact_name": "Muharrem Tarım",
+      "contact_org": "",
+      "phones": [
+        "05325632977"
+      ],
+      "customer_id": 1075,
+      "customer_name": "MUHARREM ERŞAHİN",
+      "score": 0.8,
+      "matched_via": "Muharrem Tarım"
+    },
+    {
+      "contact_name": "Murat Gıda",
+      "contact_org": "",
+      "phones": [
+        "05558707075"
+      ],
+      "customer_id": 2927,
+      "customer_name": "MURAT AYDEMİR",
+      "score": 0.8,
+      "matched_via": "Murat Gıda"
+    },
+    {
+      "contact_name": "Fatma",
+      "contact_org": "",
+      "phones": [
+        "+905383881890"
+      ],
+      "customer_id": 2843,
+      "customer_name": "FATMA YILDIRIM",
+      "score": 0.8,
+      "matched_via": "Fatma"
+    },
+    {
+      "contact_name": "Yılmaz İnşaat",
+      "contact_org": "",
+      "phones": [
+        "05443932542"
+      ],
+      "customer_id": 2157,
+      "customer_name": "HÜSEYİN YILMAZ",
+      "score": 0.8,
+      "matched_via": "Yılmaz İnşaat"
+    },
+    {
+      "contact_name": "Yalçın Yalçın",
+      "contact_org": "",
+      "phones": [
+        "+905071383833"
+      ],
+      "customer_id": 2113,
+      "customer_name": "ERDOĞAN YALÇIN",
+      "score": 0.8,
+      "matched_via": "Yalçın Yalçın"
+    },
+    {
+      "contact_name": "Selçuk Yerli Nakliyat Sinop",
+      "contact_org": "",
+      "phones": [
+        "+905068105731"
+      ],
+      "customer_id": 23,
+      "customer_name": "Sinop Nakliyat",
+      "score": 0.8,
+      "matched_via": "Selçuk Yerli Nakliyat Sinop"
+    },
+    {
+      "contact_name": "Murat",
+      "contact_org": "",
+      "phones": [
+        "+905424547886"
+      ],
+      "customer_id": 2927,
+      "customer_name": "MURAT AYDEMİR",
+      "score": 0.8,
+      "matched_via": "Murat"
+    },
+    {
+      "contact_name": "Ahmet Tarım",
+      "contact_org": "",
+      "phones": [
+        "05464180019"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.8,
+      "matched_via": "Ahmet Tarım"
+    },
+    {
+      "contact_name": "Ahmet Tarım",
+      "contact_org": "",
+      "phones": [
+        "05464180019"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.8,
+      "matched_via": "Ahmet Tarım"
+    },
+    {
+      "contact_name": "Samsun E",
+      "contact_org": "",
+      "phones": [
+        "05425320612"
+      ],
+      "customer_id": 72,
+      "customer_name": "SAMSUN AŞ YEMEK SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Samsun E"
+    },
+    {
+      "contact_name": "Samsun E",
+      "contact_org": "",
+      "phones": [
+        "05425320612"
+      ],
+      "customer_id": 72,
+      "customer_name": "SAMSUN AŞ YEMEK SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.8,
+      "matched_via": "Samsun E"
+    },
+    {
+      "contact_name": "Yusuf Daş",
+      "contact_org": "",
+      "phones": [
+        "05512522127"
+      ],
+      "customer_id": 2035,
+      "customer_name": "YUSUF KARA",
+      "score": 0.8,
+      "matched_via": "Yusuf Daş"
+    },
+    {
+      "contact_name": "Yusuf Daş",
+      "contact_org": "",
+      "phones": [
+        "05512522127"
+      ],
+      "customer_id": 2035,
+      "customer_name": "YUSUF KARA",
+      "score": 0.8,
+      "matched_via": "Yusuf Daş"
+    },
+    {
+      "contact_name": "Turgay Üstün Mustafa Donbay",
+      "contact_org": "",
+      "phones": [
+        "+905416421128"
+      ],
+      "customer_id": 2954,
+      "customer_name": "MUSTAFA ÜSTÜN",
+      "score": 0.8,
+      "matched_via": "Turgay Üstün Mustafa Donbay"
+    },
+    {
+      "contact_name": "Ferhat Kaya Aksoy Kardeşler Nakliye İnşaat",
+      "contact_org": "",
+      "phones": [
+        "+905325949768"
+      ],
+      "customer_id": 1781,
+      "customer_name": "FERHAT AKSOY-AKSOY İNŞAAT",
+      "score": 0.76,
+      "matched_via": "Ferhat Kaya Aksoy Kardeşler Nakliye İnşaat"
+    },
+    {
+      "contact_name": "Şanli Aksesuar",
+      "contact_org": "",
+      "phones": [
+        "+905414040885"
+      ],
+      "customer_id": 802,
+      "customer_name": "ŞANLI EV AKSESUAR SANAYİ TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.76,
+      "matched_via": "Şanli Aksesuar"
+    },
+    {
+      "contact_name": "Ferhat Kaya Aksoy Kardeşler Nakliye İnşaat",
+      "contact_org": "",
+      "phones": [
+        "+905325949768"
+      ],
+      "customer_id": 1781,
+      "customer_name": "FERHAT AKSOY-AKSOY İNŞAAT",
+      "score": 0.76,
+      "matched_via": "Ferhat Kaya Aksoy Kardeşler Nakliye İnşaat"
+    },
+    {
+      "contact_name": "Şanli Aksesuar",
+      "contact_org": "",
+      "phones": [
+        "+905414040885"
+      ],
+      "customer_id": 802,
+      "customer_name": "ŞANLI EV AKSESUAR SANAYİ TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.76,
+      "matched_via": "Şanli Aksesuar"
+    },
+    {
+      "contact_name": "Hilmi Yazıcı Eylül Sandalye",
+      "contact_org": "Eylül Masa Sandalye",
+      "phones": [
+        "+905448913991"
+      ],
+      "customer_id": 1170,
+      "customer_name": "EKREM YAZICI EYLÜL MASA SANDALYE",
+      "score": 0.747,
+      "matched_via": "Hilmi Yazıcı Eylül Sandalye Eylül Masa Sandalye"
+    },
+    {
+      "contact_name": "Hilmi Yazıcı Eylül Sandalye",
+      "contact_org": "Eylül Masa Sandalye",
+      "phones": [
+        "+905448913991"
+      ],
+      "customer_id": 1170,
+      "customer_name": "EKREM YAZICI EYLÜL MASA SANDALYE",
+      "score": 0.747,
+      "matched_via": "Hilmi Yazıcı Eylül Sandalye Eylül Masa Sandalye"
+    },
+    {
+      "contact_name": "Ahmet Erc",
+      "contact_org": "",
+      "phones": [
+        "+905332416966"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Erc"
+    },
+    {
+      "contact_name": "Ahmet Şen Gıda",
+      "contact_org": "",
+      "phones": [
+        "05342792386"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Şen Gıda"
+    },
+    {
+      "contact_name": "Ali Lojistik",
+      "contact_org": "",
+      "phones": [
+        "05336864072"
+      ],
+      "customer_id": 21,
+      "customer_name": "Ordu Lojistik",
+      "score": 0.733,
+      "matched_via": "Ali Lojistik"
+    },
+    {
+      "contact_name": "Ali Lojistik",
+      "contact_org": "",
+      "phones": [
+        "05336864072"
+      ],
+      "customer_id": 21,
+      "customer_name": "Ordu Lojistik",
+      "score": 0.733,
+      "matched_via": "Ali Lojistik"
+    },
+    {
+      "contact_name": "Alperen İveco",
+      "contact_org": "",
+      "phones": [
+        "+905532123517"
+      ],
+      "customer_id": 2765,
+      "customer_name": "ALPEREN DURUAKAN",
+      "score": 0.733,
+      "matched_via": "Alperen İveco"
+    },
+    {
+      "contact_name": "Ant Süleyman",
+      "contact_org": "",
+      "phones": [
+        "+905433117373"
+      ],
+      "customer_id": 3048,
+      "customer_name": "SÜLEYMAN ÇALIŞKAN",
+      "score": 0.733,
+      "matched_via": "Ant Süleyman"
+    },
+    {
+      "contact_name": "Başaran Polyester",
+      "contact_org": "",
+      "phones": [
+        "05050123273"
+      ],
+      "customer_id": 1251,
+      "customer_name": "SNP BARAN TEKSTİL İNŞAAT TURİZM SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Başaran Polyester"
+    },
+    {
+      "contact_name": "Betül Aksu",
+      "contact_org": "",
+      "phones": [
+        "05392140155"
+      ],
+      "customer_id": 638,
+      "customer_name": "ŞG AKSU TEKSTİL NAKLİYE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Betül Aksu"
+    },
+    {
+      "contact_name": "Betül Aksu",
+      "contact_org": "",
+      "phones": [
+        "05392140155"
+      ],
+      "customer_id": 638,
+      "customer_name": "ŞG AKSU TEKSTİL NAKLİYE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Betül Aksu"
+    },
+    {
+      "contact_name": "Eltaş Tufan",
+      "contact_org": "",
+      "phones": [
+        "+905059953955"
+      ],
+      "customer_id": 2960,
+      "customer_name": "NEVZAT TUFAN",
+      "score": 0.733,
+      "matched_via": "Eltaş Tufan"
+    },
+    {
+      "contact_name": "Emre Abi",
+      "contact_org": "",
+      "phones": [
+        "05535355602"
+      ],
+      "customer_id": 335,
+      "customer_name": "EMRE LASTİK OTOMOTİV SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Emre Abi"
+    },
+    {
+      "contact_name": "Emre Abi",
+      "contact_org": "",
+      "phones": [
+        "05535355602"
+      ],
+      "customer_id": 335,
+      "customer_name": "EMRE LASTİK OTOMOTİV SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Emre Abi"
+    },
+    {
+      "contact_name": "Ercan No",
+      "contact_org": "",
+      "phones": [
+        "05417251955"
+      ],
+      "customer_id": 2112,
+      "customer_name": "ERCAN İNCEKARA",
+      "score": 0.733,
+      "matched_via": "Ercan No"
+    },
+    {
+      "contact_name": "Ercan No",
+      "contact_org": "",
+      "phones": [
+        "05417251955"
+      ],
+      "customer_id": 2112,
+      "customer_name": "ERCAN İNCEKARA",
+      "score": 0.733,
+      "matched_via": "Ercan No"
+    },
+    {
+      "contact_name": "Eren Cu",
+      "contact_org": "",
+      "phones": [
+        "+905332941286"
+      ],
+      "customer_id": 2831,
+      "customer_name": "EREN GIDA ENDÜSTRİSİ SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Eren Cu"
+    },
+    {
+      "contact_name": "Erol yapi",
+      "contact_org": "",
+      "phones": [
+        "+905324302624"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erol yapi"
+    },
+    {
+      "contact_name": "Erol Yaman Petrol",
+      "contact_org": "",
+      "phones": [
+        "05306097195"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erol Yaman Petrol"
+    },
+    {
+      "contact_name": "Erol Yaman Petrol",
+      "contact_org": "",
+      "phones": [
+        "05306097195"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erol Yaman Petrol"
+    },
+    {
+      "contact_name": "Faruk Abi",
+      "contact_org": "",
+      "phones": [
+        "05372531345"
+      ],
+      "customer_id": 2839,
+      "customer_name": "FARUK SARAÇ",
+      "score": 0.733,
+      "matched_via": "Faruk Abi"
+    },
+    {
+      "contact_name": "Faruk Abi",
+      "contact_org": "",
+      "phones": [
+        "05372531345"
+      ],
+      "customer_id": 2839,
+      "customer_name": "FARUK SARAÇ",
+      "score": 0.733,
+      "matched_via": "Faruk Abi"
+    },
+    {
+      "contact_name": "Fatih Yaman",
+      "contact_org": "",
+      "phones": [
+        "+905443743255"
+      ],
+      "customer_id": 1191,
+      "customer_name": "HAŞİM YAMAN",
+      "score": 0.733,
+      "matched_via": "Fatih Yaman"
+    },
+    {
+      "contact_name": "Fuat Abi",
+      "contact_org": "",
+      "phones": [
+        "05466836617"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Fuat Abi"
+    },
+    {
+      "contact_name": "Fuat Abi",
+      "contact_org": "",
+      "phones": [
+        "05466836617"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Fuat Abi"
+    },
+    {
+      "contact_name": "GARANTİ BANKASI - BEY",
+      "contact_org": "",
+      "phones": [
+        "+905491178842"
+      ],
+      "customer_id": 1108,
+      "customer_name": "TÜRKİYE GARANTİ BANKASI ANONİM ŞİRKETİ SİNOP ŞUBESİ",
+      "score": 0.733,
+      "matched_via": "GARANTİ BANKASI - BEY"
+    },
+    {
+      "contact_name": "Hamit Acar",
+      "contact_org": "",
+      "phones": [
+        "+905334088655"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.733,
+      "matched_via": "Hamit Acar"
+    },
+    {
+      "contact_name": "Halil Yaman",
+      "contact_org": "",
+      "phones": [
+        "05442740055"
+      ],
+      "customer_id": 1191,
+      "customer_name": "HAŞİM YAMAN",
+      "score": 0.733,
+      "matched_via": "Halil Yaman"
+    },
+    {
+      "contact_name": "Halil Yaman",
+      "contact_org": "",
+      "phones": [
+        "05442740055"
+      ],
+      "customer_id": 1191,
+      "customer_name": "HAŞİM YAMAN",
+      "score": 0.733,
+      "matched_via": "Halil Yaman"
+    },
+    {
+      "contact_name": "LEVENT CEP",
+      "contact_org": "",
+      "phones": [
+        "+905322357650"
+      ],
+      "customer_id": 2909,
+      "customer_name": "LEVENT DOĞAN",
+      "score": 0.733,
+      "matched_via": "LEVENT CEP"
+    },
+    {
+      "contact_name": "Muhammet Fil",
+      "contact_org": "",
+      "phones": [
+        "+905315118855"
+      ],
+      "customer_id": 53,
+      "customer_name": "MUHAMMET KARADENİZ GIDA İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Muhammet Fil"
+    },
+    {
+      "contact_name": "Muhammet Ali",
+      "contact_org": "",
+      "phones": [
+        "05427814380"
+      ],
+      "customer_id": 53,
+      "customer_name": "MUHAMMET KARADENİZ GIDA İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Muhammet Ali"
+    },
+    {
+      "contact_name": "Muhammet Ali",
+      "contact_org": "",
+      "phones": [
+        "05427814380"
+      ],
+      "customer_id": 53,
+      "customer_name": "MUHAMMET KARADENİZ GIDA İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Muhammet Ali"
+    },
+    {
+      "contact_name": "Murat Samplast",
+      "contact_org": "",
+      "phones": [
+        "+905464673677"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Murat Samplast"
+    },
+    {
+      "contact_name": "Orhan Er",
+      "contact_org": "",
+      "phones": [
+        "+905516502960"
+      ],
+      "customer_id": 2988,
+      "customer_name": "ORHAN BOLAT",
+      "score": 0.733,
+      "matched_via": "Orhan Er"
+    },
+    {
+      "contact_name": "Özer Çiçek",
+      "contact_org": "",
+      "phones": [
+        "05433945733"
+      ],
+      "customer_id": 3071,
+      "customer_name": "VELİ ÖZER",
+      "score": 0.733,
+      "matched_via": "Özer Çiçek"
+    },
+    {
+      "contact_name": "Özer Çiçek",
+      "contact_org": "",
+      "phones": [
+        "05433945733"
+      ],
+      "customer_id": 3071,
+      "customer_name": "VELİ ÖZER",
+      "score": 0.733,
+      "matched_via": "Özer Çiçek"
+    },
+    {
+      "contact_name": "Servet Ev",
+      "contact_org": "",
+      "phones": [
+        "+905321202253"
+      ],
+      "customer_id": 3036,
+      "customer_name": "SERVET GÜNAL",
+      "score": 0.733,
+      "matched_via": "Servet Ev"
+    },
+    {
+      "contact_name": "Servet Acar",
+      "contact_org": "",
+      "phones": [
+        "+905432491702"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.733,
+      "matched_via": "Servet Acar"
+    },
+    {
+      "contact_name": "Şevket Shs",
+      "contact_org": "",
+      "phones": [
+        "05324066366"
+      ],
+      "customer_id": 3038,
+      "customer_name": "ŞEVKET ASLANBAŞ",
+      "score": 0.733,
+      "matched_via": "Şevket Shs"
+    },
+    {
+      "contact_name": "Şevket Shs",
+      "contact_org": "",
+      "phones": [
+        "05324066366"
+      ],
+      "customer_id": 3038,
+      "customer_name": "ŞEVKET ASLANBAŞ",
+      "score": 0.733,
+      "matched_via": "Şevket Shs"
+    },
+    {
+      "contact_name": "Uğur Samplast",
+      "contact_org": "",
+      "phones": [
+        "05326743614"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Uğur Samplast"
+    },
+    {
+      "contact_name": "Uğur Samplast",
+      "contact_org": "",
+      "phones": [
+        "05326743614"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Uğur Samplast"
+    },
+    {
+      "contact_name": "Yıldıray Abi",
+      "contact_org": "",
+      "phones": [
+        "+905437381106"
+      ],
+      "customer_id": 3084,
+      "customer_name": "YILDIRAY SOYLU",
+      "score": 0.733,
+      "matched_via": "Yıldıray Abi"
+    },
+    {
+      "contact_name": "Zafer Aktaş",
+      "contact_org": "",
+      "phones": [
+        "+905449652979"
+      ],
+      "customer_id": 2323,
+      "customer_name": "ZAFER DERELİ DERELİ İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Zafer Aktaş"
+    },
+    {
+      "contact_name": "Zafer Bektaş",
+      "contact_org": "",
+      "phones": [
+        "+905353865515"
+      ],
+      "customer_id": 2758,
+      "customer_name": "ALİ BEKTAŞ",
+      "score": 0.733,
+      "matched_via": "Zafer Bektaş"
+    },
+    {
+      "contact_name": "Erol Yaman Petrol",
+      "contact_org": "",
+      "phones": [
+        "05306097195"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erol Yaman Petrol"
+    },
+    {
+      "contact_name": "Ercan No",
+      "contact_org": "",
+      "phones": [
+        "05417251955"
+      ],
+      "customer_id": 2112,
+      "customer_name": "ERCAN İNCEKARA",
+      "score": 0.733,
+      "matched_via": "Ercan No"
+    },
+    {
+      "contact_name": "Murat Samplast",
+      "contact_org": "",
+      "phones": [
+        "+905464673677"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Murat Samplast"
+    },
+    {
+      "contact_name": "Muhammet Fil",
+      "contact_org": "",
+      "phones": [
+        "+905315118855"
+      ],
+      "customer_id": 53,
+      "customer_name": "MUHAMMET KARADENİZ GIDA İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Muhammet Fil"
+    },
+    {
+      "contact_name": "Fuat Abi",
+      "contact_org": "",
+      "phones": [
+        "05466836617"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Fuat Abi"
+    },
+    {
+      "contact_name": "Erol yapi",
+      "contact_org": "",
+      "phones": [
+        "+905324302624"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erol yapi"
+    },
+    {
+      "contact_name": "LEVENT CEP",
+      "contact_org": "",
+      "phones": [
+        "+905322357650"
+      ],
+      "customer_id": 2909,
+      "customer_name": "LEVENT DOĞAN",
+      "score": 0.733,
+      "matched_via": "LEVENT CEP"
+    },
+    {
+      "contact_name": "Ali Lojistik",
+      "contact_org": "",
+      "phones": [
+        "05336864072"
+      ],
+      "customer_id": 21,
+      "customer_name": "Ordu Lojistik",
+      "score": 0.733,
+      "matched_via": "Ali Lojistik"
+    },
+    {
+      "contact_name": "Servet Acar",
+      "contact_org": "",
+      "phones": [
+        "+905432491702"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.733,
+      "matched_via": "Servet Acar"
+    },
+    {
+      "contact_name": "Fatih Yaman",
+      "contact_org": "",
+      "phones": [
+        "+905443743255"
+      ],
+      "customer_id": 1191,
+      "customer_name": "HAŞİM YAMAN",
+      "score": 0.733,
+      "matched_via": "Fatih Yaman"
+    },
+    {
+      "contact_name": "Ant Süleyman",
+      "contact_org": "",
+      "phones": [
+        "+905433117373"
+      ],
+      "customer_id": 3048,
+      "customer_name": "SÜLEYMAN ÇALIŞKAN",
+      "score": 0.733,
+      "matched_via": "Ant Süleyman"
+    },
+    {
+      "contact_name": "Alperen İveco",
+      "contact_org": "",
+      "phones": [
+        "+905532123517"
+      ],
+      "customer_id": 2765,
+      "customer_name": "ALPEREN DURUAKAN",
+      "score": 0.733,
+      "matched_via": "Alperen İveco"
+    },
+    {
+      "contact_name": "Faruk Abi",
+      "contact_org": "",
+      "phones": [
+        "05372531345"
+      ],
+      "customer_id": 2839,
+      "customer_name": "FARUK SARAÇ",
+      "score": 0.733,
+      "matched_via": "Faruk Abi"
+    },
+    {
+      "contact_name": "Orhan Er",
+      "contact_org": "",
+      "phones": [
+        "+905516502960"
+      ],
+      "customer_id": 2988,
+      "customer_name": "ORHAN BOLAT",
+      "score": 0.733,
+      "matched_via": "Orhan Er"
+    },
+    {
+      "contact_name": "Muhammet Ali",
+      "contact_org": "",
+      "phones": [
+        "05427814380"
+      ],
+      "customer_id": 53,
+      "customer_name": "MUHAMMET KARADENİZ GIDA İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Muhammet Ali"
+    },
+    {
+      "contact_name": "Ahmet Şen Gıda",
+      "contact_org": "",
+      "phones": [
+        "05342792386"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Şen Gıda"
+    },
+    {
+      "contact_name": "Şevket Shs",
+      "contact_org": "",
+      "phones": [
+        "05324066366"
+      ],
+      "customer_id": 3038,
+      "customer_name": "ŞEVKET ASLANBAŞ",
+      "score": 0.733,
+      "matched_via": "Şevket Shs"
+    },
+    {
+      "contact_name": "Hamit Acar",
+      "contact_org": "",
+      "phones": [
+        "+905334088655"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.733,
+      "matched_via": "Hamit Acar"
+    },
+    {
+      "contact_name": "Emre Abi",
+      "contact_org": "",
+      "phones": [
+        "05535355602"
+      ],
+      "customer_id": 335,
+      "customer_name": "EMRE LASTİK OTOMOTİV SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Emre Abi"
+    },
+    {
+      "contact_name": "Ahmet Erc",
+      "contact_org": "",
+      "phones": [
+        "+905332416966"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Erc"
+    },
+    {
+      "contact_name": "Zafer Bektaş",
+      "contact_org": "",
+      "phones": [
+        "+905353865515"
+      ],
+      "customer_id": 2758,
+      "customer_name": "ALİ BEKTAŞ",
+      "score": 0.733,
+      "matched_via": "Zafer Bektaş"
+    },
+    {
+      "contact_name": "Özer Çiçek",
+      "contact_org": "",
+      "phones": [
+        "05433945733"
+      ],
+      "customer_id": 3071,
+      "customer_name": "VELİ ÖZER",
+      "score": 0.733,
+      "matched_via": "Özer Çiçek"
+    },
+    {
+      "contact_name": "Uğur Samplast",
+      "contact_org": "",
+      "phones": [
+        "05326743614"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Uğur Samplast"
+    },
+    {
+      "contact_name": "Betül Aksu",
+      "contact_org": "",
+      "phones": [
+        "05392140155"
+      ],
+      "customer_id": 638,
+      "customer_name": "ŞG AKSU TEKSTİL NAKLİYE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Betül Aksu"
+    },
+    {
+      "contact_name": "Halil Yaman",
+      "contact_org": "",
+      "phones": [
+        "05442740055"
+      ],
+      "customer_id": 1191,
+      "customer_name": "HAŞİM YAMAN",
+      "score": 0.733,
+      "matched_via": "Halil Yaman"
+    },
+    {
+      "contact_name": "altug Acar",
+      "contact_org": "",
+      "phones": [
+        "+905416606855"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.733,
+      "matched_via": "altug Acar"
+    },
+    {
+      "contact_name": "hakan taşel",
+      "contact_org": "",
+      "phones": [
+        "+905304622210"
+      ],
+      "customer_id": 2859,
+      "customer_name": "HAKAN AFŞAR",
+      "score": 0.733,
+      "matched_via": "hakan taşel"
+    },
+    {
+      "contact_name": "Onur Gençyiğit Hobi",
+      "contact_org": "",
+      "phones": [
+        "+905541476398"
+      ],
+      "customer_id": 2210,
+      "customer_name": "ONUR İNŞAAT VE PAZARLAMA ANONİM ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Onur Gençyiğit Hobi"
+    },
+    {
+      "contact_name": "Gökhan Akü",
+      "contact_org": "",
+      "phones": [
+        "05412350299"
+      ],
+      "customer_id": 2852,
+      "customer_name": "GÖKHAN GÜNGÖR",
+      "score": 0.733,
+      "matched_via": "Gökhan Akü"
+    },
+    {
+      "contact_name": "Gökhan Akü",
+      "contact_org": "",
+      "phones": [
+        "05412350299"
+      ],
+      "customer_id": 2852,
+      "customer_name": "GÖKHAN GÜNGÖR",
+      "score": 0.733,
+      "matched_via": "Gökhan Akü"
+    },
+    {
+      "contact_name": "Damla",
+      "contact_org": "",
+      "phones": [
+        "05392515076"
+      ],
+      "customer_id": 1767,
+      "customer_name": "DAMLA OTOMOTİV EMLAK TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Damla"
+    },
+    {
+      "contact_name": "Serhat Bey Petrol",
+      "contact_org": "",
+      "phones": [
+        "+905435518828"
+      ],
+      "customer_id": 2713,
+      "customer_name": "SERHAT DURUAKAN",
+      "score": 0.733,
+      "matched_via": "Serhat Bey Petrol"
+    },
+    {
+      "contact_name": "Recep Boryap",
+      "contact_org": "",
+      "phones": [
+        "05393163465"
+      ],
+      "customer_id": 3003,
+      "customer_name": "RECEP GÜR",
+      "score": 0.733,
+      "matched_via": "Recep Boryap"
+    },
+    {
+      "contact_name": "Ali Fındık",
+      "contact_org": "",
+      "phones": [
+        "+905374738263"
+      ],
+      "customer_id": 764,
+      "customer_name": "ERÇAL FINDIK OTOMOTİV SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Ali Fındık"
+    },
+    {
+      "contact_name": "Yusuf Çon",
+      "contact_org": "",
+      "phones": [
+        "05446485781"
+      ],
+      "customer_id": 2035,
+      "customer_name": "YUSUF KARA",
+      "score": 0.733,
+      "matched_via": "Yusuf Çon"
+    },
+    {
+      "contact_name": "Yusuf Çon",
+      "contact_org": "",
+      "phones": [
+        "05446485781"
+      ],
+      "customer_id": 2035,
+      "customer_name": "YUSUF KARA",
+      "score": 0.733,
+      "matched_via": "Yusuf Çon"
+    },
+    {
+      "contact_name": "Nilüfer Samplast",
+      "contact_org": "",
+      "phones": [
+        "+905076690801"
+      ],
+      "customer_id": 503,
+      "customer_name": "SAMPLAST PVC İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Nilüfer Samplast"
+    },
+    {
+      "contact_name": "Murat Taflan",
+      "contact_org": "",
+      "phones": [
+        "+905320573155"
+      ],
+      "customer_id": 35,
+      "customer_name": "TAFLAN UN-İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Murat Taflan"
+    },
+    {
+      "contact_name": "Ünal Abi",
+      "contact_org": "",
+      "phones": [
+        "05350563329"
+      ],
+      "customer_id": 2201,
+      "customer_name": "MÜCAHİT ÜNAL İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Ünal Abi"
+    },
+    {
+      "contact_name": "Ünal Abi",
+      "contact_org": "",
+      "phones": [
+        "05350563329"
+      ],
+      "customer_id": 2201,
+      "customer_name": "MÜCAHİT ÜNAL İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Ünal Abi"
+    },
+    {
+      "contact_name": "Nazim",
+      "contact_org": "",
+      "phones": [
+        "05416254073"
+      ],
+      "customer_id": 2203,
+      "customer_name": "NAZIM BALCI-BALCIOĞLU İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Nazim"
+    },
+    {
+      "contact_name": "Nazim",
+      "contact_org": "",
+      "phones": [
+        "05416254073"
+      ],
+      "customer_id": 2203,
+      "customer_name": "NAZIM BALCI-BALCIOĞLU İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Nazim"
+    },
+    {
+      "contact_name": "Hülya",
+      "contact_org": "",
+      "phones": [
+        "05414544867"
+      ],
+      "customer_id": 751,
+      "customer_name": "HÜLYA KARAGÜNDÜZ-HAKO ENERJİ",
+      "score": 0.733,
+      "matched_via": "Hülya"
+    },
+    {
+      "contact_name": "Oar Aydın",
+      "contact_org": "",
+      "phones": [
+        "05549304010"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Oar Aydın"
+    },
+    {
+      "contact_name": "Oar Aydın",
+      "contact_org": "",
+      "phones": [
+        "05549304010"
+      ],
+      "customer_id": 1970,
+      "customer_name": "FUAT AYDIN-AYDIN İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Oar Aydın"
+    },
+    {
+      "contact_name": "Burak Petrol",
+      "contact_org": "",
+      "phones": [
+        "05363957575"
+      ],
+      "customer_id": 2918,
+      "customer_name": "MEHMET BURAK GÜREL",
+      "score": 0.733,
+      "matched_via": "Burak Petrol"
+    },
+    {
+      "contact_name": "Burak Petrol",
+      "contact_org": "",
+      "phones": [
+        "05363957575"
+      ],
+      "customer_id": 2918,
+      "customer_name": "MEHMET BURAK GÜREL",
+      "score": 0.733,
+      "matched_via": "Burak Petrol"
+    },
+    {
+      "contact_name": "Hasan Çat",
+      "contact_org": "",
+      "phones": [
+        "+905337337281"
+      ],
+      "customer_id": 1793,
+      "customer_name": "HASAN ÜNYELİ-ÜNYELİ NAKLİYAT",
+      "score": 0.733,
+      "matched_via": "Hasan Çat"
+    },
+    {
+      "contact_name": "❤️Murat’ım❤️",
+      "contact_org": "",
+      "phones": [
+        "+905416712302"
+      ],
+      "customer_id": 2927,
+      "customer_name": "MURAT AYDEMİR",
+      "score": 0.733,
+      "matched_via": "❤️Murat’ım❤️"
+    },
+    {
+      "contact_name": "Özlem",
+      "contact_org": "",
+      "phones": [
+        "05330939895"
+      ],
+      "customer_id": 2230,
+      "customer_name": "SALİH TÖNGEL ÖZLEM İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Özlem"
+    },
+    {
+      "contact_name": "Özlem",
+      "contact_org": "",
+      "phones": [
+        "05330939895"
+      ],
+      "customer_id": 2230,
+      "customer_name": "SALİH TÖNGEL ÖZLEM İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Özlem"
+    },
+    {
+      "contact_name": "Seda Ceylan",
+      "contact_org": "",
+      "phones": [
+        "+905454650102"
+      ],
+      "customer_id": 2681,
+      "customer_name": "CEYLAN UN SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Seda Ceylan"
+    },
+    {
+      "contact_name": "Musa Md",
+      "contact_org": "",
+      "phones": [
+        "05077706184"
+      ],
+      "customer_id": 2192,
+      "customer_name": "MUSA YILDIRIM YILDIRIM İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Musa Md"
+    },
+    {
+      "contact_name": "Musa Md",
+      "contact_org": "",
+      "phones": [
+        "05077706184"
+      ],
+      "customer_id": 2192,
+      "customer_name": "MUSA YILDIRIM YILDIRIM İNŞAAT",
+      "score": 0.733,
+      "matched_via": "Musa Md"
+    },
+    {
+      "contact_name": "Recep erçinler",
+      "contact_org": "",
+      "phones": [
+        "+905424165143"
+      ],
+      "customer_id": 3003,
+      "customer_name": "RECEP GÜR",
+      "score": 0.733,
+      "matched_via": "Recep erçinler"
+    },
+    {
+      "contact_name": "Ergün Kaynak Golf",
+      "contact_org": "",
+      "phones": [
+        "05423266138"
+      ],
+      "customer_id": 154,
+      "customer_name": "BAŞ KAYNAK SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Ergün Kaynak Golf"
+    },
+    {
+      "contact_name": "Ergün Kaynak Golf",
+      "contact_org": "",
+      "phones": [
+        "05423266138"
+      ],
+      "customer_id": 154,
+      "customer_name": "BAŞ KAYNAK SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Ergün Kaynak Golf"
+    },
+    {
+      "contact_name": "Selim Taflan",
+      "contact_org": "",
+      "phones": [
+        "+905465214679"
+      ],
+      "customer_id": 35,
+      "customer_name": "TAFLAN UN-İNŞAAT SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.733,
+      "matched_via": "Selim Taflan"
+    },
+    {
+      "contact_name": "Ahmet Ula",
+      "contact_org": "",
+      "phones": [
+        "05465050592"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Ula"
+    },
+    {
+      "contact_name": "Ahmet Ula",
+      "contact_org": "",
+      "phones": [
+        "05465050592"
+      ],
+      "customer_id": 1752,
+      "customer_name": "AHMET ACAR ACAR OTOMOTİV",
+      "score": 0.733,
+      "matched_via": "Ahmet Ula"
+    },
+    {
+      "contact_name": "Erkan Erol",
+      "contact_org": "",
+      "phones": [
+        "+905462998801"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.733,
+      "matched_via": "Erkan Erol"
+    },
+    {
+      "contact_name": "Özgür D Elvan Baharat İsuzu Npr Sahibinden 1231589109",
+      "contact_org": "",
+      "phones": [
+        "05321588039"
+      ],
+      "customer_id": 87,
+      "customer_name": "ELVAN BAHARAT GIDA İNŞAAT PAZARLAMA SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.714,
+      "matched_via": "Özgür D Elvan Baharat İsuzu Npr Sahibinden 1231589109"
+    },
+    {
+      "contact_name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+      "contact_org": "",
+      "phones": [
+        "05012098000"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.714,
+      "matched_via": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy"
+    },
+    {
+      "contact_name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+      "contact_org": "",
+      "phones": [
+        "05549192999"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.714,
+      "matched_via": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy"
+    },
+    {
+      "contact_name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+      "contact_org": "",
+      "phones": [
+        "05012098000"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.714,
+      "matched_via": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy"
+    },
+    {
+      "contact_name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+      "contact_org": "",
+      "phones": [
+        "05549192999"
+      ],
+      "customer_id": 2052,
+      "customer_name": "AHMET CAN-CAN İNŞAAT",
+      "score": 0.714,
+      "matched_via": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy"
+    },
+    {
+      "contact_name": "Adem Acar Burada",
+      "contact_org": "",
+      "phones": [
+        "+905324328887"
+      ],
+      "customer_id": 2756,
+      "customer_name": "ALİ ACAR",
+      "score": 0.7,
+      "matched_via": "Adem Acar Burada"
+    },
+    {
+      "contact_name": "Akın Er",
+      "contact_org": "",
+      "phones": [
+        "05373950355"
+      ],
+      "customer_id": 142,
+      "customer_name": "AKIN POMPA MAKİNE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.7,
+      "matched_via": "Akın Er"
+    },
+    {
+      "contact_name": "Akın Er",
+      "contact_org": "",
+      "phones": [
+        "05373950355"
+      ],
+      "customer_id": 142,
+      "customer_name": "AKIN POMPA MAKİNE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.7,
+      "matched_via": "Akın Er"
+    },
+    {
+      "contact_name": "Ali Akın",
+      "contact_org": "",
+      "phones": [
+        "05523602758"
+      ],
+      "customer_id": 142,
+      "customer_name": "AKIN POMPA MAKİNE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.7,
+      "matched_via": "Ali Akın"
+    },
+    {
+      "contact_name": "Ali Sandıkçı",
+      "contact_org": "",
+      "phones": [
+        "03624475820"
+      ],
+      "customer_id": 1,
+      "customer_name": "Sandıkçı Global Lojistik",
+      "score": 0.7,
+      "matched_via": "Ali Sandıkçı"
+    },
+    {
+      "contact_name": "Ali Sandıkçı",
+      "contact_org": "",
+      "phones": [
+        "03624475820"
+      ],
+      "customer_id": 1,
+      "customer_name": "Sandıkçı Global Lojistik",
+      "score": 0.7,
+      "matched_via": "Ali Sandıkçı"
+    },
+    {
+      "contact_name": "Ali Sandıkçı",
+      "contact_org": "",
+      "phones": [
+        "05424346700"
+      ],
+      "customer_id": 1,
+      "customer_name": "Sandıkçı Global Lojistik",
+      "score": 0.7,
+      "matched_via": "Ali Sandıkçı"
+    },
+    {
+      "contact_name": "Ali Sandıkçı",
+      "contact_org": "",
+      "phones": [
+        "05424346700"
+      ],
+      "customer_id": 1,
+      "customer_name": "Sandıkçı Global Lojistik",
+      "score": 0.7,
+      "matched_via": "Ali Sandıkçı"
+    },
+    {
+      "contact_name": "Ayhan Bld",
+      "contact_org": "",
+      "phones": [
+        "05448080501"
+      ],
+      "customer_id": 603,
+      "customer_name": "AYHAN ÜNLÜTÜRK ÜNLÜTÜRK TİCARET",
+      "score": 0.7,
+      "matched_via": "Ayhan Bld"
+    },
+    {
+      "contact_name": "Ayhan Bld",
+      "contact_org": "",
+      "phones": [
+        "05448080501"
+      ],
+      "customer_id": 603,
+      "customer_name": "AYHAN ÜNLÜTÜRK ÜNLÜTÜRK TİCARET",
+      "score": 0.7,
+      "matched_via": "Ayhan Bld"
+    },
+    {
+      "contact_name": "Burak Laz",
+      "contact_org": "",
+      "phones": [
+        "05301125792"
+      ],
+      "customer_id": 2918,
+      "customer_name": "MEHMET BURAK GÜREL",
+      "score": 0.7,
+      "matched_via": "Burak Laz"
+    },
+    {
+      "contact_name": "Burak Laz",
+      "contact_org": "",
+      "phones": [
+        "05301125792"
+      ],
+      "customer_id": 2918,
+      "customer_name": "MEHMET BURAK GÜREL",
+      "score": 0.7,
+      "matched_via": "Burak Laz"
+    },
+    {
+      "contact_name": "EKO TAŞIMACILIK",
+      "contact_org": "EKO TAŞIMACILIK",
+      "phones": [
+        "+905432660262"
+      ],
+      "customer_id": 8,
+      "customer_name": "Ulusoy Karadeniz Taşımacılık",
+      "score": 0.7,
+      "matched_via": "EKO TAŞIMACILIK EKO TAŞIMACILIK"
+    },
+    {
+      "contact_name": "Emrah Özer Alacak",
+      "contact_org": "",
+      "phones": [
+        "05325981849"
+      ],
+      "customer_id": 3071,
+      "customer_name": "VELİ ÖZER",
+      "score": 0.7,
+      "matched_via": "Emrah Özer Alacak"
+    },
+    {
+      "contact_name": "Erol Yılmaz Samfresh",
+      "contact_org": "",
+      "phones": [
+        "+905333126370"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.7,
+      "matched_via": "Erol Yılmaz Samfresh"
+    },
+    {
+      "contact_name": "Hasan kervan Agro",
+      "contact_org": "",
+      "phones": [
+        "05464559005"
+      ],
+      "customer_id": 3026,
+      "customer_name": "SE AGRO HAYVANCILIK GIDA SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "score": 0.7,
+      "matched_via": "Hasan kervan Agro"
+    },
+    {
+      "contact_name": "Hüseyin Ak Hafriyat",
+      "contact_org": "",
+      "phones": [
+        "05322774408"
+      ],
+      "customer_id": 2,
+      "customer_name": "HSM Hafriyat",
+      "score": 0.7,
+      "matched_via": "Hüseyin Ak Hafriyat"
+    },
+    {
+      "contact_name": "Hüseyin Ak Hafriyat",
+      "contact_org": "",
+      "phones": [
+        "05322774408"
+      ],
+      "customer_id": 2,
+      "customer_name": "HSM Hafriyat",
+      "score": 0.7,
+      "matched_via": "Hüseyin Ak Hafriyat"
+    },
+    {
+      "contact_name": "Ilk Emrah",
+      "contact_org": "",
+      "phones": [
+        "05456579055"
+      ],
+      "customer_id": 2110,
+      "customer_name": "EMRAH ARSLAN ARSLAN HAFRİYAT",
+      "score": 0.7,
+      "matched_via": "Ilk Emrah"
+    },
+    {
+      "contact_name": "Ilk Emrah",
+      "contact_org": "",
+      "phones": [
+        "05456579055"
+      ],
+      "customer_id": 2110,
+      "customer_name": "EMRAH ARSLAN ARSLAN HAFRİYAT",
+      "score": 0.7,
+      "matched_via": "Ilk Emrah"
+    },
+    {
+      "contact_name": "İbrahim Özer İzmir",
+      "contact_org": "",
+      "phones": [
+        "+905320691859"
+      ],
+      "customer_id": 3071,
+      "customer_name": "VELİ ÖZER",
+      "score": 0.7,
+      "matched_via": "İbrahim Özer İzmir"
+    },
+    {
+      "contact_name": "İlyas İnşaat",
+      "contact_org": "",
+      "phones": [
+        "+905441356155"
+      ],
+      "customer_id": 257,
+      "customer_name": "İLYAS AL ALTAŞ KUZİNE",
+      "score": 0.7,
+      "matched_via": "İlyas İnşaat"
+    },
+    {
+      "contact_name": "Kavak Çetaş",
+      "contact_org": "",
+      "phones": [
+        "05493225503"
+      ],
+      "customer_id": 138,
+      "customer_name": "ŞENPİLİÇ GIDA SANAYİ VE TİCARET ANONİM ŞİRKETİ KAVAK ŞUBESİ",
+      "score": 0.7,
+      "matched_via": "Kavak Çetaş"
+    },
+    {
+      "contact_name": "Kavak Çetaş",
+      "contact_org": "",
+      "phones": [
+        "05493225503"
+      ],
+      "customer_id": 138,
+      "customer_name": "ŞENPİLİÇ GIDA SANAYİ VE TİCARET ANONİM ŞİRKETİ KAVAK ŞUBESİ",
+      "score": 0.7,
+      "matched_via": "Kavak Çetaş"
+    },
+    {
+      "contact_name": "Kenan Erol Lead",
+      "contact_org": "",
+      "phones": [
+        "05380105037"
+      ],
+      "customer_id": 2833,
+      "customer_name": "EROL TAN",
+      "score": 0.7,
+      "matched_via": "Kenan Erol Lead"
+    }
+  ],
+  "unmatched_sample": [
+    {
+      "name": "Abdul Samed Candan Süt",
+      "org": "",
+      "phone": "05434459255"
+    },
+    {
+      "name": "Adem Dalman Transport",
+      "org": "",
+      "phone": "05443656348"
+    },
+    {
+      "name": "Adem Dalman Transport",
+      "org": "",
+      "phone": "05443656348"
+    },
+    {
+      "name": "Adem Dayım",
+      "org": "",
+      "phone": "05356671416"
+    },
+    {
+      "name": "Adem Dayım",
+      "org": "",
+      "phone": "05356671416"
+    },
+    {
+      "name": "Abdulsamet 4350",
+      "org": "",
+      "phone": "05333822423"
+    },
+    {
+      "name": "Adem Elektrikçi",
+      "org": "",
+      "phone": "05438933523"
+    },
+    {
+      "name": "Adem Elektrikçi",
+      "org": "",
+      "phone": "05438933523"
+    },
+    {
+      "name": "Ağcagüney petrol",
+      "org": "",
+      "phone": "05327795785"
+    },
+    {
+      "name": "Ağcagüney petrol",
+      "org": "",
+      "phone": "05327795785"
+    },
+    {
+      "name": "Adnan Uzun Müşteri",
+      "org": "",
+      "phone": "+905368265518"
+    },
+    {
+      "name": "Adem Karaçuha Kaan Fabrikası",
+      "org": "",
+      "phone": "05326562128"
+    },
+    {
+      "name": "AhmetRufai",
+      "org": "",
+      "phone": "+905446844344"
+    },
+    {
+      "name": "Akın Çamur 4350 Abinin",
+      "org": "",
+      "phone": "05435976155"
+    },
+    {
+      "name": "Akkuzu Lead",
+      "org": "",
+      "phone": "05452307631"
+    },
+    {
+      "name": "Aks Enerji Mücahit",
+      "org": "",
+      "phone": "05424907237"
+    },
+    {
+      "name": "Ali Ar Alaçam Sebzeci",
+      "org": "",
+      "phone": "05309010823"
+    },
+    {
+      "name": "Ali Dikbıyık",
+      "org": "",
+      "phone": "05314520604"
+    },
+    {
+      "name": "Ali Dikbıyık",
+      "org": "",
+      "phone": "05314520604"
+    },
+    {
+      "name": "Ali Abi Dede",
+      "org": "",
+      "phone": "05334821622"
+    },
+    {
+      "name": "Ali Abi Dede",
+      "org": "",
+      "phone": "05334821622"
+    },
+    {
+      "name": "Ali Akyürek",
+      "org": "",
+      "phone": "+905398577454"
+    },
+    {
+      "name": "Aleksa",
+      "org": "",
+      "phone": "+380666229191"
+    },
+    {
+      "name": "Aleyna Beaty",
+      "org": "",
+      "phone": "+905413755855"
+    },
+    {
+      "name": "Ali Adıyaman Panelvan",
+      "org": "",
+      "phone": "+905350609221"
+    },
+    {
+      "name": "Ali Ustabaşı",
+      "org": "",
+      "phone": "05336972247"
+    },
+    {
+      "name": "Ali Ustabaşı",
+      "org": "",
+      "phone": "05336972247"
+    },
+    {
+      "name": "Ali Bey",
+      "org": "",
+      "phone": "+905306045004"
+    },
+    {
+      "name": "Ali Helvalı",
+      "org": "",
+      "phone": "05348548188"
+    },
+    {
+      "name": "Ali Deniz Dizayn",
+      "org": "",
+      "phone": "05528366706"
+    },
+    {
+      "name": "Ali Panelvan",
+      "org": "",
+      "phone": "+905336516493"
+    },
+    {
+      "name": "Ali Bey Algida",
+      "org": "",
+      "phone": "05333520599"
+    },
+    {
+      "name": "Ali Bey Algida",
+      "org": "",
+      "phone": "05333520599"
+    },
+    {
+      "name": "Ali kocatepe Alsa Nakliye Bafra",
+      "org": "",
+      "phone": "05323169636"
+    },
+    {
+      "name": "Ali kocatepe Alsa Nakliye Bafra",
+      "org": "",
+      "phone": "05323169636"
+    },
+    {
+      "name": "Ali Ok Pazarlama",
+      "org": "",
+      "phone": "+905385119837"
+    },
+    {
+      "name": "Alparslan Karaca",
+      "org": "",
+      "phone": "+905347433716"
+    },
+    {
+      "name": "Anıl Abi",
+      "org": "",
+      "phone": "+905067353597"
+    },
+    {
+      "name": "Anahtarcı",
+      "org": "",
+      "phone": "05383837169"
+    },
+    {
+      "name": "Anahtarcı",
+      "org": "",
+      "phone": "05383837169"
+    },
+    {
+      "name": "Almodi Sigortacı",
+      "org": "",
+      "phone": "+905427926513"
+    },
+    {
+      "name": "Arif Sahin",
+      "org": "",
+      "phone": "05457668458"
+    },
+    {
+      "name": "Arif Sahin",
+      "org": "",
+      "phone": "05457668458"
+    },
+    {
+      "name": "Arif Kır",
+      "org": "",
+      "phone": "05349606734"
+    },
+    {
+      "name": "Arif Kır",
+      "org": "",
+      "phone": "05349606734"
+    },
+    {
+      "name": "Arın Çağlayaner",
+      "org": "",
+      "phone": "+905070840790"
+    },
+    {
+      "name": "Annemin Arkadaşı",
+      "org": "",
+      "phone": "+905467488171"
+    },
+    {
+      "name": "Arabam Com",
+      "org": "",
+      "phone": "+905386853057"
+    },
+    {
+      "name": "Arif Güleç 530 Plus",
+      "org": "",
+      "phone": "05424036671"
+    },
+    {
+      "name": "Arif Güleç 530 Plus",
+      "org": "",
+      "phone": "05424036671"
+    },
+    {
+      "name": "Annem",
+      "org": "",
+      "phone": "05300828791"
+    },
+    {
+      "name": "Annem",
+      "org": "",
+      "phone": "05300828791"
+    },
+    {
+      "name": "Arayan Kişi",
+      "org": "",
+      "phone": "05434692516"
+    },
+    {
+      "name": "Arda Arinna Ankara",
+      "org": "",
+      "phone": "+905547548119"
+    },
+    {
+      "name": "Araba Soran",
+      "org": "",
+      "phone": "05335612553"
+    },
+    {
+      "name": "Araba Soran",
+      "org": "",
+      "phone": "05335612553"
+    },
+    {
+      "name": "Armutçuoğlu Otomotiv Satış Destek",
+      "org": "",
+      "phone": "+905359779875"
+    },
+    {
+      "name": "Armutçuoğlu Otomotiv",
+      "org": "Armutçuoğlu Otomotiv",
+      "phone": "+905300739983"
+    },
+    {
+      "name": "Ategoyu Soran",
+      "org": "",
+      "phone": "05354708336"
+    },
+    {
+      "name": "Ategoyu Soran",
+      "org": "",
+      "phone": "05354708336"
+    },
+    {
+      "name": "Ata Tv",
+      "org": "",
+      "phone": "+905010710516"
+    },
+    {
+      "name": "Aşkın Çaykara Abinin",
+      "org": "",
+      "phone": "05353152575"
+    },
+    {
+      "name": "Aşina Assistt",
+      "org": "",
+      "phone": "+905443556119"
+    },
+    {
+      "name": "Aşkın Kopkal",
+      "org": "",
+      "phone": "05524376088"
+    },
+    {
+      "name": "Aşkın Kopkal",
+      "org": "",
+      "phone": "05524376088"
+    },
+    {
+      "name": "Aşkın Fotocu",
+      "org": "",
+      "phone": "+905324005684"
+    },
+    {
+      "name": "Atilla Genç Atikar",
+      "org": "",
+      "phone": "+905052665055"
+    },
+    {
+      "name": "Ayça Şallı Assisttt",
+      "org": "",
+      "phone": "05452525887"
+    },
+    {
+      "name": "Ayfer Karavan",
+      "org": "",
+      "phone": "05442558241"
+    },
+    {
+      "name": "Aynur Teyzem",
+      "org": "",
+      "phone": "05448016757"
+    },
+    {
+      "name": "Aynur Teyzem",
+      "org": "",
+      "phone": "05448016757"
+    },
+    {
+      "name": "Ayşe Keleş Müdür",
+      "org": "",
+      "phone": "05346655903"
+    },
+    {
+      "name": "Ayşe Keleş Müdür",
+      "org": "",
+      "phone": "05346655903"
+    },
+    {
+      "name": "Aysun",
+      "org": "",
+      "phone": "+905392043751"
+    },
+    {
+      "name": "Aylin Şubesi",
+      "org": "",
+      "phone": "05498370383"
+    },
+    {
+      "name": "Aylin Şubesi",
+      "org": "",
+      "phone": "05498370383"
+    },
+    {
+      "name": "Aysel Hizmetli",
+      "org": "",
+      "phone": "05302612274"
+    },
+    {
+      "name": "Bafra Cam",
+      "org": "",
+      "phone": "+905459603639"
+    },
+    {
+      "name": "Aziz Sezgin Ürünleri",
+      "org": "",
+      "phone": "05337303852"
+    },
+    {
+      "name": "Bahri İstanbul Nakliyeci Albayraktan Gelen 4100 3. Motor",
+      "org": "",
+      "phone": "05344244189"
+    },
+    {
+      "name": "Basri Bey",
+      "org": "",
+      "phone": "+905327881495"
+    },
+    {
+      "name": "Batuhan Hasanoğlu Arayan",
+      "org": "",
+      "phone": "05302436161"
+    },
+    {
+      "name": "Behnan Demirci",
+      "org": "",
+      "phone": "05541755454"
+    },
+    {
+      "name": "Behnan Demirci",
+      "org": "",
+      "phone": "05541755454"
+    },
+    {
+      "name": "Bbh 1812",
+      "org": "",
+      "phone": "02123405555"
+    },
+    {
+      "name": "Bbh 1672",
+      "org": "",
+      "phone": "02123405555"
+    },
+    {
+      "name": "Batuhan Karaca",
+      "org": "",
+      "phone": "+905426884319"
+    },
+    {
+      "name": "Batuhan Karaca",
+      "org": "",
+      "phone": "+905333136355"
+    },
+    {
+      "name": "Beytul Kılıç Lar Ürünleri",
+      "org": "",
+      "phone": "05326003406"
+    },
+    {
+      "name": "Beytul Kılıç Lar Ürünleri",
+      "org": "",
+      "phone": "05326003406"
+    },
+    {
+      "name": "Berna Tahsilat",
+      "org": "",
+      "phone": "+905079051536"
+    },
+    {
+      "name": "Berkan",
+      "org": "",
+      "phone": "05384733511"
+    },
+    {
+      "name": "Berkan",
+      "org": "",
+      "phone": "05384733511"
+    },
+    {
+      "name": "Bertna",
+      "org": "",
+      "phone": "+355696920314"
+    },
+    {
+      "name": "Bertna",
+      "org": "",
+      "phone": "+355696920314"
+    },
+    {
+      "name": "Beytullah Tokur",
+      "org": "",
+      "phone": "05457628423"
+    },
+    {
+      "name": "Beytullah Tokur",
+      "org": "",
+      "phone": "05457628423"
+    },
+    {
+      "name": "Beyza Telci",
+      "org": "",
+      "phone": "05014440223"
+    },
+    {
+      "name": "Beyza Telci",
+      "org": "",
+      "phone": "05014440223"
+    },
+    {
+      "name": "Boyabat İs Oral",
+      "org": "IŞLETME VE TARIM BOYABAT İŞ BANKASI",
+      "phone": "+905529934416"
+    }
+  ]
+}

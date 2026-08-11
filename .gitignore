@@ -1,0 +1,20 @@
+# Frontend dependencies and builds
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Backend dependencies and builds
+backend/__pycache__/
+backend/venv/
+backend/.env
+backend/*.db
+backend/*.db-journal
+backend/*.db-wal
+backend/uploads/
+
+# OS and IDE files
+.DS_Store
+.vscode/
+.idea/
+*.log

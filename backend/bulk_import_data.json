@@ -1,0 +1,19 @@
+[
+{"name":"Uludağ İçecek Samsun Dağıtım","phone":"+90 362 228 16 25","city":"Samsun","district":"İlkadım","sector":"Gıda / Tarım","seg":"B","pot":"high","score":65,"source":"Orta Karadeniz İçecek Bayileri","addr":"Toybelen, 290. Sk. No:6 İlkadım"},
+{"name":"Arya İçecek Meşrubat","phone":"+90 362 228 58 38","city":"Samsun","district":"Canik","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":55,"source":"Orta Karadeniz İçecek Bayileri","addr":"Yenimahalle, Zahireci Sk. No:13/A Canik"},
+{"name":"Bektaş İçecek Dağıtım","phone":"+90 362 457 58 00","city":"Samsun","district":"Atakum","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":55,"source":"Orta Karadeniz İçecek Bayileri","addr":"Körfez Mah. Atatürk Bulv. No:171 Atakum"},
+{"name":"Aker İçecek ve Dağıtım","phone":"+90 542 509 44 95","city":"Samsun","district":"Merkez","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri","area":"Pınar Su Distribütörü"},
+{"name":"Akdağ Su Samsun (Korkmaz)","phone":"+90 362 230 18 86","contact":"Mustafa Korkmaz","city":"Samsun","district":"İlkadım","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri","addr":"Derebahçe, Laleli Sk. No:20"},
+{"name":"Ata Gıda A.Ş.","phone":"+90 452 233 09 60","city":"Ordu","district":"Altınordu","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":55,"source":"Orta Karadeniz İçecek Bayileri","addr":"Karapınar Mah. OSB 1170. Sk."},
+{"name":"Özak Gıda Çorum","phone":"+90 364 225 57 00","city":"Çorum","district":"Merkez","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri","addr":"Akkent Mah. Gimat 2. Sk. No:16/6"},
+{"name":"Orion İçecek Gıda","phone":"+90 532 567 71 90","city":"Samsun","district":"Atakum","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri","addr":"Körfez Mah. 5040. Sk."},
+{"name":"Cebeci Edt Gıda Pazarlama","phone":"+90 542 231 13 55","city":"Ordu","district":"Altınordu","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Samsun İçecek Ltd.","phone":"+90 362 446 03 00","city":"Samsun","district":"İlkadım","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":55,"source":"Orta Karadeniz İçecek Bayileri","addr":"Cedit Mah. Nebiler Cd. No:45"},
+{"name":"Su Sepetim (Ordu)","phone":"+90 452 888 17 77","city":"Ordu","district":"Altınordu","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Yalçın Gıda (Fatsa)","phone":"+90 452 423 98 39","city":"Ordu","district":"Fatsa","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Altaş Yağ ve Su Tarım","phone":"+90 452 233 44 55","city":"Ordu","district":"Altınordu","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Samsun Su Dünyası","phone":"+90 362 230 42 52","city":"Samsun","district":"İlkadım","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Birsu Ticaret (Akdağ Su)","phone":"+90 362 230 42 52","city":"Samsun","district":"İlkadım","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Şahame Gıda İnşaat","phone":"+90 364 225 00 00","city":"Çorum","district":"Merkez","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri"},
+{"name":"Bahar Dış Ticaret","phone":"+90 362 431 19 88","city":"Samsun","district":"Atakum","sector":"Gıda / Tarım","seg":"C","pot":"medium","score":50,"source":"Orta Karadeniz İçecek Bayileri","addr":"Atatürk Bulvarı No:71 Atakum"}
+]

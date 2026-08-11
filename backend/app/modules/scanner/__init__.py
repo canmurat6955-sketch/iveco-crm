@@ -1,0 +1,1 @@
+# Google Places Scanner Module

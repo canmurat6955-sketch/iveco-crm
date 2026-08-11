@@ -1,0 +1,629 @@
+{
+  "total_groups": 25,
+  "crm_matched": 25,
+  "groups": [
+    {
+      "firma_key": "nakliye uluslararası",
+      "crm_customer_id": 3107,
+      "crm_customer_name": "Adnan Bilgin Bahar Uluslararası Nakliye Kavak",
+      "people": [
+        {
+          "name": "Adnan Bilgin Bahar Uluslararası Nakliye Kavak",
+          "phone": "0534 397 94 37",
+          "norm_phone": "905343979437",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ayhan Dayıoğlu Aday Uluslararası Nakliye Samsun",
+          "phone": "0507 747 99 27",
+          "norm_phone": "905077479927",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+          "phone": "0501 209 80 00",
+          "norm_phone": "905012098000",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ahmet Altun Can Bey Uluslararası Nakliye Tekkeköy",
+          "phone": "0554 919 29 99",
+          "norm_phone": "905549192999",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ali Balaç Balaç Uluslararası Nakliye Samsun",
+          "phone": "0530 781 77 38",
+          "norm_phone": "905307817738",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ali Balaç Uluslararası Nakliye Alaçam",
+          "phone": "0545 304 02 39",
+          "norm_phone": "905453040239",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Eyüp Erdinli Selam Uluslararası Nakliye Bafra",
+          "phone": "0505 829 98 95",
+          "norm_phone": "905058299895",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "cem petrol",
+      "crm_customer_id": 3162,
+      "crm_customer_name": "Cem Petrol Araç Kenan",
+      "people": [
+        {
+          "name": "Cem Petrol Araç Kenan",
+          "phone": "0545 762 61 67",
+          "norm_phone": "905457626167",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Cem Petrol Serhat Yıldız Yeğeni",
+          "phone": "0501 319 07 55",
+          "norm_phone": "905013190755",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Adana Cem Petrol Aracını Alan",
+          "phone": "0532 653 42 89",
+          "norm_phone": "905326534289",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Erkan Çamoğlu Cem Petrol",
+          "phone": "0542 202 43 20",
+          "norm_phone": "905422024320",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Şadi Cem Petrol",
+          "phone": "0546 661 99 55",
+          "norm_phone": "905466619955",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Nagihan Cem Petrol",
+          "phone": "0501 049 36 55",
+          "norm_phone": "905010493655",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "iveco otomotiv",
+      "crm_customer_id": 3158,
+      "crm_customer_name": "Burcu İveco Otomotiv L Belgesi Garanti",
+      "people": [
+        {
+          "name": "Burcu İveco Otomotiv L Belgesi Garanti",
+          "phone": "0533 954 99 31",
+          "norm_phone": "905339549931",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Damla İveco Otomotiv",
+          "phone": "0542 469 99 35",
+          "norm_phone": "905424699935",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Nehir İveco Otomotiv",
+          "phone": "0545 140 96 55",
+          "norm_phone": "905451409655",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Derya iveco otomotiv",
+          "phone": "0533 603 15 94",
+          "norm_phone": "905336031594",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "hakan nakliye",
+      "crm_customer_id": 3361,
+      "crm_customer_name": "Serkan Gür Hakan Nakliye Erfelek",
+      "people": [
+        {
+          "name": "Serkan Gür Hakan Nakliye Erfelek",
+          "phone": "0544 445 33 57",
+          "norm_phone": "905444453357",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Serkan Gür Hakan Nakliye Erfelek",
+          "phone": "0541 957 45 57",
+          "norm_phone": "905419574557",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Ramazan Gür Hakan Nakliye Erfelek",
+          "phone": "0530 117 95 57",
+          "norm_phone": "905301179557",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "bankası teb",
+      "crm_customer_id": 3371,
+      "crm_customer_name": "Şener Bey Teb Bankası",
+      "people": [
+        {
+          "name": "Şener Bey Teb Bankası",
+          "phone": "0536 862 78 66",
+          "norm_phone": "905368627866",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Seda Teb Bankası Atakumm",
+          "phone": "0506 872 05 43",
+          "norm_phone": "905068720543",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Bade Teb Bankası Merkez",
+          "phone": "0507 649 66 51",
+          "norm_phone": "905076496651",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "traktörcü vezirköprü",
+      "crm_customer_id": 3300,
+      "crm_customer_name": "Murat Kurt Kaya Nakliye Vezirköprü",
+      "people": [
+        {
+          "name": "Cengiz Vezirköprü Traktörcü",
+          "phone": "0544 464 37 46",
+          "norm_phone": "905444643746",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Vezirköprü Traktörcü",
+          "phone": "0542 330 65 32",
+          "norm_phone": "905423306532",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "yasin çalışkan vezirköprü traktörcü",
+          "phone": "0543 626 12 10",
+          "norm_phone": "905436261210",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "armutçuoğlu otomotiv",
+      "crm_customer_id": 3131,
+      "crm_customer_name": "Armutçuoğlu Otomotiv Satış Destek",
+      "people": [
+        {
+          "name": "Armutçuoğlu Otomotiv Satış Destek",
+          "phone": "0535 977 98 75",
+          "norm_phone": "905359779875",
+          "role": "Satış",
+          "org": ""
+        },
+        {
+          "name": "Armutçuoğlu Otomotiv",
+          "phone": "0530 073 99 83",
+          "norm_phone": "905300739983",
+          "role": null,
+          "org": "Armutçuoğlu Otomotiv"
+        }
+      ]
+    },
+    {
+      "firma_key": "nakliye taşımacılık özonat",
+      "crm_customer_id": 3132,
+      "crm_customer_name": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+      "people": [
+        {
+          "name": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+          "phone": "0362 228 48 34",
+          "norm_phone": "903622284834",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Arzu Ertürk Özonat Taşımacılık Nakliye Samsun",
+          "phone": "0506 866 85 04",
+          "norm_phone": "905068668504",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "bey mobilya",
+      "crm_customer_id": 3154,
+      "crm_customer_name": "Burak Bey Mobilya",
+      "people": [
+        {
+          "name": "Burak Bey Mobilya",
+          "phone": "0533 694 11 87",
+          "norm_phone": "905336941187",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Sami Bey Mobilya",
+          "phone": "0532 372 16 88",
+          "norm_phone": "905323721688",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "demirel musa",
+      "crm_customer_id": 3165,
+      "crm_customer_name": "Cihan Ulusu Musa Demirel Arabayı Tokat",
+      "people": [
+        {
+          "name": "Cihan Ulusu Musa Demirel Arabayı Tokat",
+          "phone": "0535 282 30 37",
+          "norm_phone": "905352823037",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Fatih Musa Demirel Yeni",
+          "phone": "0544 620 59 51",
+          "norm_phone": "905446205951",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "bey gıda",
+      "crm_customer_id": 3189,
+      "crm_customer_name": "Engin Bey Gıda",
+      "people": [
+        {
+          "name": "Engin Bey Gıda",
+          "phone": "0533 730 52 10",
+          "norm_phone": "905337305210",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Erdem Bey Gıda",
+          "phone": "0536 917 99 42",
+          "norm_phone": "905369179942",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "demirtaş fatih",
+      "crm_customer_id": 3206,
+      "crm_customer_name": "Fatih Demirtaş",
+      "people": [
+        {
+          "name": "Fatih Demirtaş",
+          "phone": "0538 356 55 55",
+          "norm_phone": "905383565555",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Fatih Demirtaş İş Telefonu",
+          "phone": "0542 696 08 06",
+          "norm_phone": "905426960806",
+          "role": null,
+          "org": "Fatih Demirtaş"
+        }
+      ]
+    },
+    {
+      "firma_key": "nakliye yakupoğlu",
+      "crm_customer_id": 3216,
+      "crm_customer_name": "Fikri Osma Yakupoğlu Nakliye Ondokuzmayıs",
+      "people": [
+        {
+          "name": "Fikri Osma Yakupoğlu Nakliye Ondokuzmayıs",
+          "phone": "0532 245 53 41",
+          "norm_phone": "905322455341",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Fikri Osma Yakupoğlu Nakliye Samsun",
+          "phone": "0541 245 53 41",
+          "norm_phone": "905412455341",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "hakan oto",
+      "crm_customer_id": 3223,
+      "crm_customer_name": "Hakan Oto Muhasebeci",
+      "people": [
+        {
+          "name": "Hakan Oto Muhasebeci",
+          "phone": "0506 053 53 43",
+          "norm_phone": "905060535343",
+          "role": "Muhasebe",
+          "org": ""
+        },
+        {
+          "name": "Hakan Oto",
+          "phone": "0532 224 12 91",
+          "norm_phone": "905322241291",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "hasan lojistik",
+      "crm_customer_id": 3239,
+      "crm_customer_name": "Hasan Lojistik",
+      "people": [
+        {
+          "name": "Hasan Lojistik",
+          "phone": "0542 735 05 32",
+          "norm_phone": "905427350532",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Hasan Lojistik Albayrak",
+          "phone": "0534 571 54 48",
+          "norm_phone": "905345715448",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "genç plastik",
+      "crm_customer_id": 3294,
+      "crm_customer_name": "muhasebe kadir 2 Genç Plastik",
+      "people": [
+        {
+          "name": "muhasebe kadir 2 Genç Plastik",
+          "phone": "0546 490 09 33",
+          "norm_phone": "905464900933",
+          "role": "Muhasebe",
+          "org": ""
+        },
+        {
+          "name": "Abdullah Abi Genç Plastik",
+          "phone": "0530 973 31 32",
+          "norm_phone": "905309733132",
+          "role": "Aile",
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "kaya nakliye",
+      "crm_customer_id": 3300,
+      "crm_customer_name": "Murat Kurt Kaya Nakliye Vezirköprü",
+      "people": [
+        {
+          "name": "Murat Kurt Kaya Nakliye Vezirköprü",
+          "phone": "0533 038 22 38",
+          "norm_phone": "905330382238",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Saim Kaya Nakliye Vezirköprü",
+          "phone": "0541 593 03 55",
+          "norm_phone": "905415930355",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "nakliyat yerli",
+      "crm_customer_id": 133,
+      "crm_customer_name": "YEM TAVUKÇULUK-NAKLİYAT TİCARET VE SANAYİ ANONİM ŞİRKETİ ERNUR TAVUKÇULUK KONUT-YAPI HİZMETLERİ TURİZM SANAYİ VE TİCARET ANONİM ŞİRKETİ",
+      "people": [
+        {
+          "name": "YERLİ NAKLİYAT",
+          "phone": "0530 173 19 85",
+          "norm_phone": "905301731985",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Selçuk Yerli Nakliyat Sinop",
+          "phone": "0506 810 57 31",
+          "norm_phone": "905068105731",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "olimpia oto",
+      "crm_customer_id": 3404,
+      "crm_customer_name": "Olimpia Oto Cam",
+      "people": [
+        {
+          "name": "Olimpia Oto Cam",
+          "phone": "0530 761 18 55",
+          "norm_phone": "905307611855",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Alperen Olimpia Oto Cam",
+          "phone": "0538 293 63 28",
+          "norm_phone": "905382936328",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "bankası garanti",
+      "crm_customer_id": 3409,
+      "crm_customer_name": "Hasan Garanti Bankası Aslan Abi",
+      "people": [
+        {
+          "name": "Hasan Garanti Bankası Aslan Abi",
+          "phone": "0532 505 20 05",
+          "norm_phone": "905325052005",
+          "role": "Aile",
+          "org": ""
+        },
+        {
+          "name": "Seda Garanti Bankası Tokat",
+          "phone": "0507 946 19 42",
+          "norm_phone": "905079461942",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "atılım inşaat",
+      "crm_customer_id": 489,
+      "crm_customer_name": "CİHAN İNŞAAT MALZEMELERİ SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
+      "people": [
+        {
+          "name": "Fatih Abi Atılım İnşaat",
+          "phone": "0543 468 61 55",
+          "norm_phone": "905434686155",
+          "role": "Aile",
+          "org": ""
+        },
+        {
+          "name": "Atılım İnşaat Malzemeleri Şoför Caner",
+          "phone": "0541 251 30 91",
+          "norm_phone": "905412513091",
+          "role": "Şoför",
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "lojistik tutan",
+      "crm_customer_id": 3426,
+      "crm_customer_name": "Hayri Tutan Lojistik Müdürü",
+      "people": [
+        {
+          "name": "Hayri Tutan Lojistik Müdürü",
+          "phone": "0536 340 87 66",
+          "norm_phone": "905363408766",
+          "role": "Müdür",
+          "org": ""
+        },
+        {
+          "name": "Hayri Tutan Lojistik Müdürü",
+          "phone": "0530 441 01 74",
+          "norm_phone": "905304410174",
+          "role": "Müdür",
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "ayan plastik",
+      "crm_customer_id": 3457,
+      "crm_customer_name": "Kübra Hanım Ayan Plastik",
+      "people": [
+        {
+          "name": "Kübra Hanım Ayan Plastik",
+          "phone": "0541 613 28 50",
+          "norm_phone": "905416132850",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Erdal Ayan Plastik",
+          "phone": "0533 613 28 48",
+          "norm_phone": "905336132848",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "seda yapı",
+      "crm_customer_id": 3463,
+      "crm_customer_name": "Seda Yapı Kredi Mass",
+      "people": [
+        {
+          "name": "Seda Yapı Kredi Mass",
+          "phone": "0531 834 01 55",
+          "norm_phone": "905318340155",
+          "role": null,
+          "org": ""
+        },
+        {
+          "name": "Seda Yapı Kredi",
+          "phone": "0545 365 81 55",
+          "norm_phone": "905453658155",
+          "role": null,
+          "org": ""
+        }
+      ]
+    },
+    {
+      "firma_key": "abi mobilyacı",
+      "crm_customer_id": 3558,
+      "crm_customer_name": "Adem Abi Mobilyacı Çarşamba 12m3",
+      "people": [
+        {
+          "name": "Adem Abi Mobilyacı Çarşamba 12m3",
+          "phone": "0543 796 10 05",
+          "norm_phone": "905437961005",
+          "role": "Aile",
+          "org": ""
+        },
+        {
+          "name": "Oktay Abi Mobilyacı",
+          "phone": "0534 796 74 96",
+          "norm_phone": "905347967496",
+          "role": "Aile",
+          "org": ""
+        }
+      ]
+    }
+  ]
+}
