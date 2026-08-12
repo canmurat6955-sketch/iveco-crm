@@ -24,6 +24,13 @@ export default function CardScanner() {
   const [address, setAddress] = useState('');
   const [allCrmCustomers, setAllCrmCustomers] = useState([]);
   
+  // Konum Ayrıştırma State'leri
+  const [locationMode, setLocationMode] = useState('gps');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [resolvedCity, setResolvedCity] = useState('Samsun');
+  const [resolvedDistrict, setResolvedDistrict] = useState('Tekkeköy');
+  
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const navigate = useNavigate();
@@ -64,10 +71,100 @@ export default function CardScanner() {
       setAddress(data.address || '');
       
       toast.success("Kartvizit başarıyla tarandı! Lütfen bilgileri kontrol edin.", { id: 'ocr_load' });
+
+      // Otomatik konum bulmayı tetikle
+      if (locationMode === 'gps') {
+        setTimeout(() => { fetchGpsCoordinates(); }, 500);
+      } else if (data.address) {
+        setTimeout(() => { fetchLocationFromAddressDirect(data.address); }, 500);
+      }
     } catch (err) {
-      toast.error("Tarama sırasında bir hata oluştu.", { id: 'ocr_load' });
+      toast.error(err.response?.data?.detail || "Tarama sırasında bir hata oluştu.", { id: 'ocr_load' });
     } finally {
       setScanning(false);
+    }
+  };
+
+  const fetchGpsCoordinates = () => {
+    if (!navigator.geolocation) {
+      toast.error("Cihazınız konum servisini desteklemiyor.");
+      return;
+    }
+    toast.loading("GPS konumunuz alınıyor...", { id: 'gps_load' });
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+        toast.success("GPS Konumu alındı! 📍", { id: 'gps_load' });
+
+        // Şehir ve ilçeyi otomatik doldurmak için reverse geocoding yap
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+            headers: { 'Accept-Language': 'tr' }
+          });
+          const data = await response.json();
+          if (data && data.address) {
+            const addr = data.address;
+            const detectedCity = addr.province || addr.city || '';
+            const detectedDistrict = addr.suburb || addr.town || addr.district || addr.borough || '';
+            setResolvedCity(detectedCity.replace(' İl', '').replace(' İli', '').trim() || 'Samsun');
+            setResolvedDistrict(detectedDistrict.trim() || 'Tekkeköy');
+            toast.success(`Konum çözümlendi: ${detectedCity} / ${detectedDistrict}`);
+          }
+        } catch (err) {
+          console.warn("Geocoding error:", err);
+        }
+      },
+      (error) => {
+        toast.error("GPS konumu alınamadı. Lütfen izinlerinizi kontrol edin.", { id: 'gps_load' });
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
+  const fetchLocationFromAddress = async () => {
+    if (!address.trim()) {
+      toast.error("Adres alanı boş olduğu için konum aranamıyor.");
+      return;
+    }
+    toast.loading("Adresten koordinat aranıyor...", { id: 'addr_load' });
+    await fetchLocationFromAddressDirect(address);
+  };
+
+  const fetchLocationFromAddressDirect = async (addrText) => {
+    const query = addrText || address;
+    if (!query.trim()) return;
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+        headers: { 'Accept-Language': 'tr' }
+      });
+      const results = await response.json();
+      if (results && results.length > 0) {
+        const res = results[0];
+        setLatitude(res.lat);
+        setLongitude(res.lon);
+        toast.success("Adres koordinatları bulundu! 🗺️", { id: 'addr_load' });
+        
+        // Reverse geocoding yaparak şehir ve ilçeyi daha net alalım
+        const revResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${res.lat}&lon=${res.lon}&zoom=18&addressdetails=1`, {
+          headers: { 'Accept-Language': 'tr' }
+        });
+        const revData = await revResponse.json();
+        if (revData && revData.address) {
+          const addr = revData.address;
+          const detectedCity = addr.province || addr.city || '';
+          const detectedDistrict = addr.suburb || addr.town || addr.district || addr.borough || '';
+          setResolvedCity(detectedCity.replace(' İl', '').replace(' İli', '').trim() || 'Samsun');
+          setResolvedDistrict(detectedDistrict.trim() || 'Tekkeköy');
+        }
+      } else {
+        if (addrText) {
+          toast.error("Adresten koordinat çözümlenemedi. Lütfen adresi netleştirin.", { id: 'addr_load' });
+        }
+      }
+    } catch (err) {
+      console.warn("Direct address search failed:", err);
     }
   };
 
@@ -91,13 +188,15 @@ export default function CardScanner() {
         phone: phone || null,
         email: email || null,
         address: address || null,
-        city: "Samsun", // Varsayılan şehir
-        district: "Tekkeköy",
+        city: resolvedCity || "Samsun",
+        district: resolvedDistrict || "Tekkeköy",
         segment: "B", // Varsayılan segment
         potential_level: "high", // Varsayılan potansiyel
         potential_score: 65,
-        sales_notes: "Kartvizit tarayıcı ile otomatik eklendi.",
-        pipeline_stage: "lead"
+        sales_notes: `Kartvizit tarayıcı ile otomatik eklendi. Konum Kaynağı: ${locationMode === 'gps' ? 'GPS Uydusu' : 'Adres Çözümleme'}`,
+        pipeline_stage: "lead",
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null
       });
 
       const customerId = customerRes.data.id;
@@ -254,7 +353,66 @@ export default function CardScanner() {
               <textarea className="form-textarea" rows={2} value={address} onChange={e => setAddress(e.target.value)} />
             </div>
 
-            <div className="flex gap-2 mt-4">
+            {/* Konum Tipi Seçimi */}
+            <div style={{ background: 'rgba(99, 102, 241, 0.03)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', margin: '5px 0 10px' }}>
+              <label className="form-label" style={{ fontWeight: '700', marginBottom: 8, display: 'block', fontSize: '0.85rem' }}>📍 Müşteri Konum Girişi</label>
+              <div className="flex gap-2 mb-3">
+                <button 
+                  type="button" 
+                  className={`btn w-full btn-sm ${locationMode === 'gps' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => setLocationMode('gps')}
+                  style={{ fontSize: '0.75rem', height: 32, padding: '0 6px', fontWeight: 'bold' }}
+                >
+                  Şu An Müşterinin Yanındayım (GPS)
+                </button>
+                <button 
+                  type="button" 
+                  className={`btn w-full btn-sm ${locationMode === 'address' ? 'btn-primary' : 'btn-secondary'}`}
+                  onClick={() => setLocationMode('address')}
+                  style={{ fontSize: '0.75rem', height: 32, padding: '0 6px', fontWeight: 'bold' }}
+                >
+                  Ofisteyim (Adresten Konum Çek)
+                </button>
+              </div>
+              
+              {locationMode === 'gps' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <button 
+                    type="button"
+                    className="btn btn-secondary btn-sm flex items-center justify-center gap-1 w-full"
+                    onClick={fetchGpsCoordinates}
+                    style={{ background: 'rgba(52, 211, 153, 0.12)', color: '#34d399', borderColor: 'rgba(52, 211, 153, 0.25)', height: 32, fontSize: '0.8rem', fontWeight: 'bold' }}
+                  >
+                    📍 Şu Anki Konumumu GPS ile Al
+                  </button>
+                  {latitude && longitude && (
+                    <div style={{ fontSize: 10, color: '#34d399', textAlign: 'center', fontWeight: 'bold' }}>
+                      Enlem: {parseFloat(latitude).toFixed(6)} | Boylam: {parseFloat(longitude).toFixed(6)} ({resolvedCity} / {resolvedDistrict})
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {locationMode === 'address' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <button 
+                    type="button"
+                    className="btn btn-secondary btn-sm flex items-center justify-center gap-1 w-full"
+                    onClick={fetchLocationFromAddress}
+                    style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.25)', height: 32, fontSize: '0.8rem', fontWeight: 'bold' }}
+                  >
+                    🔍 Yazdığım Adresten Konum Bul
+                  </button>
+                  {latitude && longitude && (
+                    <div style={{ fontSize: 10, color: '#60a5fa', textAlign: 'center', fontWeight: 'bold' }}>
+                      Bulunan Koordinat: {parseFloat(latitude).toFixed(6)} | {parseFloat(longitude).toFixed(6)} ({resolvedCity} / {resolvedDistrict})
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2 mt-2">
               <button type="button" className="btn btn-secondary w-full" onClick={() => setResult(null)}>
                 İptal Et
               </button>
