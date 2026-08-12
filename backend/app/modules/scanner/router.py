@@ -372,8 +372,20 @@ async def scan_card(
                     responses = data.get("responses", [])
                     if responses and "fullTextAnnotation" in responses[0]:
                         ocr_text = responses[0]["fullTextAnnotation"]["text"]
+                elif r.status_code == 403:
+                    err_data = r.json()
+                    err_msg = err_data.get("error", {}).get("message", "")
+                    if "blocked" in err_msg.lower() or "API_KEY_SERVICE_BLOCKED" in str(err_data):
+                        raise HTTPException(
+                            status_code=400,
+                            detail="Google Cloud Vision API anahtarınız için engellenmiş. Lütfen Google Cloud Console'dan anahtarınızın kısıtlamalarına 'Cloud Vision API'yi ekleyin."
+                        )
+                    else:
+                        raise HTTPException(status_code=400, detail=f"Google API Yetki Hatası: {err_msg}")
+        except HTTPException:
+            raise
         except Exception as e:
-            print("Google Vision OCR Hatası (Mock Veriye Düşülüyor):", str(e))
+            print("Google Vision OCR Hatası:", str(e))
             
     # Eğer OCR başarılı olduysa metni akıllıca ayrıştır
     if ocr_text.strip():
