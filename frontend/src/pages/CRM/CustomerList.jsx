@@ -18,7 +18,11 @@ export default function CustomerList() {
   const [deleting, setDeleting] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
   const [merging, setMerging] = useState(false);
-  const [form, setForm] = useState({ company_name: '', city: '', district: '', phone: '', email: '', sector: '', segment: 'C', potential_level: 'medium' });
+  const [form, setForm] = useState({ 
+    company_name: '', city: '', district: '', phone: '', email: '', 
+    sector: '', segment: 'C', potential_level: 'medium',
+    latitude: '', longitude: '' 
+  });
   const navigate = useNavigate();
 
   const load = () => {
@@ -80,14 +84,72 @@ export default function CustomerList() {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await crmApi.createCustomer(form);
+      const submitData = {
+        ...form,
+        latitude: form.latitude ? parseFloat(form.latitude) : null,
+        longitude: form.longitude ? parseFloat(form.longitude) : null
+      };
+      await crmApi.createCustomer(submitData);
       toast.success('Müşteri eklendi');
       setShowAdd(false);
-      setForm({ company_name: '', city: '', district: '', phone: '', email: '', sector: '', segment: 'C', potential_level: 'medium' });
+      setForm({ 
+        company_name: '', city: '', district: '', phone: '', email: '', 
+        sector: '', segment: 'C', potential_level: 'medium',
+        latitude: '', longitude: '' 
+      });
       load();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Hata oluştu');
     }
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Cihazınız konum servisini desteklemiyor.");
+      return;
+    }
+
+    toast.loading("Uydudan GPS konumunuz alınıyor...", { id: 'gps_load' });
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        setForm(prev => ({
+          ...prev,
+          latitude: latitude.toString(),
+          longitude: longitude.toString()
+        }));
+
+        toast.success("Konum alındı! 📍", { id: 'gps_load' });
+
+        // Adres, şehir ve ilçeyi otomatik doldurmak için reverse geocoding yap
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`, {
+            headers: { 'Accept-Language': 'tr' }
+          });
+          const data = await response.json();
+          if (data && data.address) {
+            const addr = data.address;
+            const detectedCity = addr.province || addr.city || '';
+            const detectedDistrict = addr.suburb || addr.town || addr.district || addr.borough || '';
+            
+            setForm(prev => ({
+              ...prev,
+              city: detectedCity.replace(' İl', '').replace(' İli', '').trim(),
+              district: detectedDistrict.trim(),
+              sales_notes: (prev.sales_notes || '') + `\n[Müşteri Ziyareti GPS Konumu]: ${data.display_name}`
+            }));
+            toast.success(`Konum çözümlendi: ${detectedCity} / ${detectedDistrict}`);
+          }
+        } catch (err) {
+          console.warn("Konum çözümlenemedi:", err);
+        }
+      },
+      (error) => {
+        toast.error("Konum alınamadı. İzinlerinizi ve GPS'inizi kontrol edin.", { id: 'gps_load' });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const handleMerge = async (primaryId) => {
@@ -273,6 +335,27 @@ export default function CustomerList() {
                   <label className="form-label">İlçe</label>
                   <input className="form-input" value={form.district} onChange={e => setForm({ ...form, district: e.target.value })} />
                 </div>
+              </div>
+              
+              {/* GPS Konum Butonu ve Koordinatlar */}
+              <div style={{ marginBottom: 15, background: 'rgba(99, 102, 241, 0.04)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary w-full flex items-center justify-center gap-2" 
+                  onClick={handleGetLocation}
+                  style={{ background: 'rgba(59, 130, 246, 0.12)', borderColor: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', fontWeight: 'bold', height: 38 }}
+                >
+                  📍 Bulunduğum Noktayı Al (GPS Konumu)
+                </button>
+                {form.latitude && form.longitude ? (
+                  <div style={{ fontSize: 11, color: '#34d399', marginTop: 8, textAlign: 'center', fontWeight: '600' }}>
+                    Konum Kaydedildi: Enlem: {parseFloat(form.latitude).toFixed(6)} | Boylam: {parseFloat(form.longitude).toFixed(6)}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 8, textAlign: 'center' }}>
+                    * Müşterinin yanındayken bu butona basarak GPS koordinatlarını otomatik kaydedebilirsiniz.
+                  </div>
+                )}
               </div>
               <div className="form-row">
                 <div className="form-group">
