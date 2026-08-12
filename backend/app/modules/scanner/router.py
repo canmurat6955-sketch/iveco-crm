@@ -337,11 +337,147 @@ async def scan_card(
     file: UploadFile = File(...),
     current_user=Depends(get_current_user),
 ):
-    """Kartvizit resmini AI OCR kullanarak tarar ve bilgileri ayrıştırır (Fallback Mock Desteği ile)."""
-    # Dosya okuma simülasyonu
-    await file.read()
+    """Kartvizit resmini Google Cloud Vision OCR kullanarak tarar ve bilgileri ayrıştırır. Anahtar yoksa veya hata çıkarsa mock veriye düşer."""
+    import base64
+    import re
+    import random
+    import httpx
+
+    contents = await file.read()
     
-    # Gerçekçi mock Türkçe kartvizit listesi
+    # API Anahtarını al
+    api_key = settings.GOOGLE_MAPS_API_KEY
+    ocr_text = ""
+    
+    if api_key and api_key != "MOCK_GOOGLE_MAPS_API_KEY":
+        try:
+            # Görseli base64'e çevir
+            base64_image = base64.b64encode(contents).decode("utf-8")
+            
+            # Google Vision API endpoint'i (Aynı Google Maps API Key ile kullanılabilir)
+            url = f"https://vision.googleapis.com/v1/images:annotate?key={api_key}"
+            payload = {
+                "requests": [
+                    {
+                        "image": {"content": base64_image},
+                        "features": [{"type": "TEXT_DETECTION"}]
+                    }
+                ]
+            }
+            
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                r = await client.post(url, json=payload)
+                if r.status_code == 200:
+                    data = r.json()
+                    responses = data.get("responses", [])
+                    if responses and "fullTextAnnotation" in responses[0]:
+                        ocr_text = responses[0]["fullTextAnnotation"]["text"]
+        except Exception as e:
+            print("Google Vision OCR Hatası (Mock Veriye Düşülüyor):", str(e))
+            
+    # Eğer OCR başarılı olduysa metni akıllıca ayrıştır
+    if ocr_text.strip():
+        lines = [line.strip() for line in ocr_text.split("\n") if line.strip()]
+        
+        email = None
+        website = None
+        phone = None
+        company_name = None
+        contact_name = None
+        role = None
+        
+        # 1. E-posta ayıkla
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', ocr_text)
+        if email_match:
+            email = email_match.group(0)
+            
+        # 2. Web sitesi ayıkla
+        web_match = re.search(r'(https?://)?(www\.)?[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}', ocr_text)
+        if web_match:
+            candidate = web_match.group(0)
+            if "@" not in candidate:
+                website = candidate
+                
+        if not website and email:
+            domain = email.split("@")[1]
+            if domain not in ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "mail.com", "yandex.ru", "yandex.com", "mail.ru"]:
+                website = f"www.{domain}"
+
+        # 3. Telefon numarası ayıkla (Türk cep veya sabit hat)
+        phone_matches = re.findall(r'(?:\+90|0)?\s?[5][0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}', ocr_text)
+        if phone_matches:
+            phone = phone_matches[0]
+        else:
+            phone_matches = re.findall(r'\b(?:\+90|0)?[2-9][0-9]{2}\s?[0-9]{3}\s?[0-9]{4}\b', ocr_text)
+            if phone_matches:
+                phone = phone_matches[0]
+
+        # 4. Firma, İsim ve Rol ayıklama kuralları
+        business_keywords = ["lojistik", "nakliyat", "nakliye", "insaat", "yapi", "tasimacilik", "ltd", "sti", "a.s.", "sanayi", "ticaret", "petrol", "akaryakit", "otomotiv", "servis"]
+        role_keywords = ["mudur", "sorumlu", "temsilci", "yonetici", "kurucu", "ceo", "muhendis", "danisman", "baskan", "manager", "sefi"]
+        
+        def clean_for_match(s: str) -> str:
+            s = s.lower()
+            replacements = {"ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c"}
+            for k, v in replacements.items():
+                s = s.replace(k, v)
+            return s
+
+        potential_roles = []
+        potential_companies = []
+        potential_names = []
+        
+        for line in lines:
+            cleaned = clean_for_match(line)
+            if email and email in line:
+                continue
+            if website and website in line:
+                continue
+            if phone and "".join(filter(str.isdigit, phone)) in "".join(filter(str.isdigit, line)):
+                continue
+            if any(w in cleaned for w in ["tel:", "tel.", "gsm:", "e-mail", "email", "web:", "fax:", "faks:"]):
+                continue
+                
+            if any(w in cleaned for w in role_keywords):
+                potential_roles.append(line)
+                continue
+                
+            if any(w in cleaned for w in business_keywords):
+                potential_companies.append(line)
+                continue
+                
+            words = line.split()
+            if 2 <= len(words) <= 3 and all(w.isalpha() for w in words):
+                potential_names.append(line)
+
+        if potential_names:
+            contact_name = potential_names[0]
+        elif lines:
+            contact_name = lines[0]
+
+        if potential_roles:
+            role = potential_roles[0]
+
+        if potential_companies:
+            company_name = potential_companies[0]
+        elif len(lines) > 1:
+            company_name = lines[1]
+            
+        # Adres olarak en uzun mantıklı satırı seç
+        longest_lines = [l for l in lines if len(l) > 15 and not any(x in l for x in [email or "@@@", website or "www.", phone or "0000"])]
+        address = longest_lines[0] if longest_lines else (", ".join(lines[:3]) if lines else "")
+
+        return CardScanResponse(
+            contact_name=contact_name or "Müşteri Yetkilisi",
+            role=role or "Yetkili",
+            phone=phone or "",
+            email=email or "",
+            company_name=company_name or "Yeni Firma Ltd. Şti.",
+            address=address or "",
+            website=website or ""
+        )
+
+    # 5. Fallback Mock Desteği
     mock_cards = [
         {
             "contact_name": "Mustafa Öztürk",
@@ -371,13 +507,7 @@ async def scan_card(
             "website": "demirinsaat.com"
         }
     ]
-    
-    import random
     selected = random.choice(mock_cards)
-    
-    import asyncio
-    await asyncio.sleep(1.0)
-    
     return CardScanResponse(**selected)
 
 
