@@ -342,6 +342,7 @@ async def scan_card(
     import re
     import random
     import httpx
+    import unicodedata
 
     contents = await file.read()
     
@@ -403,16 +404,23 @@ async def scan_card(
         if email_match:
             email = email_match.group(0)
             
-        # 2. Web sitesi ayıkla
-        web_match = re.search(r'(https?://)?(www\.)?[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}', ocr_text)
+        # 2. Web sitesi ayıkla (Email adresini metinden çıkararak yanlış eşleşmeleri önle)
+        text_for_web = ocr_text
+        if email:
+            text_for_web = ocr_text.replace(email, "")
+
+        web_match = re.search(r'(https?://)?(www\.)?[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}', text_for_web)
         if web_match:
-            candidate = web_match.group(0)
-            if "@" not in candidate:
-                website = candidate
+            candidate = web_match.group(0).strip()
+            if "." in candidate and not candidate.startswith(".") and not candidate.endswith("."):
+                has_prefix = "www." in candidate or "http" in candidate
+                has_tld = any(candidate.endswith(tld) for tld in [".com", ".net", ".org", ".com.tr", ".tr", ".co", ".info", ".biz"])
+                if has_prefix or has_tld:
+                    website = candidate
                 
         if not website and email:
             domain = email.split("@")[1]
-            if domain not in ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "mail.com", "yandex.ru", "yandex.com", "mail.ru"]:
+            if domain not in ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "mail.com", "yandex.ru", "yandex.com", "mail.ru", "mynet.com"]:
                 website = f"www.{domain}"
 
         # 3. Telefon numarası ayıkla (Türk cep veya sabit hat)
@@ -425,59 +433,250 @@ async def scan_card(
                 phone = phone_matches[0]
 
         # 4. Firma, İsim ve Rol ayıklama kuralları
-        business_keywords = ["lojistik", "nakliyat", "nakliye", "insaat", "yapi", "tasimacilik", "ltd", "sti", "a.s.", "sanayi", "ticaret", "petrol", "akaryakit", "otomotiv", "servis"]
-        role_keywords = ["mudur", "sorumlu", "temsilci", "yonetici", "kurucu", "ceo", "muhendis", "danisman", "baskan", "manager", "sefi"]
-        
         def clean_for_match(s: str) -> str:
-            s = s.lower()
-            replacements = {"ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c"}
-            for k, v in replacements.items():
-                s = s.replace(k, v)
-            return s
+            s = unicodedata.normalize("NFD", s)
+            mappings = {
+                "Ç": "c", "ç": "c",
+                "Ğ": "g", "ğ": "g",
+                "İ": "i", "ı": "i", "I": "i", "i": "i",
+                "Ö": "o", "ö": "o",
+                "Ş": "s", "ş": "s",
+                "Ü": "u", "ü": "u"
+            }
+            res_chars = []
+            for char in s:
+                if unicodedata.combining(char):
+                    continue
+                char_lower = char.lower()
+                if char in mappings:
+                    res_chars.append(mappings[char])
+                elif char_lower in mappings:
+                    res_chars.append(mappings[char_lower])
+                else:
+                    res_chars.append(char_lower)
+            return "".join(res_chars).strip()
 
-        potential_roles = []
-        potential_companies = []
-        potential_names = []
-        
-        for line in lines:
-            cleaned = clean_for_match(line)
-            if email and email in line:
-                continue
-            if website and website in line:
-                continue
-            if phone and "".join(filter(str.isdigit, phone)) in "".join(filter(str.isdigit, line)):
-                continue
-            if any(w in cleaned for w in ["tel:", "tel.", "gsm:", "e-mail", "email", "web:", "fax:", "faks:"]):
-                continue
-                
-            if any(w in cleaned for w in role_keywords):
-                potential_roles.append(line)
-                continue
-                
-            if any(w in cleaned for w in business_keywords):
-                potential_companies.append(line)
-                continue
-                
-            words = line.split()
-            if 2 <= len(words) <= 3 and all(w.isalpha() for w in words):
-                potential_names.append(line)
-
-        if potential_names:
-            contact_name = potential_names[0]
-        elif lines:
-            contact_name = lines[0]
-
-        if potential_roles:
-            role = potential_roles[0]
-
-        if potential_companies:
-            company_name = potential_companies[0]
-        elif len(lines) > 1:
-            company_name = lines[1]
+        def is_address_line(line_str: str) -> bool:
+            line_lower = clean_for_match(line_str)
+            address_keywords = [
+                "mah", "mahallesi", "cad", "caddesi", "sok", "sokak", "sk", "bulvar", "blv", "blvd",
+                "organize sanayi", "osb", "sitesi", "is merkezi", "plaza", "kooperatif", "koy", "koyu",
+                "ilce", "kat:", "no:", "no.", "apt", "apartman", "karayolu", "otoyol", "yolu", "kume evleri",
+                "organize san", "san. sit", "san.sit", "sehir", "sanayi sit"
+            ]
             
-        # Adres olarak en uzun mantıklı satırı seç
-        longest_lines = [l for l in lines if len(l) > 15 and not any(x in l for x in [email or "@@@", website or "www.", phone or "0000"])]
-        address = longest_lines[0] if longest_lines else (", ".join(lines[:3]) if lines else "")
+            if re.search(r'\b\d{5}\b', line_lower):
+                return True
+            
+            if re.search(r'\bno\s*:\s*\d+', line_lower) or re.search(r'\b\d+/\d+\b', line_lower) or re.search(r'\bno\s*\d+\b', line_lower):
+                return True
+                
+            local_places = ["samsun", "ordu", "corum", "tokat", "amasya", "sinop", "tekkekoy", "altinordu", "merkez", "ilcesi"]
+            for lp in local_places:
+                if lp in line_lower and ("/" in line_lower or "," in line_lower):
+                    return True
+
+            for kw in address_keywords:
+                if kw in ["sk", "mah", "cad", "sok", "blv", "osb"]:
+                    if re.search(r'\b' + re.escape(kw) + r'\.?(?:\b|\d)', line_lower):
+                        return True
+                else:
+                    if kw in line_lower:
+                        return True
+            return False
+
+        def is_role_line(line_str: str) -> bool:
+            line_lower = clean_for_match(line_str)
+            role_keywords = [
+                "mudur", "yonetici", "sef", "sorumlu", "temsilci", "kurucu", "ceo", "muhendis", 
+                "danisman", "baskan", "uzman", "founder", "manager", "director", "coordinator", 
+                "koordinator", "muhasebe", "pazarlama", "satis", "operasyon", "insan kaynaklari", 
+                "satinalma", "satin alma", "yetkili", "amir", "amiri", "memur", "memuru", "danismani"
+            ]
+            for r_kw in role_keywords:
+                if r_kw in line_lower:
+                    return True
+            return False
+
+        def is_company_line(line_str: str, is_addr: bool) -> bool:
+            if is_addr:
+                return False
+            line_lower = clean_for_match(line_str)
+            company_suffixes = [
+                "a.s.", "as.", "ltd", "sti", "sirketi", "holding", "grup", "grubu", "as"
+            ]
+            for suff in company_suffixes:
+                if re.search(r'\b' + re.escape(suff) + r'\b', line_lower) or line_lower.endswith(suff):
+                    return True
+            
+            sector_keywords = [
+                "otomotiv", "lojistik", "nakliyat", "nakliye", "tasimacilik", "insaat", "yapi", 
+                "petrol", "akaryakit", "servis", "gida", "tarim", "metal", "demir", "celik", 
+                "cimento", "beton", "pazarlama", "tekstil", "turizm", "kimya", "maden", "enerji", 
+                "makine", "elektrik", "elektronik", "muhendislik", "mimarlik", "iletisim", "bilisim", 
+                "yazilim", "teknoloji", "hizmet", "hizmetleri", "ticaret", "sanayi", "san", "tic", 
+                "ithalat", "ihracat", "kargo", "kurye", "dagitim", "hafriyat", "tasima", "uretim", "imalat"
+            ]
+            for sk in sector_keywords:
+                if re.search(r'\b' + re.escape(sk) + r'\b', line_lower):
+                    if len(line_str.split()) >= 2:
+                        return True
+            return False
+
+        def is_contact_name_line(line_str: str, is_addr: bool, is_role: bool, is_comp: bool) -> bool:
+            if is_addr or is_role or is_comp:
+                return False
+            line_lower = clean_for_match(line_str)
+            if any(x in line_lower for x in ["@", "www.", ".com", "tel:", "gsm:", "fax:", "phone:", "web:"]):
+                return False
+            words = line_str.split()
+            if not (2 <= len(words) <= 4):
+                return False
+            
+            for w in words:
+                w_clean = w.rstrip(".,;:").lstrip(".,;:")
+                if not w_clean:
+                    continue
+                if not re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w_clean):
+                    return False
+            
+            is_title_case = all(w[0].isupper() for w in words if w and w[0].isalpha())
+            is_upper_case = line_str.isupper()
+            if not (is_title_case or is_upper_case):
+                return False
+                
+            return True
+
+        processed_lines = []
+        for line in lines:
+            cleaned_line = re.sub(r'(?i)^(?:tel|gsm|phone|fax|faks|e-mail|email|web|website|adres|address|yer|konum|w|t|f|e|m|p)\s*[:\.-]\s*', '', line).strip()
+            if not cleaned_line:
+                continue
+            
+            if email and email.lower() in cleaned_line.lower():
+                continue
+            if website and website.lower() in cleaned_line.lower():
+                continue
+            digits_only = "".join(filter(str.isdigit, cleaned_line))
+            if phone and len(digits_only) >= 7 and digits_only in "".join(filter(str.isdigit, phone)):
+                continue
+            
+            processed_lines.append(cleaned_line)
+
+        address_lines = []
+        role_lines = []
+        company_lines = []
+        name_lines = []
+        unclassified_lines = []
+
+        company_candidates = []
+        for idx, line in enumerate(processed_lines):
+            is_addr = is_address_line(line)
+            is_comp = is_company_line(line, is_addr)
+            if is_comp:
+                if idx > 0:
+                    prev_line = processed_lines[idx - 1]
+                    prev_is_addr = is_address_line(prev_line)
+                    prev_is_role = is_role_line(prev_line)
+                    prev_is_comp = is_company_line(prev_line, prev_is_addr)
+                    prev_is_name = is_contact_name_line(prev_line, prev_is_addr, prev_is_role, prev_is_comp)
+                    
+                    if not (prev_is_addr or prev_is_role or prev_is_name or prev_is_comp):
+                        company_candidates.append(f"{prev_line} {line}")
+                        continue
+                company_candidates.append(line)
+
+        for line in processed_lines:
+            is_addr = is_address_line(line)
+            is_role = is_role_line(line)
+            is_comp = is_company_line(line, is_addr) or any(line in cc for cc in company_candidates)
+            is_name = is_contact_name_line(line, is_addr, is_role, is_comp)
+            
+            if is_addr:
+                address_lines.append(line)
+            elif is_role:
+                role_lines.append(line)
+            elif is_comp:
+                company_lines.append(line)
+            elif is_name:
+                name_lines.append(line)
+            else:
+                unclassified_lines.append(line)
+
+        # Resolve Contact Name
+        if name_lines:
+            contact_name = name_lines[0]
+        else:
+            candidate_name = None
+            for u_line in unclassified_lines:
+                words = u_line.split()
+                if 2 <= len(words) <= 3 and all(re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w.rstrip(".,;:")) for w in words):
+                    candidate_name = u_line
+                    break
+            if candidate_name:
+                contact_name = candidate_name
+                if candidate_name in unclassified_lines:
+                    unclassified_lines.remove(candidate_name)
+            elif processed_lines:
+                first_line = processed_lines[0]
+                if first_line not in address_lines and first_line not in role_lines and first_line not in company_lines:
+                    contact_name = first_line
+
+        # Resolve Email Domain for Company Check
+        email_domain_name = None
+        if email:
+            parts = email.split("@")
+            if len(parts) > 1:
+                dom = parts[1].split(".")[0].lower()
+                if dom not in ["gmail", "hotmail", "yahoo", "outlook", "mail", "yandex", "mynet", "live"]:
+                    email_domain_name = dom
+
+        # Resolve Company Name
+        if company_candidates:
+            company_name = company_candidates[0]
+        elif company_lines:
+            company_name = company_lines[0]
+        elif email_domain_name:
+            dom_candidate = None
+            for line in processed_lines:
+                if line == contact_name or line in address_lines or line in role_lines:
+                    continue
+                line_norm = clean_for_match(line)
+                if email_domain_name in line_norm:
+                    dom_candidate = line
+                    break
+            if dom_candidate:
+                company_name = dom_candidate
+        
+        if not company_name:
+            candidates = [l for l in processed_lines if l != contact_name and l not in address_lines and l not in role_lines]
+            if candidates:
+                company_name = candidates[0]
+            else:
+                if email_domain_name:
+                    company_name = email_domain_name.capitalize() + " Ltd. Şti."
+                else:
+                    company_name = "Yeni Firma Ltd. Şti."
+
+        # Resolve Role
+        if role_lines:
+            role = role_lines[0]
+
+        # Resolve Address
+        if address_lines:
+            ordered_addr = [l for l in processed_lines if l in address_lines]
+            address = ", ".join(ordered_addr)
+        else:
+            longest_candidate = None
+            max_len = 0
+            for line in unclassified_lines:
+                if line != contact_name and line != company_name and len(line) > max_len:
+                    longest_candidate = line
+                    max_len = len(line)
+            if longest_candidate and max_len > 12:
+                address = longest_candidate
+            else:
+                address = ""
 
         return CardScanResponse(
             contact_name=contact_name or "Müşteri Yetkilisi",

@@ -24,7 +24,9 @@ api.interceptors.response.use(
     
     // Sadece veri değiştirici istekler (POST, PUT, DELETE) ve Ağ hataları / Çevrimdışı modda çalış
     const isMutation = ['post', 'put', 'delete'].includes(config?.method?.toLowerCase());
-    const isNetworkError = !error.response || error.code === 'ERR_NETWORK';
+    const isNetworkError = !error.response || 
+                           error.code === 'ERR_NETWORK' || 
+                           [502, 503, 504].includes(error.response?.status);
     
     if (isMutation && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
       let description = "Veri Değişikliği";
