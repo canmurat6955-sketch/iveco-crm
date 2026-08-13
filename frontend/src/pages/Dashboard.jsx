@@ -71,7 +71,10 @@ export default function Dashboard() {
 
   // ── MOBILE DASHBOARD (Saha Satış Arayüzü) ──────────────────────────
   if (isMobile) {
-    const firstName = user?.full_name?.split(' ')[0] || 'Satışçı';
+    let firstName = user?.full_name?.split(' ')[0] || 'Satışçı';
+    if (firstName === 'Satış' || firstName === 'Satis') {
+      firstName = 'King';
+    }
     
     return (
       <div className="mobile-dashboard animate-in">

@@ -93,7 +93,7 @@ def _seed_initial_data():
             sales_rep = User(
                 email="satis@iveco-crm.local",
                 hashed_password=get_password_hash("satis123"),
-                full_name="Satış Temsilcisi",
+                full_name="King Temsilcisi",
                 role="sales_rep",
             )
             db.add_all([admin, sales_rep])

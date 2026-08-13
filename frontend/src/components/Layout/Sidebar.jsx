@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
 import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass } from 'react-icons/fi';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -20,6 +21,14 @@ export default function Sidebar() {
   }, []);
 
   const isActive = (path) => location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+  
+  const { user } = useAuth();
+  let userName = user?.full_name || 'Sistem Yöneticisi';
+  if (userName.startsWith('Satış') || userName.startsWith('Satis')) {
+    userName = 'King';
+  }
+  const userRole = user?.role === 'admin' ? 'Yönetici' : 'Satış Temsilcisi';
+  const userAvatar = userName.charAt(0);
 
   return (
     <aside className="sidebar">
@@ -73,10 +82,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-user">
-        <div className="user-avatar">S</div>
+        <div className="user-avatar">{userAvatar}</div>
         <div className="user-info">
-          <div className="user-name">Sistem Yöneticisi</div>
-          <div className="user-role">Yönetici</div>
+          <div className="user-name">{userName}</div>
+          <div className="user-role">{userRole}</div>
         </div>
       </div>
     </aside>
