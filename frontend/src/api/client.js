@@ -28,7 +28,16 @@ api.interceptors.response.use(
                            error.code === 'ERR_NETWORK' || 
                            [502, 503, 504].includes(error.response?.status);
     
-    if (isMutation && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
+    // Giriş, arama ve doğrulama gibi kritik canlı istekler çevrimdışı kuyruğa alınmamalıdır
+    const isExcluded = config?.url && (
+      config.url.includes('/auth/login') ||
+      config.url.includes('/scanner/search') ||
+      config.url.includes('/scanner/scan-card') ||
+      config.url.includes('/check-duplicate') ||
+      config.url.includes('/routes/optimize')
+    );
+    
+    if (isMutation && !isExcluded && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
       let description = "Veri Değişikliği";
       if (config.url.includes('/visits/start')) description = "Ziyaret Başlatma";
       else if (config.url.includes('/end')) description = "Ziyaret Sonlandırma";
