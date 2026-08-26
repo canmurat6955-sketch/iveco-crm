@@ -10,7 +10,7 @@ from fuzzywuzzy import fuzz
 from urllib.parse import urlparse
 from datetime import datetime, timedelta, timezone, date as date_type
 
-from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice
+from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice, Vehicle
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerListResponse,
     CustomerResponse, InteractionCreate, CRMStats, DuplicateGroup,
