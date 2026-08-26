@@ -134,7 +134,7 @@ export default function ProformaDetail() {
             </div>
             <div style={{ display: 'flex', marginTop: '4px' }}>
               <span style={{ width: '130px', fontWeight: 700 }}>Vergi Dairesi:</span>
-              <span style={{ flex: 1 }}>{customer.city ? `${customer.city.toUpperCase()} V.D.` : '—'}</span>
+              <span style={{ flex: 1 }}>{customer.vergi_dairesi || (customer.city ? `${customer.city.toUpperCase()} V.D.` : '—')}</span>
             </div>
             <div style={{ display: 'flex' }}>
               <span style={{ width: '130px', fontWeight: 700 }}>T.C. / Vergi No:</span>

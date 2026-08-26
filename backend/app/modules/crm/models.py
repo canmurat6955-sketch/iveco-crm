@@ -17,6 +17,7 @@ class Customer(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_name = Column(String(500), nullable=False, index=True)
     tax_number = Column(String(50), nullable=True, index=True)
+    vergi_dairesi = Column(String(200), nullable=True)
     city = Column(String(100), nullable=True, index=True)
     district = Column(String(100), nullable=True)
     address = Column(Text, nullable=True)

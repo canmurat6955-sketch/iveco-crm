@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 class CustomerCreate(BaseModel):
     company_name: str = Field(..., min_length=2, description="Firma adı")
     tax_number: Optional[str] = None
+    vergi_dairesi: Optional[str] = None
     city: Optional[str] = None
     district: Optional[str] = None
     address: Optional[str] = None
@@ -42,6 +43,7 @@ class CustomerCreate(BaseModel):
 class CustomerUpdate(BaseModel):
     company_name: Optional[str] = None
     tax_number: Optional[str] = None
+    vergi_dairesi: Optional[str] = None
     city: Optional[str] = None
     district: Optional[str] = None
     address: Optional[str] = None
@@ -74,6 +76,7 @@ class CustomerResponse(BaseModel):
     id: int
     company_name: str
     tax_number: Optional[str] = None
+    vergi_dairesi: Optional[str] = None
     city: Optional[str] = None
     district: Optional[str] = None
     address: Optional[str] = None
