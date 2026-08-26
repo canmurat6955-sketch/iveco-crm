@@ -16,7 +16,7 @@ from app.core.security import get_password_hash
 async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
     # Startup: create tables and seed data
-    from app.modules.crm.models import ProformaInvoice
+    from app.modules.crm.models import ProformaInvoice, Vehicle
     create_all_tables()
     _seed_initial_data()
     os.makedirs(settings.FILE_STORAGE_PATH, exist_ok=True)

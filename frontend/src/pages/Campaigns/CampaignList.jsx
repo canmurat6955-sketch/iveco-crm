@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { campaignsApi } from '../../api/client';
+import { campaignsApi, crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
 
 const CATEGORY_LABELS = {
@@ -15,6 +15,35 @@ export default function CampaignList() {
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ title: '', category: 'daily_catalog', description: '', validity_start: '', validity_end: '', version: '' });
   const [file, setFile] = useState(null);
+  
+  // Catalog Excel Upload
+  const [showCatalogUpload, setShowCatalogUpload] = useState(false);
+  const [catalogFile, setCatalogFile] = useState(null);
+  const [uploadingCatalog, setUploadingCatalog] = useState(false);
+
+  const handleCatalogUpload = async (e) => {
+    e.preventDefault();
+    if (!catalogFile) {
+      toast.error('Lütfen bir Excel veya CSV dosyası seçin.');
+      return;
+    }
+    try {
+      setUploadingCatalog(true);
+      toast.loading('Katalog sisteme yükleniyor...', { id: 'catalog' });
+      const res = await crmApi.importVehicles(catalogFile);
+      if (res.data.success) {
+        toast.success(`Katalog başarıyla güncellendi! ${res.data.imported} araç eklendi, ${res.data.updated} araç güncellendi.`, { id: 'catalog', duration: 5000 });
+        setShowCatalogUpload(false);
+        setCatalogFile(null);
+      } else {
+        toast.error(res.data.message || 'Yükleme başarısız.', { id: 'catalog' });
+      }
+    } catch {
+      toast.error('Katalog içe aktarılırken hata oluştu.', { id: 'catalog' });
+    } finally {
+      setUploadingCatalog(false);
+    }
+  };
 
   useEffect(() => {
     campaignsApi.getAll({ category: categoryFilter || undefined })
@@ -53,7 +82,10 @@ export default function CampaignList() {
             <button key={k} className={`btn btn-sm ${categoryFilter === k ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setCategoryFilter(k)}>{v}</button>
           ))}
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>+ Yeni Kampanya</button>
+        <div className="flex gap-2">
+          <button className="btn btn-secondary" onClick={() => setShowCatalogUpload(true)}>📁 Fiyat Listesi Yükle (Excel)</button>
+          <button className="btn btn-primary" onClick={() => setShowAdd(true)}>+ Yeni Kampanya</button>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
@@ -125,6 +157,38 @@ export default function CampaignList() {
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAdd(false)}>İptal</button>
                 <button type="submit" className="btn btn-primary">Yükle</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCatalogUpload && (
+        <div className="modal-overlay" onClick={() => setShowCatalogUpload(false)}>
+          <div className="modal-content glass-card" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">Araç Fiyat Listesi Yükle (Excel/CSV)</h3>
+            </div>
+            <form onSubmit={handleCatalogUpload}>
+              <div className="form-group" style={{ margin: '1rem 0' }}>
+                <label className="form-label">Excel veya CSV Dosyası *</label>
+                <input 
+                  type="file" 
+                  className="form-input" 
+                  accept=".xlsx, .xls, .csv" 
+                  onChange={e => setCatalogFile(e.target.files[0])} 
+                  style={{ padding: '0.5rem' }} 
+                  required 
+                />
+              </div>
+              <div className="text-xs text-muted leading-relaxed mb-4">
+                <strong>Kolon Şablonu:</strong> Excel dosyanızın ilk satırında en azından <strong>model</strong> (veya <em>araç</em>) sütunu bulunmalıdır. Diğer opsiyonel sütunlar: <strong>fiyat</strong> (matrah), <strong>motor gücü</strong>, <strong>azami ağırlık</strong>, <strong>renk</strong>, <strong>model yılı</strong>.
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCatalogUpload(false)}>İptal</button>
+                <button type="submit" className="btn btn-success" disabled={uploadingCatalog}>
+                  {uploadingCatalog ? 'Yükleniyor...' : 'Kataloğu Yükle'}
+                </button>
               </div>
             </form>
           </div>
