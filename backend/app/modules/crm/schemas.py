@@ -201,3 +201,84 @@ class DuplicateGroup(BaseModel):
     match_type: str  # name, phone, domain, location
     match_score: float
     customers: List[CustomerResponse]
+
+
+# ── Proforma Invoice Schemas ──────────────────────────────────────────
+
+class ProformaCreate(BaseModel):
+    vehicle_model: str = Field(..., description="Araç modeli (örn: IVECO DAILY 70 C 16...)")
+    model_year: Optional[str] = None
+    chassis_no: Optional[str] = None
+    motor_no: Optional[str] = None
+    motor_power: Optional[str] = None
+    color: Optional[str] = None
+    max_weight: Optional[str] = None
+    
+    # Fiyatlandırma
+    unit_price: float = Field(..., ge=0, description="Birim Fiyat (Matrah)")
+    otv_rate: float = Field(default=4.0, ge=0, description="ÖTV Oranı (%)")
+    kdv_rate: float = Field(default=20.0, ge=0, description="KDV Oranı (%)")
+    
+    # Koşullar ve Açıklamalar
+    delivery_place: Optional[str] = None
+    payment_terms: Optional[str] = None
+    notes: Optional[str] = None
+    validity_date: Optional[date] = None
+    date: Optional[date] = None
+
+
+class ProformaUpdate(BaseModel):
+    vehicle_model: Optional[str] = None
+    model_year: Optional[str] = None
+    chassis_no: Optional[str] = None
+    motor_no: Optional[str] = None
+    motor_power: Optional[str] = None
+    color: Optional[str] = None
+    max_weight: Optional[str] = None
+    
+    unit_price: Optional[float] = None
+    otv_rate: Optional[float] = None
+    kdv_rate: Optional[float] = None
+    
+    delivery_place: Optional[str] = None
+    payment_terms: Optional[str] = None
+    notes: Optional[str] = None
+    validity_date: Optional[date] = None
+    date: Optional[date] = None
+
+
+class ProformaResponse(BaseModel):
+    id: int
+    customer_id: int
+    created_by_id: int
+    
+    invoice_number: str
+    date: date
+    validity_date: Optional[date] = None
+    
+    vehicle_model: str
+    model_year: Optional[str] = None
+    chassis_no: Optional[str] = None
+    motor_no: Optional[str] = None
+    motor_power: Optional[str] = None
+    color: Optional[str] = None
+    max_weight: Optional[str] = None
+    
+    unit_price: float
+    otv_rate: float
+    otv_amount: float
+    subtotal: float
+    kdv_rate: float
+    kdv_amount: float
+    grand_total: float
+    grand_total_words: Optional[str] = None
+    
+    delivery_place: Optional[str] = None
+    payment_terms: Optional[str] = None
+    notes: Optional[str] = None
+    
+    created_at: datetime
+    updated_at: datetime
+    
+    model_config = {"from_attributes": True}
+

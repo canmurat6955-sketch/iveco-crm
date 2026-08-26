@@ -34,7 +34,8 @@ api.interceptors.response.use(
       config.url.includes('/scanner/search') ||
       config.url.includes('/scanner/scan-card') ||
       config.url.includes('/check-duplicate') ||
-      config.url.includes('/routes/optimize')
+      config.url.includes('/routes/optimize') ||
+      config.url.includes('/proformas')
     );
     
     if (isMutation && !isExcluded && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
@@ -97,6 +98,13 @@ export const crmApi = {
   deleteContact: (contactId) => api.delete(`/crm/contacts/${contactId}`),
   getContactSuggestions: () => api.get('/crm/contact-suggestions'),
   mergeCustomers: (primaryId, secondaryIds) => api.post('/crm/customers/merge', { primary_id: primaryId, secondary_ids: secondaryIds }),
+  
+  // Proforma Invoice Endpoints
+  getCustomerProformas: (customerId) => api.get(`/crm/customers/${customerId}/proformas`),
+  createProforma: (customerId, data) => api.post(`/crm/customers/${customerId}/proformas`, data),
+  getProforma: (proformaId) => api.get(`/crm/proformas/${proformaId}`),
+  updateProforma: (proformaId, data) => api.put(`/crm/proformas/${proformaId}`, data),
+  deleteProforma: (proformaId) => api.delete(`/crm/proformas/${proformaId}`),
 };
 
 // ── Discovery API ───────────────────────────────────────────────

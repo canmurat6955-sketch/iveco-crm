@@ -10,11 +10,12 @@ from fuzzywuzzy import fuzz
 from urllib.parse import urlparse
 from datetime import datetime, timedelta, timezone, date as date_type
 
-from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact
+from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerListResponse,
     CustomerResponse, InteractionCreate, CRMStats, DuplicateGroup,
     ContactCreate, ContactUpdate, ContactResponse,
+    ProformaCreate, ProformaUpdate, ProformaResponse,
 )
 from app.core.deps import PaginationParams, CustomerFilterParams
 
@@ -489,6 +490,175 @@ class CRMService:
                 
         results.sort(key=lambda x: x["distance_to_route"])
         return results
+
+    def number_to_turkish_words(self, n: float) -> str:
+        n = round(n, 2)
+        integer_part = int(n)
+        decimal_part = int(round((n - integer_part) * 100))
+
+        ones = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"]
+        tens = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"]
+        hundreds = ["", "yüz", "ikiyüz", "üçyüz", "dörtyüz", "beşyüz", "altıyüz", "yediyüz", "sekizyüz", "dokuzyüz"]
+        
+        def convert_group(num: int) -> str:
+            h = num // 100
+            t = (num % 100) // 10
+            o = num % 10
+            
+            res = ""
+            if h > 0:
+                res += hundreds[h]
+            if t > 0:
+                res += tens[t]
+            if o > 0:
+                res += ones[o]
+            return res
+
+        if integer_part == 0:
+            int_str = "sıfır"
+        else:
+            groups = []
+            temp = integer_part
+            while temp > 0:
+                groups.append(temp % 1000)
+                temp //= 1000
+                
+            group_names = ["", "bin", "milyon", "milyar", "trilyon"]
+            parts = []
+            for i, val in enumerate(groups):
+                if val == 0:
+                    continue
+                grp_str = convert_group(val)
+                if i == 1 and val == 1:
+                    grp_str = ""
+                parts.append(grp_str + group_names[i])
+            
+            parts.reverse()
+            int_str = "".join(parts)
+
+        dec_str = ""
+        if decimal_part > 0:
+            t = decimal_part // 10
+            o = decimal_part % 10
+            dec_words = tens[t] + ones[o]
+            dec_str = f" {dec_words} Kr."
+
+        result = f"Yalnız {int_str} TL"
+        if decimal_part > 0:
+            result = f"Yalnız {int_str} TL{dec_str}"
+        
+        words = result.split()
+        if len(words) >= 2:
+            words[1] = words[1].capitalize()
+            result = " ".join(words)
+            
+        return result
+
+    def calculate_proforma_prices(self, unit_price: float, otv_rate: float, kdv_rate: float) -> dict:
+        otv_amount = round(unit_price * (otv_rate / 100.0), 2)
+        subtotal = round(unit_price + otv_amount, 2)
+        kdv_amount = round(subtotal * (kdv_rate / 100.0), 2)
+        grand_total = round(subtotal + kdv_amount, 2)
+        return {
+            "otv_amount": otv_amount,
+            "subtotal": subtotal,
+            "kdv_amount": kdv_amount,
+            "grand_total": grand_total
+        }
+
+    def create_proforma(self, customer_id: int, data: ProformaCreate, user_id: int) -> ProformaInvoice:
+        customer = self.db.query(Customer).filter(Customer.id == customer_id, Customer.is_active == True).first()
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Müşteri bulunamadı")
+            
+        p_date = data.date or date_type.today()
+        current_year = p_date.year
+        year_start = date_type(current_year, 1, 1)
+        year_end = date_type(current_year, 12, 31)
+        count = self.db.query(ProformaInvoice).filter(
+            ProformaInvoice.date >= year_start,
+            ProformaInvoice.date <= year_end
+        ).count()
+        invoice_number = f"ERC-{current_year}-{count+1:04d}"
+        
+        prices = self.calculate_proforma_prices(data.unit_price, data.otv_rate, data.kdv_rate)
+        grand_total_words = self.number_to_turkish_words(prices["grand_total"])
+        
+        db_proforma = ProformaInvoice(
+            customer_id=customer_id,
+            created_by_id=user_id,
+            invoice_number=invoice_number,
+            date=p_date,
+            validity_date=data.validity_date,
+            vehicle_model=data.vehicle_model,
+            model_year=data.model_year,
+            chassis_no=data.chassis_no,
+            motor_no=data.motor_no,
+            motor_power=data.motor_power,
+            color=data.color,
+            max_weight=data.max_weight,
+            unit_price=data.unit_price,
+            otv_rate=data.otv_rate,
+            otv_amount=prices["otv_amount"],
+            subtotal=prices["subtotal"],
+            kdv_rate=data.kdv_rate,
+            kdv_amount=prices["kdv_amount"],
+            grand_total=prices["grand_total"],
+            grand_total_words=grand_total_words,
+            delivery_place=data.delivery_place,
+            payment_terms=data.payment_terms,
+            notes=data.notes
+        )
+        
+        self.db.add(db_proforma)
+        self.db.commit()
+        self.db.refresh(db_proforma)
+        return db_proforma
+
+    def get_proforma(self, proforma_id: int) -> ProformaInvoice:
+        proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == proforma_id).first()
+        if not proforma:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proforma fatura bulunamadı")
+        return proforma
+
+    def list_customer_proformas(self, customer_id: int) -> List[ProformaInvoice]:
+        return self.db.query(ProformaInvoice).filter(
+            ProformaInvoice.customer_id == customer_id
+        ).order_by(desc(ProformaInvoice.created_at)).all()
+
+    def update_proforma(self, proforma_id: int, data: ProformaUpdate) -> ProformaInvoice:
+        proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == proforma_id).first()
+        if not proforma:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proforma fatura bulunamadı")
+            
+        update_data = data.model_dump(exclude_unset=True)
+        
+        unit_price = update_data.get("unit_price", proforma.unit_price)
+        otv_rate = update_data.get("otv_rate", proforma.otv_rate)
+        kdv_rate = update_data.get("kdv_rate", proforma.kdv_rate)
+        
+        if "unit_price" in update_data or "otv_rate" in update_data or "kdv_rate" in update_data:
+            prices = self.calculate_proforma_prices(unit_price, otv_rate, kdv_rate)
+            update_data["otv_amount"] = prices["otv_amount"]
+            update_data["subtotal"] = prices["subtotal"]
+            update_data["kdv_amount"] = prices["kdv_amount"]
+            update_data["grand_total"] = prices["grand_total"]
+            update_data["grand_total_words"] = self.number_to_turkish_words(prices["grand_total"])
+            
+        for key, value in update_data.items():
+            setattr(proforma, key, value)
+            
+        self.db.commit()
+        self.db.refresh(proforma)
+        return proforma
+
+    def delete_proforma(self, proforma_id: int):
+        proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == proforma_id).first()
+        if not proforma:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proforma fatura bulunamadı")
+        self.db.delete(proforma)
+        self.db.commit()
+
 
 
 

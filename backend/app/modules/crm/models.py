@@ -53,6 +53,7 @@ class Customer(Base):
     assigned_to = relationship("User", foreign_keys=[assigned_to_id])
     interactions = relationship("CustomerInteraction", back_populates="customer", cascade="all, delete-orphan")
     contacts = relationship("CustomerContact", back_populates="customer", cascade="all, delete-orphan")
+    proformas = relationship("ProformaInvoice", back_populates="customer", cascade="all, delete-orphan")
 
     # Composite indexes for duplicate detection
     __table_args__ = (
@@ -107,3 +108,50 @@ class CustomerContact(Base):
 
     def __repr__(self):
         return f"<Contact {self.contact_name} ({self.role}) for Customer#{self.customer_id}>"
+
+
+class ProformaInvoice(Base):
+    __tablename__ = "proforma_invoices"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    invoice_number = Column(String(100), nullable=False, index=True)
+    date = Column(Date, nullable=False, default=date.today)
+    validity_date = Column(Date, nullable=True)
+    
+    # Araç Bilgileri
+    vehicle_model = Column(String(500), nullable=False)
+    model_year = Column(String(50), nullable=True)
+    chassis_no = Column(String(100), nullable=True)
+    motor_no = Column(String(100), nullable=True)
+    motor_power = Column(String(100), nullable=True)
+    color = Column(String(100), nullable=True)
+    max_weight = Column(String(100), nullable=True)
+    
+    # Fiyatlandırma
+    unit_price = Column(Float, nullable=False, default=0.0) # Matrah
+    otv_rate = Column(Float, nullable=False, default=4.0) # ÖTV %
+    otv_amount = Column(Float, nullable=False, default=0.0)
+    subtotal = Column(Float, nullable=False, default=0.0) # Ara Toplam
+    kdv_rate = Column(Float, nullable=False, default=20.0) # KDV %
+    kdv_amount = Column(Float, nullable=False, default=0.0)
+    grand_total = Column(Float, nullable=False, default=0.0)
+    grand_total_words = Column(String(500), nullable=True) # Yazıyla tutar
+    
+    # Koşullar ve Açıklamalar
+    delivery_place = Column(String(500), nullable=True)
+    payment_terms = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    customer = relationship("Customer", back_populates="proformas")
+    creator = relationship("User", foreign_keys=[created_by_id])
+
+    def __repr__(self):
+        return f"<ProformaInvoice {self.invoice_number} for Customer#{self.customer_id}>"
+

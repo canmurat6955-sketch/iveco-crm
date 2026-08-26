@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi, salesApi } from '../../api/client';
 import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers } from 'react-icons/fi';
+import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText } from 'react-icons/fi';
 
 
 const INTERACTION_ICONS = {
@@ -30,11 +30,13 @@ export default function CustomerDetail() {
   const [showAddContact, setShowAddContact] = useState(false);
   const [contactForm, setContactForm] = useState({ contact_name: '', role: '', phone: '', email: '', notes: '', is_primary: false });
   const [editingContact, setEditingContact] = useState(null);
+  const [proformas, setProformas] = useState([]);
 
   useEffect(() => {
     crmApi.getCustomer(id).then(r => setCustomer(r.data)).catch(() => toast.error('Müşteri bulunamadı'));
     crmApi.getInteractions(id).then(r => setInteractions(r.data)).catch(() => {});
     crmApi.getContacts(id).then(r => setContacts(r.data)).catch(() => {});
+    crmApi.getCustomerProformas(id).then(r => setProformas(r.data)).catch(() => {});
   }, [id]);
 
   const addContact = async (e) => {
@@ -332,6 +334,9 @@ export default function CustomerDetail() {
               <button className="btn btn-secondary btn-sm w-full" onClick={() => setShowInteraction(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiPlus size={14} /> Etkileşim Ekle
               </button>
+              <button className="btn btn-secondary btn-sm w-full" onClick={() => navigate(`/customers/${customer.id}/proforma/new`)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                <FiFileText size={14} /> Proforma Fatura Hazırla
+              </button>
             </div>
           </div>
 
@@ -426,6 +431,40 @@ export default function CustomerDetail() {
           </div>
         ) : <div className="empty-state"><p>Henüz irtibat kişisi yok</p></div>}
       </div>
+
+      {/* ── PROFORMAS SECTION ── */}
+      <div className="card mt-6">
+        <div className="card-header">
+          <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiFileText size={18} /> Proforma Faturalar</h3>
+          <button className="btn btn-primary btn-sm" onClick={() => navigate(`/customers/${customer.id}/proforma/new`)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <FiPlus size={14} /> Yeni Fatura
+          </button>
+        </div>
+        {proformas.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+            {proformas.map(p => (
+              <div key={p.id} style={{
+                background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '0.875rem',
+                borderLeft: '3px solid var(--accent-blue)', display: 'flex', flexDirection: 'column', gap: 6,
+                transition: 'transform 0.15s, box-shadow 0.15s', cursor: 'pointer'
+              }} onClick={() => navigate(`/proformas/${p.id}`)}
+                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'; }}
+                 onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}>
+                <div className="flex items-center justify-between">
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--accent-blue-light)' }}>{p.invoice_number}</span>
+                  <span className="text-xs text-muted">{new Date(p.date).toLocaleDateString('tr-TR')}</span>
+                </div>
+                <div className="text-sm font-semibold" style={{ color: 'var(--text-heading)', marginTop: 4 }}>{p.vehicle_model}</div>
+                <div className="flex justify-between items-center mt-2 pt-2" style={{ borderTop: '1px dashed var(--border-color)' }}>
+                  <span className="text-xs text-muted">Genel Toplam</span>
+                  <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#10b981' }}>{p.grand_total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : <div className="empty-state"><p>Henüz proforma fatura oluşturulmamış</p></div>}
+      </div>
+
 
       {/* ── ADD/EDIT CONTACT MODAL ── */}
       {showAddContact && (
