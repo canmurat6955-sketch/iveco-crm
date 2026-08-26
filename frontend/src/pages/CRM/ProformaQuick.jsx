@@ -95,7 +95,7 @@ export default function ProformaQuick() {
 
   // Proforma Details (Prefilled with ERC template example defaults)
   const [vehicle, setVehicle] = useState({
-    vehicle_model: 'IVECO DAILY 70 C 16 H 3.0 A 8 CC 4350 EVIE',
+    vehicle_model: '',
     model_year: '2025',
     chassis_no: '',
     motor_no: '',
@@ -376,7 +376,7 @@ export default function ProformaQuick() {
 
             {/* Vehicle Model & Speech */}
             <div className="form-group">
-              <label className="form-label">Araç Modeli *</label>
+              <label className="form-label">Araç Modeli / PIC Tanımı *</label>
               <div className="flex gap-2">
                 <input 
                   className="form-input" 
