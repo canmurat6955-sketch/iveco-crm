@@ -15,6 +15,8 @@ import RoutePlanner from './pages/Sales/RoutePlanner';
 import CardScanner from './pages/CRM/CardScanner';
 import Login from './pages/Login';
 import MapPage from './pages/CRM/Map';
+import ProformaNew from './pages/CRM/ProformaNew';
+import ProformaDetail from './pages/CRM/ProformaDetail';
 
 
 
@@ -54,7 +56,8 @@ export default function App() {
             <Route path="routes" element={<RoutePlanner />} />
             <Route path="scan-card" element={<CardScanner />} />
             <Route path="map" element={<MapPage />} />
-
+            <Route path="customers/:customerId/proforma/new" element={<ProformaNew />} />
+            <Route path="proformas/:id" element={<ProformaDetail />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

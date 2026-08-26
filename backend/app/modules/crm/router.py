@@ -15,6 +15,7 @@ from app.modules.crm.schemas import (
     CustomerListResponse, InteractionCreate, InteractionResponse,
     ImportResult, CRMStats, DuplicateGroup,
     ContactCreate, ContactUpdate, ContactResponse,
+    ProformaCreate, ProformaUpdate, ProformaResponse,
 )
 
 router = APIRouter(prefix="/api/crm", tags=["CRM"])
@@ -199,3 +200,47 @@ def merge_customers(data: dict, db: Session = Depends(get_db), current_user=Depe
         raise HTTPException(status_code=400, detail="primary_id ve secondary_ids gerekli")
     result = CRMService(db).merge_customers(primary_id, secondary_ids)
     return result
+
+
+# ── Proforma Invoice Endpoints ──────────────────────────────────────────
+
+@router.get("/customers/{customer_id}/proformas", response_model=List[ProformaResponse])
+def list_customer_proformas(customer_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Müşteriye ait tüm proformaları listeler."""
+    return CRMService(db).list_customer_proformas(customer_id)
+
+
+@router.post("/customers/{customer_id}/proformas", response_model=ProformaResponse)
+def create_proforma(
+    customer_id: int,
+    data: ProformaCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye yeni bir proforma fatura oluşturur."""
+    return CRMService(db).create_proforma(customer_id, data, current_user.id)
+
+
+@router.get("/proformas/{proforma_id}", response_model=ProformaResponse)
+def get_proforma(proforma_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """ID'ye göre proforma detayını getirir."""
+    return CRMService(db).get_proforma(proforma_id)
+
+
+@router.put("/proformas/{proforma_id}", response_model=ProformaResponse)
+def update_proforma(
+    proforma_id: int,
+    data: ProformaUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Proforma faturayı günceller."""
+    return CRMService(db).update_proforma(proforma_id, data)
+
+
+@router.delete("/proformas/{proforma_id}")
+def delete_proforma(proforma_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Proforma faturayı siler."""
+    CRMService(db).delete_proforma(proforma_id)
+    return {"message": "Proforma fatura başarıyla silindi"}
+
