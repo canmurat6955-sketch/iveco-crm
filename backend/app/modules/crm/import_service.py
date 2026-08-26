@@ -124,3 +124,94 @@ def _parse_excel(content: bytes) -> List[List[str]]:
         rows.append([str(cell) if cell is not None else "" for cell in row])
     wb.close()
     return rows
+
+
+# ── Vehicle Import Service ──────────────────────────────────────────
+
+from app.modules.crm.models import Vehicle
+
+COLUMN_MAP_VEHICLES = {
+    "model": "model_name", "model adı": "model_name", "model adi": "model_name", "araç": "model_name", "arac": "model_name", "araç modeli": "model_name", "arac modeli": "model_name",
+    "fiyat": "unit_price", "fiyatı": "unit_price", "fiyati": "unit_price", "matrah": "unit_price", "birim fiyat": "unit_price", "katalog fiyatı": "unit_price",
+    "model yılı": "model_year", "model yili": "model_year", "yıl": "model_year", "yili": "model_year",
+    "motor gücü": "motor_power", "motor": "motor_power", "motor gücü/hacmi": "motor_power",
+    "azami ağırlık": "max_weight", "ağırlık": "max_weight", "agirlik": "max_weight", "tonaj": "max_weight",
+    "renk": "color"
+}
+
+def _map_vehicle_headers(headers: List[str]) -> dict:
+    mapping = {}
+    for idx, header in enumerate(headers):
+        clean = header.strip().lower()
+        if clean in COLUMN_MAP_VEHICLES:
+            mapping[idx] = COLUMN_MAP_VEHICLES[clean]
+    return mapping
+
+async def import_vehicles_from_file(file: UploadFile, db: Session) -> dict:
+    content = await file.read()
+    filename = file.filename.lower()
+
+    if filename.endswith(".csv"):
+        rows = _parse_csv(content)
+    elif filename.endswith((".xlsx", ".xls")):
+        rows = _parse_excel(content)
+    else:
+        return {"success": False, "message": "Desteklenmeyen dosya formatı. CSV veya Excel kullanın."}
+
+    if not rows:
+        return {"success": False, "message": "Dosya boş veya okunamadı."}
+
+    headers = rows[0]
+    col_map = _map_vehicle_headers(headers)
+
+    if "model_name" not in col_map.values():
+        return {"success": False, "message": "Araç modeli adını içeren kolon bulunamadı (Başlık 'model' veya 'araç' olmalı)."}
+
+    imported = 0
+    updated = 0
+    errors = 0
+
+    for row_idx, row in enumerate(rows[1:], start=2):
+        try:
+            data = {}
+            for col_idx, field_name in col_map.items():
+                if col_idx < len(row) and row[col_idx]:
+                    val = row[col_idx].strip()
+                    if field_name == "unit_price":
+                        val = val.replace(".", "").replace(",", ".")
+                        try: val = float(val)
+                        except: val = 0.0
+                    data[field_name] = val
+
+            model_name = data.get("model_name")
+            if not model_name:
+                errors += 1
+                continue
+
+            existing = db.query(Vehicle).filter(
+                Vehicle.model_name == model_name,
+                Vehicle.model_year == data.get("model_year")
+            ).first()
+
+            if existing:
+                for key, val in data.items():
+                    setattr(existing, key, val)
+                updated += 1
+            else:
+                db_vehicle = Vehicle(**data)
+                db.add(db_vehicle)
+                imported += 1
+
+        except Exception as e:
+            errors += 1
+            print(f"Araç satır {row_idx} hata: {e}")
+
+    db.commit()
+    return {
+        "success": True,
+        "imported": imported,
+        "updated": updated,
+        "errors": errors,
+        "total_rows": len(rows) - 1
+    }
+

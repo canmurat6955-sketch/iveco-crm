@@ -659,6 +659,13 @@ class CRMService:
         self.db.delete(proforma)
         self.db.commit()
 
+    def search_vehicles(self, query: str = "") -> List[Vehicle]:
+        q = self.db.query(Vehicle)
+        if query:
+            q = q.filter(Vehicle.model_name.ilike(f"%{query}%"))
+        return q.limit(30).all()
+
+
 
 
 

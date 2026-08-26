@@ -282,3 +282,29 @@ class ProformaResponse(BaseModel):
     
     model_config = {"from_attributes": True}
 
+
+# ── Vehicle Schemas ──────────────────────────────────────────────────
+
+class VehicleCreate(BaseModel):
+    model_name: str = Field(..., description="Araç Modeli adı")
+    model_year: Optional[str] = None
+    motor_power: Optional[str] = None
+    max_weight: Optional[str] = None
+    color: Optional[str] = "BEYAZ"
+    unit_price: float = Field(..., ge=0, description="Katalog Matrah Fiyatı")
+
+
+class VehicleResponse(BaseModel):
+    id: int
+    model_name: str
+    model_year: Optional[str] = None
+    motor_power: Optional[str] = None
+    max_weight: Optional[str] = None
+    color: Optional[str] = None
+    unit_price: float
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+

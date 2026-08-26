@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPrinter, FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle } from 'react-icons/fi';
 
 export default function ProformaDetail() {
   const { id } = useParams();
@@ -29,6 +29,12 @@ export default function ProformaDetail() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleWhatsAppShare = () => {
+    const wpMessage = `Sayın ${customer?.company_name?.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: https://iveco-crm.vercel.app/proformas/${proforma.id}`;
+    const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
+    window.open(wpUrl, '_blank');
   };
 
   const handleDelete = async () => {
@@ -61,6 +67,9 @@ export default function ProformaDetail() {
         <div className="flex gap-2">
           <button onClick={handleDelete} className="btn btn-danger btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <FiTrash2 size={16} /> Sil
+          </button>
+          <button onClick={handleWhatsAppShare} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#25D366', borderColor: '#25D366' }}>
+            <FiMessageCircle size={16} /> WhatsApp Paylaş
           </button>
           <button onClick={handlePrint} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <FiPrinter size={16} /> Yazdır / PDF Kaydet

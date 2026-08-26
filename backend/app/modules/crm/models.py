@@ -155,3 +155,22 @@ class ProformaInvoice(Base):
     def __repr__(self):
         return f"<ProformaInvoice {self.invoice_number} for Customer#{self.customer_id}>"
 
+
+class Vehicle(Base):
+    __tablename__ = "vehicles"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    model_name = Column(String(500), nullable=False, index=True)
+    model_year = Column(String(50), nullable=True)
+    motor_power = Column(String(100), nullable=True)
+    max_weight = Column(String(100), nullable=True)
+    color = Column(String(100), nullable=True, default="BEYAZ")
+    unit_price = Column(Float, nullable=False, default=0.0) # Katalog Matrah Fiyatı
+    
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<Vehicle {self.model_name} ({self.unit_price} TL)>"
+
+

@@ -9,13 +9,14 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.deps import PaginationParams, CustomerFilterParams
 from app.modules.crm.service import CRMService
-from app.modules.crm.import_service import import_from_file
+from app.modules.crm.import_service import import_from_file, import_vehicles_from_file
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerResponse,
     CustomerListResponse, InteractionCreate, InteractionResponse,
     ImportResult, CRMStats, DuplicateGroup,
     ContactCreate, ContactUpdate, ContactResponse,
     ProformaCreate, ProformaUpdate, ProformaResponse,
+    VehicleResponse,
 )
 
 router = APIRouter(prefix="/api/crm", tags=["CRM"])
@@ -243,4 +244,23 @@ def delete_proforma(proforma_id: int, db: Session = Depends(get_db), current_use
     """Proforma faturayı siler."""
     CRMService(db).delete_proforma(proforma_id)
     return {"message": "Proforma fatura başarıyla silindi"}
+
+
+# ── Vehicle Catalog Endpoints ──────────────────────────────────────────
+
+@router.get("/vehicles", response_model=List[VehicleResponse])
+def search_vehicles(query: str = "", db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Katalogdaki araçları arar."""
+    return CRMService(db).search_vehicles(query)
+
+
+@router.post("/vehicles/import")
+async def import_vehicles(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Excel veya CSV dosyasından araç kataloğunu içe aktarır."""
+    return await import_vehicles_from_file(file, db)
+
 

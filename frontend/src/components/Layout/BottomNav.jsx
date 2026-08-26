@@ -41,6 +41,9 @@ export default function BottomNav({ onVisitStart }) {
         <div className="more-menu-overlay" onClick={() => setShowMoreMenu(false)}>
           <div className="more-menu" onClick={e => e.stopPropagation()}>
             <div className="more-menu-header">Hızlı Erişim</div>
+            <button className="more-menu-item" onClick={() => { navigate('/proforma/quick'); setShowMoreMenu(false); }} style={{ fontWeight: 'bold', color: '#10b981' }}>
+              📄 1-Tıkla Proforma Sihirbazı
+            </button>
             <button className="more-menu-item" onClick={() => { navigate('/discovery'); setShowMoreMenu(false); }}>
               🧭 Firma Keşfi (Discovery)
             </button>

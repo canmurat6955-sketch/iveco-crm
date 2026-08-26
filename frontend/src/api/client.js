@@ -33,9 +33,11 @@ api.interceptors.response.use(
       config.url.includes('/auth/login') ||
       config.url.includes('/scanner/search') ||
       config.url.includes('/scanner/scan-card') ||
+      config.url.includes('/scanner/scan-vergi-levhasi') ||
       config.url.includes('/check-duplicate') ||
       config.url.includes('/routes/optimize') ||
-      config.url.includes('/proformas')
+      config.url.includes('/proformas') ||
+      config.url.includes('/vehicles')
     );
     
     if (isMutation && !isExcluded && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
@@ -105,6 +107,18 @@ export const crmApi = {
   getProforma: (proformaId) => api.get(`/crm/proformas/${proformaId}`),
   updateProforma: (proformaId, data) => api.put(`/crm/proformas/${proformaId}`, data),
   deleteProforma: (proformaId) => api.delete(`/crm/proformas/${proformaId}`),
+  
+  // Vehicle Catalog Endpoints
+  searchVehicles: (query) => api.get('/crm/vehicles', { params: { query } }),
+  importVehicles: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/crm/vehicles/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
 };
 
 // ── Discovery API ───────────────────────────────────────────────
@@ -198,6 +212,15 @@ export const scannerApi = {
     const formData = new FormData();
     formData.append('file', file);
     return api.post('/scanner/scan-card', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+  scanVergiLevhasi: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/scanner/scan-vergi-levhasi', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
