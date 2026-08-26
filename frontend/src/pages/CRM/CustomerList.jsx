@@ -19,7 +19,7 @@ export default function CustomerList() {
   const [showMerge, setShowMerge] = useState(false);
   const [merging, setMerging] = useState(false);
   const [form, setForm] = useState({ 
-    company_name: '', city: '', district: '', phone: '', email: '', 
+    company_name: '', tax_number: '', vergi_dairesi: '', city: '', district: '', phone: '', email: '', 
     sector: '', segment: 'C', potential_level: 'medium',
     latitude: '', longitude: '' 
   });
@@ -317,9 +317,13 @@ export default function CustomerList() {
             <h3 className="modal-title">Yeni Müşteri Ekle</h3>
             <form onSubmit={handleAdd}>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group" style={{ flex: 2 }}>
                   <label className="form-label">Firma Adı *</label>
                   <input className="form-input" required value={form.company_name} onChange={e => setForm({ ...form, company_name: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Vergi Dairesi</label>
+                  <input className="form-input" value={form.vergi_dairesi || ''} onChange={e => setForm({ ...form, vergi_dairesi: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Vergi No</label>

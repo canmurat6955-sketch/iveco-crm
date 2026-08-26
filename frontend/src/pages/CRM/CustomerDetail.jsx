@@ -92,6 +92,7 @@ export default function CustomerDetail() {
       district: customer.district || '',
       sector: customer.sector || '',
       tax_number: customer.tax_number || '',
+      vergi_dairesi: customer.vergi_dairesi || '',
       current_fleet: customer.current_fleet || '',
       estimated_fleet_size: customer.estimated_fleet_size || '',
       previous_vehicles: customer.previous_vehicles || '',
@@ -250,6 +251,7 @@ export default function CustomerDetail() {
             <div>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>İş Bilgileri</div>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiBriefcase size={14} style={{ color: 'var(--accent-blue-light)' }} /> Sektör: {customer.sector || '—'}</p>
+              <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiHash size={14} style={{ color: 'var(--accent-amber)' }} /> Vergi Dairesi: {customer.vergi_dairesi || '—'}</p>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiHash size={14} style={{ color: 'var(--accent-amber)' }} /> Vergi No: {customer.tax_number || '—'}</p>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiTruck size={14} style={{ color: 'var(--accent-green)' }} /> Mevcut Filo: {customer.current_fleet || '—'}</p>
               <p className="text-sm" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiLayers size={14} style={{ color: 'var(--accent-purple)' }} /> Filo Büyüklüğü: {customer.estimated_fleet_size || '—'}</p>
@@ -563,6 +565,10 @@ export default function CustomerDetail() {
                   <div className="form-group">
                     <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiGlobe size={13} /> Website</label>
                     <input className="form-input" value={editForm.website || ''} onChange={e => handleEditChange('website', e.target.value)} placeholder="www.firma.com" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiHash size={13} /> Vergi Dairesi</label>
+                    <input className="form-input" value={editForm.vergi_dairesi || ''} onChange={e => handleEditChange('vergi_dairesi', e.target.value)} placeholder="Gaziler V.D." />
                   </div>
                   <div className="form-group">
                     <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiHash size={13} /> Vergi No</label>
