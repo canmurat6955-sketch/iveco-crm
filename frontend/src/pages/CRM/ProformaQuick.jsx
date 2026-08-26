@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crmApi, scannerApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiPlay, FiPlus, FiCheckCircle } from 'react-icons/fi';
+import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
 // Speech Dictation Number Converter
 function parseTurkishNumber(text) {
@@ -11,7 +11,6 @@ function parseTurkishNumber(text) {
     .replace(/\s+/g, " ")
     .trim();
 
-  // Check if string contains only digits
   const plainDigits = text.replace(/\s/g, "");
   if (/^\d+$/.test(plainDigits)) {
     return parseInt(plainDigits);
@@ -82,6 +81,7 @@ export default function ProformaQuick() {
   // States
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showSpecs, setShowSpecs] = useState(false);
   
   // OCR Customer Details
   const [customer, setCustomer] = useState({
@@ -93,10 +93,10 @@ export default function ProformaQuick() {
     district: ''
   });
 
-  // Proforma Details
+  // Proforma Details (Prefilled with ERC template example defaults)
   const [vehicle, setVehicle] = useState({
-    vehicle_model: '',
-    model_year: new Date().getFullYear().toString(),
+    vehicle_model: 'IVECO DAILY 70 C 16 H 3.0 A 8 CC 4350 EVIE',
+    model_year: '2025',
     chassis_no: '',
     motor_no: '',
     motor_power: '2998 CM3 118 KW',
@@ -113,11 +113,6 @@ export default function ProformaQuick() {
     date: new Date().toISOString().split('T')[0],
     validity_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   });
-
-  // Autocomplete suggestions
-  const [vehicleQuery, setVehicleQuery] = useState('');
-  const [vehicleSuggestions, setVehicleSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Live calculation results
   const [calculations, setCalculations] = useState({
@@ -150,21 +145,6 @@ export default function ProformaQuick() {
     });
   }, [vehicle.unit_price, vehicle.otv_rate, vehicle.kdv_rate]);
 
-  // Handle Autocomplete Lookup
-  useEffect(() => {
-    if (vehicleQuery.trim().length > 1) {
-      crmApi.searchVehicles(vehicleQuery)
-        .then(res => {
-          setVehicleSuggestions(res.data);
-          setShowSuggestions(true);
-        })
-        .catch(() => {});
-    } else {
-      setVehicleSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [vehicleQuery]);
-
   // Handle OCR upload
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -190,22 +170,6 @@ export default function ProformaQuick() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Select Vehicle Suggestion
-  const handleSelectVehicle = (v) => {
-    setVehicle({
-      ...vehicle,
-      vehicle_model: v.model_name,
-      model_year: v.model_year || vehicle.model_year,
-      motor_power: v.motor_power || vehicle.motor_power,
-      max_weight: v.max_weight || vehicle.max_weight,
-      color: v.color || vehicle.color,
-      unit_price: v.unit_price ? v.unit_price.toString() : ''
-    });
-    setVehicleQuery(v.model_name);
-    setShowSuggestions(false);
-    toast.success('Katalog bilgileri forma yüklendi!');
   };
 
   // Browser Native Speech Recognition
@@ -242,7 +206,6 @@ export default function ProformaQuick() {
           toast.error(`Sayı anlaşılamadı: "${resultText}"`);
         }
       } else if (fieldName === 'model') {
-        setVehicleQuery(resultText);
         setVehicle(prev => ({ ...prev, vehicle_model: resultText }));
         toast.success(`Model dikte edildi: "${resultText}"`);
       }
@@ -276,7 +239,7 @@ export default function ProformaQuick() {
       return;
     }
     if (!vehicle.vehicle_model) {
-      toast.error('Araç modeli seçilmeli veya yazılmalıdır.');
+      toast.error('Araç modeli yazılmalıdır.');
       return;
     }
     if (!vehicle.unit_price || parseFloat(vehicle.unit_price) <= 0) {
@@ -345,12 +308,12 @@ export default function ProformaQuick() {
         <FiCheckCircle color="#10b981" /> 1-Tıkla Proforma Sihirbazı
       </h2>
       <p className="text-muted" style={{ marginTop: '-12px', marginBottom: '24px' }}>
-        Vergi levhasını yükleyin, araç modelini ve fiyatı sesle dikte edip anında WhatsApp'tan teklifinizi gönderin.
+        Vergi levhasını yükleyin, araç modelini ve fiyatı yazın/söyleyin ve anında WhatsApp'tan teklifinizi gönderin.
       </p>
 
       <div className="grid grid-2" style={{ gap: '1.5rem', alignItems: 'start' }}>
         
-        {/* Adım 1: Dosya/Levha Upload ve Bilgiler */}
+        {/* Adım 1: Dosya/Levha Upload ve Müşteri Bilgileri */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Upload Card */}
@@ -405,24 +368,21 @@ export default function ProformaQuick() {
           </div>
         </div>
 
-        {/* Adım 2: Fiyat ve Model Dikte/Seçim */}
+        {/* Adım 2: Fiyat ve Model Bilgileri */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           <div className="card glass-card">
             <div className="section-title">TEKLİF EDİLECEK ARAÇ VE FİYAT</div>
 
             {/* Vehicle Model & Speech */}
-            <div className="form-group" style={{ position: 'relative' }}>
-              <label className="form-label">Araç Modeli Arayın veya Söyleyin *</label>
+            <div className="form-group">
+              <label className="form-label">Araç Modeli *</label>
               <div className="flex gap-2">
                 <input 
                   className="form-input" 
-                  value={vehicleQuery} 
-                  onChange={e => {
-                    setVehicleQuery(e.target.value);
-                    setVehicle({ ...vehicle, vehicle_model: e.target.value });
-                  }} 
-                  placeholder="Katalogdan araç adı yazın veya mikrofona konuşun..." 
+                  value={vehicle.vehicle_model} 
+                  onChange={e => setVehicle({ ...vehicle, vehicle_model: e.target.value })} 
+                  placeholder="Örn: IVECO DAILY 70 C 16 H 3.0 A 8 CC 4350 EVIE" 
                   required 
                 />
                 <button 
@@ -434,35 +394,6 @@ export default function ProformaQuick() {
                   {listeningField === 'model' ? <FiMicOff size={18} /> : <FiMic size={18} />}
                 </button>
               </div>
-
-              {/* Autocomplete Dropdown */}
-              {showSuggestions && vehicleSuggestions.length > 0 && (
-                <div style={{
-                  position: 'absolute', top: '100%', left: 0, right: '48px', zIndex: 100,
-                  background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-                  maxHeight: '200px', overflowY: 'auto', marginTop: 4
-                }}>
-                  {vehicleSuggestions.map(v => (
-                    <div 
-                      key={v.id} 
-                      onClick={() => handleSelectVehicle(v)}
-                      style={{
-                        padding: '10px 12px', borderBottom: '1px solid var(--border-color)',
-                        cursor: 'pointer', display: 'flex', justifyContent: 'space-between',
-                        alignItems: 'center', transition: 'background 0.15s'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                      onMouseLeave={e => e.currentTarget.style.background = ''}
-                    >
-                      <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{v.model_name}</span>
-                      <span style={{ color: '#10b981', fontSize: '0.8rem', fontWeight: 700 }}>
-                        {v.unit_price.toLocaleString('tr-TR')} TL
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Price Box & Speech */}
@@ -475,7 +406,7 @@ export default function ProformaQuick() {
                   step="0.01"
                   value={vehicle.unit_price} 
                   onChange={e => setVehicle({ ...vehicle, unit_price: e.target.value })} 
-                  placeholder="Birim matrah fiyatı girin veya mikrofona söyleyin..." 
+                  placeholder="Birim matrah fiyatı girin veya mikrofona konuşun..." 
                   required 
                 />
                 <button 
@@ -519,15 +450,42 @@ export default function ProformaQuick() {
             </button>
           </div>
           
-          {/* Quick Technical Specs (Read-only view of populated vehicle) */}
+          {/* Quick Technical Specs (Edit mode toggled by button) */}
           <div className="card glass-card">
-            <div className="section-title">KATALOGDAN DOLDURULAN TEKNİK ÖZELLİKLER</div>
-            <div className="grid grid-2" style={{ gap: '0.75rem', fontSize: '0.85rem' }}>
-              <div><span className="text-muted">Model Yılı:</span> <span className="font-semibold">{vehicle.model_year}</span></div>
-              <div><span className="text-muted">Renk:</span> <span className="font-semibold">{vehicle.color}</span></div>
-              <div><span className="text-muted">Motor Gücü:</span> <span className="font-semibold">{vehicle.motor_power}</span></div>
-              <div><span className="text-muted">Azami Ağırlık:</span> <span className="font-semibold">{vehicle.max_weight}</span></div>
+            <div className="card-header" style={{ padding: 0, border: 'none', marginBottom: showSpecs ? '1rem' : 0 }}>
+              <h3 className="card-title" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Teknik Detaylar (Varsayılan Örnek Değerler)</h3>
+              <button className="btn btn-sm btn-secondary" onClick={() => setShowSpecs(!showSpecs)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 8px' }}>
+                <FiEdit size={12} /> {showSpecs ? 'Gizle' : 'Düzenle'}
+              </button>
             </div>
+            
+            {showSpecs ? (
+              <div className="grid grid-2" style={{ gap: '1rem', marginTop: '1rem' }}>
+                <div className="form-group">
+                  <label className="form-label text-xs">Model Yılı</label>
+                  <input className="form-input input-sm" value={vehicle.model_year} onChange={e => setVehicle({...vehicle, model_year: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label text-xs">Renk</label>
+                  <input className="form-input input-sm" value={vehicle.color} onChange={e => setVehicle({...vehicle, color: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label text-xs">Motor Gücü</label>
+                  <input className="form-input input-sm" value={vehicle.motor_power} onChange={e => setVehicle({...vehicle, motor_power: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label text-xs">Azami Ağırlık</label>
+                  <input className="form-input input-sm" value={vehicle.max_weight} onChange={e => setVehicle({...vehicle, max_weight: e.target.value})} />
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-2" style={{ gap: '0.75rem', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                <div><span className="text-muted">Model Yılı:</span> <span className="font-semibold">{vehicle.model_year}</span></div>
+                <div><span className="text-muted">Renk:</span> <span className="font-semibold">{vehicle.color}</span></div>
+                <div><span className="text-muted">Motor Gücü:</span> <span className="font-semibold">{vehicle.motor_power}</span></div>
+                <div><span className="text-muted">Azami Ağırlık:</span> <span className="font-semibold">{vehicle.max_weight}</span></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
