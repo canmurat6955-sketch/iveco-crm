@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload } from 'react-icons/fi';
+import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileText } from 'react-icons/fi';
 import html2pdf from 'html2pdf.js';
 
 export default function ProformaDetail() {
@@ -59,6 +59,26 @@ export default function ProformaDetail() {
       });
   };
 
+  const handleDownloadExcel = async () => {
+    try {
+      toast.loading('Excel dosyası hazırlanıyor ve indiriliyor...', { id: 'excel' });
+      const response = await crmApi.exportProformaExcel(id);
+      
+      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `PROFORMA_${proforma.invoice_number}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Excel başarıyla indirildi!', { id: 'excel' });
+    } catch (err) {
+      console.error(err);
+      toast.error('Excel dosyası oluşturulurken bir hata oluştu.', { id: 'excel' });
+    }
+  };
+
   const handleWhatsAppShare = () => {
     const wpMessage = `Sayın ${customer?.company_name?.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: https://iveco-crm.vercel.app/proformas/${proforma.id}`;
     const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
@@ -101,6 +121,9 @@ export default function ProformaDetail() {
           </button>
           <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#1e40af', borderColor: '#1e40af' }}>
             <FiDownload size={16} /> PDF İndir
+          </button>
+          <button onClick={handleDownloadExcel} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#047857', borderColor: '#047857' }}>
+            <FiFileText size={16} /> Excel İndir (Bankacı İçin)
           </button>
           <button onClick={handlePrint} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <FiPrinter size={16} /> Yazdır / PDF Kaydet

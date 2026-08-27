@@ -3,7 +3,11 @@ CRM API endpoints: Customer CRUD, import, interactions, stats, duplicates.
 """
 from typing import List
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+import io
+import openpyxl
+from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -226,6 +230,257 @@ def create_proforma(
 def get_proforma(proforma_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """ID'ye göre proforma detayını getirir."""
     return CRMService(db).get_proforma(proforma_id)
+
+
+@router.get("/proformas/{proforma_id}/export-excel")
+def export_proforma_excel(proforma_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Proforma faturayı Excel formatında indirir."""
+    service = CRMService(db)
+    proforma = service.get_proforma(proforma_id)
+    customer = service.get_customer(proforma.customer_id)
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "PROFORMA TEKLİF"
+    
+    ws.views.sheetView[0].showGridLines = True
+    
+    font_title = Font(name="Arial", size=14, bold=True, color="1E3A8A")
+    font_subtitle = Font(name="Arial", size=9, italic=True, color="475569")
+    font_section = Font(name="Arial", size=11, bold=True, color="FFFFFF")
+    font_bold = Font(name="Arial", size=10, bold=True)
+    font_regular = Font(name="Arial", size=10)
+    
+    fill_section = PatternFill(start_color="1E3A8A", end_color="1E3A8A", fill_type="solid")
+    fill_zebra = PatternFill(start_color="F1F5F9", end_color="F1F5F9", fill_type="solid")
+    
+    thin_side = Side(border_style="thin", color="CBD5E1")
+    double_side = Side(border_style="double", color="475569")
+    border_total = Border(top=thin_side, bottom=double_side)
+    
+    ws.column_dimensions['A'].width = 25
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['C'].width = 20
+    ws.column_dimensions['D'].width = 20
+    
+    ws.merge_cells("A1:D1")
+    ws["A1"] = "ERC SAMSUN OTOMOTİV SAN. VE TİC. A.Ş."
+    ws["A1"].font = font_title
+    ws["A1"].alignment = Alignment(horizontal="center")
+    
+    ws.merge_cells("A2:D2")
+    ws["A2"] = "Eğercili Mah. Atatürk Bulv. No:122/3 Çarşamba / SAMSUN"
+    ws["A2"].font = font_regular
+    ws["A2"].alignment = Alignment(horizontal="center")
+    
+    ws.merge_cells("A3:D3")
+    ws["A3"] = "Mersis No: 0338084534400001 | Tel: 0362 834 00 55"
+    ws["A3"].font = font_subtitle
+    ws["A3"].alignment = Alignment(horizontal="center")
+    
+    ws["A5"] = "PROFORMA NO:"
+    ws["A5"].font = font_bold
+    ws["B5"] = proforma.invoice_number
+    ws["B5"].font = font_regular
+    
+    ws["C5"] = "TARİH:"
+    ws["C5"].font = font_bold
+    ws["D5"] = proforma.date.strftime("%d.%m.%Y") if proforma.date else ""
+    ws["D5"].font = font_regular
+    
+    ws["A6"] = "GEÇERLİLİK TARİHİ:"
+    ws["A6"].font = font_bold
+    ws["B6"] = proforma.validity_date.strftime("%d.%m.%Y") if proforma.validity_date else ""
+    ws["B6"].font = font_regular
+    
+    ws.merge_cells("A8:D8")
+    ws["A8"] = "MÜŞTERİ BİLGİLERİ"
+    ws["A8"].font = font_section
+    ws["A8"].fill = fill_section
+    ws["A8"].alignment = Alignment(horizontal="left", indent=1)
+    
+    ws["A9"] = "Müşteri Ünvanı:"
+    ws["A9"].font = font_bold
+    ws.merge_cells("B9:D9")
+    ws["B9"] = customer.company_name
+    ws["B9"].font = font_regular
+    
+    ws["A10"] = "Vergi Dairesi:"
+    ws["A10"].font = font_bold
+    ws["B10"] = customer.vergi_dairesi
+    ws["B10"].font = font_regular
+    
+    ws["C10"] = "Vergi Numarası:"
+    ws["C10"].font = font_bold
+    ws["D10"] = customer.tax_number
+    ws["D10"].font = font_regular
+    
+    ws["A11"] = "Adres:"
+    ws["A11"].font = font_bold
+    ws.merge_cells("B11:D11")
+    ws["B11"] = f"{customer.address or ''} {customer.district or ''} / {customer.city or ''}"
+    ws["B11"].font = font_regular
+    
+    ws.merge_cells("A13:D13")
+    ws["A13"] = "ARAÇ TEKNİK BİLGİLERİ"
+    ws["A13"].font = font_section
+    ws["A13"].fill = fill_section
+    ws["A13"].alignment = Alignment(horizontal="left", indent=1)
+    
+    ws["A14"] = "Araç Modeli:"
+    ws["A14"].font = font_bold
+    ws.merge_cells("B14:D14")
+    ws["B14"] = proforma.vehicle_model
+    ws["B14"].font = font_regular
+    
+    ws["A15"] = "Model Yılı:"
+    ws["A15"].font = font_bold
+    ws["B15"] = proforma.model_year or ""
+    ws["B15"].font = font_regular
+    
+    ws["C15"] = "Renk:"
+    ws["C15"].font = font_bold
+    ws["D15"] = proforma.color or ""
+    ws["D15"].font = font_regular
+    
+    ws["A16"] = "Şasi Numarası:"
+    ws["A16"].font = font_bold
+    ws["B16"] = proforma.chassis_no or ""
+    ws["B16"].font = font_regular
+    
+    ws["C16"] = "Motor Numarası:"
+    ws["C16"].font = font_bold
+    ws["D16"] = proforma.motor_no or ""
+    ws["D16"].font = font_regular
+    
+    ws["A17"] = "Motor Gücü:"
+    ws["A17"].font = font_bold
+    ws["B17"] = proforma.motor_power or ""
+    ws["B17"].font = font_regular
+    
+    ws["C17"] = "Azami Ağırlık:"
+    ws["C17"].font = font_bold
+    ws["D17"] = proforma.max_weight or ""
+    ws["D17"].font = font_regular
+    
+    ws.merge_cells("A19:D19")
+    ws["A19"] = "FİNANSAL DETAYLAR VE VERGİLER"
+    ws["A19"].font = font_section
+    ws["A19"].fill = fill_section
+    ws["A19"].alignment = Alignment(horizontal="left", indent=1)
+    
+    ws["A20"] = "Açıklama"
+    ws["A20"].font = font_bold
+    ws.merge_cells("B20:C20")
+    ws["B20"] = "Oran / Tutar Detayı"
+    ws["B20"].font = font_bold
+    ws["D20"] = "Tutar (TL)"
+    ws["D20"].font = font_bold
+    ws["D20"].alignment = Alignment(horizontal="right")
+    
+    ws["A21"] = "Araç Net Matrahı"
+    ws["A21"].font = font_regular
+    ws.merge_cells("B21:C21")
+    ws["B21"] = "Birim Fiyat"
+    ws["B21"].font = font_regular
+    ws["D21"] = proforma.unit_price
+    ws["D21"].font = font_regular
+    ws["D21"].number_format = '#,##0.00'
+    ws["D21"].alignment = Alignment(horizontal="right")
+    
+    ws["A22"] = "Özel Tüketim Vergisi (ÖTV)"
+    ws["A22"].font = font_regular
+    ws.merge_cells("B22:C22")
+    ws["B22"] = f"% {proforma.otv_rate}"
+    ws["B22"].font = font_regular
+    ws["D22"] = proforma.otv_amount
+    ws["D22"].font = font_regular
+    ws["D22"].number_format = '#,##0.00'
+    ws["D22"].alignment = Alignment(horizontal="right")
+    
+    ws["A23"] = "ÖTV'li Ara Toplam"
+    ws["A23"].font = font_bold
+    ws.merge_cells("B23:C23")
+    ws["B23"] = "Matrah + ÖTV"
+    ws["B23"].font = font_regular
+    ws["D23"] = proforma.subtotal
+    ws["D23"].font = font_bold
+    ws["D23"].number_format = '#,##0.00'
+    ws["D23"].alignment = Alignment(horizontal="right")
+    
+    ws["A24"] = "Katma Değer Vergisi (KDV)"
+    ws["A24"].font = font_regular
+    ws.merge_cells("B24:C24")
+    ws["B24"] = f"% {proforma.kdv_rate}"
+    ws["B24"].font = font_regular
+    ws["D24"] = proforma.kdv_amount
+    ws["D24"].font = font_regular
+    ws["D24"].number_format = '#,##0.00'
+    ws["D24"].alignment = Alignment(horizontal="right")
+    
+    ws["A25"] = "Anahtar Teslim Toplam Fiyat"
+    ws["A25"].font = font_bold
+    ws["A25"].fill = fill_zebra
+    ws.merge_cells("B25:C25")
+    ws["B25"] = "HER ŞEY DAHİL NET"
+    ws["B25"].font = font_bold
+    ws["B25"].fill = fill_zebra
+    ws["D25"] = proforma.grand_total
+    ws["D25"].font = font_bold
+    ws["D25"].fill = fill_zebra
+    ws["D25"].number_format = '#,##0.00'
+    ws["D25"].alignment = Alignment(horizontal="right")
+    ws["D25"].border = border_total
+    
+    ws.merge_cells("A26:D26")
+    ws["A26"] = f"Yalnız: {proforma.grand_total_words}"
+    ws["A26"].font = font_bold
+    ws["A26"].alignment = Alignment(horizontal="left", indent=1)
+    
+    ws.merge_cells("A28:D28")
+    ws["A28"] = "SATIŞ KOŞULLARI VE AÇIKLAMALAR"
+    ws["A28"].font = font_section
+    ws["A28"].fill = fill_section
+    ws["A28"].alignment = Alignment(horizontal="left", indent=1)
+    
+    ws["A29"] = "Teslim Yeri:"
+    ws["A29"].font = font_bold
+    ws.merge_cells("B29:D29")
+    ws["B29"] = proforma.delivery_place
+    ws["B29"].font = font_regular
+    
+    ws["A30"] = "Ödeme Şekli:"
+    ws["A30"].font = font_bold
+    ws.merge_cells("B30:D30")
+    ws["B30"] = proforma.payment_terms
+    ws["B30"].font = font_regular
+    
+    ws["A31"] = "Notlar & Açıklama:"
+    ws["A31"].font = font_bold
+    ws.merge_cells("B31:D33")
+    ws["B31"] = proforma.notes
+    ws["B31"].font = font_regular
+    ws["B31"].alignment = Alignment(wrap_text=True, vertical="top")
+    
+    for r in range(5, 34):
+        for c in range(1, 5):
+            cell = ws.cell(row=r, column=c)
+            if r in [9,10,11, 14,15,16,17, 21,22,23,24,25, 29,30,31,32,33]:
+                cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+                
+    file_stream = io.BytesIO()
+    wb.save(file_stream)
+    file_stream.seek(0)
+    
+    filename = f"PROFORMA_{proforma.invoice_number}.xlsx"
+    headers_dict = {
+        'Content-Disposition': f'attachment; filename="{filename}"'
+    }
+    return StreamingResponse(
+        file_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers_dict
+    )
 
 
 @router.put("/proformas/{proforma_id}", response_model=ProformaResponse)
