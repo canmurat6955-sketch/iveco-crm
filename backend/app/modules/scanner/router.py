@@ -790,7 +790,8 @@ async def scan_vergi_levhasi(
 
     # 3. Metin Ayrıştırma (Parse) Mantığı
     if ocr_text.strip():
-        lines = [line.strip() for line in ocr_text.split("\n") if line.strip()]
+        # Clean double spaces to simplify matches
+        ocr_clean = re.sub(r'\s+', ' ', ocr_text)
         
         unvan = None
         vkn = None
@@ -799,53 +800,52 @@ async def scan_vergi_levhasi(
         city = "SAMSUN"
         district = None
         
-        # VKN Ara (10 veya 11 hane)
-        vkn_match = re.search(r'(?:vergi\s+kimlik\s+no|vergi\s+no|kimlik\s+no|vkn)\s*[:\-\s]+(\d{10,11})', ocr_text, re.IGNORECASE)
+        # A. VKN Bulma (10-11 hane)
+        vkn_match = re.search(r'\b\d{10,11}\b', ocr_clean)
         if vkn_match:
-            vkn = vkn_match.group(1).strip()
+            vkn = vkn_match.group(0)
         else:
-            all_digits = re.findall(r'\b\d{10,11}\b', ocr_text)
-            if all_digits:
-                vkn = all_digits[0]
+            digits_only = "".join([c for c in ocr_clean if c.isdigit()])
+            for match in re.finditer(r'\d{10,11}', digits_only):
+                vkn = match.group(0)
+                break
                 
-        # Vergi Dairesi Ara
-        vd_match = re.search(r'(?:vergi\s+dairesi|dairesi)\s*[:\-\s]+([A-ZÇĞİÖŞÜa-zçğıöşü\s\.]+)', ocr_text, re.IGNORECASE)
+        # B. Vergi Dairesi Bulma
+        vd_match = re.search(r'([A-ZÇĞİÖŞÜa-zçğıöşü\d\s\-]+)\s+(?:V\.D\.|V\.D|VERGİ\s+DAİRESİ)\b', ocr_clean, re.IGNORECASE)
         if vd_match:
-            vergi_dairesi = vd_match.group(1).strip()
+            vd_candidate = vd_match.group(1).strip()
+            vd_words = vd_candidate.split()
+            if len(vd_words) > 2:
+                vergi_dairesi = " ".join(vd_words[-2:]) + " V.D."
+            else:
+                vergi_dairesi = vd_candidate + " V.D."
+            for label in ["VERGİ", "DAİRESİ", "KİMLİK", "NO", "TC", "V.D.", "V.D"]:
+                vergi_dairesi = re.sub(rf'^{label}\b', '', vergi_dairesi, flags=re.IGNORECASE).strip()
+                
+        # C. Unvan Bulma
+        suffix_pattern = r'([A-ZÇĞİÖŞÜa-zçğıöşü\d\s\.,\-\"\&]+(?:\bLİMİTED\s+ŞİRKETİ\b|\bLTD\s*\.\s*ŞTİ\b|\bANONİM\s+ŞİRKETİ\b|\bA\s*\.\s*Ş\b|\bAŞ\b|\bŞİRKETİ\b))'
+        company_match = re.search(suffix_pattern, ocr_clean, re.IGNORECASE)
+        if company_match:
+            unvan_candidate = company_match.group(1).strip()
+            unvan_clean = re.sub(r'.*(?:unvanı|unvan|mükellefin|adı soyadı veya ticaret ünvanı)\s*', '', unvan_candidate, flags=re.IGNORECASE).strip()
+            unvan = re.sub(r'^[:\-\s\.]+', '', unvan_clean).strip()
             
-        # Unvan Ara
-        unvan_match = re.search(r'(?:unvanı|unvan|adı\s+soyadı)\s*[:\-\s]+(.*)', ocr_text, re.IGNORECASE)
-        if unvan_match:
-            unvan = unvan_match.group(1).strip()
-            
-        # Adres Ara
-        address_match = re.search(r'(?:iş\s+yeri\s+adresi|adresi|adres)\s*[:\-\s]+(.*)', ocr_text, re.IGNORECASE)
-        if address_match:
-            address = address_match.group(1).strip()
-            
-        # Line-by-line fallback scanning
-        for line in lines:
-            line_clean = line.lower()
-            if "unvan" in line_clean and ":" in line:
-                val = line.split(":", 1)[1].strip()
-                if not unvan or len(val) > len(unvan):
-                    unvan = val
-            if "adres" in line_clean and ":" in line:
-                val = line.split(":", 1)[1].strip()
-                if not address or len(val) > len(address):
-                    address = val
-            if ("vergi dairesi" in line_clean or "dairesi" in line_clean) and ":" in line:
-                val = line.split(":", 1)[1].strip()
-                if not vergi_dairesi or len(val) > len(vergi_dairesi):
-                    vergi_dairesi = val
-            if "vergi kimlik" in line_clean and ":" in line:
-                digits = "".join([c for c in line.split(":", 1)[1] if c.isdigit()])
-                if len(digits) >= 10:
-                    vkn = digits
+        # D. Adres Bulma
+        if unvan:
+            parts = ocr_clean.split(unvan)
+            if len(parts) > 1:
+                after_unvan = parts[1].strip()
+                after_unvan = re.split(r'(?://|www\.|http|sorgulayabilirsiniz)', after_unvan, flags=re.IGNORECASE)[0].strip()
+                address = re.sub(r'^[:\-\s\.]+', '', after_unvan).strip()
+        else:
+            # Fallback to look for MAH., CAD., SOK.
+            address_match = re.search(r'(?:iş\s+yeri\s+adresi|adresi|adres)\s*[:\-\s]+(.*)', ocr_clean, re.IGNORECASE)
+            if address_match:
+                address = address_match.group(1).strip()
+                address = re.split(r'(?://|www\.|http|sorgulayabilirsiniz)', address, flags=re.IGNORECASE)[0].strip()
 
-        # City / District Parsing
+        # E. İl / İlçe Ayıklama
         if address:
-            address = re.sub(r'\s+', ' ', address)
             geo_match = re.search(r'([A-ZÇĞİÖŞÜa-zçğıöşü]+)\s*/\s*([A-ZÇĞİÖŞÜa-zçğıöşü]+)\b\s*$', address)
             if geo_match:
                 district = geo_match.group(1).strip().upper()
@@ -863,10 +863,10 @@ async def scan_vergi_levhasi(
                             pass
                         break
 
-        # Clean fields
-        if unvan: unvan = unvan.strip(" :-\t")
+        # Temizlik ve Formatlama
+        if unvan: unvan = unvan.strip(" :-\t").upper()
         if vergi_dairesi: vergi_dairesi = vergi_dairesi.strip(" :-\t").upper()
-        if address: address = address.strip(" :-\t")
+        if address: address = address.strip(" :-\t").upper()
         
         if unvan:
             return VergiLevhasiScanResponse(
