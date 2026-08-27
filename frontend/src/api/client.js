@@ -107,6 +107,7 @@ export const crmApi = {
   getProforma: (proformaId) => api.get(`/crm/proformas/${proformaId}`),
   updateProforma: (proformaId, data) => api.put(`/crm/proformas/${proformaId}`, data),
   deleteProforma: (proformaId) => api.delete(`/crm/proformas/${proformaId}`),
+  exportProformaExcel: (proformaId) => api.get(`/crm/proformas/${proformaId}/export-excel`, { responseType: 'blob' }),
   
   // Vehicle Catalog Endpoints
   searchVehicles: (query) => api.get('/crm/vehicles', { params: { query } }),
