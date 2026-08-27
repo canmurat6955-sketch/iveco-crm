@@ -4,23 +4,7 @@ import { crmApi, scannerApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
-const presetVehicles = [
-  { model: "IVECO DAILY 35C16 3.0 3750 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35C16 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35C18 3.0 3750 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35C18 3.0 4100 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S16 2.3 3520 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S16 2.3 3750 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S16 2.3 4100 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S18 3.0 3520 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S18 3.0 4100 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
-  { model: "IVECO DAILY 70C16 3.0 4350 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C16 3.0 4750 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C18 3.0 4350 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C18 3.0 4750 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C18D 3.0 4350 A8 HI-MATIC (ÇİFT KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C18D 3.0 4750 A8 HI-MATIC (ÇİFT KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." }
-];
+import { tsbVehicles } from '../../data/ivecoVehicles';
 
 // Speech Dictation Number Converter
 function parseTurkishNumber(text) {
@@ -100,6 +84,7 @@ export default function ProformaQuick() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
+  const [vehicleSearchTerm, setVehicleSearchTerm] = useState('');
   
   // OCR Customer Details
   const [customer, setCustomer] = useState({
@@ -326,6 +311,10 @@ export default function ProformaQuick() {
     }
   };
 
+  const filteredVehicles = tsbVehicles.filter(v => 
+    v.model.toLowerCase().includes(vehicleSearchTerm.toLowerCase())
+  );
+
   return (
     <div className="animate-in pb-12">
       <h2 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -400,14 +389,24 @@ export default function ProformaQuick() {
 
             {/* Hazır Şablon Seçimi */}
             <div className="form-group">
-              <label className="form-label" style={{ color: 'var(--accent-blue-light)', fontWeight: 600 }}>Hazır Araç Listesinden Seçin</label>
+              <label className="form-label" style={{ color: 'var(--accent-blue-light)', fontWeight: 600 }}>
+                Hazır Araç Listesinden Seçin ({tsbVehicles.length} Araç)
+              </label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Araç listesini aramak için yazın... (Örn: 35 C 13 veya 70 C)" 
+                value={vehicleSearchTerm} 
+                onChange={e => setVehicleSearchTerm(e.target.value)} 
+                style={{ fontSize: '0.85rem', padding: '6px 12px', marginBottom: '8px' }}
+              />
               <select 
                 className="form-input" 
-                defaultValue="" 
+                value="" 
                 onChange={e => {
                   const val = e.target.value;
                   if (val !== "") {
-                    const preset = presetVehicles[parseInt(val)];
+                    const preset = filteredVehicles[parseInt(val)];
                     setVehicle(prev => ({
                       ...prev,
                       vehicle_model: preset.model,
@@ -417,8 +416,10 @@ export default function ProformaQuick() {
                   }
                 }}
               >
-                <option value="">-- Listeden Araç Seçin (Otomatik doldurur) --</option>
-                {presetVehicles.map((p, idx) => (
+                <option value="">
+                  {filteredVehicles.length === 0 ? "Eşleşen araç bulunamadı" : `-- Eşleşen ${filteredVehicles.length} araç arasından seçin --`}
+                </option>
+                {filteredVehicles.map((p, idx) => (
                   <option key={idx} value={idx}>{p.model}</option>
                 ))}
               </select>
