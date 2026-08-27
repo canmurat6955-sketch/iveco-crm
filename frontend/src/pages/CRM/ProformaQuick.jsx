@@ -295,10 +295,11 @@ export default function ProformaQuick() {
       const wpMessage = `Sayın ${customer.company_name.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: https://iveco-crm.vercel.app/proformas/${proformaId}`;
       const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
       
-      window.open(wpUrl, '_blank');
-
-      // Navigate to the printable detail page
+      // Navigate to printable detail page first to set history, then redirect current tab to WhatsApp (bypasses popup blocker)
       navigate(`/proformas/${proformaId}`);
+      setTimeout(() => {
+        window.location.href = wpUrl;
+      }, 150);
 
     } catch (err) {
       toast.error('İşlem kaydedilirken hata oluştu.', { id: 'save' });

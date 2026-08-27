@@ -822,12 +822,13 @@ async def scan_vergi_levhasi(
             for label in ["VERGİ", "DAİRESİ", "KİMLİK", "NO", "TC", "V.D.", "V.D"]:
                 vergi_dairesi = re.sub(rf'^{label}\b', '', vergi_dairesi, flags=re.IGNORECASE).strip()
                 
-        # Alternatif/Kurumlar Vergi Dairesi Arama (Örn: TÜRÜ V.D. çıkarsa veya boşsa)
-        if not vergi_dairesi or any(x in vergi_dairesi.upper() for x in ["TÜR", "TUR", "TR"]) or len(vergi_dairesi) <= 10:
+        # Alternatif/Kurumlar Vergi Dairesi Arama (Örn: TÜRÜ V.D. veya VERGİ V.D. çıkarsa veya boşsa)
+        blacklist = ["TÜR", "TUR", "TR", "VERGİ", "VERGI", "DAİRE", "DAIRE", "VD", "LEVHA", "MÜKELLEF"]
+        if not vergi_dairesi or any(x in vergi_dairesi.upper() for x in blacklist) or len(vergi_dairesi) <= 10:
             pattern_alt = r'(?:KURUMLAR\s+VERG\S*|VERG\S*\s+DA\S*RES\S*)\s+([A-ZÇĞİÖŞÜa-zçğıöşü\uFFFD\w\?]+)\b'
             for m in re.finditer(pattern_alt, ocr_clean, re.IGNORECASE):
                 candidate = m.group(1).upper()
-                if not any(x in candidate for x in ["TÜR", "TUR", "TR"]):
+                if not any(x in candidate for x in blacklist):
                     vergi_dairesi = candidate + " V.D."
                     vergi_dairesi = vergi_dairesi.replace("\uFFFD", "Ğ").replace("SEMENLER", "SEĞMENLER")
                     break
