@@ -2,7 +2,7 @@
 CRM Pydantic schemas for request/response validation.
 """
 
-from datetime import datetime, date
+from datetime import datetime, date as dt_date
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
@@ -23,7 +23,7 @@ class CustomerCreate(BaseModel):
     current_fleet: Optional[str] = None
     estimated_fleet_size: Optional[int] = None
     previous_vehicles: Optional[str] = None
-    last_contact_date: Optional[date] = None
+    last_contact_date: Optional[dt_date] = None
     segment: str = Field(default="C", description="Müşteri segmenti: A/B/C/D")
     sales_notes: Optional[str] = None
     potential_level: str = Field(default="medium", description="very_high/high/medium/low")
@@ -54,7 +54,7 @@ class CustomerUpdate(BaseModel):
     current_fleet: Optional[str] = None
     estimated_fleet_size: Optional[int] = None
     previous_vehicles: Optional[str] = None
-    last_contact_date: Optional[date] = None
+    last_contact_date: Optional[dt_date] = None
     segment: Optional[str] = None
     sales_notes: Optional[str] = None
     potential_level: Optional[str] = None
@@ -87,7 +87,7 @@ class CustomerResponse(BaseModel):
     current_fleet: Optional[str] = None
     estimated_fleet_size: Optional[int] = None
     previous_vehicles: Optional[str] = None
-    last_contact_date: Optional[date] = None
+    last_contact_date: Optional[dt_date] = None
     segment: str
     sales_notes: Optional[str] = None
     potential_level: str
@@ -160,7 +160,7 @@ class InteractionCreate(BaseModel):
     interaction_type: str = Field(..., description="call/visit/email/whatsapp/meeting")
     notes: Optional[str] = None
     next_action: Optional[str] = None
-    next_action_date: Optional[date] = None
+    next_action_date: Optional[dt_date] = None
 
 
 class InteractionResponse(BaseModel):
@@ -170,7 +170,7 @@ class InteractionResponse(BaseModel):
     interaction_type: str
     notes: Optional[str] = None
     next_action: Optional[str] = None
-    next_action_date: Optional[date] = None
+    next_action_date: Optional[dt_date] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -226,8 +226,8 @@ class ProformaCreate(BaseModel):
     delivery_place: Optional[str] = None
     payment_terms: Optional[str] = None
     notes: Optional[str] = None
-    validity_date: Optional[date] = None
-    date: Optional[date] = None
+    validity_date: Optional[dt_date] = None
+    date: Optional[dt_date] = None
 
 
 class ProformaUpdate(BaseModel):
@@ -246,8 +246,8 @@ class ProformaUpdate(BaseModel):
     delivery_place: Optional[str] = None
     payment_terms: Optional[str] = None
     notes: Optional[str] = None
-    validity_date: Optional[date] = None
-    date: Optional[date] = None
+    validity_date: Optional[dt_date] = None
+    date: Optional[dt_date] = None
 
 
 class ProformaResponse(BaseModel):
@@ -256,8 +256,8 @@ class ProformaResponse(BaseModel):
     created_by_id: int
     
     invoice_number: str
-    date: date
-    validity_date: Optional[date] = None
+    date: dt_date
+    validity_date: Optional[dt_date] = None
     
     vehicle_model: str
     model_year: Optional[str] = None
