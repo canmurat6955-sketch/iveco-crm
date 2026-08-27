@@ -257,7 +257,10 @@ export default function ProformaQuick() {
       // 1. Check or Create Customer
       let customerId = null;
       if (customer.tax_number) {
-        const dupesRes = await crmApi.checkDuplicate({ tax_number: customer.tax_number });
+        const dupesRes = await crmApi.checkDuplicate({ 
+          company_name: customer.company_name || 'GEÇİCİ UNVAN',
+          tax_number: customer.tax_number 
+        });
         if (dupesRes.data && dupesRes.data.length > 0) {
           customerId = dupesRes.data[0].id;
         }
@@ -270,8 +273,7 @@ export default function ProformaQuick() {
           vergi_dairesi: customer.vergi_dairesi,
           address: customer.address,
           city: customer.city || 'SAMSUN',
-          district: customer.district || '',
-          status: 'active'
+          district: customer.district || ''
         });
         customerId = newCustomerRes.data.id;
       }

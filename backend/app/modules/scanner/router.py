@@ -822,6 +822,16 @@ async def scan_vergi_levhasi(
             for label in ["VERGİ", "DAİRESİ", "KİMLİK", "NO", "TC", "V.D.", "V.D"]:
                 vergi_dairesi = re.sub(rf'^{label}\b', '', vergi_dairesi, flags=re.IGNORECASE).strip()
                 
+        # Alternatif/Kurumlar Vergi Dairesi Arama (Örn: TÜRÜ V.D. çıkarsa veya boşsa)
+        if not vergi_dairesi or any(x in vergi_dairesi.upper() for x in ["TÜR", "TUR", "TR"]) or len(vergi_dairesi) <= 10:
+            pattern_alt = r'(?:KURUMLAR\s+VERG\S*|VERG\S*\s+DA\S*RES\S*)\s+([A-ZÇĞİÖŞÜa-zçğıöşü\uFFFD\w\?]+)\b'
+            for m in re.finditer(pattern_alt, ocr_clean, re.IGNORECASE):
+                candidate = m.group(1).upper()
+                if not any(x in candidate for x in ["TÜR", "TUR", "TR"]):
+                    vergi_dairesi = candidate + " V.D."
+                    vergi_dairesi = vergi_dairesi.replace("\uFFFD", "Ğ").replace("SEMENLER", "SEĞMENLER")
+                    break
+                
         # C. Unvan Bulma
         suffix_pattern = r'([A-ZÇĞİÖŞÜa-zçğıöşü\d\s\.,\-\"\&]+(?:\bLİMİTED\s+ŞİRKETİ\b|\bLTD\s*\.\s*ŞTİ\b|\bANONİM\s+ŞİRKETİ\b|\bA\s*\.\s*Ş\b|\bAŞ\b|\bŞİRKETİ\b))'
         company_match = re.search(suffix_pattern, ocr_clean, re.IGNORECASE)
@@ -843,6 +853,25 @@ async def scan_vergi_levhasi(
             if address_match:
                 address = address_match.group(1).strip()
                 address = re.split(r'(?://|www\.|http|sorgulayabilirsiniz)', address, flags=re.IGNORECASE)[0].strip()
+
+        # Adresi Şehir isminden sonra kesip NACE kodlarını ve tabloları temizleme
+        if address:
+            city_list = [
+                "SAMSUN", "ANKARA", "İSTANBUL", "ISTANBUL", "İZMİR", "IZMIR", "ORDU", "AMASYA", 
+                "SİNOP", "SINOP", "TOKAT", "GİRESUN", "GIRESUN", "TRABZON", "ÇORUM", "CORUM",
+                "RİZE", "RIZE", "ARTVİN", "ARTVIN", "GÜMÜŞHANE", "GUMUSHANE", "BAYBURT"
+            ]
+            address_upper = address.upper()
+            found_city_idx = -1
+            found_city_name = ""
+            for c_name in city_list:
+                idx = address_upper.find(c_name)
+                if idx != -1:
+                    if found_city_idx == -1 or idx > found_city_idx:
+                        found_city_idx = idx
+                        found_city_name = c_name
+            if found_city_idx != -1:
+                address = address[:found_city_idx + len(found_city_name)].strip()
 
         # E. İl / İlçe Ayıklama
         if address:
