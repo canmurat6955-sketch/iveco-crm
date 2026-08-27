@@ -114,34 +114,37 @@ export default function ProformaQuick() {
     validity_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   });
 
-  // Live calculation results
+  // Live calculation results (reverse calculated from net price)
   const [calculations, setCalculations] = useState({
     otv_amount: 0,
     subtotal: 0,
     kdv_amount: 0,
-    grand_total: 0
+    grand_total: 0,
+    matrah: 0
   });
 
   // Dictation States
   const [listeningField, setListeningField] = useState(null); // 'model' or 'price'
   const recognitionRef = useRef(null);
 
-  // Recalculate taxes
+  // Recalculate taxes reverse-calculated from net price (grand total)
   useEffect(() => {
-    const price = parseFloat(vehicle.unit_price) || 0;
+    const netPrice = parseFloat(vehicle.unit_price) || 0;
     const otvRate = parseFloat(vehicle.otv_rate) || 0;
     const kdvRate = parseFloat(vehicle.kdv_rate) || 0;
 
-    const otv_amount = Math.round(price * (otvRate / 100.0) * 100) / 100;
-    const subtotal = Math.round((price + otv_amount) * 100) / 100;
-    const kdv_amount = Math.round(subtotal * (kdvRate / 100.0) * 100) / 100;
-    const grand_total = Math.round((subtotal + kdv_amount) * 100) / 100;
+    const grand_total = netPrice;
+    const subtotal = grand_total / (1 + kdvRate / 100.0);
+    const kdv_amount = grand_total - subtotal;
+    const matrah = subtotal / (1 + otvRate / 100.0);
+    const otv_amount = subtotal - matrah;
 
     setCalculations({
-      otv_amount,
-      subtotal,
-      kdv_amount,
-      grand_total
+      otv_amount: Math.round(otv_amount * 100) / 100,
+      subtotal: Math.round(subtotal * 100) / 100,
+      kdv_amount: Math.round(kdv_amount * 100) / 100,
+      grand_total: Math.round(grand_total * 100) / 100,
+      matrah: Math.round(matrah * 100) / 100
     });
   }, [vehicle.unit_price, vehicle.otv_rate, vehicle.kdv_rate]);
 
@@ -276,7 +279,7 @@ export default function ProformaQuick() {
       // 2. Create Proforma Invoice
       const proformaPayload = {
         ...vehicle,
-        unit_price: parseFloat(vehicle.unit_price),
+        unit_price: calculations.matrah,
         otv_rate: parseFloat(vehicle.otv_rate),
         kdv_rate: parseFloat(vehicle.kdv_rate)
       };
@@ -398,7 +401,7 @@ export default function ProformaQuick() {
 
             {/* Price Box & Speech */}
             <div className="form-group">
-              <label className="form-label">Birim Fiyat (Matrah) Söyleyin veya Yazın *</label>
+              <label className="form-label">Net Satış Fiyatı (Anahtar Teslim - Her Şey Dahil) Söyleyin veya Yazın *</label>
               <div className="flex gap-2">
                 <input 
                   className="form-input" 
@@ -406,7 +409,7 @@ export default function ProformaQuick() {
                   step="0.01"
                   value={vehicle.unit_price} 
                   onChange={e => setVehicle({ ...vehicle, unit_price: e.target.value })} 
-                  placeholder="Birim matrah fiyatı girin veya mikrofona konuşun..." 
+                  placeholder="Net satış fiyatını girin veya mikrofona konuşun (Örn: 2500000)..." 
                   required 
                 />
                 <button 
@@ -423,15 +426,23 @@ export default function ProformaQuick() {
             {/* Calculations preview block */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
               <div className="flex justify-between text-xs text-muted">
+                <span>Hesaplanan Araç Matrahı (Net Fiyat):</span>
+                <span>{calculations.matrah.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
+              </div>
+              <div className="flex justify-between text-xs text-muted">
                 <span>ÖTV Tutarı (%{vehicle.otv_rate}):</span>
                 <span>{calculations.otv_amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
+              </div>
+              <div className="flex justify-between text-xs text-muted" style={{ borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '0.5rem' }}>
+                <span>Ara Toplam (KDV Hariç):</span>
+                <span>{calculations.subtotal.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
               </div>
               <div className="flex justify-between text-xs text-muted">
                 <span>KDV Tutarı (%{vehicle.kdv_rate}):</span>
                 <span>{calculations.kdv_amount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
               </div>
               <div className="flex justify-between font-bold" style={{ color: '#10b981', borderTop: '1px dashed var(--border-color)', paddingTop: '0.75rem', fontSize: '1.1rem' }}>
-                <span>Genel Toplam:</span>
+                <span>Genel Toplam (Anahtar Teslim):</span>
                 <span>{calculations.grand_total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</span>
               </div>
             </div>
