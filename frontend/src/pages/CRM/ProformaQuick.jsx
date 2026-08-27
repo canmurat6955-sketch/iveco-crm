@@ -5,12 +5,21 @@ import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
 const presetVehicles = [
-  { model: "IVECO DAILY 70C16 3.0 4350 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW", weight: "7200 KG." },
-  { model: "IVECO DAILY 70C18 3.0 4750 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "7200 KG." },
-  { model: "IVECO DAILY 35C16 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW", weight: "3500 KG." },
-  { model: "IVECO DAILY 35C18 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S16 2.3 3520 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW", weight: "3500 KG." },
-  { model: "IVECO DAILY 35S18 3.0 3520 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "3500 KG." }
+  { model: "IVECO DAILY 35C16 3.0 3750 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35C16 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35C18 3.0 3750 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35C18 3.0 4100 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S16 2.3 3520 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S16 2.3 3750 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S16 2.3 4100 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW (160 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S18 3.0 3520 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S18 3.0 4100 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "3500 KG." },
+  { model: "IVECO DAILY 70C16 3.0 4350 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C16 3.0 4750 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW (160 BG)", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C18 3.0 4350 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C18 3.0 4750 A8 HI-MATIC (ŞASİ KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C18D 3.0 4350 A8 HI-MATIC (ÇİFT KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C18D 3.0 4750 A8 HI-MATIC (ÇİFT KABİN)", power: "2998 CM3 132 KW (180 BG)", weight: "7200 KG." }
 ];
 
 // Speech Dictation Number Converter
