@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload } from 'react-icons/fi';
+import html2pdf from 'html2pdf.js';
 
 export default function ProformaDetail() {
   const { id } = useParams();
@@ -29,6 +30,33 @@ export default function ProformaDetail() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('proforma-sheet');
+    if (!element) {
+      toast.error('Proforma şablonu bulunamadı.');
+      return;
+    }
+    
+    const opt = {
+      margin:       0.3,
+      filename:     `PROFORMA_${proforma.invoice_number}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, logging: false, useCORS: true },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    
+    toast.loading('PDF hazırlanıyor ve indiriliyor...', { id: 'pdf' });
+    
+    html2pdf().from(element).set(opt).save()
+      .then(() => {
+        toast.success('PDF başarıyla indirildi!', { id: 'pdf' });
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
+      });
   };
 
   const handleWhatsAppShare = () => {
@@ -71,6 +99,9 @@ export default function ProformaDetail() {
           <button onClick={handleWhatsAppShare} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#25D366', borderColor: '#25D366' }}>
             <FiMessageCircle size={16} /> WhatsApp Paylaş
           </button>
+          <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#1e40af', borderColor: '#1e40af' }}>
+            <FiDownload size={16} /> PDF İndir
+          </button>
           <button onClick={handlePrint} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <FiPrinter size={16} /> Yazdır / PDF Kaydet
           </button>
@@ -78,7 +109,7 @@ export default function ProformaDetail() {
       </div>
 
       {/* Printable Sheet A4 styled */}
-      <div className="print-container" style={{
+      <div id="proforma-sheet" className="print-container" style={{
         background: '#fff',
         color: '#000',
         padding: '24px',
