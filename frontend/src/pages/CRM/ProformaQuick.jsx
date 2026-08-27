@@ -4,6 +4,15 @@ import { crmApi, scannerApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
+const presetVehicles = [
+  { model: "IVECO DAILY 70C16 3.0 4350 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW", weight: "7200 KG." },
+  { model: "IVECO DAILY 70C18 3.0 4750 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "7200 KG." },
+  { model: "IVECO DAILY 35C16 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 118 KW", weight: "3500 KG." },
+  { model: "IVECO DAILY 35C18 3.0 4100 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S16 2.3 3520 A8 (ŞASİ KABİN)", power: "2287 CM3 118 KW", weight: "3500 KG." },
+  { model: "IVECO DAILY 35S18 3.0 3520 A8 (ŞASİ KABİN)", power: "2998 CM3 132 KW", weight: "3500 KG." }
+];
+
 // Speech Dictation Number Converter
 function parseTurkishNumber(text) {
   text = text.toLowerCase()
@@ -379,6 +388,32 @@ export default function ProformaQuick() {
           
           <div className="card glass-card">
             <div className="section-title">TEKLİF EDİLECEK ARAÇ VE FİYAT</div>
+
+            {/* Hazır Şablon Seçimi */}
+            <div className="form-group">
+              <label className="form-label" style={{ color: 'var(--accent-blue-light)', fontWeight: 600 }}>Hazır Araç Listesinden Seçin</label>
+              <select 
+                className="form-input" 
+                defaultValue="" 
+                onChange={e => {
+                  const val = e.target.value;
+                  if (val !== "") {
+                    const preset = presetVehicles[parseInt(val)];
+                    setVehicle(prev => ({
+                      ...prev,
+                      vehicle_model: preset.model,
+                      motor_power: preset.power,
+                      max_weight: preset.weight
+                    }));
+                  }
+                }}
+              >
+                <option value="">-- Listeden Araç Seçin (Otomatik doldurur) --</option>
+                {presetVehicles.map((p, idx) => (
+                  <option key={idx} value={idx}>{p.model}</option>
+                ))}
+              </select>
+            </div>
 
             {/* Vehicle Model & Speech */}
             <div className="form-group">
