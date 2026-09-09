@@ -72,7 +72,16 @@ export default function CampaignList() {
               <p>Yüklenme: {new Date(c.created_at).toLocaleDateString('tr-TR')}</p>
             </div>
             <div className="flex gap-2">
-              {c.file_name && <a href={`/api/campaigns/${c.id}/download`} className="btn btn-secondary btn-sm" target="_blank">📥 İndir</a>}
+              {c.file_name && (
+                <a 
+                  href={`${import.meta.env.VITE_API_URL || '/api'}/campaigns/${c.id}/download`} 
+                  className="btn btn-secondary btn-sm" 
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  📥 İndir
+                </a>
+              )}
               <button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>Sil</button>
             </div>
           </div>

@@ -295,7 +295,8 @@ export default function ProformaQuick() {
       toast.success('Proforma başarıyla oluşturuldu!', { id: 'save' });
 
       // 3. Share on WhatsApp
-      const wpMessage = `Sayın ${customer.company_name.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: https://iveco-crm.vercel.app/proformas/${proformaId}`;
+      const origin = window.location.origin;
+      const wpMessage = `Sayın ${customer.company_name.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: ${origin}/proformas/${proformaId}`;
       const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
       
       // Navigate to printable detail page first to set history, then redirect current tab to WhatsApp (bypasses popup blocker)

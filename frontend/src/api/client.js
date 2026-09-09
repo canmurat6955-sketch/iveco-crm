@@ -47,7 +47,13 @@ api.interceptors.response.use(
       else if (config.url.includes('/activities')) description = "Satış Aktivitesi Kaydı";
       else if (config.url.includes('/customers')) description = "Müşteri Değişikliği";
       
-      offlineSync.queueRequest(config.url, config.method, JSON.parse(config.data || '{}'), description);
+      let parsedData = {};
+      try {
+        parsedData = typeof config.data === 'string' ? JSON.parse(config.data) : (config.data || {});
+      } catch (e) {
+        parsedData = config.data || {};
+      }
+      offlineSync.queueRequest(config.url, config.method, parsedData, description);
       
       // Hata fırlatmak yerine, uygulamanın devam etmesi için başarılıymış gibi simüle edilmiş response dön
       return Promise.resolve({

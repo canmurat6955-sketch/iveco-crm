@@ -885,38 +885,11 @@ async def scan_card(
             longitude=lon
         )
 
-    # 5. Fallback Mock Desteği
-    mock_cards = [
-        {
-            "contact_name": "Mustafa Öztürk",
-            "role": "Lojistik Müdürü",
-            "phone": "0533 456 7890",
-            "email": "mustafa.ozturk@ozturklojistik.com",
-            "company_name": "Öztürk Global Lojistik A.Ş.",
-            "address": "Samsun OSB, Tekkeköy / Samsun",
-            "website": "ozturklojistik.com"
-        },
-        {
-            "contact_name": "Serkan Yılmaz",
-            "role": "Satın Alma Sorumlusu",
-            "phone": "0542 987 6543",
-            "email": "syilmaz@karadenizbeton.com.tr",
-            "company_name": "Karadeniz Hazır Beton Ltd. Şti.",
-            "address": "Sanayi Sitesi, Altınordu / Ordu",
-            "website": "karadenizbeton.com.tr"
-        },
-        {
-            "contact_name": "Elif Demir",
-            "role": "Genel Müdür Yardımcısı",
-            "phone": "0505 111 2233",
-            "email": "edemir@demirinsaat.com",
-            "company_name": "Demir İnşaat Yapı Grubu",
-            "address": "Meydan Mahallesi, Merkez / Çorum",
-            "website": "demirinsaat.com"
-        }
-    ]
-    selected = random.choice(mock_cards)
-    return CardScanResponse(**selected)
+    # 5. Metin okunamadıysa sahte veri dönmek yerine şeffaf hata fırlat
+    raise HTTPException(
+        status_code=422,
+        detail="Kartvizit üzerindeki metinler okunamadı veya ayrıştırılamadı. Lütfen daha net, düz ve iyi aydınlatılmış bir fotoğraf yükleyin."
+    )
 
 
 class VergiLevhasiScanResponse(BaseModel):
@@ -1084,13 +1057,9 @@ async def scan_vergi_levhasi(
                 district=district
             )
 
-    return VergiLevhasiScanResponse(
-        company_name="AKGÜL METİN GIDA TARIM ÜRÜNLERİ İNŞAAT NAKLİYE SANAYİ VE TİCARET LİMİTED ŞİRKETİ",
-        tax_number="241450137",
-        vergi_dairesi="SALIPAZARI V.D.",
-        address="YENİ MAH. VATAN CAD. NO: 10 B SALIPAZARI/SAMSUN",
-        city="SAMSUN",
-        district="SALIPAZARI"
+    raise HTTPException(
+        status_code=422,
+        detail="Vergi levhası okunamadı veya unvan/VKN bilgisi tespit edilemedi. Lütfen net bir PDF veya kaliteli bir fotoğraf yükleyin."
     )
 
 

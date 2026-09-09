@@ -80,7 +80,8 @@ export default function ProformaDetail() {
   };
 
   const handleWhatsAppShare = () => {
-    const wpMessage = `Sayın ${customer?.company_name?.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: https://iveco-crm.vercel.app/proformas/${proforma.id}`;
+    const origin = window.location.origin;
+    const wpMessage = `Sayın ${customer?.company_name?.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: ${origin}/proformas/${proforma.id}`;
     const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
     window.open(wpUrl, '_blank');
   };
