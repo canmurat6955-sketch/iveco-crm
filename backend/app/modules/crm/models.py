@@ -55,6 +55,8 @@ class Customer(Base):
     interactions = relationship("CustomerInteraction", back_populates="customer", cascade="all, delete-orphan")
     contacts = relationship("CustomerContact", back_populates="customer", cascade="all, delete-orphan")
     proformas = relationship("ProformaInvoice", back_populates="customer", cascade="all, delete-orphan")
+    fleet_vehicles = relationship("CustomerFleetVehicle", back_populates="customer", cascade="all, delete-orphan")
+    reminders = relationship("CustomerReminder", back_populates="customer", cascade="all, delete-orphan")
 
     # Composite indexes for duplicate detection
     __table_args__ = (
@@ -173,5 +175,55 @@ class Vehicle(Base):
 
     def __repr__(self):
         return f"<Vehicle {self.model_name} ({self.unit_price} TL)>"
+
+
+class CustomerFleetVehicle(Base):
+    """Müşterinin mevcut araç filosundaki araçlar."""
+    __tablename__ = "customer_fleet_vehicles"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    brand = Column(String(100), nullable=False)  # IVECO, Ford, Mercedes-Benz, Isuzu, Fiat, vb.
+    model = Column(String(200), nullable=False)  # Daily 35S16, Transit 350L, Sprinter, etc.
+    model_year = Column(Integer, nullable=True)  # 2020, 2021, 2022 etc.
+    plate_number = Column(String(50), nullable=True)  # 55 ABC 123
+    body_type = Column(String(100), nullable=True)  # Açık Sac Kasa, Kapalı Alüminyum, Frigorifik, Damper, vb.
+    fuel_type = Column(String(50), nullable=True, default="Dizel")
+    estimated_replacement_year = Column(Integer, nullable=True)  # 2026 vb.
+    mileage = Column(Integer, nullable=True)
+    notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    customer = relationship("Customer", back_populates="fleet_vehicles")
+
+    def __repr__(self):
+        return f"<FleetVehicle {self.brand} {self.model} ({self.model_year}) for Customer#{self.customer_id}>"
+
+
+class CustomerReminder(Base):
+    """Müşteri takip ve zaman zaman bilgilendirme hatırlatıcıları."""
+    __tablename__ = "customer_reminders"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    reminder_date = Column(Date, nullable=False)
+    reminder_type = Column(String(100), nullable=False, default="takip")  # filo_yenileme, kampanya, ziyaret, servis_kasko, takip
+    title = Column(String(255), nullable=False)
+    notes = Column(Text, nullable=True)
+    is_completed = Column(Boolean, default=False)
+    completed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    customer = relationship("Customer", back_populates="reminders")
+    user = relationship("User", foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f"<Reminder {self.title} on {self.reminder_date} for Customer#{self.customer_id}>"
+
 
 

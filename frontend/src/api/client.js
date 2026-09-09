@@ -119,7 +119,21 @@ export const crmApi = {
         'Content-Type': 'multipart/form-data'
       }
     });
-  }
+  },
+
+  // Fleet Endpoints
+  getFleet: (customerId) => api.get(`/crm/customers/${customerId}/fleet`),
+  addFleetVehicle: (customerId, data) => api.post(`/crm/customers/${customerId}/fleet`, data),
+  updateFleetVehicle: (vehicleId, data) => api.put(`/crm/fleet/${vehicleId}`, data),
+  deleteFleetVehicle: (vehicleId) => api.delete(`/crm/fleet/${vehicleId}`),
+  getFleetRenewalOpportunities: () => api.get('/crm/fleet/renewal-opportunities'),
+
+  // Reminder Endpoints
+  getReminders: (customerId) => api.get(`/crm/customers/${customerId}/reminders`),
+  addReminder: (customerId, data) => api.post(`/crm/customers/${customerId}/reminders`, data),
+  updateReminder: (reminderId, data) => api.put(`/crm/reminders/${reminderId}`, data),
+  deleteReminder: (reminderId) => api.delete(`/crm/reminders/${reminderId}`),
+  getUpcomingReminders: (days = 14) => api.get('/crm/reminders/upcoming', { params: { days } })
 };
 
 // ── Discovery API ───────────────────────────────────────────────

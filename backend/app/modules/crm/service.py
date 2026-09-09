@@ -10,12 +10,14 @@ from fuzzywuzzy import fuzz
 from urllib.parse import urlparse
 from datetime import datetime, timedelta, timezone, date as date_type
 
-from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice, Vehicle
+from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice, Vehicle, CustomerFleetVehicle, CustomerReminder
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerListResponse,
     CustomerResponse, InteractionCreate, CRMStats, DuplicateGroup,
     ContactCreate, ContactUpdate, ContactResponse,
     ProformaCreate, ProformaUpdate, ProformaResponse,
+    FleetVehicleCreate, FleetVehicleUpdate, FleetVehicleResponse,
+    ReminderCreate, ReminderUpdate, ReminderResponse,
 )
 from app.core.deps import PaginationParams, CustomerFilterParams
 
@@ -664,6 +666,209 @@ class CRMService:
         if query:
             q = q.filter(Vehicle.model_name.ilike(f"%{query}%"))
         return q.limit(30).all()
+
+
+    # ── Fleet Vehicle Methods ──────────────────────────────────────────
+
+    def get_fleet(self, customer_id: int) -> List[FleetVehicleResponse]:
+        vehicles = self.db.query(CustomerFleetVehicle).filter(
+            CustomerFleetVehicle.customer_id == customer_id
+        ).order_by(CustomerFleetVehicle.id.desc()).all()
+        
+        current_year = datetime.now(timezone.utc).year
+        result = []
+        for v in vehicles:
+            age = (current_year - v.model_year) if v.model_year else None
+            is_due = (age is not None and age >= 3) or (v.estimated_replacement_year is not None and v.estimated_replacement_year <= current_year)
+            
+            resp = FleetVehicleResponse(
+                id=v.id,
+                customer_id=v.customer_id,
+                brand=v.brand,
+                model=v.model,
+                model_year=v.model_year,
+                plate_number=v.plate_number,
+                body_type=v.body_type,
+                fuel_type=v.fuel_type,
+                estimated_replacement_year=v.estimated_replacement_year,
+                mileage=v.mileage,
+                notes=v.notes,
+                created_at=v.created_at,
+                updated_at=v.updated_at,
+                vehicle_age=age,
+                is_renewal_due=is_due
+            )
+            result.append(resp)
+        return result
+
+    def add_fleet_vehicle(self, customer_id: int, data: FleetVehicleCreate) -> CustomerFleetVehicle:
+        customer = self.db.query(Customer).filter(Customer.id == customer_id).first()
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Müşteri bulunamadı")
+            
+        vehicle = CustomerFleetVehicle(
+            customer_id=customer_id,
+            brand=data.brand,
+            model=data.model,
+            model_year=data.model_year,
+            plate_number=data.plate_number,
+            body_type=data.body_type,
+            fuel_type=data.fuel_type or "Dizel",
+            estimated_replacement_year=data.estimated_replacement_year,
+            mileage=data.mileage,
+            notes=data.notes
+        )
+        self.db.add(vehicle)
+        self.db.commit()
+        self.db.refresh(vehicle)
+        
+        fleet_count = self.db.query(CustomerFleetVehicle).filter(CustomerFleetVehicle.customer_id == customer_id).count()
+        customer.estimated_fleet_size = fleet_count
+        self.db.commit()
+        
+        return vehicle
+
+    def update_fleet_vehicle(self, vehicle_id: int, data: FleetVehicleUpdate) -> CustomerFleetVehicle:
+        vehicle = self.db.query(CustomerFleetVehicle).filter(CustomerFleetVehicle.id == vehicle_id).first()
+        if not vehicle:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Filo aracı bulunamadı")
+            
+        update_data = data.model_dump(exclude_unset=True)
+        for k, val in update_data.items():
+            setattr(vehicle, k, val)
+            
+        self.db.commit()
+        self.db.refresh(vehicle)
+        return vehicle
+
+    def delete_fleet_vehicle(self, vehicle_id: int):
+        vehicle = self.db.query(CustomerFleetVehicle).filter(CustomerFleetVehicle.id == vehicle_id).first()
+        if not vehicle:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Filo aracı bulunamadı")
+        cust_id = vehicle.customer_id
+        self.db.delete(vehicle)
+        self.db.commit()
+        
+        customer = self.db.query(Customer).filter(Customer.id == cust_id).first()
+        if customer:
+            customer.estimated_fleet_size = self.db.query(CustomerFleetVehicle).filter(CustomerFleetVehicle.customer_id == cust_id).count()
+            self.db.commit()
+
+    def get_fleet_renewal_opportunities(self) -> List[dict]:
+        current_year = datetime.now(timezone.utc).year
+        cutoff_year = current_year - 3
+        
+        vehicles = self.db.query(CustomerFleetVehicle).join(Customer).filter(
+            Customer.is_active == True,
+            or_(
+                CustomerFleetVehicle.model_year <= cutoff_year,
+                CustomerFleetVehicle.estimated_replacement_year <= current_year
+            )
+        ).order_by(CustomerFleetVehicle.model_year.asc()).all()
+        
+        opportunities = []
+        for v in vehicles:
+            age = (current_year - v.model_year) if v.model_year else None
+            opportunities.append({
+                "vehicle_id": v.id,
+                "customer_id": v.customer_id,
+                "company_name": v.customer.company_name,
+                "customer_phone": v.customer.phone,
+                "city": v.customer.city,
+                "district": v.customer.district,
+                "brand": v.brand,
+                "model": v.model,
+                "model_year": v.model_year,
+                "plate_number": v.plate_number,
+                "body_type": v.body_type,
+                "vehicle_age": age,
+                "is_renewal_due": True,
+                "notes": v.notes
+            })
+        return opportunities
+
+
+    # ── Reminder Methods ────────────────────────────────────────────────
+
+    def get_reminders(self, customer_id: int) -> List[CustomerReminder]:
+        return self.db.query(CustomerReminder).filter(
+            CustomerReminder.customer_id == customer_id
+        ).order_by(CustomerReminder.is_completed.asc(), CustomerReminder.reminder_date.asc()).all()
+
+    def add_reminder(self, customer_id: int, user_id: Optional[int], data: ReminderCreate) -> CustomerReminder:
+        customer = self.db.query(Customer).filter(Customer.id == customer_id).first()
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Müşteri bulunamadı")
+            
+        reminder = CustomerReminder(
+            customer_id=customer_id,
+            user_id=user_id,
+            reminder_date=data.reminder_date,
+            reminder_type=data.reminder_type,
+            title=data.title,
+            notes=data.notes,
+            is_completed=False
+        )
+        self.db.add(reminder)
+        self.db.commit()
+        self.db.refresh(reminder)
+        return reminder
+
+    def update_reminder(self, reminder_id: int, data: ReminderUpdate) -> CustomerReminder:
+        reminder = self.db.query(CustomerReminder).filter(CustomerReminder.id == reminder_id).first()
+        if not reminder:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hatırlatıcı bulunamadı")
+            
+        update_data = data.model_dump(exclude_unset=True)
+        if "is_completed" in update_data:
+            if update_data["is_completed"]:
+                reminder.completed_at = datetime.now(timezone.utc)
+            else:
+                reminder.completed_at = None
+                
+        for k, val in update_data.items():
+            setattr(reminder, k, val)
+            
+        self.db.commit()
+        self.db.refresh(reminder)
+        return reminder
+
+    def delete_reminder(self, reminder_id: int):
+        reminder = self.db.query(CustomerReminder).filter(CustomerReminder.id == reminder_id).first()
+        if not reminder:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hatırlatıcı bulunamadı")
+        self.db.delete(reminder)
+        self.db.commit()
+
+    def get_upcoming_reminders(self, days_ahead: int = 14) -> List[dict]:
+        today = date_type.today()
+        end_date = today + timedelta(days=days_ahead)
+        
+        reminders = self.db.query(CustomerReminder).join(Customer).filter(
+            Customer.is_active == True,
+            CustomerReminder.is_completed == False,
+            CustomerReminder.reminder_date <= end_date
+        ).order_by(CustomerReminder.reminder_date.asc()).all()
+        
+        result = []
+        for r in reminders:
+            result.append({
+                "id": r.id,
+                "customer_id": r.customer_id,
+                "company_name": r.customer.company_name,
+                "customer_phone": r.customer.phone,
+                "city": r.customer.city,
+                "district": r.customer.district,
+                "reminder_date": r.reminder_date,
+                "reminder_type": r.reminder_type,
+                "title": r.title,
+                "notes": r.notes,
+                "is_completed": r.is_completed,
+                "created_at": r.created_at,
+                "is_overdue": r.reminder_date < today
+            })
+        return result
+
 
 
 

@@ -4,7 +4,7 @@ import { dashboardApi, crmApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
-import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap } from 'react-icons/fi';
+import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
 
@@ -25,6 +25,10 @@ export default function Dashboard() {
   const [discoveries, setDiscoveries] = useState([]);
   const [highPotential, setHighPotential] = useState([]);
   const [todayCalls, setTodayCalls] = useState([]);
+
+  // Filo Yenileme & Akıllı Takip State'leri
+  const [upcomingReminders, setUpcomingReminders] = useState([]);
+  const [renewalOpportunities, setRenewalOpportunities] = useState([]);
   
   // GPS ve Yakınım State'leri
   const { location, error: gpsError, loading: gpsLoading } = useGeolocation();
@@ -45,6 +49,8 @@ export default function Dashboard() {
       dashboardApi.getNewDiscoveries().then(r => setDiscoveries(r.data)),
       dashboardApi.getHighPotential().then(r => setHighPotential(r.data)),
       dashboardApi.getTodayCalls().then(r => setTodayCalls(r.data)),
+      crmApi.getUpcomingReminders(14).then(r => setUpcomingReminders(r.data || [])),
+      crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
     ]).catch(() => {});
   }, []);
 
@@ -181,6 +187,58 @@ export default function Dashboard() {
             )}
           </div>
         </section>
+
+        {/* Yaklaşan Bilgilendirmeler & Hatırlatıcılar */}
+        {upcomingReminders.length > 0 && (
+          <section className="mobile-section mb-6">
+            <div className="flex justify-between items-center mb-3">
+              <div className="section-title" style={{ margin: 0 }}>YAKLAŞAN BİLGİLENDİRMELER (14 GÜN)</div>
+              <span className="badge badge-purple">{upcomingReminders.length}</span>
+            </div>
+            <div className="mobile-list">
+              {upcomingReminders.slice(0, 5).map((r, i) => (
+                <div key={i} className="mobile-list-item" onClick={() => navigate(`/customers/${r.customer_id}`)}>
+                  <div className="item-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>
+                    <FiBell size={16} />
+                  </div>
+                  <div className="item-details">
+                    <div className="item-name">{r.company_name}</div>
+                    <div className="item-sub">{r.title} · {r.reminder_date}</div>
+                  </div>
+                  {r.is_overdue ? (
+                    <span className="badge badge-red">Gecikmiş</span>
+                  ) : (
+                    <span className="badge badge-purple">Yakında</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Filo Yenileme Fırsatları */}
+        {renewalOpportunities.length > 0 && (
+          <section className="mobile-section mb-6">
+            <div className="flex justify-between items-center mb-3">
+              <div className="section-title" style={{ margin: 0 }}>FİLO YENİLEME FIRSATLARI (≥3 YAŞ)</div>
+              <span className="badge badge-amber">{renewalOpportunities.length}</span>
+            </div>
+            <div className="mobile-list">
+              {renewalOpportunities.slice(0, 5).map((v, i) => (
+                <div key={i} className="mobile-list-item" onClick={() => navigate(`/customers/${v.customer_id}`)}>
+                  <div className="item-avatar" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
+                    <FiTruck size={16} />
+                  </div>
+                  <div className="item-details">
+                    <div className="item-name">{v.company_name}</div>
+                    <div className="item-sub">{v.brand} {v.model} ({v.model_year || '—'}) {v.plate_number ? `· ${v.plate_number}` : ''}</div>
+                  </div>
+                  <span className="badge badge-amber">{v.vehicle_age} Yaş</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     );
   }
@@ -269,6 +327,69 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Fleet Renewal & Upcoming Reminders Row */}
+      <div className="dashboard-row-2" style={{ marginBottom: '1.5rem' }}>
+        {/* Filo Yenileme Fırsatları */}
+        <div className="card glass-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FiRefreshCw style={{ marginRight: 8, color: 'var(--accent-amber)' }} /> Filo Yenileme Fırsatları (≥3 Yaş)
+            </h3>
+            <span className="badge badge-amber">{renewalOpportunities.length} Araç</span>
+          </div>
+          {renewalOpportunities.length > 0 ? (
+            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
+              {renewalOpportunities.slice(0, 6).map((v, i) => (
+                <div key={i} className="list-item" onClick={() => navigate(`/customers/${v.customer_id}`)} style={{ cursor: 'pointer' }}>
+                  <div className="list-avatar" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
+                    <FiTruck size={16} />
+                  </div>
+                  <div className="list-item-content">
+                    <div className="list-item-title">{v.company_name} <span className="text-xs text-muted">({v.city || '—'})</span></div>
+                    <div className="list-item-subtitle">{v.brand} {v.model} {v.plate_number ? `[${v.plate_number}]` : ''} · Model: {v.model_year}</div>
+                  </div>
+                  <span className="badge badge-amber">{v.vehicle_age} Yaşında</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state"><p>Yenileme kriterine uyan araç kaydı bulunmuyor.</p></div>
+          )}
+        </div>
+
+        {/* Yaklaşan Bilgilendirmeler */}
+        <div className="card glass-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FiBell style={{ marginRight: 8, color: 'var(--accent-purple)' }} /> Yaklaşan Müşteri Bilgilendirmeleri (14 Gün)
+            </h3>
+            <span className="badge badge-purple">{upcomingReminders.length} Bildirim</span>
+          </div>
+          {upcomingReminders.length > 0 ? (
+            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
+              {upcomingReminders.slice(0, 6).map((r, i) => (
+                <div key={i} className="list-item" onClick={() => navigate(`/customers/${r.customer_id}`)} style={{ cursor: 'pointer' }}>
+                  <div className="list-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>
+                    <FiCalendar size={16} />
+                  </div>
+                  <div className="list-item-content">
+                    <div className="list-item-title">{r.company_name}</div>
+                    <div className="list-item-subtitle">{r.title} · <span style={{ color: 'var(--accent-blue-light)' }}>{r.reminder_date}</span></div>
+                  </div>
+                  {r.is_overdue ? (
+                    <span className="badge badge-red">Gecikti</span>
+                  ) : (
+                    <span className="badge badge-purple">Yakında</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state"><p>Önümüzdeki 14 gün için planlanan hatırlatıcı yok.</p></div>
+          )}
+        </div>
+      </div>
 
       {/* Action Lists Row */}
       <div className="dashboard-row-3">
