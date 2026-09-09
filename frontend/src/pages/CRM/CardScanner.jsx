@@ -71,13 +71,16 @@ export default function CardScanner() {
       setEmail(data.email || '');
       setWebsite(data.website || '');
       setAddress(data.address || '');
+
+      // Backend'in akıllı çözdüğü konum ve koordinatları ata
+      if (data.city) setResolvedCity(data.city);
+      if (data.district) setResolvedDistrict(data.district);
+      if (data.latitude && data.longitude) {
+        setLatitude(data.latitude.toString());
+        setLongitude(data.longitude.toString());
+      }
       
       toast.success("Kartvizit başarıyla tarandı! Lütfen bilgileri kontrol edin.", { id: 'ocr_load' });
-
-      // Adres varsa otomatik koordinat bulmayı tetikle
-      if (data.address) {
-        setTimeout(() => { fetchLocationFromAddressDirect(data.address); }, 600);
-      }
     } catch (err) {
       toast.error(err.response?.data?.detail || "Tarama sırasında bir hata oluştu.", { id: 'ocr_load' });
     } finally {
@@ -129,39 +132,69 @@ export default function CardScanner() {
       return;
     }
     toast.loading("Adresten koordinat aranıyor...", { id: 'addr_load' });
-    await fetchLocationFromAddressDirect(address);
+    await fetchLocationFromAddressDirect(address, true);
   };
 
-  const fetchLocationFromAddressDirect = async (addrText) => {
-    const query = addrText || address;
-    if (!query.trim()) return;
+  const fetchLocationFromAddressDirect = async (addrText, isManual = false) => {
+    const raw = addrText || address;
+    if (!raw || !raw.trim()) return;
+
+    const turkishCities = ['Samsun', 'Ordu', 'Çorum', 'Corum', 'Amasya', 'Sinop', 'Tokat', 'Giresun', 'Trabzon', 'İstanbul', 'Istanbul', 'Ankara', 'İzmir', 'Izmir', 'Bursa', 'Antalya'];
+    const turkishDistricts = ['İlkadım', 'Ilkadim', 'Atakum', 'Canik', 'Tekkeköy', 'Tekkekoy', 'Çarşamba', 'Carsamba', 'Bafra', 'Terme', 'Havza', 'Vezirköprü', 'Alaçam', '19 Mayıs', 'Kavak', 'Salıpazarı', 'Ayvacık', 'Asarcık', 'Ladik', 'Yakakent', 'Altınordu', 'Ünye', 'Fatsa', 'Merzifon', 'Suluova'];
+
+    let foundCity = 'Samsun';
+    for (const c of turkishCities) {
+      if (new RegExp(`\\b${c}\\b`, 'i').test(raw)) {
+        foundCity = c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+        break;
+      }
+    }
+
+    let foundDistrict = null;
+    for (const d of turkishDistricts) {
+      if (new RegExp(`\\b${d}\\b`, 'i').test(raw)) {
+        foundDistrict = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
+        break;
+      }
+    }
+
+    const cleaned = raw.replace(/^(?:Adres|Address)\s*[:\.-]?\s*/i, '').replace(/[/,]/g, ' ').trim();
+    const candidates = [cleaned];
+    if (foundDistrict && foundCity) candidates.push(`${foundDistrict}, ${foundCity}`);
+    else if (foundDistrict) candidates.push(`${foundDistrict}, Samsun`);
+    if (foundCity) candidates.push(foundCity);
+    candidates.push('Samsun, Türkiye');
+
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
-        headers: { 'Accept-Language': 'tr' }
-      });
-      const results = await response.json();
-      if (results && results.length > 0) {
-        const res = results[0];
-        setLatitude(res.lat);
-        setLongitude(res.lon);
-        toast.success("Adres koordinatları bulundu! 🗺️", { id: 'addr_load' });
-        
-        // Reverse geocoding yaparak şehir ve ilçeyi daha net alalım
-        const revResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${res.lat}&lon=${res.lon}&zoom=18&addressdetails=1`, {
-          headers: { 'Accept-Language': 'tr' }
-        });
-        const revData = await revResponse.json();
-        if (revData && revData.address) {
-          const addr = revData.address;
-          const detectedCity = addr.province || addr.city || '';
-          const detectedDistrict = addr.suburb || addr.town || addr.district || addr.borough || '';
-          setResolvedCity(detectedCity.replace(' İl', '').replace(' İli', '').trim() || 'Samsun');
-          setResolvedDistrict(detectedDistrict.trim() || 'Tekkeköy');
+      for (const q of candidates) {
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`, {
+            headers: { 'Accept-Language': 'tr' }
+          });
+          const results = await response.json();
+          if (results && results.length > 0) {
+            const res = results[0];
+            setLatitude(res.lat);
+            setLongitude(res.lon);
+            const finalCity = foundCity || 'Samsun';
+            const finalDistrict = foundDistrict || 'Tekkeköy';
+            setResolvedCity(finalCity);
+            setResolvedDistrict(finalDistrict);
+            toast.success(`Konum çözümlendi: ${finalCity} / ${finalDistrict} 📍`, { id: 'addr_load' });
+            return;
+          }
+        } catch (e) {
+          // ignore candidate error
         }
-      } else {
-        if (addrText) {
-          toast.error("Adresten koordinat çözümlenemedi. Lütfen adresi netleştirin.", { id: 'addr_load' });
-        }
+      }
+
+      // Varsayılan koordinatlar
+      setLatitude('41.213498');
+      setLongitude('36.457804');
+      setResolvedCity(foundCity || 'Samsun');
+      setResolvedDistrict(foundDistrict || 'Tekkeköy');
+      if (isManual) {
+        toast.success(`Bölge konumu (${foundCity || 'Samsun'} / ${foundDistrict || 'Tekkeköy'}) atandı 📍`, { id: 'addr_load' });
       }
     } catch (err) {
       console.warn("Direct address search failed:", err);
