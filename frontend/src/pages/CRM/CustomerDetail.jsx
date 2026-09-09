@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi, salesApi } from '../../api/client';
 import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText } from 'react-icons/fi';
+import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw } from 'react-icons/fi';
 
 
 const INTERACTION_ICONS = {
@@ -32,11 +32,40 @@ export default function CustomerDetail() {
   const [editingContact, setEditingContact] = useState(null);
   const [proformas, setProformas] = useState([]);
 
+  // Filo Yönetimi State'leri
+  const [fleet, setFleet] = useState([]);
+  const [showAddFleet, setShowAddFleet] = useState(false);
+  const [editingFleet, setEditingFleet] = useState(null);
+  const [fleetForm, setFleetForm] = useState({
+    brand: 'IVECO',
+    model: '',
+    model_year: 2022,
+    plate_number: '',
+    body_type: 'Açık Sac Kasa',
+    fuel_type: 'Dizel',
+    estimated_replacement_year: 2026,
+    mileage: '',
+    notes: ''
+  });
+
+  // Takip & Bilgilendirme Hatırlatıcıları State'leri
+  const [reminders, setReminders] = useState([]);
+  const [showAddReminder, setShowAddReminder] = useState(false);
+  const [editingReminder, setEditingReminder] = useState(null);
+  const [reminderForm, setReminderForm] = useState({
+    reminder_date: new Date().toISOString().split('T')[0],
+    reminder_type: 'filo_yenileme',
+    title: '',
+    notes: ''
+  });
+
   useEffect(() => {
     crmApi.getCustomer(id).then(r => setCustomer(r.data)).catch(() => toast.error('Müşteri bulunamadı'));
     crmApi.getInteractions(id).then(r => setInteractions(r.data)).catch(() => {});
     crmApi.getContacts(id).then(r => setContacts(r.data)).catch(() => {});
     crmApi.getCustomerProformas(id).then(r => setProformas(r.data)).catch(() => {});
+    crmApi.getFleet(id).then(r => setFleet(r.data)).catch(() => {});
+    crmApi.getReminders(id).then(r => setReminders(r.data)).catch(() => {});
   }, [id]);
 
   const addContact = async (e) => {
@@ -79,6 +108,107 @@ export default function CustomerDetail() {
     });
     setEditingContact(contact);
     setShowAddContact(true);
+  };
+
+  // ── Fleet Handlers ──
+  const handleSaveFleet = async (e) => {
+    e.preventDefault();
+    try {
+      const data = { ...fleetForm };
+      if (data.model_year) data.model_year = parseInt(data.model_year) || null;
+      if (data.estimated_replacement_year) data.estimated_replacement_year = parseInt(data.estimated_replacement_year) || null;
+      if (data.mileage) data.mileage = parseInt(data.mileage) || null;
+      Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
+
+      if (editingFleet) {
+        await crmApi.updateFleetVehicle(editingFleet.id, data);
+        toast.success('Filo aracı güncellendi');
+      } else {
+        await crmApi.addFleetVehicle(id, data);
+        toast.success('Araç filoya eklendi 🎉');
+      }
+      setShowAddFleet(false);
+      setEditingFleet(null);
+      setFleetForm({ brand: 'IVECO', model: '', model_year: 2022, plate_number: '', body_type: 'Açık Sac Kasa', fuel_type: 'Dizel', estimated_replacement_year: 2026, mileage: '', notes: '' });
+      crmApi.getFleet(id).then(r => setFleet(r.data));
+      crmApi.getCustomer(id).then(r => setCustomer(r.data));
+    } catch { toast.error('Filo kaydı sırasında hata oluştu'); }
+  };
+
+  const handleDeleteFleet = async (vehicleId) => {
+    if (!confirm('Bu aracı filodan kaldırmak istediğinize emin misiniz?')) return;
+    try {
+      await crmApi.deleteFleetVehicle(vehicleId);
+      toast.success('Araç filodan silindi');
+      setFleet(prev => prev.filter(v => v.id !== vehicleId));
+      crmApi.getCustomer(id).then(r => setCustomer(r.data));
+    } catch { toast.error('Silme hatası'); }
+  };
+
+  const openEditFleet = (veh) => {
+    setEditingFleet(veh);
+    setFleetForm({
+      brand: veh.brand || 'IVECO',
+      model: veh.model || '',
+      model_year: veh.model_year || 2022,
+      plate_number: veh.plate_number || '',
+      body_type: veh.body_type || 'Açık Sac Kasa',
+      fuel_type: veh.fuel_type || 'Dizel',
+      estimated_replacement_year: veh.estimated_replacement_year || 2026,
+      mileage: veh.mileage || '',
+      notes: veh.notes || ''
+    });
+    setShowAddFleet(true);
+  };
+
+  // ── Reminder Handlers ──
+  const handleSaveReminder = async (e) => {
+    e.preventDefault();
+    try {
+      const data = { ...reminderForm };
+      if (!data.title) { toast.error('Başlık gerekli'); return; }
+      if (!data.reminder_date) { toast.error('Tarih gerekli'); return; }
+
+      if (editingReminder) {
+        await crmApi.updateReminder(editingReminder.id, data);
+        toast.success('Hatırlatıcı güncellendi');
+      } else {
+        await crmApi.addReminder(id, data);
+        toast.success('Hatırlatıcı oluşturuldu ⏰');
+      }
+      setShowAddReminder(false);
+      setEditingReminder(null);
+      setReminderForm({ reminder_date: new Date().toISOString().split('T')[0], reminder_type: 'filo_yenileme', title: '', notes: '' });
+      crmApi.getReminders(id).then(r => setReminders(r.data));
+    } catch { toast.error('Hatırlatıcı eklenirken hata oluştu'); }
+  };
+
+  const handleToggleReminder = async (reminder) => {
+    try {
+      const updated = await crmApi.updateReminder(reminder.id, { is_completed: !reminder.is_completed });
+      toast.success(!reminder.is_completed ? 'Hatırlatıcı tamamlandı olarak işaretlendi ✅' : 'Hatırlatıcı aktif hale getirildi');
+      setReminders(prev => prev.map(r => r.id === reminder.id ? updated.data : r));
+    } catch { toast.error('Güncelleme hatası'); }
+  };
+
+  const handleDeleteReminder = async (reminderId) => {
+    if (!confirm('Bu hatırlatıcıyı silmek istediğinize emin misiniz?')) return;
+    try {
+      await crmApi.deleteReminder(reminderId);
+      toast.success('Hatırlatıcı silindi');
+      setReminders(prev => prev.filter(r => r.id !== reminderId));
+    } catch { toast.error('Silme hatası'); }
+  };
+
+  const sendReminderWhatsApp = (rem) => {
+    const phone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : '';
+    if (!phone) {
+      toast.error('Müşterinin telefon numarası kayıtlı değil');
+      return;
+    }
+    const cleanPhone = phone.startsWith('0') ? '9' + phone : phone.startsWith('90') ? phone : '90' + phone;
+    const msg = `Merhaba ${customer.company_name} yetkilisi, ERC Samsun Otomotiv adına iletişime geçiyorum. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dileriz.`;
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const openEditModal = () => {
@@ -467,6 +597,232 @@ export default function CustomerDetail() {
         ) : <div className="empty-state"><p>Henüz proforma fatura oluşturulmamış</p></div>}
       </div>
 
+      {/* ── FLEET SECTION ── */}
+      <div className="card mt-6">
+        <div className="card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiTruck size={18} style={{ color: '#10b981' }} /> Müşteri Araç Filosu
+            </h3>
+            {fleet.length > 0 && (
+              <span className="badge badge-green" style={{ fontSize: '0.75rem' }}>{fleet.length} Araç Kayıtlı</span>
+            )}
+            {fleet.some(v => v.is_renewal_due) && (
+              <span className="badge badge-amber" style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <FiRefreshCw size={11} /> Yenileme Fırsatı Var
+              </span>
+            )}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={() => { setEditingFleet(null); setShowAddFleet(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <FiPlus size={14} /> Filoya Araç Ekle
+          </button>
+        </div>
+
+        {fleet.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '0.85rem' }}>
+            {fleet.map(veh => {
+              return (
+                <div key={veh.id} style={{
+                  background: 'var(--bg-input)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '1rem',
+                  borderLeft: `4px solid ${veh.is_renewal_due ? '#f59e0b' : '#3b82f6'}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                  position: 'relative'
+                }}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-heading)' }}>
+                        {veh.brand} {veh.model}
+                      </span>
+                      {veh.plate_number && (
+                        <span style={{ marginLeft: 8, background: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '2px 6px', borderRadius: 4, fontSize: '0.72rem', fontWeight: 'bold' }}>
+                          {veh.plate_number}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button onClick={() => openEditFleet(veh)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 3 }}>
+                        <FiEdit2 size={13} />
+                      </button>
+                      <button onClick={() => handleDeleteFleet(veh.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: 3 }}>
+                        <FiTrash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap" style={{ fontSize: '0.78rem' }}>
+                    {veh.model_year && (
+                      <span className="badge" style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)' }}>
+                        {veh.model_year} Model {veh.vehicle_age ? `(${veh.vehicle_age} Yaşında)` : ''}
+                      </span>
+                    )}
+                    {veh.body_type && (
+                      <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa' }}>
+                        {veh.body_type}
+                      </span>
+                    )}
+                    {veh.fuel_type && (
+                      <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#34d399' }}>
+                        {veh.fuel_type}
+                      </span>
+                    )}
+                  </div>
+
+                  {veh.is_renewal_due && (
+                    <div style={{
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      border: '1px solid rgba(245, 158, 11, 0.3)',
+                      borderRadius: 6,
+                      padding: '6px 8px',
+                      fontSize: '0.75rem',
+                      color: '#fbbf24',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginTop: 2
+                    }}>
+                      <span>🔄 <strong>Yenileme Vakti:</strong> Araç {veh.vehicle_age} yaşında!</span>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => navigate(`/customers/${customer.id}/proforma/new`)}
+                        style={{ padding: '2px 6px', fontSize: '0.7rem', height: 'auto' }}
+                      >
+                        Teklif Hazırla
+                      </button>
+                    </div>
+                  )}
+
+                  {veh.notes && (
+                    <div className="text-xs text-muted" style={{ marginTop: 2, borderTop: '1px dashed var(--border-color)', paddingTop: 6 }}>
+                      {veh.notes}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>Henüz müşterinin araç filosu işlenmemiş. Filodaki araçları ekleyerek akıllı yenileme takibini başlatabilirsiniz.</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── REMINDERS SECTION ── */}
+      <div className="card mt-6">
+        <div className="card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiBell size={18} style={{ color: '#f59e0b' }} /> Zaman Zaman Bilgilendirme ve Takip Hatırlatıcıları
+            </h3>
+            {reminders.filter(r => !r.is_completed).length > 0 && (
+              <span className="badge badge-amber" style={{ fontSize: '0.75rem' }}>
+                {reminders.filter(r => !r.is_completed).length} Aktif Hatırlatıcı
+              </span>
+            )}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={() => { setEditingReminder(null); setShowAddReminder(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <FiPlus size={14} /> Hatırlatıcı Ekle
+          </button>
+        </div>
+
+        {reminders.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {reminders.map(rem => {
+              const typeLabels = {
+                filo_yenileme: { label: '🚚 Filo Yenileme', color: '#f59e0b' },
+                kampanya: { label: '📢 Kampanya Bilgilendirme', color: '#3b82f6' },
+                ziyaret: { label: '☕ Periyodik Ziyaret / Hatır Sorma', color: '#10b981' },
+                servis_kasko: { label: '🛠️ Servis / Kasko', color: '#8b5cf6' },
+                takip: { label: '📝 Genel Takip', color: '#06b6d4' }
+              };
+              const typeCfg = typeLabels[rem.reminder_type] || typeLabels.takip;
+              const isPast = new Date(rem.reminder_date) < new Date(new Date().toISOString().split('T')[0]);
+
+              return (
+                <div key={rem.id} style={{
+                  background: rem.is_completed ? 'rgba(255,255,255,0.02)' : 'var(--bg-input)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.9rem',
+                  borderLeft: `4px solid ${rem.is_completed ? '#10b981' : isPast ? '#ef4444' : typeCfg.color}`,
+                  opacity: rem.is_completed ? 0.65 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  flexWrap: 'wrap'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 240 }}>
+                    <button
+                      onClick={() => handleToggleReminder(rem)}
+                      style={{
+                        background: rem.is_completed ? '#10b981' : 'transparent',
+                        border: `2px solid ${rem.is_completed ? '#10b981' : 'var(--text-muted)'}`,
+                        color: '#fff',
+                        borderRadius: '50%',
+                        width: 22,
+                        height: 22,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        marginTop: 2,
+                        flexShrink: 0
+                      }}
+                      title={rem.is_completed ? 'Tamamlandı (Geri al)' : 'Tamamlandı olarak işaretle'}
+                    >
+                      {rem.is_completed && <FiCheck size={12} />}
+                    </button>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.9rem', textDecoration: rem.is_completed ? 'line-through' : 'none', color: rem.is_completed ? 'var(--text-muted)' : 'var(--text-heading)' }}>
+                          {rem.title}
+                        </span>
+                        <span className="badge" style={{ background: `${typeCfg.color}20`, color: typeCfg.color, border: `1px solid ${typeCfg.color}40`, fontSize: '0.7rem' }}>
+                          {typeCfg.label}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: isPast && !rem.is_completed ? '#ef4444' : 'var(--text-secondary)' }}>
+                          📅 {new Date(rem.reminder_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          {isPast && !rem.is_completed && ' (Günü Geçti!)'}
+                        </span>
+                      </div>
+                      {rem.notes && (
+                        <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          {rem.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {!rem.is_completed && (
+                      <button
+                        className="btn btn-sm btn-secondary"
+                        onClick={() => sendReminderWhatsApp(rem)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, borderColor: '#25d366', color: '#25d366', fontSize: '0.75rem' }}
+                        title="Müşteriye tek tıkla WhatsApp mesajı gönder"
+                      >
+                        <FiMessageSquare size={12} /> WhatsApp Bilgi
+                      </button>
+                    )}
+                    <button onClick={() => handleDeleteReminder(rem.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: 4 }}>
+                      <FiTrash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>Müşteri için kayıtlı hatırlatıcı bulunmuyor. Yeni kampanya, filo yenileme veya çay sohbeti gibi periyodik hatırlatıcılar oluşturabilirsiniz.</p>
+          </div>
+        )}
+      </div>
+
 
       {/* ── ADD/EDIT CONTACT MODAL ── */}
       {showAddContact && (
@@ -695,6 +1051,156 @@ export default function CustomerDetail() {
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowInteraction(false)}>İptal</button>
                 <button type="submit" className="btn btn-primary">Kaydet</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── FLEET VEHICLE MODAL ── */}
+      {showAddFleet && (
+        <div className="modal-overlay" onClick={() => { setShowAddFleet(false); setEditingFleet(null); }}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 540 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <h3 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiTruck size={20} style={{ color: '#10b981' }} /> {editingFleet ? 'Filo Aracını Düzenle' : 'Filoya Yeni Araç Ekle'}
+              </h3>
+              <button onClick={() => { setShowAddFleet(false); setEditingFleet(null); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                <FiX size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveFleet}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Marka *</label>
+                  <select className="form-select" value={fleetForm.brand} onChange={e => setFleetForm({ ...fleetForm, brand: e.target.value })} required>
+                    <option value="IVECO">IVECO</option>
+                    <option value="Ford">Ford</option>
+                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                    <option value="Isuzu">Isuzu</option>
+                    <option value="Fiat">Fiat</option>
+                    <option value="Renault">Renault</option>
+                    <option value="Mitsubishi">Mitsubishi / Fuso</option>
+                    <option value="MAN">MAN</option>
+                    <option value="Scania">Scania</option>
+                    <option value="Diğer">Diğer</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Model *</label>
+                  <input className="form-input" value={fleetForm.model} onChange={e => setFleetForm({ ...fleetForm, model: e.target.value })} required placeholder="Daily 35S16, Transit 350L vb." />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Model Yılı</label>
+                  <input className="form-input" type="number" min="1990" max="2035" value={fleetForm.model_year || ''} onChange={e => setFleetForm({ ...fleetForm, model_year: e.target.value })} placeholder="2022" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Plaka</label>
+                  <input className="form-input" value={fleetForm.plate_number || ''} onChange={e => setFleetForm({ ...fleetForm, plate_number: e.target.value.toUpperCase() })} placeholder="55 ABC 123" />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Kasa / Üst Yapı Tipi</label>
+                  <select className="form-select" value={fleetForm.body_type || 'Açık Sac Kasa'} onChange={e => setFleetForm({ ...fleetForm, body_type: e.target.value })}>
+                    <option value="Açık Sac Kasa">Açık Sac Kasa</option>
+                    <option value="Kapalı Alüminyum Kasa">Kapalı Alüminyum Kasa</option>
+                    <option value="Frigorifik Kasa">Frigorifik Kasa</option>
+                    <option value="Damper">Damper</option>
+                    <option value="Panelvan">Panelvan</option>
+                    <option value="Çekici">Çekici</option>
+                    <option value="Kurtarıcı / Oto Taşıyıcı">Kurtarıcı / Oto Taşıyıcı</option>
+                    <option value="Şasi">Şasi (Kasa Yok)</option>
+                    <option value="Diğer">Diğer</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Tahmini Yenileme Yılı</label>
+                  <input className="form-input" type="number" min="2024" max="2040" value={fleetForm.estimated_replacement_year || ''} onChange={e => setFleetForm({ ...fleetForm, estimated_replacement_year: e.target.value })} placeholder="2026" />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Yakıt Tipi</label>
+                  <select className="form-select" value={fleetForm.fuel_type || 'Dizel'} onChange={e => setFleetForm({ ...fleetForm, fuel_type: e.target.value })}>
+                    <option value="Dizel">Dizel</option>
+                    <option value="Elektrik">Elektrik</option>
+                    <option value="Benzin">Benzin</option>
+                    <option value="CNG">CNG / Doğalgaz</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Kilometre (Opsiyonel)</label>
+                  <input className="form-input" type="number" value={fleetForm.mileage || ''} onChange={e => setFleetForm({ ...fleetForm, mileage: e.target.value })} placeholder="185000" />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Araç Durum / Kullanım Notları</label>
+                <textarea className="form-textarea" rows={2} value={fleetForm.notes || ''} onChange={e => setFleetForm({ ...fleetForm, notes: e.target.value })} placeholder="Örn: Ağır yük taşınıyor, kasa yıpranmış, seneye Daily ile yenilenecek." />
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowAddFleet(false); setEditingFleet(null); }}>İptal</button>
+                <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <FiSave size={14} /> {editingFleet ? 'Güncelle' : 'Filoya Kaydet'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── CUSTOMER REMINDER MODAL ── */}
+      {showAddReminder && (
+        <div className="modal-overlay" onClick={() => { setShowAddReminder(false); setEditingReminder(null); }}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 500 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <h3 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiBell size={20} style={{ color: '#f59e0b' }} /> {editingReminder ? 'Hatırlatıcıyı Düzenle' : 'Yeni Müşteri Hatırlatıcısı'}
+              </h3>
+              <button onClick={() => { setShowAddReminder(false); setEditingReminder(null); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                <FiX size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveReminder}>
+              <div className="form-group">
+                <label className="form-label">Hatırlatıcı Konusu / Başlık *</label>
+                <input className="form-input" value={reminderForm.title} onChange={e => setReminderForm({ ...reminderForm, title: e.target.value })} required placeholder="Örn: 2021 Model Transit filo yenileme teklifi sun" />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Hatırlatma Tarihi *</label>
+                  <input className="form-input" type="date" value={reminderForm.reminder_date} onChange={e => setReminderForm({ ...reminderForm, reminder_date: e.target.value })} required />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Hatırlatıcı Türü</label>
+                  <select className="form-select" value={reminderForm.reminder_type} onChange={e => setReminderForm({ ...reminderForm, reminder_type: e.target.value })}>
+                    <option value="filo_yenileme">🚚 Filo Yenileme</option>
+                    <option value="kampanya">📢 Kampanya Bilgilendirme</option>
+                    <option value="ziyaret">☕ Periyodik Ziyaret / Hatır Sorma</option>
+                    <option value="servis_kasko">🛠️ Servis & Kasko</option>
+                    <option value="takip">📝 Genel Takip</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Müşteriye Verilecek Bilgi / Notlar</label>
+                <textarea className="form-textarea" rows={3} value={reminderForm.notes || ''} onChange={e => setReminderForm({ ...reminderForm, notes: e.target.value })} placeholder="Örn: Bu ay geçerli olan %1.89 faizli Daily şasi kamyonet kampanyasını müşteriye ilet." />
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowAddReminder(false); setEditingReminder(null); }}>İptal</button>
+                <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <FiSave size={14} /> {editingReminder ? 'Güncelle' : 'Hatırlatıcı Oluştur'}
+                </button>
               </div>
             </form>
           </div>

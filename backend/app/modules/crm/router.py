@@ -21,6 +21,8 @@ from app.modules.crm.schemas import (
     ContactCreate, ContactUpdate, ContactResponse,
     ProformaCreate, ProformaUpdate, ProformaResponse,
     VehicleResponse,
+    FleetVehicleCreate, FleetVehicleUpdate, FleetVehicleResponse,
+    ReminderCreate, ReminderUpdate, ReminderResponse,
 )
 
 router = APIRouter(prefix="/api/crm", tags=["CRM"])
@@ -205,6 +207,79 @@ def merge_customers(data: dict, db: Session = Depends(get_db), current_user=Depe
         raise HTTPException(status_code=400, detail="primary_id ve secondary_ids gerekli")
     result = CRMService(db).merge_customers(primary_id, secondary_ids)
     return result
+
+
+# ── Fleet Vehicle Endpoints ──────────────────────────────────────────
+
+@router.get("/customers/{customer_id}/fleet", response_model=List[FleetVehicleResponse])
+def get_customer_fleet(customer_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Müşterinin mevcut araç filosunu listeler."""
+    return CRMService(db).get_fleet(customer_id)
+
+
+@router.post("/customers/{customer_id}/fleet", response_model=FleetVehicleResponse)
+def add_customer_fleet_vehicle(customer_id: int, data: FleetVehicleCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Müşteri filosuna yeni araç ekler."""
+    CRMService(db).add_fleet_vehicle(customer_id, data)
+    fleet = CRMService(db).get_fleet(customer_id)
+    return fleet[0]
+
+
+@router.put("/fleet/{vehicle_id}", response_model=FleetVehicleResponse)
+def update_fleet_vehicle(vehicle_id: int, data: FleetVehicleUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Filo aracını günceller."""
+    vehicle = CRMService(db).update_fleet_vehicle(vehicle_id, data)
+    fleet = CRMService(db).get_fleet(vehicle.customer_id)
+    for v in fleet:
+        if v.id == vehicle_id:
+            return v
+    return vehicle
+
+
+@router.delete("/fleet/{vehicle_id}")
+def delete_fleet_vehicle(vehicle_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Filodan araç siler."""
+    CRMService(db).delete_fleet_vehicle(vehicle_id)
+    return {"message": "Filo aracı silindi"}
+
+
+@router.get("/fleet/renewal-opportunities")
+def get_fleet_renewal_opportunities(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Tüm müşterilerde araç yenileme vakti gelmiş filo fırsatlarını listeler."""
+    return CRMService(db).get_fleet_renewal_opportunities()
+
+
+# ── Customer Reminder Endpoints ──────────────────────────────────────
+
+@router.get("/customers/{customer_id}/reminders", response_model=List[ReminderResponse])
+def get_customer_reminders(customer_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Müşteriye ait hatırlatıcıları listeler."""
+    return CRMService(db).get_reminders(customer_id)
+
+
+@router.post("/customers/{customer_id}/reminders", response_model=ReminderResponse)
+def add_customer_reminder(customer_id: int, data: ReminderCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Müşteriye yeni takip/bilgilendirme hatırlatıcısı ekler."""
+    return CRMService(db).add_reminder(customer_id, current_user.id, data)
+
+
+@router.put("/reminders/{reminder_id}", response_model=ReminderResponse)
+def update_reminder(reminder_id: int, data: ReminderUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Hatırlatıcıyı günceller veya tamamlandı işaretler."""
+    return CRMService(db).update_reminder(reminder_id, data)
+
+
+@router.delete("/reminders/{reminder_id}")
+def delete_reminder(reminder_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Hatırlatıcıyı siler."""
+    CRMService(db).delete_reminder(reminder_id)
+    return {"message": "Hatırlatıcı silindi"}
+
+
+@router.get("/reminders/upcoming")
+def get_upcoming_reminders(days: int = 14, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Tüm müşteriler için yaklaşan hatırlatıcıları listeler (Dashboard & Bildirimler için)."""
+    return CRMService(db).get_upcoming_reminders(days_ahead=days)
 
 
 # ── Proforma Invoice Endpoints ──────────────────────────────────────────

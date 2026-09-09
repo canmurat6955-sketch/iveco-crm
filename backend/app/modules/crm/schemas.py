@@ -311,3 +311,87 @@ class VehicleResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ── Fleet Vehicle Schemas ────────────────────────────────────────────
+
+class FleetVehicleCreate(BaseModel):
+    brand: str = Field(..., description="Marka (IVECO, Ford, Mercedes vb.)")
+    model: str = Field(..., description="Model (Daily 35S16 vb.)")
+    model_year: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    fuel_type: Optional[str] = "Dizel"
+    estimated_replacement_year: Optional[int] = None
+    mileage: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class FleetVehicleUpdate(BaseModel):
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    model_year: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    fuel_type: Optional[str] = None
+    estimated_replacement_year: Optional[int] = None
+    mileage: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class FleetVehicleResponse(BaseModel):
+    id: int
+    customer_id: int
+    brand: str
+    model: str
+    model_year: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    fuel_type: Optional[str] = None
+    estimated_replacement_year: Optional[int] = None
+    mileage: Optional[int] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    vehicle_age: Optional[int] = None
+    is_renewal_due: bool = False
+
+    model_config = {"from_attributes": True}
+
+
+# ── Customer Reminder Schemas ────────────────────────────────────────
+
+class ReminderCreate(BaseModel):
+    reminder_date: dt_date
+    reminder_type: str = Field(default="takip", description="filo_yenileme, kampanya, ziyaret, servis_kasko, takip")
+    title: str = Field(..., description="Hatırlatıcı başlığı")
+    notes: Optional[str] = None
+
+
+class ReminderUpdate(BaseModel):
+    reminder_date: Optional[dt_date] = None
+    reminder_type: Optional[str] = None
+    title: Optional[str] = None
+    notes: Optional[str] = None
+    is_completed: Optional[bool] = None
+
+
+class ReminderResponse(BaseModel):
+    id: int
+    customer_id: int
+    user_id: Optional[int] = None
+    reminder_date: dt_date
+    reminder_type: str
+    title: str
+    notes: Optional[str] = None
+    is_completed: bool = False
+    completed_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    company_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+
