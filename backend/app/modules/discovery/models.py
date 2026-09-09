@@ -53,3 +53,86 @@ class DiscoveredCompany(Base):
 
     def __repr__(self):
         return f"<DiscoveredCompany {self.company_name}>"
+
+
+class Tender(Base):
+    __tablename__ = "tenders"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tender_number = Column(String(100), nullable=True, index=True)  # İKN: İhale Kayıt Numarası
+    title = Column(String(500), nullable=False)
+    organization = Column(String(255), nullable=False)  # Kurum Adı
+    city = Column(String(100), nullable=True, index=True)
+    district = Column(String(100), nullable=True)
+    category = Column(String(100), nullable=True)  # Temizlik & Çöp, Lojistik & Nakliye, Fen İşleri, Gıda Dağıtım
+    tender_date = Column(DateTime, nullable=True)
+    status = Column(String(50), default="announced")  # announced, bidding, awarded, completed
+    estimated_vehicles = Column(Integer, default=1)
+    suggested_iveco_model = Column(String(255), nullable=True)  # Daily 70C18 Çöp Kasası, Eurocargo vb.
+    contractor_name = Column(String(500), nullable=True)  # İhaleyi Kazanan Yüklenici Firma
+    contractor_phone = Column(String(50), nullable=True)
+    contractor_contact = Column(String(200), nullable=True)
+    contract_amount = Column(String(100), nullable=True)  # Sözleşme Bedeli
+    notes = Column(Text, nullable=True)
+    matched_customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    customer = relationship("Customer", foreign_keys=[matched_customer_id], lazy="joined")
+
+
+class BodybuilderPartner(Base):
+    __tablename__ = "bodybuilder_partners"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    company_name = Column(String(255), nullable=False)
+    contact_person = Column(String(200), nullable=True)  # Usta veya Yetkili Adı
+    phone = Column(String(50), nullable=True)
+    city = Column(String(100), nullable=True, default="Samsun")
+    district = Column(String(100), nullable=True)
+    address = Column(Text, nullable=True)
+    specialty = Column(String(255), nullable=False)  # Frigofirik Kasa, Açık Kasa, Damper, Çekici, Vinç vb.
+    notes = Column(Text, nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    referrals = relationship("BodybuilderReferral", back_populates="bodybuilder", cascade="all, delete-orphan")
+
+
+class BodybuilderReferral(Base):
+    __tablename__ = "bodybuilder_referrals"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    bodybuilder_id = Column(Integer, ForeignKey("bodybuilder_partners.id", ondelete="CASCADE"), nullable=False)
+    customer_name = Column(String(255), nullable=False)
+    customer_phone = Column(String(50), nullable=True)
+    city = Column(String(100), nullable=True)
+    requested_chassis = Column(String(255), nullable=True)  # Örn: Daily 35C16, Daily 70C18, Eurocargo
+    requested_body = Column(String(255), nullable=True)  # Frigo, Damper, Sac Kasa
+    status = Column(String(50), default="new")  # new, contacted, offered, won, lost
+    notes = Column(Text, nullable=True)
+    crm_customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    bodybuilder = relationship("BodybuilderPartner", back_populates="referrals")
+    customer = relationship("Customer", foreign_keys=[crm_customer_id], lazy="joined")
+
+
+class NewCompanyRegistration(Base):
+    __tablename__ = "new_company_registrations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    company_name = Column(String(500), nullable=False)
+    nace_code = Column(String(50), nullable=True)
+    nace_description = Column(String(500), nullable=True)
+    city = Column(String(100), nullable=True, default="Samsun")
+    district = Column(String(100), nullable=True)
+    registration_date = Column(DateTime, nullable=True)
+    capital = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    address = Column(Text, nullable=True)
+    status = Column(String(50), default="new")  # new, contacted, converted, ignored
+    matched_customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    customer = relationship("Customer", foreign_keys=[matched_customer_id], lazy="joined")
+
