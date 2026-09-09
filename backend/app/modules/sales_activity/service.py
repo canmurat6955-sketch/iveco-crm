@@ -226,11 +226,9 @@ class SalesActivityService:
             interaction_type="visit",
             notes=data.notes,
             next_action=data.next_action,
-            next_follow_up_date=data.next_follow_up_date, # Date tipinde
             created_at=datetime.now(timezone.utc)
         )
-        # SQLAlchemy models.py'da next_action_date olarak tanımlanmış, crm/models.py:67: next_action_date
-        # name mismatch düzeltmesi:
+        # next_action_date sütunu constructor dışından atanıyor (model alan adı farklılığı)
         interaction.next_action_date = data.next_follow_up_date
         
         self.db.add(interaction)

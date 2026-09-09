@@ -66,10 +66,8 @@ class CRMService:
     def get_map_markers(self) -> List[dict]:
         customers = self.db.query(Customer).filter(
             Customer.is_active == True,
-            Customer.latitude != None,
-            Customer.longitude != None,
-            Customer.latitude != "",
-            Customer.longitude != ""
+            Customer.latitude.isnot(None),
+            Customer.longitude.isnot(None),
         ).all()
         return [
             {

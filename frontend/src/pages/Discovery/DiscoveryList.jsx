@@ -10,7 +10,7 @@ import {
   FiChevronRight, FiSearch, FiMapPin, FiPlus, FiNavigation, 
   FiSliders, FiArrowRight, FiInfo, FiTruck, FiTool, FiFileText,
   FiPhoneCall, FiMessageSquare, FiCheckCircle, FiRefreshCw, FiCalendar,
-  FiDollarSign, FiAward, FiLayers, FiBriefcase, FiAlertCircle
+  FiDollarSign, FiAward, FiLayers, FiBriefcase, FiAlertCircle, FiTarget
 } from 'react-icons/fi';
 
 // Sadece Hedef 9 İl (Samsun, Ordu, Sivas, Giresun, Çorum, Amasya, Sinop, Tokat, Kastamonu)

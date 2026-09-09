@@ -19,6 +19,13 @@ export default function MapPage() {
   const markersRef = useRef([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.__navigateToCustomer = (id) => navigate(`/customers/${id}`);
+    return () => {
+      delete window.__navigateToCustomer;
+    };
+  }, [navigate]);
+
   // Şehir ve Sektör listeleri (filtreleme için)
   const [cities, setCities] = useState([]);
   const [sectors, setSectors] = useState([]);
@@ -188,7 +195,7 @@ export default function MapPage() {
             <h4 style="margin: 0 0 6px 0; font-weight: 700; color: #1d4ed8;">${c.company_name}</h4>
             <p style="margin: 0 0 4px 0; font-size: 12px;">📍 ${c.city} / ${c.district || ''}</p>
             <p style="margin: 0 0 8px 0; font-size: 11px; color: #64748b;">💼 Sektör: ${c.sector || '—'}</p>
-            <button onclick="window.location.hash='#/customers/${c.id}'" style="background: #2563eb; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Detaya Git</button>
+            <button onclick="if (window.__navigateToCustomer) { window.__navigateToCustomer(${c.id}); } else { window.location.href='/customers/${c.id}'; }" style="background: #2563eb; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Detaya Git</button>
           </div>
         `
       });

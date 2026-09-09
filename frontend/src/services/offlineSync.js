@@ -2,7 +2,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 // API temel URL'i (Bizim client.js'teki axios instance'ından alınabilir veya doğrudan yazılabilir)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const offlineSync = {
   /**

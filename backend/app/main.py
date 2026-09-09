@@ -31,14 +31,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration (hardcoded to * for zero-config production deploy)
-origins = ["*"]
-allow_credentials = False
+# CORS configuration: allows localhost, Vercel deployments, Render, and custom configured origins
+configured_origins = settings.cors_origins_list
+origins = configured_origins if configured_origins else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=allow_credentials,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|.*\.vercel\.app|.*\.onrender\.com)(:\d+)?",
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

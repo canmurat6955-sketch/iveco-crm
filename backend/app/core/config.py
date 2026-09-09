@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Iveco CRM - Müşteri İstihbarat Platformu"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     # Security
     SECRET_KEY: str = "iveco-crm-secret-key-change-in-production"

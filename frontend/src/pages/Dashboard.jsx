@@ -37,11 +37,14 @@ export default function Dashboard() {
   const [nearbyCount, setNearbyCount] = useState(0);
   const [nearbyList, setNearbyList] = useState([]);
 
+  const [loadError, setLoadError] = useState(false);
+
   const { user } = useAuth();
   const isMobile = useDeviceDetect();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadDashboard = () => {
+    setLoadError(false);
     Promise.all([
       dashboardApi.getSummary().then(r => setSummary(r.data)),
       dashboardApi.getAnalytics().then(r => setAnalytics(r.data)),
@@ -51,7 +54,14 @@ export default function Dashboard() {
       dashboardApi.getTodayCalls().then(r => setTodayCalls(r.data)),
       crmApi.getUpcomingReminders(14).then(r => setUpcomingReminders(r.data || [])),
       crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
-    ]).catch(() => {});
+    ]).catch((err) => {
+      console.error("Dashboard yüklenirken hata:", err);
+      setLoadError(true);
+    });
+  };
+
+  useEffect(() => {
+    loadDashboard();
   }, []);
 
   // Konum alındığında yakındaki müşterileri dinamik sorgula
@@ -72,6 +82,17 @@ export default function Dashboard() {
       .catch(() => {});
     }
   }, [location]);
+
+  if (loadError && !summary) {
+    return (
+      <div className="empty-state" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Dashboard verileri yüklenemedi veya sunucu yanıt vermedi.</p>
+        <button className="btn btn-primary btn-sm" onClick={loadDashboard}>
+          Yeniden Dene
+        </button>
+      </div>
+    );
+  }
 
   if (!summary) return <div className="dashboard-loading"><div className="loading-pulse" /><span>Dashboard yükleniyor...</span></div>;
 
@@ -269,9 +290,9 @@ export default function Dashboard() {
         <div className="card glass-card">
           <div className="card-header">
             <h3 className="card-title"><FiTrendingUp style={{ marginRight: 8 }} /> Satış Pipeline</h3>
-            <span className="text-xs text-muted">Toplam: {Object.values(summary.pipeline).reduce((a, b) => a + b, 0)}</span>
+            <span className="text-xs text-muted">Toplam: {Object.values(summary?.pipeline || {}).reduce((a, b) => a + b, 0)}</span>
           </div>
-          <PipelineFunnel data={summary.pipeline} />
+          <PipelineFunnel data={summary?.pipeline || {}} />
         </div>
         <div className="card glass-card">
           <div className="card-header">
