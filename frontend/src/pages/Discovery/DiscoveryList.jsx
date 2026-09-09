@@ -13,14 +13,59 @@ import {
   FiDollarSign, FiAward, FiLayers, FiBriefcase, FiAlertCircle
 } from 'react-icons/fi';
 
-// Bölgesel OSB ve Sanayi Siteleri
+// Sadece Hedef 9 İl (Samsun, Ordu, Sivas, Giresun, Çorum, Amasya, Sinop, Tokat, Kastamonu)
+export const ALLOWED_PROVINCES = [
+  'Samsun', 'Ordu', 'Sivas', 'Giresun', 'Çorum', 'Amasya', 'Sinop', 'Tokat', 'Kastamonu'
+];
+
+// Bölgesel OSB ve Sanayi Siteleri (Sadece 9 Hedef İl)
 const OSB_OPTIONS = [
+  // Samsun
   { id: 'tekkekoy', name: 'Samsun Tekkeköy OSB', city: 'Samsun' },
-  { id: 'gida_borsasi', name: 'Samsun Gıda Borsası & Hali', city: 'Samsun' },
+  { id: 'samsun_gida_osb', name: 'Samsun Gıda İhtisas OSB', city: 'Samsun' },
+  { id: 'samsun_merkez_osb', name: 'Samsun Merkez OSB', city: 'Samsun' },
+  { id: 'bafra_osb', name: 'Bafra Karma OSB', city: 'Samsun' },
+  { id: 'carsamba_osb', name: 'Çarşamba Karma OSB', city: 'Samsun' },
+  { id: 'kavak_osb', name: 'Kavak OSB', city: 'Samsun' },
   { id: 'ilkadim_sanayi', name: 'İlkadım 19 Mayıs Sanayi', city: 'Samsun' },
-  { id: 'corum_osb', name: 'Çorum Organize Sanayi Bölgesi', city: 'Çorum' },
+
+  // Ordu
+  { id: 'ordu_merkez_osb', name: 'Ordu Organize Sanayi Bölgesi', city: 'Ordu' },
   { id: 'fatsa_osb', name: 'Ordu Fatsa OSB & Sanayi', city: 'Ordu' },
-  { id: 'trabzon_degirmendere', name: 'Trabzon Değirmendere Ambarlar', city: 'Trabzon' },
+  { id: 'unye_osb', name: 'Ünye Organize Sanayi Bölgesi', city: 'Ordu' },
+
+  // Sivas
+  { id: 'sivas_1_osb', name: 'Sivas 1. Organize Sanayi Bölgesi', city: 'Sivas' },
+  { id: 'sivas_demirag_osb', name: 'Sivas Demirağ OSB', city: 'Sivas' },
+  { id: 'sivas_sarkisla_osb', name: 'Sivas Şarkışla OSB', city: 'Sivas' },
+
+  // Giresun
+  { id: 'giresun_1_osb', name: 'Giresun 1. Organize Sanayi Bölgesi', city: 'Giresun' },
+  { id: 'giresun_bulancak_osb', name: 'Giresun 2. OSB (Bulancak)', city: 'Giresun' },
+
+  // Çorum
+  { id: 'corum_osb', name: 'Çorum Organize Sanayi Bölgesi', city: 'Çorum' },
+  { id: 'sungurlu_osb', name: 'Çorum Sungurlu OSB', city: 'Çorum' },
+  { id: 'osmancik_osb', name: 'Çorum Osmancık OSB', city: 'Çorum' },
+
+  // Amasya
+  { id: 'amasya_merkez_osb', name: 'Amasya Merkez OSB', city: 'Amasya' },
+  { id: 'merzifon_osb', name: 'Amasya Merzifon OSB', city: 'Amasya' },
+  { id: 'suluova_et_osb', name: 'Suluova Kırmızı Et İhtisas OSB', city: 'Amasya' },
+
+  // Sinop
+  { id: 'sinop_merkez_osb', name: 'Sinop Organize Sanayi Bölgesi', city: 'Sinop' },
+  { id: 'boyabat_osb', name: 'Sinop Boyabat OSB', city: 'Sinop' },
+
+  // Tokat
+  { id: 'tokat_merkez_osb', name: 'Tokat Merkez OSB', city: 'Tokat' },
+  { id: 'erbaa_osb', name: 'Tokat Erbaa OSB', city: 'Tokat' },
+  { id: 'turhal_osb', name: 'Tokat Turhal OSB', city: 'Tokat' },
+
+  // Kastamonu
+  { id: 'kastamonu_merkez_osb', name: 'Kastamonu Merkez OSB', city: 'Kastamonu' },
+  { id: 'tosya_osb', name: 'Kastamonu Tosya OSB', city: 'Kastamonu' },
+  { id: 'seydiler_osb', name: 'Kastamonu Seydiler OSB', city: 'Kastamonu' },
 ];
 
 // Iveco Hedef Ticari Sektör Presetleri
@@ -69,6 +114,10 @@ export default function DiscoveryList() {
 
   // Ana Navigasyon Tabları
   const [activeTab, setActiveTab] = useState('osb_radar'); // osb_radar | tenders | bodybuilders | new_registrations | live_search | sources
+
+  // ── Bölge Filtresi (Sadece Hedef 9 İl) ──────────────────────────────
+  const [selectedProvinceFilter, setSelectedProvinceFilter] = useState('Tümü');
+  const [scrapingLiveTenders, setScrapingLiveTenders] = useState(false);
 
   // ── Tab 1: Akılcı OSB Radar State'leri ──────────────────────────────
   const [selectedOsb, setSelectedOsb] = useState('Samsun Tekkeköy OSB');
@@ -214,15 +263,31 @@ export default function DiscoveryList() {
   };
 
   // ── İhale Radarı Fonksiyonları ─────────────────────────────────────
-  const loadTenders = async () => {
+  const loadTenders = async (prov = selectedProvinceFilter) => {
     setLoadingTenders(true);
     try {
-      const res = await discoveryApi.getTenders();
+      const params = prov && prov !== 'Tümü' ? { city: prov } : {};
+      const res = await discoveryApi.getTenders(params);
       setTenders(res.data || []);
     } catch {
       // Hata sessizce yutulabilir
     } finally {
       setLoadingTenders(false);
+    }
+  };
+
+  const handleScrapeLiveTenders = async () => {
+    setScrapingLiveTenders(true);
+    try {
+      const targetCity = selectedProvinceFilter !== 'Tümü' ? selectedProvinceFilter : null;
+      toast.loading("İlan.gov.tr'den canlı kamu ihaleleri taranıyor...", { id: 'tender-scrape' });
+      const res = await discoveryApi.scrapeLiveTenders(targetCity);
+      setTenders(res.data || []);
+      toast.success(`${res.data?.length || 0} aktif kamu ihalesi güncellendi!`, { id: 'tender-scrape' });
+    } catch {
+      toast.error('Canlı ihale taramasında hata oluştu.', { id: 'tender-scrape' });
+    } finally {
+      setScrapingLiveTenders(false);
     }
   };
 
@@ -249,12 +314,13 @@ export default function DiscoveryList() {
   };
 
   // ── Üst Yapıcı Fonksiyonları ───────────────────────────────────────
-  const loadBodybuildersAndReferrals = async () => {
+  const loadBodybuildersAndReferrals = async (prov = selectedProvinceFilter) => {
     setLoadingBb(true);
     try {
+      const params = prov && prov !== 'Tümü' ? { city: prov } : {};
       const [bbRes, refRes] = await Promise.all([
-        discoveryApi.getBodybuilders(),
-        discoveryApi.getReferrals()
+        discoveryApi.getBodybuilders(params),
+        discoveryApi.getReferrals(params)
       ]);
       setBodybuilders(bbRes.data || []);
       setReferrals(refRes.data || []);
@@ -303,14 +369,30 @@ export default function DiscoveryList() {
   };
 
   // ── Yeni Kurulan Şirketler ─────────────────────────────────────────
-  const loadNewCompanies = async () => {
+  const loadNewCompanies = async (prov = selectedProvinceFilter) => {
     setLoadingNewCompanies(true);
     try {
-      const res = await discoveryApi.getNewRegistrations();
+      const params = prov && prov !== 'Tümü' ? { city: prov } : {};
+      const res = await discoveryApi.getNewRegistrations(params);
       setNewCompanies(res.data || []);
     } catch {
     } finally {
       setLoadingNewCompanies(false);
+    }
+  };
+
+  // ── Bölge Filtresi Değiştiğinde ────────────────────────────────────
+  const handleProvinceFilterChange = (prov) => {
+    setSelectedProvinceFilter(prov);
+    loadTenders(prov);
+    loadBodybuildersAndReferrals(prov);
+    loadNewCompanies(prov);
+
+    if (prov !== 'Tümü') {
+      const osbsInProv = OSB_OPTIONS.filter(o => o.city === prov);
+      if (osbsInProv.length > 0) {
+        setSelectedOsb(osbsInProv[0].name);
+      }
     }
   };
 
@@ -399,6 +481,41 @@ export default function DiscoveryList() {
         </button>
       </div>
 
+      {/* ── 9 HEDEF İL HIZLI FİLTRE BARI ───────────────────────────────── */}
+      <div 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          flexWrap: 'wrap',
+          padding: '0.75rem 1rem',
+          background: 'rgba(30, 41, 59, 0.5)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-color)',
+          marginBottom: '1.25rem'
+        }}
+      >
+        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-blue-light)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <FiMapPin size={15} /> HEDEF İL FİLTRESİ:
+        </span>
+        {['Tümü', ...ALLOWED_PROVINCES].map(prov => (
+          <button
+            key={prov}
+            type="button"
+            className={`btn btn-sm ${selectedProvinceFilter === prov ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => handleProvinceFilterChange(prov)}
+            style={{
+              borderRadius: 16,
+              padding: '0.25rem 0.85rem',
+              fontSize: '0.8rem',
+              fontWeight: selectedProvinceFilter === prov ? 700 : 500
+            }}
+          >
+            {prov === 'Tümü' ? '🌐 Tümü (9 İl)' : prov}
+          </button>
+        ))}
+      </div>
+
       {/* ── TAB 1: AKILCI OSB & SEKTÖREL RADAR ───────────────────────────── */}
       {activeTab === 'osb_radar' && (
         <div className="flex flex-col gap-6">
@@ -406,14 +523,16 @@ export default function DiscoveryList() {
           <div className="card glass-card">
             <div className="card-header">
               <h3 className="card-title"><FiTarget style={{ marginRight: 8, color: 'var(--accent-blue-light)' }} /> Bölgesel Sanayi & Sektör Avcısı</h3>
-              <span className="text-xs text-muted">Hedefli OSB taraması yaparak doğrudan şasi/kamyonet ihtiyacı olan firmaları bulun</span>
+              <span className="text-xs text-muted">Hedefli OSB taraması yaparak doğrudan şasi/kamyonet ihtiyacı olan firmaları bulun (9 İl Kapsamı)</span>
             </div>
 
             {/* OSB Hızlı Seçim Hapları */}
             <div className="mb-4">
-              <label className="text-xs font-semibold text-muted mb-2 block">1. HEDEF BÖLGE / ORGANİZE SANAYİ BÖLGESİ SEÇİN:</label>
+              <label className="text-xs font-semibold text-muted mb-2 block">
+                1. HEDEF BÖLGE / ORGANİZE SANAYİ BÖLGESİ SEÇİN {selectedProvinceFilter !== 'Tümü' ? `(${selectedProvinceFilter})` : ''}:
+              </label>
               <div className="flex gap-2 flex-wrap">
-                {OSB_OPTIONS.map(osb => (
+                {(selectedProvinceFilter === 'Tümü' ? OSB_OPTIONS : OSB_OPTIONS.filter(o => o.city === selectedProvinceFilter)).map(osb => (
                   <button 
                     key={osb.id} 
                     type="button" 
@@ -584,9 +703,20 @@ export default function DiscoveryList() {
               <h3 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Belediye & Kamu Araç İhaleleri İzleme Radarı</h3>
               <p className="text-xs text-muted">Bölgedeki çöp toplama, fen işleri ve lojistik ihalelerini kazanan yüklenicilere toplu filo şasisi sunun.</p>
             </div>
-            <button className="btn btn-primary btn-sm" onClick={() => setShowTenderModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <FiPlus size={16} /> + Yeni İhale Kaydet
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                className="btn btn-secondary btn-sm" 
+                onClick={handleScrapeLiveTenders} 
+                disabled={scrapingLiveTenders}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                {scrapingLiveTenders ? <FiLoader className="spin" size={16} /> : <FiRefreshCw size={16} />}
+                {scrapingLiveTenders ? 'İlanlar Taranıyor...' : '📡 İlan.gov.tr Canlı İhale Tara'}
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowTenderModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <FiPlus size={16} /> + Yeni İhale Kaydet
+              </button>
+            </div>
           </div>
 
           <div className="card glass-card">
@@ -661,7 +791,10 @@ export default function DiscoveryList() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state"><p>Kayıtlı ihale bulunmuyor.</p></div>
+              <div className="empty-state">
+                <FiInfo size={24} style={{ marginBottom: 8 }} />
+                <p>Seçili il için kayıtlı ihale bulunmuyor. İlan.gov.tr'den canlı kamu ihalelerini taramak için yukarıdaki "📡 İlan.gov.tr Canlı İhale Tara" butonuna tıklayabilirsiniz.</p>
+              </div>
             )}
           </div>
         </div>
@@ -741,7 +874,10 @@ export default function DiscoveryList() {
                   ))}
                 </div>
               ) : (
-                <div className="empty-state"><p>Henüz üst yapıcı yönlendirmesi bulunmuyor.</p></div>
+                <div className="empty-state">
+                  <FiInfo size={24} style={{ marginBottom: 8 }} />
+                  <p>Seçili il için henüz üst yapıcı yönlendirmesi bulunmuyor. Yeni müşteri talebi geldiğinde yukarıdaki "+ Yeni Müşteri Talebi Gir" butonunu kullanabilirsiniz.</p>
+                </div>
               )}
             </div>
           </div>
@@ -758,34 +894,41 @@ export default function DiscoveryList() {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-              {bodybuilders.map(bb => (
-                <div key={bb.id} className="card glass-card">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{bb.company_name}</div>
-                    <span className="badge badge-blue">{bb.specialty}</span>
+            {bodybuilders.length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                {bodybuilders.map(bb => (
+                  <div key={bb.id} className="card glass-card">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{bb.company_name}</div>
+                      <span className="badge badge-blue">{bb.specialty}</span>
+                    </div>
+                    <div className="text-xs text-muted mb-2">👤 <strong>Usta / Yetkili:</strong> {bb.contact_person || '—'}</div>
+                    <div className="text-xs text-secondary mb-2">📞 <strong>Telefon:</strong> {bb.phone || '—'}</div>
+                    <div className="text-xs text-muted mb-3">📍 {bb.address || `${bb.city} / ${bb.district || ''}`}</div>
+                    {bb.notes && <div className="text-xs text-muted italic mb-3">"{bb.notes}"</div>}
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
+                      <span className="text-xs font-semibold" style={{ color: 'var(--accent-green)' }}>
+                        {bb.referrals_count || 0} Yönlendirme
+                      </span>
+                      <button 
+                        className="btn btn-secondary btn-sm" 
+                        onClick={() => {
+                          setNewReferral(prev => ({ ...prev, bodybuilder_id: bb.id }));
+                          setShowReferralModal(true);
+                        }}
+                      >
+                        + Talep Gir
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted mb-2">👤 <strong>Usta / Yetkili:</strong> {bb.contact_person || '—'}</div>
-                  <div className="text-xs text-secondary mb-2">📞 <strong>Telefon:</strong> {bb.phone || '—'}</div>
-                  <div className="text-xs text-muted mb-3">📍 {bb.address || `${bb.city} / ${bb.district || ''}`}</div>
-                  {bb.notes && <div className="text-xs text-muted italic mb-3">"{bb.notes}"</div>}
-                  <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
-                    <span className="text-xs font-semibold" style={{ color: 'var(--accent-green)' }}>
-                      {bb.referrals_count || 0} Yönlendirme
-                    </span>
-                    <button 
-                      className="btn btn-secondary btn-sm" 
-                      onClick={() => {
-                        setNewReferral(prev => ({ ...prev, bodybuilder_id: bb.id }));
-                        setShowReferralModal(true);
-                      }}
-                    >
-                      + Talep Gir
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="card glass-card empty-state">
+                <FiTool size={24} style={{ marginBottom: 8 }} />
+                <p>Seçili il için kayıtlı üst yapıcı / kasacı partneri bulunmuyor. Yeni bir usta veya karoser atölyesi kaydetmek için yukarıdaki "+ Yeni Kasacı Ekle" butonuna tıklayabilirsiniz.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -842,7 +985,10 @@ export default function DiscoveryList() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state"><p>Yeni şirket kaydı bulunamadı.</p></div>
+              <div className="empty-state">
+                <FiInfo size={24} style={{ marginBottom: 8 }} />
+                <p>Seçili il için yeni şirket kaydı bulunamadı. Ticaret sicil bültenleri güncellendikçe kayıtlar listelenecektir.</p>
+              </div>
             )}
           </div>
         </div>
@@ -926,6 +1072,20 @@ export default function DiscoveryList() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label className="text-xs font-semibold text-muted">Şehir (Hedef 9 İl) *</label>
+                  <select className="input" value={newTender.city} onChange={e => setNewTender({ ...newTender, city: e.target.value })}>
+                    {ALLOWED_PROVINCES.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">İlçe / Bölge</label>
+                  <input className="input" placeholder="Örn: Tekkeköy, Fatsa..." value={newTender.district} onChange={e => setNewTender({ ...newTender, district: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
                   <label className="text-xs font-semibold text-muted">Tahmini Araç İhtiyacı</label>
                   <input type="number" className="input" value={newTender.estimated_vehicles} onChange={e => setNewTender({ ...newTender, estimated_vehicles: parseInt(e.target.value) || 1 })} />
                 </div>
@@ -995,13 +1155,21 @@ export default function DiscoveryList() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
+                  <label className="text-xs font-semibold text-muted">Şehir (Hedef 9 İl)</label>
+                  <select className="input" value={newReferral.city} onChange={e => setNewReferral({ ...newReferral, city: e.target.value })}>
+                    {ALLOWED_PROVINCES.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="text-xs font-semibold text-muted">Talep Edilen Şasi</label>
                   <input className="input" placeholder="Örn: Daily 35C16" value={newReferral.requested_chassis} onChange={e => setNewReferral({ ...newReferral, requested_chassis: e.target.value })} />
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-muted">İstenen Üst Yapı / Kasa</label>
-                  <input className="input" placeholder="Örn: Frigorifik Kasa" value={newReferral.requested_body} onChange={e => setNewReferral({ ...newReferral, requested_body: e.target.value })} />
-                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted">İstenen Üst Yapı / Kasa</label>
+                <input className="input" placeholder="Örn: Frigorifik Kasa" value={newReferral.requested_body} onChange={e => setNewReferral({ ...newReferral, requested_body: e.target.value })} />
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted">Usta Notu</label>
@@ -1041,8 +1209,12 @@ export default function DiscoveryList() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted">Şehir</label>
-                  <input className="input" value={newBb.city} onChange={e => setNewBb({ ...newBb, city: e.target.value })} />
+                  <label className="text-xs font-semibold text-muted">Şehir (Hedef 9 İl) *</label>
+                  <select className="input" value={newBb.city} onChange={e => setNewBb({ ...newBb, city: e.target.value })}>
+                    {ALLOWED_PROVINCES.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-muted">Uzmanlık Alanı *</label>

@@ -151,26 +151,27 @@ export const discoveryApi = {
   searchOsbRadar: (data) => api.post('/discovery/radar/osb-search', data),
 
   // Kamu & Belediye İhale Radarı
-  getTenders: () => api.get('/discovery/tenders'),
+  getTenders: (params) => api.get('/discovery/tenders', { params }),
+  scrapeLiveTenders: (city) => api.post('/discovery/tenders/scrape-live', null, { params: { city } }),
   createTender: (data) => api.post('/discovery/tenders', data),
   updateTender: (id, data) => api.put(`/discovery/tenders/${id}`, data),
   deleteTender: (id) => api.delete(`/discovery/tenders/${id}`),
   convertTenderToLead: (id) => api.post(`/discovery/tenders/${id}/convert-to-lead`),
 
   // Üst Yapıcı (Kasacı / Karoser) Partnerleri
-  getBodybuilders: () => api.get('/discovery/bodybuilders'),
+  getBodybuilders: (params) => api.get('/discovery/bodybuilders', { params }),
   createBodybuilder: (data) => api.post('/discovery/bodybuilders', data),
   updateBodybuilder: (id, data) => api.put(`/discovery/bodybuilders/${id}`, data),
   deleteBodybuilder: (id) => api.delete(`/discovery/bodybuilders/${id}`),
 
   // Üst Yapıcı Müşteri Yönlendirmeleri (Referrals)
-  getReferrals: (bodybuilderId) => api.get('/discovery/bodybuilders/referrals', { params: { bodybuilder_id: bodybuilderId } }),
+  getReferrals: (params) => api.get('/discovery/bodybuilders/referrals', { params: typeof params === 'object' ? params : { bodybuilder_id: params } }),
   createReferral: (data) => api.post('/discovery/bodybuilders/referrals', data),
   updateReferral: (id, data) => api.put(`/discovery/bodybuilders/referrals/${id}`, data),
   convertReferralToLead: (id) => api.post(`/discovery/bodybuilders/referrals/${id}/convert-to-lead`),
 
   // Yeni Kurulan Şirketler (Ticaret Sicil / NACE)
-  getNewRegistrations: (city) => api.get('/discovery/new-registrations', { params: { city } }),
+  getNewRegistrations: (city) => api.get('/discovery/new-registrations', { params: typeof city === 'object' ? city : { city } }),
   convertNewCompanyToLead: (id) => api.post(`/discovery/new-registrations/${id}/convert-to-lead`),
 };
 

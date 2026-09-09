@@ -36,9 +36,23 @@ def search_osb_radar(
 # ── Kamu & Belediye İhale Radarı ──────────────────────────────────────────
 
 @router.get("/tenders", response_model=List[TenderResponse])
-def list_tenders(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Aktif ve sonuçlanan kamu/belediye ihalelerini listeler."""
-    return DiscoveryService(db).get_tenders()
+def list_tenders(
+    city: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Hedef 9 ildeki aktif ve sonuçlanan kamu/belediye ihalelerini listeler."""
+    return DiscoveryService(db).get_tenders(city)
+
+
+@router.post("/tenders/scrape-live", response_model=List[TenderResponse])
+def scrape_live_tenders(
+    city: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """İlan.gov.tr üzerinden hedef 9 il için canlı kamu/belediye taşıma ve araç ihalelerini tarar."""
+    return DiscoveryService(db).scrape_live_tenders(city)
 
 
 @router.post("/tenders", response_model=TenderResponse)
@@ -73,9 +87,13 @@ def convert_tender_contractor_to_lead(
 # ── Üst Yapıcı (Kasacı / Karoser) Partnerleri ──────────────────────────────
 
 @router.get("/bodybuilders", response_model=List[BodybuilderResponse])
-def list_bodybuilders(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Anlaşmalı üst yapıcı (kasacı/karoser) partnerlerini listeler."""
-    return DiscoveryService(db).get_bodybuilders()
+def list_bodybuilders(
+    city: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Hedef 9 ildeki anlaşmalı üst yapıcı (kasacı/karoser) partnerlerini listeler."""
+    return DiscoveryService(db).get_bodybuilders(city)
 
 
 @router.post("/bodybuilders", response_model=BodybuilderResponse)
@@ -102,11 +120,12 @@ def delete_bodybuilder(id: int, db: Session = Depends(get_db), current_user=Depe
 @router.get("/bodybuilders/referrals", response_model=List[ReferralResponse])
 def list_referrals(
     bodybuilder_id: Optional[int] = Query(None),
+    city: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
     """Üst yapıcılardan gelen şasi ve müşteri taleplerini listeler."""
-    return DiscoveryService(db).get_referrals(bodybuilder_id)
+    return DiscoveryService(db).get_referrals(bodybuilder_id, city)
 
 
 @router.post("/bodybuilders/referrals", response_model=ReferralResponse)
