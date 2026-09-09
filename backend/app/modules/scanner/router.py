@@ -330,6 +330,67 @@ class CardScanResponse(BaseModel):
     company_name: Optional[str] = None
     address: Optional[str] = None
     website: Optional[str] = None
+    city: Optional[str] = "Samsun"
+    district: Optional[str] = "Tekkeköy"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+
+async def geocode_address_smart(addr: Optional[str]):
+    """Adresten il, ilçe ve koordinatları kademeli olarak akıllı şekilde çözer."""
+    import re
+    import httpx
+    
+    if not addr or not addr.strip():
+        return None, None, "Samsun", "Tekkeköy"
+
+    turkish_cities = [
+        'Samsun', 'Ordu', 'Çorum', 'Corum', 'Amasya', 'Sinop', 'Tokat', 'Giresun', 
+        'Trabzon', 'İstanbul', 'Istanbul', 'Ankara', 'İzmir', 'Izmir', 'Bursa', 'Antalya'
+    ]
+    turkish_districts = [
+        'İlkadım', 'Ilkadim', 'Atakum', 'Canik', 'Tekkeköy', 'Tekkekoy', 'Çarşamba', 'Carsamba',
+        'Bafra', 'Terme', 'Havza', 'Vezirköprü', 'Vezirkopru', 'Alaçam', 'Alacam', '19 Mayıs',
+        'Kavak', 'Salıpazarı', 'Salipazari', 'Ayvacık', 'Ayvacik', 'Asarcık', 'Asarcik',
+        'Ladik', 'Yakakent', 'Altınordu', 'Altinordu', 'Ünye', 'Unye', 'Fatsa', 'Merzifon', 'Suluova'
+    ]
+
+    found_city = None
+    for c in turkish_cities:
+        if re.search(r'\b' + re.escape(c) + r'\b', addr, re.IGNORECASE):
+            found_city = c.capitalize()
+            break
+
+    found_district = None
+    for d in turkish_districts:
+        if re.search(r'\b' + re.escape(d) + r'\b', addr, re.IGNORECASE):
+            found_district = d.capitalize()
+            break
+
+    candidates = []
+    cleaned = re.sub(r'^(?:Adres|Address)\s*[:\.-]?\s*', '', addr, flags=re.IGNORECASE)
+    cleaned = re.sub(r'[/,]', ' ', cleaned).strip()
+    candidates.append(cleaned)
+
+    if found_district and found_city:
+        candidates.append(f"{found_district}, {found_city}")
+    elif found_district:
+        candidates.append(f"{found_district}, Samsun")
+    if found_city:
+        candidates.append(found_city)
+    candidates.append("Samsun, Türkiye")
+
+    async with httpx.AsyncClient(timeout=6.0, headers={'User-Agent': 'IvecoCRM/1.0'}) as client:
+        for q in candidates:
+            try:
+                r = await client.get('https://nominatim.openstreetmap.org/search', params={'q': q, 'format': 'json', 'limit': 1})
+                if r.status_code == 200 and r.json():
+                    item = r.json()[0]
+                    return float(item['lat']), float(item['lon']), found_city or "Samsun", found_district or "Tekkeköy"
+            except Exception:
+                pass
+
+    return 41.213498, 36.457804, found_city or "Samsun", found_district or "Tekkeköy"
 
 
 
@@ -772,6 +833,8 @@ async def scan_card(
             else:
                 address = ""
 
+        lat, lon, det_city, det_dist = await geocode_address_smart(address)
+
         return CardScanResponse(
             contact_name=contact_name or "Müşteri Yetkilisi",
             role=role or "Yetkili",
@@ -779,7 +842,11 @@ async def scan_card(
             email=email or "",
             company_name=company_name or "Yeni Firma Ltd. Şti.",
             address=address or "",
-            website=website or ""
+            website=website or "",
+            city=det_city or "Samsun",
+            district=det_dist or "Tekkeköy",
+            latitude=lat,
+            longitude=lon
         )
 
     # 5. Fallback Mock Desteği
