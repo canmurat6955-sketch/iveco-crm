@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { discoveryApi, enrichmentApi, scannerApi, crmApi } from '../../api/client';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { discoveryApi, scannerApi, crmApi, enrichmentApi } from '../../api/client';
 import useGeolocation from '../../hooks/useGeolocation';
 import { searchIntentParser } from '../../services/searchIntentParser';
 import { duplicateDetection } from '../../services/duplicateDetection';
@@ -7,165 +8,176 @@ import toast from 'react-hot-toast';
 import { 
   FiZap, FiPlay, FiLoader, FiCheck, FiX, FiChevronLeft, 
   FiChevronRight, FiSearch, FiMapPin, FiPlus, FiNavigation, 
-  FiSliders, FiArrowRight, FiInfo 
+  FiSliders, FiArrowRight, FiInfo, FiTruck, FiTool, FiFileText,
+  FiPhoneCall, FiMessageSquare, FiCheckCircle, FiRefreshCw, FiCalendar,
+  FiDollarSign, FiAward, FiLayers, FiBriefcase, FiAlertCircle
 } from 'react-icons/fi';
 
-// Samsun/Ordu/Sinop bölgesi için zenginleştirilmiş test mock verileri
-const MOCK_PLACES_DATA = [
-  { company_name: "Karadeniz Lojistik Hizmetleri", phone: "0362 266 9090", address: "Samsun OSB 4. Cadde No:12, Tekkeköy, Samsun", district: "Tekkeköy", city: "Samsun", website: "karadenizlojistik.com.tr", sector: "Nakliye / Lojistik", rating: 4.6, google_place_id: "mock_place_01", google_maps_url: "https://maps.google.com/?cid=1" },
-  { company_name: "Çarşamba Akaryakıt ve Dinlenme Tesisleri", phone: "0362 833 4455", address: "Atatürk Bulvarı No:240, Çarşamba, Samsun", district: "Çarşamba", city: "Samsun", website: "carsambapetrol.com", sector: "Akaryakıt", rating: 4.2, google_place_id: "mock_place_02", google_maps_url: "https://maps.google.com/?cid=2" },
-  { company_name: "Özkan Beton Yapı Elemanları", phone: "0362 222 1122", address: "Kutlukent Mah. 12. Sokak No:4, Tekkeköy, Samsun", district: "Tekkeköy", city: "Samsun", website: "ozkanbeton.com", sector: "İnşaat", rating: 4.0, google_place_id: "mock_place_03", google_maps_url: "https://maps.google.com/?cid=3" },
-  { company_name: "Sinop Lider Nakliyat", phone: "0368 261 4050", address: "Yeni Sanayi Sitesi C Blok No:8, Sinop Merkez, Sinop", district: "Merkez", city: "Sinop", website: "sinoplider.com", sector: "Nakliye / Lojistik", rating: 4.5, google_place_id: "mock_place_04", google_maps_url: "https://maps.google.com/?cid=4" },
-  { company_name: "Çorum Akaryakıt Ticaret A.Ş.", phone: "0364 225 1020", address: "Ankara Yolu 3. km, Çorum Merkez, Çorum", district: "Merkez", city: "Çorum", website: "corumpetrol.com", sector: "Akaryakıt", rating: 4.1, google_place_id: "mock_place_05", google_maps_url: "https://maps.google.com/?cid=5" },
-  { company_name: "Samsun Gıda Dağıtım Deposu", phone: "0362 444 3456", address: "Gıda Borsası No:18, İlkadım, Samsun", district: "İlkadım", city: "Samsun", website: "samsungida.com", sector: "Gıda", rating: 4.3, google_place_id: "mock_place_06", google_maps_url: "https://maps.google.com/?cid=6" },
-  { company_name: "Ordu Taşımacılık Kooperatifi", phone: "0452 234 5678", address: "Terminal Cad. No:45, Altınordu, Ordu", district: "Altınordu", city: "Ordu", website: "ordutasimacilik.org", sector: "Nakliye / Lojistik", rating: 3.9, google_place_id: "mock_place_07", google_maps_url: "https://maps.google.com/?cid=7" },
-  { company_name: "Amasya Yapı İnşaat Malzemeleri", phone: "0358 218 8090", address: "Sanayi Sitesi 2. Blok No:14, Amasya Merkez, Amasya", district: "Merkez", city: "Amasya", website: "amasyayapi.com", sector: "İnşaat", rating: 4.4, google_place_id: "mock_place_08", google_maps_url: "https://maps.google.com/?cid=8" }
+// Bölgesel OSB ve Sanayi Siteleri
+const OSB_OPTIONS = [
+  { id: 'tekkekoy', name: 'Samsun Tekkeköy OSB', city: 'Samsun' },
+  { id: 'gida_borsasi', name: 'Samsun Gıda Borsası & Hali', city: 'Samsun' },
+  { id: 'ilkadim_sanayi', name: 'İlkadım 19 Mayıs Sanayi', city: 'Samsun' },
+  { id: 'corum_osb', name: 'Çorum Organize Sanayi Bölgesi', city: 'Çorum' },
+  { id: 'fatsa_osb', name: 'Ordu Fatsa OSB & Sanayi', city: 'Ordu' },
+  { id: 'trabzon_degirmendere', name: 'Trabzon Değirmendere Ambarlar', city: 'Trabzon' },
+];
+
+// Iveco Hedef Ticari Sektör Presetleri
+const SECTOR_PRESETS = [
+  { 
+    id: 'soguk_zincir', 
+    label: '🥩 Soğuk Zincir & Frigo', 
+    desc: 'Et, Balık, Tavuk, Süt & Dondurma',
+    targetVehicle: 'Iveco Daily 35C16 / 50C18 Frigorifik' 
+  },
+  { 
+    id: 'lojistik_ambar', 
+    label: '📦 Nakliyat & Kargo Ambarı', 
+    desc: 'Şehir İçi Dağıtım & Koli Nakliyesi',
+    targetVehicle: 'Iveco Daily 35S16 Kapalı Sac / Eurocargo' 
+  },
+  { 
+    id: 'insaat_nalbur', 
+    label: '🏗️ İnşaat, Hafriyat & Nalbur', 
+    desc: 'Kereste, Mermer, Hırdavat & Agrega',
+    targetVehicle: 'Iveco Daily 35C16 Sac Kasa / 70C18 Damper' 
+  },
+  { 
+    id: 'oto_kurtarma', 
+    label: '🚚 Oto Kurtarma & Çekici', 
+    desc: '7/24 Yol Yardım & Ağır Kurtarıcı',
+    targetVehicle: 'Iveco Daily 70C18 Kayar Kasa Platform' 
+  },
+  { 
+    id: 'firin_unlu', 
+    label: '🍞 Fırın & Ekmek Dağıtımı', 
+    desc: 'Toplu Ekmek & Unlu Mamul İmalatçıları',
+    targetVehicle: 'Iveco Daily 35S14 Panelvan / 35C15 Kasa' 
+  },
+  { 
+    id: 'toptan_gida', 
+    label: '🥫 Toptan Gıda & Meşrubat', 
+    desc: 'Su, Meşrubat & Bakliyat Dağıtıcıları',
+    targetVehicle: 'Iveco Daily 35C16 / 70C18 Kasa' 
+  },
 ];
 
 export default function DiscoveryList() {
-  // Geolocation hook'u
-  const { location, error: gpsError, loading: gpsLoading, getLocation } = useGeolocation();
-  
-  // Arama tabları (Google Places Canlı Arama vs Taramalar)
-  const [activeTab, setActiveTab] = useState('live_search'); // live_search | sources
-  
-  // Canlı Arama State'leri
+  const navigate = useNavigate();
+  const { location, loading: gpsLoading, getLocation } = useGeolocation();
+
+  // Ana Navigasyon Tabları
+  const [activeTab, setActiveTab] = useState('osb_radar'); // osb_radar | tenders | bodybuilders | new_registrations | live_search | sources
+
+  // ── Tab 1: Akılcı OSB Radar State'leri ──────────────────────────────
+  const [selectedOsb, setSelectedOsb] = useState('Samsun Tekkeköy OSB');
+  const [selectedSector, setSelectedSector] = useState('soguk_zincir');
+  const [customOsbQuery, setCustomOsbQuery] = useState('');
+  const [searchingOsb, setSearchingOsb] = useState(false);
+  const [osbResults, setOsbResults] = useState([]);
+
+  // ── Tab 2: Kamu & Belediye İhale Radarı State'leri ──────────────────
+  const [tenders, setTenders] = useState([]);
+  const [loadingTenders, setLoadingTenders] = useState(false);
+  const [showTenderModal, setShowTenderModal] = useState(false);
+  const [newTender, setNewTender] = useState({
+    tender_number: '',
+    title: '',
+    organization: '',
+    city: 'Samsun',
+    district: '',
+    category: 'Temizlik & Çöp',
+    estimated_vehicles: 8,
+    suggested_iveco_model: 'Iveco Daily 70C18 Çöp Kasası',
+    contractor_name: '',
+    contractor_phone: '',
+    contractor_contact: '',
+    contract_amount: '',
+    notes: ''
+  });
+
+  // ── Tab 3: Üst Yapıcı Partnerleri & Yönlendirmeler State'leri ───────
+  const [bodybuilders, setBodybuilders] = useState([]);
+  const [referrals, setReferrals] = useState([]);
+  const [loadingBb, setLoadingBb] = useState(false);
+  const [showReferralModal, setShowReferralModal] = useState(false);
+  const [showBbModal, setShowBbModal] = useState(false);
+  const [newReferral, setNewReferral] = useState({
+    bodybuilder_id: '',
+    customer_name: '',
+    customer_phone: '',
+    city: 'Samsun',
+    requested_chassis: 'Iveco Daily 35C16 Şasi',
+    requested_body: 'Frigorifik Kasa (-18°C)',
+    notes: ''
+  });
+  const [newBb, setNewBb] = useState({
+    company_name: '',
+    contact_person: '',
+    phone: '',
+    city: 'Samsun',
+    district: '',
+    specialty: 'Frigofirik Kasa & Soğutucu',
+    address: '',
+    notes: ''
+  });
+
+  // ── Tab 4: Yeni Kurulan Şirketler (Ticaret Sicil / NACE) ────────────
+  const [newCompanies, setNewCompanies] = useState([]);
+  const [loadingNewCompanies, setLoadingNewCompanies] = useState(false);
+
+  // ── Tab 5: Serbest Arama & Kaynaklar (Mevcut Yapı) ──────────────────
   const [searchQuery, setSearchQuery] = useState('');
-  const [parsedIntent, setParsedIntent] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [scanResults, setScanResults] = useState([]);
-  const [crmCustomers, setCrmCustomers] = useState([]);
-  const [loadingCrm, setLoadingCrm] = useState(false);
-  const [searchLimit, setSearchLimit] = useState(20);
-
-  // Tarama Kaynakları State'leri (Mevcut yapı)
   const [sources, setSources] = useState([]);
   const [companies, setCompanies] = useState({ items: [], total: 0 });
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [running, setRunning] = useState(null);
+  const [searchLimit, setSearchLimit] = useState(20);
   const pageSize = 15;
 
-  // 1. CRM'deki tüm müşterileri fuzzy matching için çek (Performanslı)
+  // İlk yüklemede verileri çek
   useEffect(() => {
-    setLoadingCrm(true);
-    // Tek seferde fuzzy için tüm müşteri listesini çekiyoruz (Pagination devre dışı veya yüksek limit)
-    crmApi.getCustomers({ page: 1, page_size: 5000 })
-      .then(res => {
-        setCrmCustomers(res.data.items || []);
-      })
-      .catch(() => {})
-      .finally(() => setLoadingCrm(false));
+    // OSB Radarı ilk aramayı otomatik yap
+    handleOsbSearch();
+    loadTenders();
+    loadBodybuildersAndReferrals();
+    loadNewCompanies();
+    discoveryApi.getSources().then(r => setSources(r.data || [])).catch(() => {});
   }, []);
 
-  // 2. Tarama kaynaklarını çek (Mevcut Yapı)
-  useEffect(() => {
-    discoveryApi.getSources().then(r => setSources(r.data)).catch(() => {});
-  }, []);
-
-  // 3. Taranan firmaları çek (Mevcut Yapı)
   useEffect(() => {
     if (activeTab === 'sources') {
       loadCompanies();
     }
   }, [page, statusFilter, activeTab]);
 
-  const loadCompanies = () => {
-    discoveryApi.getCompanies({ page, page_size: pageSize, status: statusFilter || undefined })
-      .then(r => setCompanies(r.data)).catch(() => {});
-  };
-
-  // ── Arama ve Google Places Entegrasyonu ──────────────────────────────────
-  const handleLiveSearch = async (e) => {
-    if (e) e.preventDefault();
-    if (searchQuery.length < 3) {
-      toast.error("Arama terimi en az 3 karakter olmalıdır.");
-      return;
-    }
-
-    setScanning(true);
-    setScanResults([]);
-    
-    // 1. Doğal dil parser'ı çalıştır
-    const intent = searchIntentParser.parse(searchQuery);
-    setParsedIntent(intent);
-
+  // ── OSB Radar Arama Fonksiyonu ─────────────────────────────────────
+  const handleOsbSearch = async () => {
+    setSearchingOsb(true);
     try {
-      // 2. Arama endpoint'ini çağır
-      // (Burası backend'de Google Places'tan veri çekecek)
-      const res = await scannerApi.search({
-        query: searchQuery,
-        max_results: searchLimit
+      const selectedOsbObj = OSB_OPTIONS.find(o => o.name === selectedOsb);
+      const res = await discoveryApi.searchOsbRadar({
+        osb_name: selectedOsb,
+        sector_preset: selectedSector,
+        custom_query: customOsbQuery || undefined,
+        city: selectedOsbObj?.city || 'Samsun',
+        limit: 20
       });
-
-      let placesData = [];
-
-      if (res.data.error || (res.data.results && res.data.results.length === 0)) {
-        // API key yoksa veya hata geldiyse: Akıllı Mock Fallback devreye girsin!
-        console.warn("Google API hatası. Mock veri fallback yapılıyor:", res.data.error);
-        toast("Google API Anahtarı eksik/geçersiz. Test verileri gösteriliyor.", { icon: 'ℹ️', duration: 4000 });
-        
-        // Sorguya göre mock verileri filtrele
-        const lowerQ = searchQuery.toLowerCase();
-        placesData = MOCK_PLACES_DATA.filter(item => {
-          const matchesSector = item.sector.toLowerCase().includes(intent.sector?.toLowerCase() || '') ||
-                                item.company_name.toLowerCase().includes(intent.sector?.toLowerCase() || '');
-          const matchesCity = item.city.toLowerCase().includes(intent.city?.toLowerCase() || '') ||
-                              item.address.toLowerCase().includes(intent.city?.toLowerCase() || '');
-          return matchesSector || matchesCity || item.company_name.toLowerCase().includes(lowerQ);
-        });
-
-        // Eğer filtre sonucu boşsa, rastgele 4 tane dön
-        if (placesData.length === 0) {
-          placesData = MOCK_PLACES_DATA.slice(0, 4);
-        }
-      } else {
-        placesData = res.data.results || [];
-      }
-
-      // 3. Client-side Fuzzy Matching ile eşleştirme yap
-      const processedResults = placesData.map(biz => {
-        const matchResult = duplicateDetection.findMatch(biz, crmCustomers);
-        
-        // Konum hesaplama
-        let distance = null;
-        if (location && biz.latitude && biz.longitude) {
-          // Gerçek mesafe
-          distance = duplicateDetection.calculateDistance(
-            location.latitude, location.longitude,
-            biz.latitude, biz.longitude
-          );
-        } else if (location) {
-          // GPS varsa ve mock veri ise, test amaçlı rastgele yakın mesafe üne
-          distance = Math.random() * 8000 + 500; // 500m ile 8.5km arası
-        }
-
-        return {
-          ...biz,
-          match: matchResult, // { customer, score, matchType }
-          distance: distance
-        };
-      });
-
-      // Mesafeye veya skora göre sırala
-      processedResults.sort((a, b) => {
-        if (a.distance && b.distance) return a.distance - b.distance;
-        return b.rating - a.rating;
-      });
-
-      setScanResults(processedResults);
-      toast.success(`${processedResults.length} firma bulundu ve analiz edildi.`);
-
+      setOsbResults(res.data || []);
+      toast.success(`${res.data?.length || 0} potansiyel firma radarda tespit edildi.`);
     } catch (err) {
-      console.error(err);
-      toast.error("Arama sırasında bir hata oluştu.");
+      toast.error('OSB Radar taramasında hata oluştu.');
     } finally {
-      setScanning(false);
+      setSearchingOsb(false);
     }
   };
 
-  // Tek firmayı CRM'e aktar
-  const addSingleToCrm = async (biz) => {
+  // OSB'den Tek Tıkla CRM'e Ekle
+  const addOsbToCrm = async (biz) => {
     try {
       const res = await scannerApi.addToCrm({
         company_name: biz.company_name,
@@ -173,368 +185,879 @@ export default function DiscoveryList() {
         address: biz.address,
         district: biz.district,
         city: biz.city,
-        website: biz.website,
         sector: biz.sector,
         google_place_id: biz.google_place_id,
         google_maps_url: biz.google_maps_url,
-        rating: biz.rating
+        rating: biz.rating,
+        sales_notes: `OSB Radarı: ${selectedOsb}. Tavsiye Edilen Araç: ${biz.recommended_iveco} (${biz.target_body_type || 'Üst Yapı'}). Uyumluluk Skoru: ${biz.iveco_match_score}`
       });
 
       if (res.data.status === 'exists') {
         toast.error(res.data.message);
       } else {
         toast.success(res.data.message || 'Firma CRM\'e başarıyla eklendi!');
-        // UI'da durumu güncelle (match ekle)
-        setScanResults(prev => prev.map(item => {
-          if (item.google_place_id === biz.google_place_id) {
+        setOsbResults(prev => prev.map(item => {
+          if (item.company_name === biz.company_name) {
             return {
               ...item,
-              match: {
-                customer: { id: res.data.customer_id, company_name: biz.company_name, segment: 'C' },
-                score: 1.0,
-                matchType: 'just_added'
-              }
+              is_existing_customer: true,
+              existing_customer_id: res.data.customer_id,
+              existing_customer_name: biz.company_name
             };
           }
           return item;
         }));
-        
-        // CRM listesini güncelle
-        crmApi.getCustomers({ page: 1, page_size: 5000 }).then(r => setCrmCustomers(r.data.items || []));
       }
     } catch {
-      toast.error("CRM'e eklenirken bir hata oluştu.");
+      toast.error('CRM\'e eklenirken bir hata oluştu.');
     }
   };
 
-  // ── Tarama Kaynakları Bölümü İşlemleri (Mevcut Yapı) ──────────────────────────
-  const runSource = async (id) => {
-    setRunning(id);
+  // ── İhale Radarı Fonksiyonları ─────────────────────────────────────
+  const loadTenders = async () => {
+    setLoadingTenders(true);
     try {
-      const res = await discoveryApi.runSource(id);
-      toast.success(`${res.data.new_companies} yeni firma bulundu!`);
-      discoveryApi.getSources().then(r => setSources(r.data));
-      loadCompanies();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Tarama hatası'); }
-    finally { setRunning(null); }
+      const res = await discoveryApi.getTenders();
+      setTenders(res.data || []);
+    } catch {
+      // Hata sessizce yutulabilir
+    } finally {
+      setLoadingTenders(false);
+    }
   };
 
-  const enrichAll = async () => {
+  const handleCreateTender = async (e) => {
+    e.preventDefault();
     try {
-      const res = await enrichmentApi.enrichAll();
-      toast.success(`${res.data.enriched} firma zenginleştirildi (${res.data.above_threshold} eşik üstü)`);
-      loadCompanies();
-    } catch { toast.error('Zenginleştirme hatası'); }
+      await discoveryApi.createTender(newTender);
+      toast.success('Yeni ihale başarıyla kaydedildi!');
+      setShowTenderModal(false);
+      loadTenders();
+    } catch {
+      toast.error('İhale kaydedilirken hata oluştu.');
+    }
   };
 
-  const convertCompany = async (id) => {
+  const convertTenderToLead = async (tenderId) => {
     try {
-      await discoveryApi.convertToCustomer(id);
-      toast.success('Firma CRM\'e aktarıldı');
-      loadCompanies();
-    } catch (err) { toast.error(err.response?.data?.detail || 'Aktarma hatası'); }
+      const res = await discoveryApi.convertTenderToLead(tenderId);
+      toast.success(res.data.message || 'İhale yüklenicisi CRM\'e aktarıldı!');
+      loadTenders();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'CRM\'e aktarılırken hata oluştu.');
+    }
   };
 
-  const rejectCompany = async (id) => {
+  // ── Üst Yapıcı Fonksiyonları ───────────────────────────────────────
+  const loadBodybuildersAndReferrals = async () => {
+    setLoadingBb(true);
     try {
-      await discoveryApi.rejectCompany(id);
-      toast('Firma reddedildi');
-      loadCompanies();
-    } catch { toast.error('Hata'); }
+      const [bbRes, refRes] = await Promise.all([
+        discoveryApi.getBodybuilders(),
+        discoveryApi.getReferrals()
+      ]);
+      setBodybuilders(bbRes.data || []);
+      setReferrals(refRes.data || []);
+      if (bbRes.data?.length > 0 && !newReferral.bodybuilder_id) {
+        setNewReferral(prev => ({ ...prev, bodybuilder_id: bbRes.data[0].id }));
+      }
+    } catch {
+      // Hata yutulabilir
+    } finally {
+      setLoadingBb(false);
+    }
   };
 
-  const totalPages = Math.ceil((companies.total || 0) / pageSize);
+  const handleCreateReferral = async (e) => {
+    e.preventDefault();
+    try {
+      await discoveryApi.createReferral(newReferral);
+      toast.success('Müşteri şasi talebi başarıyla kaydedildi!');
+      setShowReferralModal(false);
+      loadBodybuildersAndReferrals();
+    } catch {
+      toast.error('Talep kaydedilemedi.');
+    }
+  };
+
+  const handleCreateBodybuilder = async (e) => {
+    e.preventDefault();
+    try {
+      await discoveryApi.createBodybuilder(newBb);
+      toast.success('Yeni üst yapıcı partneri eklendi!');
+      setShowBbModal(false);
+      loadBodybuildersAndReferrals();
+    } catch {
+      toast.error('Üst yapıcı kaydedilemedi.');
+    }
+  };
+
+  const convertReferralToLead = async (referralId) => {
+    try {
+      const res = await discoveryApi.convertReferralToLead(referralId);
+      toast.success(res.data.message || 'Talep CRM\'e aktarıldı!');
+      loadBodybuildersAndReferrals();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'CRM\'e aktarma hatası');
+    }
+  };
+
+  // ── Yeni Kurulan Şirketler ─────────────────────────────────────────
+  const loadNewCompanies = async () => {
+    setLoadingNewCompanies(true);
+    try {
+      const res = await discoveryApi.getNewRegistrations();
+      setNewCompanies(res.data || []);
+    } catch {
+    } finally {
+      setLoadingNewCompanies(false);
+    }
+  };
+
+  const convertNewCompanyToLead = async (id) => {
+    try {
+      const res = await discoveryApi.convertNewCompanyToLead(id);
+      toast.success(res.data.message || 'Firma CRM\'e aktarıldı!');
+      loadNewCompanies();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'CRM\'e aktarma hatası');
+    }
+  };
+
+  // ── Klasik Tarama & Serbest Arama Fonksiyonları ────────────────────
+  const loadCompanies = () => {
+    discoveryApi.getCompanies({ page, page_size: pageSize, status: statusFilter || undefined })
+      .then(r => setCompanies(r.data)).catch(() => {});
+  };
+
+  const handleLiveSearch = async (e) => {
+    if (e) e.preventDefault();
+    if (searchQuery.length < 3) {
+      toast.error("Arama terimi en az 3 karakter olmalıdır.");
+      return;
+    }
+    setScanning(true);
+    try {
+      const res = await scannerApi.search({ query: searchQuery, max_results: searchLimit });
+      setScanResults(res.data.results || []);
+      toast.success(`${res.data.results?.length || 0} firma bulundu.`);
+    } catch {
+      toast.error('Arama sırasında hata oluştu.');
+    } finally {
+      setScanning(false);
+    }
+  };
 
   return (
     <div className="animate-in">
-      {/* Tab Switcher */}
-      <div className="flex gap-4 mb-6" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+      {/* Sayfa Başlığı */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-heading)' }}>Müşteri İstihbaratı & Lead Radarı</h2>
+          <p className="text-sm text-muted">Samsun ve Karadeniz bölgesinde ticari araç alım potansiyeli olan sıcak firmaları yakalayın.</p>
+        </div>
+      </div>
+
+      {/* Ana Tab Menüsü */}
+      <div className="flex gap-2 mb-6 flex-wrap" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+        <button 
+          className={`btn ${activeTab === 'osb_radar' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('osb_radar')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          <FiTarget size={16} /> 🎯 OSB & Sektörel Radar
+        </button>
+        <button 
+          className={`btn ${activeTab === 'tenders' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('tenders')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          <FiFileText size={16} /> 🏛️ Kamu & Belediye İhale Radarı
+          {tenders.length > 0 && <span className="badge badge-amber" style={{ marginLeft: 4 }}>{tenders.length}</span>}
+        </button>
+        <button 
+          className={`btn ${activeTab === 'bodybuilders' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('bodybuilders')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          <FiTool size={16} /> 🛠️ Üst Yapıcı Partner Ağı & Talepler
+          {referrals.length > 0 && <span className="badge badge-green" style={{ marginLeft: 4 }}>{referrals.length}</span>}
+        </button>
+        <button 
+          className={`btn ${activeTab === 'new_registrations' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setActiveTab('new_registrations')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          <FiBriefcase size={16} /> 🏢 Yeni Kurulan Şirketler (NACE)
+        </button>
         <button 
           className={`btn ${activeTab === 'live_search' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('live_search')}
-          style={{ borderRadius: 'var(--radius-md) var(--radius-md) 0 0', borderBottom: 'none' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
-          🔎 Google Places Canlı Arama
-        </button>
-        <button 
-          className={`btn ${activeTab === 'sources' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setActiveTab('sources')}
-          style={{ borderRadius: 'var(--radius-md) var(--radius-md) 0 0', borderBottom: 'none' }}
-        >
-          📂 Tarama Kaynakları (TSO / Kayıtlar)
+          <FiSearch size={16} /> 🔎 Serbest Arama
         </button>
       </div>
 
-      {/* ── CANLI ARAMA TABI ────────────────────────────────────────────────── */}
-      {activeTab === 'live_search' && (
+      {/* ── TAB 1: AKILCI OSB & SEKTÖREL RADAR ───────────────────────────── */}
+      {activeTab === 'osb_radar' && (
         <div className="flex flex-col gap-6">
-          {/* Arama Paneli */}
+          {/* Radar Filtre Paneli */}
           <div className="card glass-card">
             <div className="card-header">
-              <h3 className="card-title">Saha Satış Arama Paneli</h3>
-              <button className="btn btn-secondary btn-sm" onClick={getLocation} disabled={gpsLoading}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <FiNavigation size={14} className={gpsLoading ? 'spin' : ''} />
-                {location ? 'Konumu Yenile' : 'Konum Al'}
-              </button>
+              <h3 className="card-title"><FiTarget style={{ marginRight: 8, color: 'var(--accent-blue-light)' }} /> Bölgesel Sanayi & Sektör Avcısı</h3>
+              <span className="text-xs text-muted">Hedefli OSB taraması yaparak doğrudan şasi/kamyonet ihtiyacı olan firmaları bulun</span>
             </div>
-            
-            <form onSubmit={handleLiveSearch} className="flex flex-col gap-4">
-              <div className="flex gap-3">
-                <div className="flex items-center gap-2 w-full" style={{ background: 'var(--bg-input)', padding: '10px 16px', borderRadius: 25, border: '1px solid var(--border-color)' }}>
-                  <FiSearch color="var(--text-muted)" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Samsun lojistik firmaları, 5km akaryakıt, Çarşamba beton..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{ background: 'transparent', border: 'none', color: 'white', outline: 'none', width: '100%', fontSize: '0.95rem' }} 
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary" disabled={scanning}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 25, padding: '0 24px' }}>
-                  {scanning ? <FiLoader size={16} className="spin" /> : <FiSearch size={16} />}
-                  Bul
-                </button>
-              </div>
 
-              {/* Arama Parametreleri */}
-              <div className="flex items-center gap-6 text-xs text-muted flex-wrap">
-                <div className="flex items-center gap-2">
-                  <FiSliders size={14} /> Limit:
-                  <select 
-                    value={searchLimit} 
-                    onChange={(e) => setSearchLimit(parseInt(e.target.value))}
-                    style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)', color: 'white', outline: 'none', borderRadius: 4, padding: '2px 6px' }}
+            {/* OSB Hızlı Seçim Hapları */}
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-muted mb-2 block">1. HEDEF BÖLGE / ORGANİZE SANAYİ BÖLGESİ SEÇİN:</label>
+              <div className="flex gap-2 flex-wrap">
+                {OSB_OPTIONS.map(osb => (
+                  <button 
+                    key={osb.id} 
+                    type="button" 
+                    className={`btn btn-sm ${selectedOsb === osb.name ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setSelectedOsb(osb.name)}
+                    style={{ borderRadius: 20 }}
                   >
-                    <option value={10}>10 Sonuç</option>
-                    <option value={20}>20 Sonuç</option>
-                    <option value={40}>40 Sonuç</option>
-                  </select>
-                </div>
-                
-                {location ? (
-                  <div style={{ color: 'var(--accent-green)' }}>
-                    📍 Aktif Konum: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)} (Hassasiyet: ~{Math.round(location.accuracy)}m)
-                  </div>
-                ) : (
-                  <div style={{ color: 'var(--accent-amber)' }}>
-                    ⚠️ Konum alınamadı. Arama varsayılan merkezden yapılacaktır.
-                  </div>
-                )}
+                    📍 {osb.name}
+                  </button>
+                ))}
               </div>
-            </form>
-
-            {/* Arama İntent Raporu */}
-            {parsedIntent && (
-              <div className="mt-4 text-xs" style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '10px 14px', borderLeft: '3px solid var(--accent-blue-light)' }}>
-                <strong>Analiz Edilen Arama:</strong> {parsedIntent.sector || 'Tüm Sektörler'} 
-                {parsedIntent.city && ` · Şehir: ${parsedIntent.city}`}
-                {parsedIntent.radius && ` · Yarıçap: ${parsedIntent.radius / 1000} km`}
-                {parsedIntent.segment && ` · Segment: ${parsedIntent.segment}`}
-                {parsedIntent.searchAlongRoute && ' · 🗺 Rota Üzerinde Arama Etkin'}
-              </div>
-            )}
-          </div>
-
-          {/* Arama Sonuç Listesi */}
-          <div className="card glass-card">
-            <div className="card-header">
-              <h3 className="card-title">Arama Sonuçları</h3>
-              <span className="badge badge-blue">{scanResults.length} Sonuç</span>
             </div>
 
-            {scanning ? (
-              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-                <FiLoader size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-blue-light)' }} />
-                <span>Google Places taranıyor ve CRM verileriyle eşleştiriliyor...</span>
-              </div>
-            ) : scanResults.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {scanResults.map((biz, idx) => {
-                  const hasMatch = biz.match && biz.match.score >= 0.75;
-                  const isJustAdded = biz.match && biz.match.matchType === 'just_added';
-                  
+            {/* Sektör Presetleri */}
+            <div className="mb-6">
+              <label className="text-xs font-semibold text-muted mb-2 block">2. IVECO HEDEF TİCARİ SEKTÖR PRESET'İ SEÇİN:</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
+                {SECTOR_PRESETS.map(preset => {
+                  const isSelected = selectedSector === preset.id;
                   return (
-                    <div key={idx} className="list-item" style={{ padding: '1.25rem', background: 'var(--bg-input)', borderLeft: `4px solid ${hasMatch ? 'var(--accent-green)' : 'var(--accent-blue-light)'}` }}>
-                      <div className="flex justify-between items-start w-full">
-                        <div>
-                          {/* Başlık ve Segment */}
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-base" style={{ color: 'var(--text-heading)' }}>{biz.company_name}</span>
-                            {biz.rating && <span className="badge badge-amber">★ {biz.rating.toFixed(1)}</span>}
-                          </div>
-                          
-                          {/* Adres ve Sektör */}
-                          <div className="text-xs text-muted mt-2">
-                            {biz.sector} · {biz.address}
-                          </div>
-
-                          {/* Telefon ve Web */}
-                          <div className="text-xs text-secondary mt-1">
-                            {biz.phone && `📞 ${biz.phone}`} {biz.website && ` · 🌐 ${biz.website}`}
-                          </div>
-
-                          {/* Konum / Mesafe */}
-                          {biz.distance && (
-                            <div className="text-xs mt-2" style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--accent-purple)' }}>
-                              <FiMapPin size={12} /> Yaklaşık mesafe: <strong>{biz.distance < 1000 ? `${Math.round(biz.distance)} m` : `${(biz.distance / 1000).toFixed(1)} km`}</strong>
-                            </div>
-                          )}
-
-                          {/* Eşleşme Bildirimi */}
-                          {hasMatch && (
-                            <div className="mt-3 text-xs" style={{ color: 'var(--accent-green)', background: 'var(--accent-green-glow)', padding: '6px 12px', borderRadius: 6, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                              <FiCheck size={12} />
-                              {isJustAdded ? (
-                                <span>CRM'e Eklendi (Müşteri ID: {biz.match.customer.id})</span>
-                              ) : (
-                                <span>Mevcut Müşteri: <strong>{biz.match.customer.company_name}</strong> (%{Math.round(biz.match.score * 100)} eşleşme - {biz.match.matchType === 'phone' ? 'Telefon' : 'İsim'})</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Aksiyon Butonları */}
-                        <div className="flex gap-2">
-                          {hasMatch ? (
-                            <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/customers/${biz.match.customer.id}`)}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              Detay <FiArrowRight size={14} />
-                            </button>
-                          ) : (
-                            <button className="btn btn-primary btn-sm" onClick={() => addSingleToCrm(biz)}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                              <FiPlus size={14} /> CRM'e Ekle
-                            </button>
-                          )}
-                        </div>
+                    <div 
+                      key={preset.id} 
+                      onClick={() => setSelectedSector(preset.id)}
+                      style={{ 
+                        padding: '0.85rem 1rem', 
+                        borderRadius: 'var(--radius-md)', 
+                        background: isSelected ? 'var(--accent-blue-glow)' : 'var(--bg-input)',
+                        border: `1.5px solid ${isSelected ? 'var(--accent-blue-light)' : 'var(--border-color)'}`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div className="font-semibold text-sm mb-1" style={{ color: isSelected ? 'var(--accent-blue-light)' : 'var(--text-heading)' }}>
+                        {preset.label}
+                      </div>
+                      <div className="text-xs text-muted mb-2">{preset.desc}</div>
+                      <div className="text-xs" style={{ color: 'var(--accent-amber)' }}>
+                        🎯 {preset.targetVehicle}
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+
+            {/* Özel Arama Terimi & Buton */}
+            <div className="flex gap-3 items-center pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <div className="flex-1">
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="İsteğe bağlı ek arama terimi (Örn: balık toptan, kereste, hazır beton)..."
+                  value={customOsbQuery}
+                  onChange={e => setCustomOsbQuery(e.target.value)}
+                  style={{ background: 'var(--bg-input)' }}
+                />
+              </div>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleOsbSearch} 
+                disabled={searchingOsb}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.6rem 1.75rem', fontWeight: 600 }}
+              >
+                {searchingOsb ? <><FiLoader size={18} className="spin" /> Radar Taranıyor...</> : <><FiTarget size={18} /> Radarı Başlat</>}
+              </button>
+            </div>
+          </div>
+
+          {/* Radar Sonuçları */}
+          <div className="card glass-card">
+            <div className="card-header">
+              <div>
+                <h3 className="card-title">Tespit Edilen Potansiyel Müşteri Listesi</h3>
+                <span className="text-xs text-muted">{selectedOsb} · {SECTOR_PRESETS.find(p => p.id === selectedSector)?.label}</span>
+              </div>
+              <span className="badge badge-blue">{osbResults.length} Firma</span>
+            </div>
+
+            {searchingOsb ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                <FiLoader size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-blue-light)' }} />
+                <span>Bölgesel sanayi sicili ve Google işletme haritası taranıyor...</span>
+              </div>
+            ) : osbResults.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {osbResults.map((biz, idx) => (
+                  <div 
+                    key={idx} 
+                    className="list-item" 
+                    style={{ 
+                      padding: '1.25rem', 
+                      background: 'var(--bg-input)', 
+                      borderLeft: `4px solid ${biz.is_existing_customer ? 'var(--accent-green)' : 'var(--accent-amber)'}`,
+                      borderRadius: 'var(--radius-md)'
+                    }}
+                  >
+                    <div className="flex justify-between items-start w-full flex-wrap gap-4">
+                      <div className="flex-1 min-w-[280px]">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-base" style={{ color: 'var(--text-heading)' }}>{biz.company_name}</span>
+                          {biz.rating && <span className="badge badge-amber">★ {biz.rating}</span>}
+                          <span className="badge badge-green">🎯 %{biz.iveco_match_score} Iveco Uyumu</span>
+                        </div>
+
+                        <div className="text-xs text-muted mt-2">
+                          📍 {biz.address || `${biz.city} / ${biz.district || 'Merkez'}`}
+                        </div>
+
+                        <div className="text-xs text-secondary mt-1">
+                          {biz.phone && <span>📞 {biz.phone}</span>}
+                          {biz.google_maps_url && (
+                            <a href={biz.google_maps_url} target="_blank" rel="noopener noreferrer" className="ml-3 text-xs" style={{ color: 'var(--accent-blue-light)' }}>
+                              🗺️ Haritada Aç ↗
+                            </a>
+                          )}
+                        </div>
+
+                        <div className="mt-3 text-xs p-2 rounded" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--accent-amber)', display: 'inline-block' }}>
+                          💡 <strong>Hedef Araç & Kasa:</strong> {biz.recommended_iveco} {biz.target_body_type ? `· [${biz.target_body_type}]` : ''}
+                        </div>
+
+                        {biz.is_existing_customer && (
+                          <div className="mt-2 text-xs" style={{ color: 'var(--accent-green)' }}>
+                            ✅ <strong>Zaten CRM\'de Kayıtlı:</strong> {biz.existing_customer_name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Aksiyon */}
+                      <div>
+                        {biz.is_existing_customer ? (
+                          <button 
+                            className="btn btn-secondary btn-sm" 
+                            onClick={() => navigate(`/customers/${biz.existing_customer_id}`)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          >
+                            Müşteri Detayı <FiArrowRight size={14} />
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn btn-primary btn-sm" 
+                            onClick={() => addOsbToCrm(biz)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          >
+                            <FiPlus size={14} /> CRM\'e Aday Ekle
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="empty-state">
                 <FiInfo size={24} style={{ marginBottom: 8 }} />
-                <p>Google Places'tan sonuçları görmek için yukarıdaki kutuya arama yazın.</p>
+                <p>Bu arama kriterine uygun işletme bulunamadı. Lütfen OSB veya sektör filtresini değiştirin.</p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ── TARAMA KAYNAKLARI TABI (Mevcut Yapı) ─────────────────────────────── */}
-      {activeTab === 'sources' && (
+      {/* ── TAB 2: KAMU & BELEDİYE İHALE RADARI ───────────────────────────── */}
+      {activeTab === 'tenders' && (
         <div className="flex flex-col gap-6">
-          {/* Sources Grid */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Tarama Kaynakları</h3>
-              <button className="btn btn-primary btn-sm" onClick={enrichAll} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <FiZap size={14} /> Tümünü Zenginleştir
+          <div className="flex justify-between items-center flex-wrap gap-3">
+            <div>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Belediye & Kamu Araç İhaleleri İzleme Radarı</h3>
+              <p className="text-xs text-muted">Bölgedeki çöp toplama, fen işleri ve lojistik ihalelerini kazanan yüklenicilere toplu filo şasisi sunun.</p>
+            </div>
+            <button className="btn btn-primary btn-sm" onClick={() => setShowTenderModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <FiPlus size={16} /> + Yeni İhale Kaydet
+            </button>
+          </div>
+
+          <div className="card glass-card">
+            {loadingTenders ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                <FiLoader size={36} className="spin" style={{ margin: '0 auto 1rem', color: 'var(--accent-blue-light)' }} />
+                <span>İhale bülteni yükleniyor...</span>
+              </div>
+            ) : tenders.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                {tenders.map(t => (
+                  <div key={t.id} className="list-item" style={{ padding: '1.25rem', background: 'var(--bg-input)', borderLeft: '4px solid var(--accent-purple)' }}>
+                    <div className="flex justify-between items-start w-full flex-wrap gap-4">
+                      <div className="flex-1 min-w-[280px]">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{t.title}</span>
+                          {t.tender_number && <span className="badge badge-blue">İKN: {t.tender_number}</span>}
+                          <span className={`badge ${t.status === 'awarded' ? 'badge-green' : 'badge-amber'}`}>
+                            {t.status === 'awarded' ? 'Sözleşme İmzalandı / Sonuçlandı' : 'Teklif Aşamasında'}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-muted mt-2">
+                          🏛️ <strong>Kurum:</strong> {t.organization} · 📍 {t.city} {t.district ? `/${t.district}` : ''} · 📂 {t.category}
+                        </div>
+
+                        <div className="mt-2 text-xs flex gap-4 flex-wrap" style={{ color: 'var(--accent-amber)' }}>
+                          <span>🚛 <strong>Araç İhtiyacı:</strong> {t.estimated_vehicles} Adet</span>
+                          <span>💡 <strong>Önerilen Şasi:</strong> {t.suggested_iveco_model || 'Iveco Şasi'}</span>
+                          {t.contract_amount && <span>💰 <strong>İhale Bedeli:</strong> {t.contract_amount}</span>}
+                        </div>
+
+                        {/* Kazanan Yüklenici Bilgileri */}
+                        {t.contractor_name ? (
+                          <div className="mt-3 p-3 rounded text-xs" style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                            <div className="font-semibold text-sm" style={{ color: 'var(--accent-green)' }}>
+                              🏆 Kazanan Yüklenici: {t.contractor_name}
+                            </div>
+                            <div className="text-secondary mt-1">
+                              {t.contractor_phone && <span>📞 Tel: {t.contractor_phone}</span>}
+                              {t.contractor_contact && <span> · 👤 Yetkili: {t.contractor_contact}</span>}
+                            </div>
+                            {t.notes && <div className="text-muted mt-1 italic">Not: {t.notes}</div>}
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-xs text-muted">Henüz kazanan yüklenici firma bilgisi girilmemiş.</div>
+                        )}
+                      </div>
+
+                      {/* Aksiyon */}
+                      <div className="flex flex-col gap-2 items-end">
+                        {t.matched_customer_id ? (
+                          <button 
+                            className="btn btn-secondary btn-sm" 
+                            onClick={() => navigate(`/customers/${t.matched_customer_id}`)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          >
+                            ✅ CRM\'de Açık Teklif <FiArrowRight size={14} />
+                          </button>
+                        ) : t.contractor_name ? (
+                          <button 
+                            className="btn btn-primary btn-sm" 
+                            onClick={() => convertTenderToLead(t.id)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          >
+                            🚀 Kazananı CRM\'e Aktar
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state"><p>Kayıtlı ihale bulunmuyor.</p></div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 3: ÜST YAPICI PARTNERLERİ & YÖNLENDİRMELER ────────────────── */}
+      {activeTab === 'bodybuilders' && (
+        <div className="flex flex-col gap-8">
+          {/* Bölüm A: Gelen Sıcak Şasi Talepleri */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Üst Yapıcılardan Gelen Sıcak Şasi Talepleri</h3>
+                <p className="text-xs text-muted">Kasacı ve frigo ustalarının yönlendirdiği sıcak şasi müşterileri</p>
+              </div>
+              <button className="btn btn-primary btn-sm" onClick={() => setShowReferralModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <FiPlus size={16} /> + Yeni Müşteri Talebi Gir
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-              {sources.map(s => (
-                <div key={s.id} style={{ background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '1rem', border: '1px solid var(--border-color)', transition: 'border-color 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-blue-light)'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-semibold text-sm">{s.name}</span>
-                    <span className={`badge ${s.is_active ? 'badge-green' : 'badge-red'}`}>{s.is_active ? 'Aktif' : 'Pasif'}</span>
+
+            <div className="card glass-card">
+              {referrals.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {referrals.map(r => (
+                    <div key={r.id} className="list-item" style={{ padding: '1.25rem', background: 'var(--bg-input)', borderLeft: '4px solid var(--accent-green)' }}>
+                      <div className="flex justify-between items-start w-full flex-wrap gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{r.customer_name}</span>
+                            <span className="badge badge-green">Yönlendiren: {r.bodybuilder_name}</span>
+                            <span className="badge badge-purple">{r.status === 'new' ? 'Yeni Sıcak Talep' : r.status === 'contacted' ? 'Görüşüldü' : r.status}</span>
+                          </div>
+
+                          <div className="text-xs text-muted mt-2">
+                            📞 <strong>Telefon:</strong> {r.customer_phone || '—'} · 📍 {r.city || 'Samsun'}
+                          </div>
+
+                          <div className="mt-2 text-xs" style={{ color: 'var(--accent-amber)' }}>
+                            🚛 <strong>Talep Edilen:</strong> {r.requested_chassis || 'Iveco Şasi'} · 🛠️ <strong>Üst Yapı:</strong> {r.requested_body || 'Kasa'}
+                          </div>
+
+                          {r.notes && <div className="text-xs text-muted mt-1 italic">Not: {r.notes}</div>}
+                        </div>
+
+                        {/* Butonlar */}
+                        <div className="flex gap-2 items-center">
+                          {r.customer_phone && (
+                            <a 
+                              href={`https://wa.me/90${r.customer_phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-secondary btn-sm"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
+                            >
+                              <FiMessageSquare size={14} /> WhatsApp
+                            </a>
+                          )}
+
+                          {r.crm_customer_id ? (
+                            <button 
+                              className="btn btn-secondary btn-sm" 
+                              onClick={() => navigate(`/customers/${r.crm_customer_id}`)}
+                            >
+                              CRM Kaydı →
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn btn-primary btn-sm" 
+                              onClick={() => convertReferralToLead(r.id)}
+                            >
+                              ➕ CRM\'e Aktar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state"><p>Henüz üst yapıcı yönlendirmesi bulunmuyor.</p></div>
+              )}
+            </div>
+          </div>
+
+          {/* Bölüm B: Anlaşmalı Üst Yapıcı Ağı */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Anlaşmalı Üst Yapıcı (Kasacı / Karoser) Ağı</h3>
+                <p className="text-xs text-muted">Bölgedeki frigo, damper, kurtarıcı ve vinç montajcıları</p>
+              </div>
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowBbModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <FiPlus size={16} /> + Yeni Kasacı Ekle
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+              {bodybuilders.map(bb => (
+                <div key={bb.id} className="card glass-card">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{bb.company_name}</div>
+                    <span className="badge badge-blue">{bb.specialty}</span>
                   </div>
-                  <p className="text-xs text-muted mb-4">Tip: {s.source_type} · Son: {s.last_run_at ? new Date(s.last_run_at).toLocaleDateString('tr-TR') : 'Hiç'}</p>
-                  {s.last_run_count > 0 && <p className="text-xs text-muted mb-4">Son taramada: {s.last_run_count} firma</p>}
-                  <button className="btn btn-secondary btn-sm w-full" onClick={() => runSource(s.id)} disabled={running === s.id}
-                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                    {running === s.id ? <><FiLoader size={14} className="spin" /> Taranıyor...</> : <><FiPlay size={14} /> Tara</>}
-                  </button>
+                  <div className="text-xs text-muted mb-2">👤 <strong>Usta / Yetkili:</strong> {bb.contact_person || '—'}</div>
+                  <div className="text-xs text-secondary mb-2">📞 <strong>Telefon:</strong> {bb.phone || '—'}</div>
+                  <div className="text-xs text-muted mb-3">📍 {bb.address || `${bb.city} / ${bb.district || ''}`}</div>
+                  {bb.notes && <div className="text-xs text-muted italic mb-3">"{bb.notes}"</div>}
+                  <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
+                    <span className="text-xs font-semibold" style={{ color: 'var(--accent-green)' }}>
+                      {bb.referrals_count || 0} Yönlendirme
+                    </span>
+                    <button 
+                      className="btn btn-secondary btn-sm" 
+                      onClick={() => {
+                        setNewReferral(prev => ({ ...prev, bodybuilder_id: bb.id }));
+                        setShowReferralModal(true);
+                      }}
+                    >
+                      + Talep Gir
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Toolbar */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex gap-3">
-              {['', 'new', 'enriched', 'converted', 'rejected'].map(s => (
-                <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
-                  onClick={() => { setStatusFilter(s); setPage(1); }}>
-                  {s === '' ? 'Tümü' : s === 'new' ? 'Yeni' : s === 'enriched' ? 'Zenginleştirilmiş' : s === 'converted' ? 'Aktarılmış' : 'Reddedilmiş'}
-                </button>
-              ))}
-            </div>
-            <span className="text-xs text-muted">Toplam: {companies.total}</span>
+      {/* ── TAB 4: YENİ KURULAN ŞİRKETLER (NACE RADARI) ──────────────────── */}
+      {activeTab === 'new_registrations' && (
+        <div className="flex flex-col gap-6">
+          <div>
+            <h3 className="text-lg font-semibold" style={{ color: 'var(--text-heading)' }}>Ticaret Sicil Yeni Kurulan Şirketler Radarı</h3>
+            <p className="text-xs text-muted">Son 30 günde tescil edilen toptancı, hafriyatçı ve lojistik şirketleri (İlk 1-3 ayda araç filosu kurmak zorundalar).</p>
           </div>
 
-          {/* Table */}
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            <table className="data-table">
-              <thead>
-                <tr><th>Firma</th><th>Şehir</th><th>Sektör</th><th>Skor</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr>
-              </thead>
-              <tbody>
-                {companies.items.length > 0 ? companies.items.map(c => (
-                  <tr key={c.id}>
-                    <td>
-                      <div className="font-semibold">{c.company_name}</div>
-                      <div className="text-xs text-muted">{c.activity_description}</div>
-                    </td>
-                    <td>{c.city || '—'}{c.district ? ` / ${c.district}` : ''}</td>
-                    <td className="text-muted">{c.sector || '—'}</td>
-                    <td>
-                      {c.enrichment_score !== null ? (
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold" style={{ color: c.enrichment_score >= 55 ? 'var(--accent-green)' : c.enrichment_score >= 35 ? 'var(--accent-amber)' : 'var(--accent-red)' }}>
-                            {c.enrichment_score}
-                          </span>
-                          <div className="score-bar" style={{ width: 40 }}>
-                            <div className={`score-bar-fill ${c.enrichment_score >= 75 ? 'very-high' : c.enrichment_score >= 55 ? 'high' : c.enrichment_score >= 35 ? 'medium' : 'low'}`}
-                              style={{ width: `${c.enrichment_score}%` }} />
-                          </div>
+          <div className="card glass-card">
+            {newCompanies.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {newCompanies.map(c => (
+                  <div key={c.id} className="list-item" style={{ padding: '1.25rem', background: 'var(--bg-input)', borderLeft: '4px solid var(--accent-blue-light)' }}>
+                    <div className="flex justify-between items-start w-full flex-wrap gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-base" style={{ color: 'var(--text-heading)' }}>{c.company_name}</span>
+                          {c.nace_code && <span className="badge badge-amber">NACE: {c.nace_code}</span>}
+                          {c.capital && <span className="badge badge-green">{c.capital}</span>}
                         </div>
-                      ) : <span className="text-muted">—</span>}
-                    </td>
-                    <td>
-                      <span className={`badge ${c.status === 'new' ? 'badge-blue' : c.status === 'enriched' ? 'badge-amber' : c.status === 'converted' ? 'badge-green' : 'badge-red'}`}>
-                        {c.status === 'new' ? 'Yeni' : c.status === 'enriched' ? 'Zenginleştirilmiş' : c.status === 'converted' ? 'Aktarılmış' : c.status === 'matched' ? 'Eşleşti' : 'Reddedildi'}
-                      </span>
-                    </td>
-                    <td className="text-muted text-xs">{new Date(c.discovered_at).toLocaleDateString('tr-TR')}</td>
-                    <td>
-                      {(c.status === 'new' || c.status === 'enriched') && (
-                        <div className="flex gap-2">
-                          <button className="btn btn-success btn-sm" onClick={() => convertCompany(c.id)} title="CRM'e aktar"
-                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 0 }}>
-                            <FiCheck size={16} />
-                          </button>
-                          <button className="btn btn-danger btn-sm" onClick={() => rejectCompany(c.id)} title="Reddet"
-                            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 0 }}>
-                            <FiX size={16} />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                )) : <tr><td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Firma bulunamadı</td></tr>}
-              </tbody>
-            </table>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid var(--border-color)' }}>
-                <span className="text-xs text-muted">Sayfa {page} / {totalPages}</span>
-                <div className="flex gap-2">
-                  <button className="btn btn-secondary btn-sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
-                    <FiChevronLeft size={16} /> Önceki
-                  </button>
-                  <button className="btn btn-secondary btn-sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
-                    Sonraki <FiChevronRight size={16} />
-                  </button>
+                        <div className="text-xs text-muted mt-2">
+                          📂 <strong>Faaliyet Alanı:</strong> {c.nace_description || '—'}
+                        </div>
+
+                        <div className="text-xs text-secondary mt-1">
+                          📍 {c.address || `${c.city} / ${c.district || ''}`} {c.phone && ` · 📞 ${c.phone}`}
+                        </div>
+
+                        {c.registration_date && (
+                          <div className="text-xs text-muted mt-1">
+                            📅 Tescil Tarihi: {new Date(c.registration_date).toLocaleDateString('tr-TR')}
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        {c.matched_customer_id ? (
+                          <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/customers/${c.matched_customer_id}`)}>
+                            CRM\'de Kayıtlı →
+                          </button>
+                        ) : (
+                          <button className="btn btn-primary btn-sm" onClick={() => convertNewCompanyToLead(c.id)}>
+                            ➕ CRM\'e Aday Ekle
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state"><p>Yeni şirket kaydı bulunamadı.</p></div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 5: SERBEST ARAMA (Google Places) ─────────────────────────── */}
+      {activeTab === 'live_search' && (
+        <div className="flex flex-col gap-6">
+          <div className="card glass-card">
+            <div className="card-header">
+              <h3 className="card-title">Google Places Serbest Arama</h3>
+              <button className="btn btn-secondary btn-sm" onClick={getLocation} disabled={gpsLoading}>
+                <FiNavigation size={14} className={gpsLoading ? 'spin' : ''} /> {location ? 'Konum Aktif' : 'Konum Al'}
+              </button>
+            </div>
+            <form onSubmit={handleLiveSearch} className="flex gap-3">
+              <input 
+                type="text" 
+                className="input" 
+                placeholder="Örn: Çarşamba beton santrali, Bafra unlu mamuller..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ background: 'var(--bg-input)' }}
+              />
+              <button type="submit" className="btn btn-primary" disabled={scanning}>
+                {scanning ? <FiLoader size={16} className="spin" /> : <FiSearch size={16} />} Ara
+              </button>
+            </form>
+          </div>
+
+          <div className="card glass-card">
+            <div className="card-header">
+              <h3 className="card-title">Arama Sonuçları</h3>
+              <span className="badge badge-blue">{scanResults.length} Sonuç</span>
+            </div>
+            {scanResults.length > 0 ? (
+              <div className="flex flex-col gap-3">
+                {scanResults.map((biz, idx) => (
+                  <div key={idx} className="list-item" style={{ padding: '1rem', background: 'var(--bg-input)' }}>
+                    <div className="flex justify-between items-center w-full">
+                      <div>
+                        <div className="font-semibold text-sm">{biz.company_name}</div>
+                        <div className="text-xs text-muted">{biz.address} {biz.phone && `· ${biz.phone}`}</div>
+                      </div>
+                      <button className="btn btn-primary btn-sm" onClick={() => addOsbToCrm(biz)}>
+                        + CRM\'e Ekle
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state"><p>Arama yapmak için yukarıya bir ifade yazın.</p></div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: YENİ İHALE EKLE ────────────────────────────────────────── */}
+      {showTenderModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card animate-in" style={{ maxWidth: 550 }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🏛️ Yeni Kamu / Belediye İhalesi Kaydet</h3>
+              <button className="btn-icon" onClick={() => setShowTenderModal(false)}><FiX size={18} /></button>
+            </div>
+            <form onSubmit={handleCreateTender} className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-semibold text-muted">İhale Başlığı *</label>
+                <input required className="input" placeholder="Örn: Samsun B.Ş.B. 3 Yıllık Çöp Toplama Alımı" value={newTender.title} onChange={e => setNewTender({ ...newTender, title: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">İhale Kayıt No (İKN)</label>
+                  <input className="input" placeholder="Örn: 2026/145892" value={newTender.tender_number} onChange={e => setNewTender({ ...newTender, tender_number: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">İlgili Kurum *</label>
+                  <input required className="input" placeholder="Örn: Samsun B.Ş.B. Temizlik" value={newTender.organization} onChange={e => setNewTender({ ...newTender, organization: e.target.value })} />
                 </div>
               </div>
-            )}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Tahmini Araç İhtiyacı</label>
+                  <input type="number" className="input" value={newTender.estimated_vehicles} onChange={e => setNewTender({ ...newTender, estimated_vehicles: parseInt(e.target.value) || 1 })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">Önerilen Iveco Şasi</label>
+                  <input className="input" placeholder="Örn: Daily 70C18 Çöp Kasası" value={newTender.suggested_iveco_model} onChange={e => setNewTender({ ...newTender, suggested_iveco_model: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Kazanan Yüklenici Firma</label>
+                  <input className="input" placeholder="Örn: Kuzey Çevre Ltd." value={newTender.contractor_name} onChange={e => setNewTender({ ...newTender, contractor_name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">Yüklenici Telefonu</label>
+                  <input className="input" placeholder="0362 ..." value={newTender.contractor_phone} onChange={e => setNewTender({ ...newTender, contractor_phone: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted">Sözleşme / İhale Bedeli</label>
+                <input className="input" placeholder="Örn: 25.000.000 ₺" value={newTender.contract_amount} onChange={e => setNewTender({ ...newTender, contract_amount: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted">İhale Notları</label>
+                <textarea className="input" rows={2} placeholder="Şartname gereksinimleri, teslim süreleri..." value={newTender.notes} onChange={e => setNewTender({ ...newTender, notes: e.target.value })} />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowTenderModal(false)}>İptal</button>
+                <button type="submit" className="btn btn-primary">Kaydet</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: YENİ MÜŞTERİ TALEBİ (REFERRAL) ─────────────────────────── */}
+      {showReferralModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card animate-in" style={{ maxWidth: 500 }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🛠️ Üst Yapıcıdan Gelen Müşteri Talebi</h3>
+              <button className="btn-icon" onClick={() => setShowReferralModal(false)}><FiX size={18} /></button>
+            </div>
+            <form onSubmit={handleCreateReferral} className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-semibold text-muted">Yönlendiren Üst Yapıcı *</label>
+                <select 
+                  required 
+                  className="input" 
+                  value={newReferral.bodybuilder_id} 
+                  onChange={e => setNewReferral({ ...newReferral, bodybuilder_id: parseInt(e.target.value) })}
+                >
+                  {bodybuilders.map(bb => (
+                    <option key={bb.id} value={bb.id}>{bb.company_name} ({bb.contact_person || 'Yetkili'})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Müşteri / Firma Adı *</label>
+                  <input required className="input" placeholder="Örn: Balıkçı Hasan" value={newReferral.customer_name} onChange={e => setNewReferral({ ...newReferral, customer_name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">Müşteri Telefonu *</label>
+                  <input required className="input" placeholder="0532 ..." value={newReferral.customer_phone} onChange={e => setNewReferral({ ...newReferral, customer_phone: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Talep Edilen Şasi</label>
+                  <input className="input" placeholder="Örn: Daily 35C16" value={newReferral.requested_chassis} onChange={e => setNewReferral({ ...newReferral, requested_chassis: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">İstenen Üst Yapı / Kasa</label>
+                  <input className="input" placeholder="Örn: Frigorifik Kasa" value={newReferral.requested_body} onChange={e => setNewReferral({ ...newReferral, requested_body: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted">Usta Notu</label>
+                <textarea className="input" rows={2} placeholder="Müşterinin özel istekleri, bütçesi..." value={newReferral.notes} onChange={e => setNewReferral({ ...newReferral, notes: e.target.value })} />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowReferralModal(false)}>İptal</button>
+                <button type="submit" className="btn btn-primary">Kaydet</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: YENİ ÜST YAPICI EKLE ─────────────────────────────────── */}
+      {showBbModal && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card animate-in" style={{ maxWidth: 500 }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🛠️ Yeni Üst Yapıcı (Kasacı) Ekle</h3>
+              <button className="btn-icon" onClick={() => setShowBbModal(false)}><FiX size={18} /></button>
+            </div>
+            <form onSubmit={handleCreateBodybuilder} className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-semibold text-muted">Firma Adı *</label>
+                <input required className="input" placeholder="Örn: Karadeniz Frigo Kasa Sanayi" value={newBb.company_name} onChange={e => setNewBb({ ...newBb, company_name: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Usta / Yetkili Adı</label>
+                  <input className="input" placeholder="Örn: Ahmet Usta" value={newBb.contact_person} onChange={e => setNewBb({ ...newBb, contact_person: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">Telefon</label>
+                  <input className="input" placeholder="0362 ..." value={newBb.phone} onChange={e => setNewBb({ ...newBb, phone: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted">Şehir</label>
+                  <input className="input" value={newBb.city} onChange={e => setNewBb({ ...newBb, city: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted">Uzmanlık Alanı *</label>
+                  <input required className="input" placeholder="Örn: Frigorifik, Damper, Vinç" value={newBb.specialty} onChange={e => setNewBb({ ...newBb, specialty: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted">Adres / Sanayi Sitesi</label>
+                <input className="input" placeholder="Örn: Tekkeköy Sanayi 4. Blok" value={newBb.address} onChange={e => setNewBb({ ...newBb, address: e.target.value })} />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowBbModal(false)}>İptal</button>
+                <button type="submit" className="btn btn-primary">Kaydet</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

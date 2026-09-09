@@ -146,6 +146,32 @@ export const discoveryApi = {
   convertToCustomer: (id) => api.post(`/discovery/companies/${id}/convert`),
   rejectCompany: (id) => api.post(`/discovery/companies/${id}/reject`),
   getStats: () => api.get('/discovery/stats'),
+
+  // OSB Radar
+  searchOsbRadar: (data) => api.post('/discovery/radar/osb-search', data),
+
+  // Kamu & Belediye İhale Radarı
+  getTenders: () => api.get('/discovery/tenders'),
+  createTender: (data) => api.post('/discovery/tenders', data),
+  updateTender: (id, data) => api.put(`/discovery/tenders/${id}`, data),
+  deleteTender: (id) => api.delete(`/discovery/tenders/${id}`),
+  convertTenderToLead: (id) => api.post(`/discovery/tenders/${id}/convert-to-lead`),
+
+  // Üst Yapıcı (Kasacı / Karoser) Partnerleri
+  getBodybuilders: () => api.get('/discovery/bodybuilders'),
+  createBodybuilder: (data) => api.post('/discovery/bodybuilders', data),
+  updateBodybuilder: (id, data) => api.put(`/discovery/bodybuilders/${id}`, data),
+  deleteBodybuilder: (id) => api.delete(`/discovery/bodybuilders/${id}`),
+
+  // Üst Yapıcı Müşteri Yönlendirmeleri (Referrals)
+  getReferrals: (bodybuilderId) => api.get('/discovery/bodybuilders/referrals', { params: { bodybuilder_id: bodybuilderId } }),
+  createReferral: (data) => api.post('/discovery/bodybuilders/referrals', data),
+  updateReferral: (id, data) => api.put(`/discovery/bodybuilders/referrals/${id}`, data),
+  convertReferralToLead: (id) => api.post(`/discovery/bodybuilders/referrals/${id}/convert-to-lead`),
+
+  // Yeni Kurulan Şirketler (Ticaret Sicil / NACE)
+  getNewRegistrations: (city) => api.get('/discovery/new-registrations', { params: { city } }),
+  convertNewCompanyToLead: (id) => api.post(`/discovery/new-registrations/${id}/convert-to-lead`),
 };
 
 // ── Enrichment API ──────────────────────────────────────────────
