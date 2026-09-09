@@ -332,30 +332,51 @@ class CardScanResponse(BaseModel):
     website: Optional[str] = None
 
 
-@router.post("/scan-card", response_model=CardScanResponse)
-async def scan_card(
-    file: UploadFile = File(...),
-    current_user=Depends(get_current_user),
-):
-    """Kartvizit resmini Google Cloud Vision OCR kullanarak tarar ve bilgileri ayrıştırır. Anahtar yoksa veya hata çıkarsa mock veriye düşer."""
-    import base64
-    import re
-    import random
-    import httpx
-    import unicodedata
 
-    contents = await file.read()
+def optimize_image_for_ocr(contents: bytes, max_size_kb: int = 950) -> bytes:
+    """Görseli OCR için optimize eder: boyutlandırır ve boyut sınırının altına düşürür."""
+    try:
+        from PIL import Image
+        import io
+        img = Image.open(io.BytesIO(contents))
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        max_dim = 1600
+        if max(img.size) > max_dim:
+            img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+            
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85, optimize=True)
+        data = buf.getvalue()
+        
+        if len(data) > max_size_kb * 1024:
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=65, optimize=True)
+            data = buf.getvalue()
+            
+        return data
+    except Exception as e:
+        print("[!] Görsel optimizasyon hatası:", str(e))
+        return contents
+
+
+async def perform_ocr(contents: bytes, filename: str = "") -> str:
+    """
+    Çok katmanlı (Multi-tier) güvenilir OCR motoru:
+    1. Katman: Google Cloud Vision API (Faturalandırma açıksa ve çalışıyorsa)
+    2. Katman: OCR.Space API Engine 2 (Ücretsiz, Türkçe karakter destekli ve kartvizit/belge odaklı)
+    3. Katman: OCR.Space API Engine 1 (Yedek)
+    """
+    import base64
+    import httpx
     
-    # API Anahtarını al
-    api_key = settings.GOOGLE_MAPS_API_KEY
     ocr_text = ""
+    api_key = settings.GOOGLE_MAPS_API_KEY
     
+    # 1. Katman: Google Vision API
     if api_key and api_key != "MOCK_GOOGLE_MAPS_API_KEY":
         try:
-            # Görseli base64'e çevir
             base64_image = base64.b64encode(contents).decode("utf-8")
-            
-            # Google Vision API endpoint'i (Aynı Google Maps API Key ile kullanılabilir)
             url = f"https://vision.googleapis.com/v1/images:annotate?key={api_key}"
             payload = {
                 "requests": [
@@ -365,28 +386,96 @@ async def scan_card(
                     }
                 ]
             }
-            
-            async with httpx.AsyncClient(timeout=15.0) as client:
+            async with httpx.AsyncClient(timeout=8.0) as client:
                 r = await client.post(url, json=payload)
                 if r.status_code == 200:
                     data = r.json()
                     responses = data.get("responses", [])
                     if responses and "fullTextAnnotation" in responses[0]:
                         ocr_text = responses[0]["fullTextAnnotation"]["text"]
-                elif r.status_code == 403:
-                    err_data = r.json()
-                    err_msg = err_data.get("error", {}).get("message", "")
-                    if "blocked" in err_msg.lower() or "API_KEY_SERVICE_BLOCKED" in str(err_data):
-                        raise HTTPException(
-                            status_code=400,
-                            detail="Google Cloud Vision API anahtarınız için engellenmiş. Lütfen Google Cloud Console'dan anahtarınızın kısıtlamalarına 'Cloud Vision API'yi ekleyin."
-                        )
-                    else:
-                        raise HTTPException(status_code=400, detail=f"Google API Yetki Hatası: {err_msg}")
-        except HTTPException:
-            raise
+                        if ocr_text.strip():
+                            print("[*] Google Vision OCR başarıyla okudu.")
+                            return ocr_text
+                else:
+                    print(f"[!] Google Vision API ({r.status_code}) yanıtı verdi. Yedek OCR devreye alınıyor...")
         except Exception as e:
-            print("Google Vision OCR Hatası:", str(e))
+            print("[!] Google Vision API çağrı hatası:", str(e))
+
+    # 2. Katman: OCR.Space API (Engine 2 - Kartvizit ve belgeler için en hassas motor)
+    if not ocr_text.strip():
+        optimized = optimize_image_for_ocr(contents)
+        keys_to_try = ["K88283424888957", "helloworld"]
+        for ocr_key in keys_to_try:
+            try:
+                async with httpx.AsyncClient(timeout=25.0) as client:
+                    resp = await client.post(
+                        "https://api.ocr.space/parse/image",
+                        data={
+                            "apikey": ocr_key,
+                            "language": "tur",
+                            "isOverlayRequired": False,
+                            "detectOrientation": True,
+                            "scale": True,
+                            "OCREngine": 2
+                        },
+                        files={"file": ("card.jpg", optimized, "image/jpeg")}
+                    )
+                    if resp.status_code == 200:
+                        res_json = resp.json()
+                        parsed_results = res_json.get("ParsedResults", [])
+                        if parsed_results and "ParsedText" in parsed_results[0]:
+                            text_candidate = parsed_results[0]["ParsedText"]
+                            if text_candidate and text_candidate.strip():
+                                print(f"[*] OCR.Space ({ocr_key[:4]}...) Engine 2 ile başarıyla okundu.")
+                                return text_candidate
+                    else:
+                        print(f"[!] OCR.Space ({ocr_key[:4]}...) yanıtı ({resp.status_code}): {resp.text[:150]}")
+            except Exception as e:
+                print(f"[!] OCR.Space ({ocr_key[:4]}...) bağlantı hatası:", str(e))
+
+    # 3. Katman: OCR.Space Engine 1 (Fallback)
+    if not ocr_text.strip():
+        try:
+            optimized = optimize_image_for_ocr(contents)
+            async with httpx.AsyncClient(timeout=25.0) as client:
+                resp = await client.post(
+                    "https://api.ocr.space/parse/image",
+                    data={
+                        "apikey": "K88283424888957",
+                        "language": "tur",
+                        "isOverlayRequired": False,
+                        "detectOrientation": True,
+                        "scale": True,
+                        "OCREngine": 1
+                    },
+                    files={"file": ("card.jpg", optimized, "image/jpeg")}
+                )
+                if resp.status_code == 200:
+                    res_json = resp.json()
+                    parsed_results = res_json.get("ParsedResults", [])
+                    if parsed_results and "ParsedText" in parsed_results[0]:
+                        text_candidate = parsed_results[0]["ParsedText"]
+                        if text_candidate and text_candidate.strip():
+                            print("[*] OCR.Space Engine 1 ile başarıyla okundu.")
+                            return text_candidate
+        except Exception as e:
+            print("[!] OCR.Space Engine 1 hatası:", str(e))
+
+    return ocr_text
+
+
+@router.post("/scan-card", response_model=CardScanResponse)
+async def scan_card(
+    file: UploadFile = File(...),
+    current_user=Depends(get_current_user),
+):
+    """Kartvizit resmini çok katmanlı OCR kullanarak tarar ve bilgileri ayrıştırır."""
+    import re
+    import random
+    import unicodedata
+
+    contents = await file.read()
+    ocr_text = await perform_ocr(contents, file.filename or "")
             
     # Eğer OCR başarılı olduysa metni akıllıca ayrıştır
     if ocr_text.strip():
@@ -423,14 +512,19 @@ async def scan_card(
             if domain not in ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "mail.com", "yandex.ru", "yandex.com", "mail.ru", "mynet.com"]:
                 website = f"www.{domain}"
 
-        # 3. Telefon numarası ayıkla (Türk cep veya sabit hat)
-        phone_matches = re.findall(r'(?:\+90|0)?\s?[5][0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}', ocr_text)
-        if phone_matches:
-            phone = phone_matches[0]
-        else:
-            phone_matches = re.findall(r'\b(?:\+90|0)?[2-9][0-9]{2}\s?[0-9]{3}\s?[0-9]{4}\b', ocr_text)
-            if phone_matches:
-                phone = phone_matches[0]
+        # 3. Telefon numarası ayıkla (Türk cep veya sabit hat formatları)
+        phone_cands = re.findall(r'(?:\+90\s*|0\s*)?[2-5][0-9\s\(\)\.-]{8,14}[0-9]', ocr_text)
+        for cand in phone_cands:
+            digits = re.sub(r'\D', '', cand)
+            if len(digits) == 10 and digits.startswith(('5', '2', '3', '4')):
+                phone = f"0{digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]}"
+                break
+            elif len(digits) == 11 and digits.startswith('0'):
+                phone = f"{digits[:4]} {digits[4:7]} {digits[7:9]} {digits[9:11]}"
+                break
+            elif len(digits) == 12 and digits.startswith('90'):
+                phone = f"0{digits[2:5]} {digits[5:8]} {digits[8:10]} {digits[10:12]}"
+                break
 
         # 4. Firma, İsim ve Rol ayıklama kuralları
         def clean_for_match(s: str) -> str:
@@ -763,30 +857,9 @@ async def scan_vergi_levhasi(
         except Exception as e:
             print("[!] PDF Okuma hatası (Vision'a geçiliyor):", str(e))
 
-    # 2. Google Vision API (PDF okunamadıysa veya resim ise)
+    # 2. Çok Katmanlı OCR (PDF okunamadıysa veya görsel/fotoğraf ise)
     if not ocr_text.strip():
-        api_key = settings.GOOGLE_MAPS_API_KEY
-        if api_key and api_key != "MOCK_GOOGLE_MAPS_API_KEY":
-            try:
-                base64_image = base64.b64encode(contents).decode("utf-8")
-                url = f"https://vision.googleapis.com/v1/images:annotate?key={api_key}"
-                payload = {
-                    "requests": [
-                        {
-                            "image": {"content": base64_image},
-                            "features": [{"type": "TEXT_DETECTION"}]
-                        }
-                    ]
-                }
-                async with httpx.AsyncClient(timeout=15.0) as client:
-                    r = await client.post(url, json=payload)
-                    if r.status_code == 200:
-                        data = r.json()
-                        responses = data.get("responses", [])
-                        if responses and "fullTextAnnotation" in responses[0]:
-                            ocr_text = responses[0]["fullTextAnnotation"]["text"]
-            except Exception as e:
-                print("[!] Vision OCR Hatası:", str(e))
+        ocr_text = await perform_ocr(contents, filename)
 
     # 3. Metin Ayrıştırma (Parse) Mantığı
     if ocr_text.strip():

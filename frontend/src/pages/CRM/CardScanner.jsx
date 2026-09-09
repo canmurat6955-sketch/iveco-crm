@@ -21,6 +21,7 @@ export default function CardScanner() {
   const [role, setRole] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [address, setAddress] = useState('');
   const [allCrmCustomers, setAllCrmCustomers] = useState([]);
   
@@ -68,15 +69,14 @@ export default function CardScanner() {
       setRole(data.role || '');
       setPhone(data.phone || '');
       setEmail(data.email || '');
+      setWebsite(data.website || '');
       setAddress(data.address || '');
       
       toast.success("Kartvizit başarıyla tarandı! Lütfen bilgileri kontrol edin.", { id: 'ocr_load' });
 
-      // Otomatik konum bulmayı tetikle
-      if (locationMode === 'gps') {
-        setTimeout(() => { fetchGpsCoordinates(); }, 500);
-      } else if (data.address) {
-        setTimeout(() => { fetchLocationFromAddressDirect(data.address); }, 500);
+      // Adres varsa otomatik koordinat bulmayı tetikle
+      if (data.address) {
+        setTimeout(() => { fetchLocationFromAddressDirect(data.address); }, 600);
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || "Tarama sırasında bir hata oluştu.", { id: 'ocr_load' });
@@ -187,6 +187,7 @@ export default function CardScanner() {
         company_name: companyName,
         phone: phone || null,
         email: email || null,
+        website: website || null,
         address: address || null,
         city: resolvedCity || "Samsun",
         district: resolvedDistrict || "Tekkeköy",
@@ -346,6 +347,11 @@ export default function CardScanner() {
             <div className="form-group">
               <label className="form-label"><FiMail size={12} /> E-posta Adresi</label>
               <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">🌐 Web Sitesi</label>
+              <input className="form-input" value={website} onChange={e => setWebsite(e.target.value)} placeholder="www.firma.com" />
             </div>
 
             <div className="form-group">
