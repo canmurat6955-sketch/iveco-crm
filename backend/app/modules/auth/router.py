@@ -4,6 +4,7 @@ Authentication API endpoints.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -33,6 +34,30 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-posta veya şifre hatalı",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = create_access_token(data={"sub": str(user.id)})
+    return TokenResponse(
+        access_token=token,
+        user=UserResponse.model_validate(user),
+    )
+
+
+class PasscodeLoginRequest(BaseModel):
+    code: str
+
+
+@router.post("/passcode", response_model=TokenResponse)
+def login_with_passcode(
+    payload: PasscodeLoginRequest,
+    db: Session = Depends(get_db),
+):
+    """Giriş kodu (erccrm / admin.erccrm) ile doğrudan mobil hızlı giriş."""
+    service = AuthService(db)
+    user = service.authenticate_user(payload.code, payload.code)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Geçersiz giriş kodu. Lütfen 'erccrm' yazın.",
         )
     token = create_access_token(data={"sub": str(user.id)})
     return TokenResponse(

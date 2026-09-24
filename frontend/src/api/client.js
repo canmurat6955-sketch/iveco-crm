@@ -75,6 +75,7 @@ export const authApi = {
     api.post('/auth/login', new URLSearchParams({ username, password }), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     }),
+  loginPasscode: (code) => api.post('/auth/passcode', { code }),
   getMe: () => api.get('/auth/me'),
   changePassword: (data) => api.post('/auth/change-password', data),
 };
