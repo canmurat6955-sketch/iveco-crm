@@ -90,3 +90,55 @@ class RouteStop(Base):
     customer = relationship("Customer", foreign_keys=[customer_id])
 
 
+class CallLog(Base):
+    __tablename__ = "call_logs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True)
+    contact_id = Column(Integer, ForeignKey("customer_contacts.id", ondelete="SET NULL"), nullable=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    
+    phone_number = Column(String(50), nullable=False, index=True)
+    normalized_phone = Column(String(20), nullable=False, index=True)
+    direction = Column(String(20), nullable=False)  # inbound, outbound, missed
+    duration_seconds = Column(Integer, default=0)
+    call_status = Column(String(30), default="completed")  # completed, missed, busy, rejected, no_answer
+    call_date = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    outcome = Column(String(100), nullable=True)  # Teklif İstendi, Fiyat Soruldu, Olumlu, Ulaşılamadı, vb.
+    notes = Column(Text, nullable=True)
+    recording_url = Column(String(500), nullable=True)
+    source = Column(String(50), default="manual")  # android_companion, cloud_pbx, manual, web_click_to_call
+    matched_by = Column(String(50), nullable=True)  # customer_phone, contact_phone, manual, unmatched
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    customer = relationship("Customer", foreign_keys=[customer_id])
+    contact = relationship("CustomerContact", foreign_keys=[contact_id])
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class WhatsAppMessage(Base):
+    __tablename__ = "whatsapp_messages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True)
+    contact_id = Column(Integer, ForeignKey("customer_contacts.id", ondelete="SET NULL"), nullable=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    
+    phone_number = Column(String(50), nullable=False, index=True)
+    normalized_phone = Column(String(20), nullable=False, index=True)
+    message_id = Column(String(150), nullable=True, index=True)  # Meta wamid or uuid
+    direction = Column(String(20), nullable=False)  # inbound, outbound
+    sender_name = Column(String(100), nullable=True)
+    message_type = Column(String(30), default="text")  # text, template, image, document, location, audio
+    content = Column(Text, nullable=False)
+    media_url = Column(String(500), nullable=True)
+    status = Column(String(30), default="sent")  # sent, delivered, read, failed, received
+    source = Column(String(50), default="meta_api")  # meta_api, web_companion, manual_log
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    customer = relationship("Customer", foreign_keys=[customer_id])
+    contact = relationship("CustomerContact", foreign_keys=[contact_id])
+    user = relationship("User", foreign_keys=[user_id])
+
+

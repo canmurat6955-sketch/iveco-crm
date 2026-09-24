@@ -7,17 +7,32 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
-# Eger veritabanı URL'i sqlite ile basliyorsa sqlite'a ozel argumanlari ekle
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+db_url = settings.DATABASE_URL
+is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args=connect_args,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-    pool_recycle=300,
-)
+try:
+    engine = create_engine(
+        db_url,
+        connect_args=connect_args,
+        echo=settings.DEBUG,
+        pool_pre_ping=True,
+        pool_recycle=300,
+    )
+    # Hızlı bağlantı testi (özellikle uzak PostgreSQL/Supabase için)
+    with engine.connect() as conn:
+        pass
+except Exception as e:
+    # Uzak veritabanı kapalıysa veya ulaşılamıyorsa yerel SQLite'a güvenle geç
+    print(f"[!] Veritabanı bağlantı hatası ({db_url}): {e}. Yerel SQLite veritabanına (iveco_crm.db) geçiliyor.")
+    db_url = "sqlite:///./iveco_crm.db"
+    is_sqlite = True
+    connect_args = {"check_same_thread": False}
+    engine = create_engine(
+        db_url,
+        connect_args=connect_args,
+        echo=settings.DEBUG,
+    )
 
 
 if is_sqlite:

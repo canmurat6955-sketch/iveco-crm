@@ -59,14 +59,102 @@ export default function CustomerDetail() {
     notes: ''
   });
 
+  // ── Çağrı & WhatsApp İletişim State'leri ──
+  const [communications, setCommunications] = useState([]);
+  const [commFilter, setCommFilter] = useState('all'); // 'all', 'call', 'whatsapp', 'visit'
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [callForm, setCallForm] = useState({
+    phone_number: '',
+    direction: 'outbound',
+    duration_minutes: 2,
+    duration_seconds: 30,
+    outcome: 'Olumlu',
+    notes: '',
+  });
+  const [whatsAppForm, setWhatsAppForm] = useState({
+    message: '',
+    template_name: ''
+  });
+
+  const loadCommunications = () => {
+    salesApi.getCommunicationsTimeline(id)
+      .then(r => setCommunications(r.data || []))
+      .catch(() => {});
+  };
+
   useEffect(() => {
-    crmApi.getCustomer(id).then(r => setCustomer(r.data)).catch(() => toast.error('Müşteri bulunamadı'));
+    crmApi.getCustomer(id).then(r => {
+      setCustomer(r.data);
+      setCallForm(prev => ({ ...prev, phone_number: r.data?.phone || '' }));
+    }).catch(() => toast.error('Müşteri bulunamadı'));
     crmApi.getInteractions(id).then(r => setInteractions(r.data)).catch(() => {});
     crmApi.getContacts(id).then(r => setContacts(r.data)).catch(() => {});
     crmApi.getCustomerProformas(id).then(r => setProformas(r.data)).catch(() => {});
     crmApi.getFleet(id).then(r => setFleet(r.data)).catch(() => {});
     crmApi.getReminders(id).then(r => setReminders(r.data)).catch(() => {});
+    loadCommunications();
   }, [id]);
+
+  const handleSaveCall = async (e) => {
+    e.preventDefault();
+    try {
+      const totalSecs = (parseInt(callForm.duration_minutes) || 0) * 60 + (parseInt(callForm.duration_seconds) || 0);
+      await salesApi.createCallLog({
+        customer_id: parseInt(id),
+        phone_number: callForm.phone_number || customer?.phone || '',
+        direction: callForm.direction,
+        duration_seconds: totalSecs,
+        outcome: callForm.outcome,
+        notes: callForm.notes,
+        source: 'manual'
+      });
+      toast.success('Telefon görüşmesi kaydedildi 📞');
+      setShowCallModal(false);
+      setCallForm({ phone_number: customer?.phone || '', direction: 'outbound', duration_minutes: 2, duration_seconds: 30, outcome: 'Olumlu', notes: '' });
+      loadCommunications();
+      crmApi.getInteractions(id).then(r => setInteractions(r.data));
+    } catch {
+      toast.error('Görüşme kaydedilirken hata oluştu');
+    }
+  };
+
+  const handleSendWhatsApp = async (e) => {
+    e.preventDefault();
+    if (!whatsAppForm.message.trim()) {
+      toast.error('Mesaj içeriği boş olamaz');
+      return;
+    }
+    try {
+      const res = await salesApi.sendWhatsAppMessage({
+        customer_id: parseInt(id),
+        message: whatsAppForm.message,
+        template_name: whatsAppForm.template_name || undefined
+      });
+      toast.success('WhatsApp mesajı kaydedildi');
+      setShowWhatsAppModal(false);
+      setWhatsAppForm({ message: '', template_name: '' });
+      loadCommunications();
+      crmApi.getInteractions(id).then(r => setInteractions(r.data));
+      if (res.data?.whatsapp_link) {
+        window.open(res.data.whatsapp_link, '_blank');
+      }
+    } catch {
+      toast.error('WhatsApp mesajı gönderilirken hata oluştu');
+    }
+  };
+
+  const selectWhatsAppTemplate = (tmplKey) => {
+    const templates = {
+      tanisma: `Sayın ${customer?.company_name || 'Yetkili'}, ERC Samsun Otomotiv IVECO Yetkili Satıcısı olarak ticari araç ihtiyaçlarınız konusunda size en uygun çözümleri sunmak isteriz. Uygun zamanınızda görüşmek dileğiyle.`,
+      katalog: `Sayın ${customer?.company_name || 'Yetkili'}, IVECO Daily ve Ağır Vasıta güncel ürün kataloğumuzu ve avantajlı finansman seçeneklerimizi incelemeniz için iletişime geçiyoruz. Detaylı teklif için bize ulaşabilirsiniz.`,
+      kampanya: `Merhaba! IVECO Daily ticari araçlarımızda bölgeye özel faiz ve takas destekli yeni dönem kampanyamız başlamıştır. Stoktaki hemen teslim araçlarımız için bilgi alabilirsiniz.`,
+      proforma: `Sayın ${customer?.company_name || 'Yetkili'}, firmanız için hazırlanan IVECO ticari araç teklif detaylarını sistemimiz üzerinden inceleyebilirsiniz.`
+    };
+    if (templates[tmplKey]) {
+      setWhatsAppForm({ message: templates[tmplKey], template_name: tmplKey });
+    }
+  };
 
   const addContact = async (e) => {
     e.preventDefault();
@@ -454,17 +542,17 @@ export default function CustomerDetail() {
           <div className="card">
             <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>Hızlı İşlemler</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <button className="btn btn-success btn-sm w-full" onClick={() => startVisit(customer.id, customer.company_name)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <button className="btn btn-primary btn-sm w-full" onClick={() => setShowCallModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+                <FiPhone size={14} /> 📞 Arama Kaydı Ekle
+              </button>
+              <button className="btn btn-success btn-sm w-full" onClick={() => setShowWhatsAppModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', background: '#25d366', borderColor: '#25d366' }}>
+                <FiMessageSquare size={14} /> 💬 WhatsApp Gönder
+              </button>
+              <button className="btn btn-secondary btn-sm w-full" onClick={() => startVisit(customer.id, customer.company_name)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiMapPin size={14} /> Ziyaret Başlat
               </button>
-              <button className="btn btn-primary btn-sm w-full" onClick={openEditModal} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <button className="btn btn-secondary btn-sm w-full" onClick={openEditModal} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiEdit2 size={14} /> Bilgileri Düzenle
-              </button>
-              <button className="btn btn-secondary btn-sm w-full" onClick={openWhatsApp} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                <FiMessageSquare size={14} /> WhatsApp Gönder
-              </button>
-              <button className="btn btn-secondary btn-sm w-full" onClick={() => setShowInteraction(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                <FiPlus size={14} /> Etkileşim Ekle
               </button>
               <button className="btn btn-secondary btn-sm w-full" onClick={() => navigate(`/customers/${customer.id}/proforma/new`)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiFileText size={14} /> Proforma Fatura Hazırla
@@ -475,43 +563,143 @@ export default function CustomerDetail() {
         </div>
       </div>
 
-      {/* Interaction Timeline */}
+      {/* ── İLETİŞİM & KONUŞMA GEÇMİŞİ (ARAMALAR + WHATSAPP) ── */}
       <div className="card mt-6">
-        <div className="card-header">
-          <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiClock size={18} /> Etkileşim Geçmişi</h3>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowInteraction(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <FiPlus size={14} /> Ekle
-          </button>
-        </div>
-        {interactions.length > 0 ? (
-          <div className="interaction-timeline">
-            {interactions.map((intr, idx) => {
-              const config = INTERACTION_ICONS[intr.interaction_type] || INTERACTION_ICONS.call;
-              const Icon = config.icon;
-              return (
-                <div key={intr.id} className="timeline-item" style={{ animationDelay: `${idx * 80}ms` }}>
-                  <div className="timeline-line" />
-                  <div className="timeline-dot" style={{ background: config.color, boxShadow: `0 0 12px ${config.color}40` }}>
-                    <Icon size={14} color="#fff" />
-                  </div>
-                  <div className="timeline-content">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="badge" style={{ background: `${config.color}20`, color: config.color, border: `1px solid ${config.color}40` }}>{config.label}</span>
-                      <span className="text-xs text-muted">{new Date(intr.created_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-                    {intr.notes && <p className="text-sm" style={{ marginBottom: 6 }}>{intr.notes}</p>}
-                    {intr.next_action && (
-                      <div className="text-xs" style={{ color: 'var(--accent-amber)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <FiCalendar size={12} /> {intr.next_action}
-                        {intr.next_action_date && <span className="text-muted"> ({intr.next_action_date})</span>}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+        <div className="card-header" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiPhone size={18} style={{ color: '#3b82f6' }} /> İletişim & Konuşma Geçmişi
+            </h3>
+            <span className="badge badge-blue" style={{ fontSize: '0.75rem' }}>
+              {communications.length} Kayıt
+            </span>
           </div>
-        ) : <div className="empty-state"><p>Henüz etkileşim kaydı yok</p></div>}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <div className="flex gap-1" style={{ background: 'var(--bg-input)', padding: '2px 4px', borderRadius: 8 }}>
+              <button
+                type="button"
+                className={`btn btn-xs ${commFilter === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setCommFilter('all')}
+                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              >
+                Tümü
+              </button>
+              <button
+                type="button"
+                className={`btn btn-xs ${commFilter === 'call' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setCommFilter('call')}
+                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              >
+                📞 Aramalar ({communications.filter(c => c.item_type === 'call').length})
+              </button>
+              <button
+                type="button"
+                className={`btn btn-xs ${commFilter === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setCommFilter('whatsapp')}
+                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              >
+                💬 WhatsApp ({communications.filter(c => c.item_type === 'whatsapp').length})
+              </button>
+              <button
+                type="button"
+                className={`btn btn-xs ${commFilter === 'visit' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setCommFilter('visit')}
+                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              >
+                📍 Ziyaretler ({communications.filter(c => c.item_type === 'visit').length})
+              </button>
+            </div>
+
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setShowCallModal(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            >
+              <FiPhone size={13} /> Arama Kaydet
+            </button>
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => setShowWhatsAppModal(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}
+            >
+              <FiMessageSquare size={13} /> WhatsApp
+            </button>
+          </div>
+        </div>
+
+        {/* Timeline Items Stream */}
+        {communications.filter(item => commFilter === 'all' || item.item_type === commFilter).length > 0 ? (
+          <div className="interaction-timeline">
+            {communications
+              .filter(item => commFilter === 'all' || item.item_type === commFilter)
+              .map((item, idx) => {
+                const isCall = item.item_type === 'call';
+                const isWA = item.item_type === 'whatsapp';
+                const color = isCall ? '#3b82f6' : (isWA ? '#25d366' : '#10b981');
+                const Icon = isCall ? FiPhone : (isWA ? FiMessageSquare : FiMapPin);
+
+                return (
+                  <div key={`${item.item_type}-${item.id}-${idx}`} className="timeline-item" style={{ animationDelay: `${idx * 50}ms` }}>
+                    <div className="timeline-line" />
+                    <div className="timeline-dot" style={{ background: color, boxShadow: `0 0 12px ${color}40` }}>
+                      <Icon size={14} color="#fff" />
+                    </div>
+
+                    <div className="timeline-content" style={{
+                      background: isWA ? (item.direction === 'outbound' ? 'rgba(37, 211, 102, 0.08)' : 'rgba(255, 255, 255, 0.04)') : 'var(--bg-input)',
+                      borderLeft: `3px solid ${color}`,
+                      borderRadius: 8,
+                      padding: '0.85rem 1rem'
+                    }}>
+                      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span className="badge" style={{ background: `${color}20`, color: color, border: `1px solid ${color}40`, fontWeight: 700 }}>
+                            {item.title}
+                          </span>
+                          {isCall && item.outcome && (
+                            <span className="badge badge-amber" style={{ fontSize: '0.72rem' }}>
+                              🎯 {item.outcome}
+                            </span>
+                          )}
+                          {isWA && (
+                            <span className="badge" style={{ fontSize: '0.7rem', background: item.direction === 'outbound' ? '#10b98125' : '#3b82f625', color: item.direction === 'outbound' ? '#10b981' : '#60a5fa' }}>
+                              {item.direction === 'outbound' ? '↗️ Giden İleti' : '↙️ Gelen Yanıt'}
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {item.actor_name && (
+                            <span className="text-xs text-muted" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <FiUser size={11} /> {item.actor_name}
+                            </span>
+                          )}
+                          <span className="text-xs text-muted">
+                            {new Date(item.timestamp).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {item.summary && (
+                        <p className="text-sm" style={{ margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                          {item.summary}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        ) : (
+          <div className="empty-state" style={{ padding: '3rem 1rem' }}>
+            <p>Seçili filtreye ait kayıtlı çağrı veya WhatsApp iletişimi bulunmuyor.</p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowCallModal(true)}>+ Telefon Görüşmesi Ekle</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => setShowWhatsAppModal(true)}>+ WhatsApp İletisi Gönder</button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── CONTACTS SECTION ── */}
@@ -1200,6 +1388,158 @@ export default function CustomerDetail() {
                 <button type="button" className="btn btn-secondary" onClick={() => { setShowAddReminder(false); setEditingReminder(null); }}>İptal</button>
                 <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <FiSave size={14} /> {editingReminder ? 'Güncelle' : 'Hatırlatıcı Oluştur'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── CALL LOG MODAL ── */}
+      {showCallModal && (
+        <div className="modal-overlay" onClick={() => setShowCallModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <h3 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiPhone size={20} style={{ color: '#3b82f6' }} /> Telefon Görüşmesi Kaydet
+              </h3>
+              <button onClick={() => setShowCallModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                <FiX size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSaveCall}>
+              <div className="form-group">
+                <label className="form-label">Aranan / Arayan Numara *</label>
+                <input
+                  className="form-input"
+                  value={callForm.phone_number}
+                  onChange={e => setCallForm({ ...callForm, phone_number: e.target.value })}
+                  placeholder="0532..."
+                  required
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Arama Yönü</label>
+                  <select
+                    className="form-select"
+                    value={callForm.direction}
+                    onChange={e => setCallForm({ ...callForm, direction: e.target.value })}
+                  >
+                    <option value="outbound">↗️ Giden Arama</option>
+                    <option value="inbound">↙️ Gelen Arama</option>
+                    <option value="missed">❌ Cevapsız Arama</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Görüşme Sonucu</label>
+                  <select
+                    className="form-select"
+                    value={callForm.outcome}
+                    onChange={e => setCallForm({ ...callForm, outcome: e.target.value })}
+                  >
+                    <option value="Olumlu">✅ Olumlu / İlgili</option>
+                    <option value="Teklif İstendi">📋 Teklif / Fiyat İstendi</option>
+                    <option value="Randevu Alındı">📅 Randevu Alındı</option>
+                    <option value="Daha Sonra Aranacak">⏰ Daha Sonra Aranacak</option>
+                    <option value="Ulaşılamadı">📵 Ulaşılamadı / Meşgul</option>
+                    <option value="İlgilenmiyor">⛔ İlgilenmiyor</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Süre (Dakika)</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    min="0"
+                    max="180"
+                    value={callForm.duration_minutes}
+                    onChange={e => setCallForm({ ...callForm, duration_minutes: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Süre (Saniye)</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={callForm.duration_seconds}
+                    onChange={e => setCallForm({ ...callForm, duration_seconds: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Görüşme Notu</label>
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  value={callForm.notes}
+                  onChange={e => setCallForm({ ...callForm, notes: e.target.value })}
+                  placeholder="Müşteri ne söyledi? Hangi araç modelini sordu? vb."
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowCallModal(false)}>İptal</button>
+                <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <FiPhone size={14} /> Kaydet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── WHATSAPP MESSAGE MODAL ── */}
+      {showWhatsAppModal && (
+        <div className="modal-overlay" onClick={() => setShowWhatsAppModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <h3 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiMessageSquare size={20} style={{ color: '#25d366' }} /> WhatsApp İletişimi
+              </h3>
+              <button onClick={() => setShowWhatsAppModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                <FiX size={20} />
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <label className="form-label text-xs">Hazır Şablon Seçin:</label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('tanisma')}>👋 Tanışma</button>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('katalog')}>📄 Ürün Kataloğu</button>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('kampanya')}>🔥 Faiz Kampanyası</button>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('proforma')}>💼 Teklif / Fiyat</button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendWhatsApp}>
+              <div className="form-group">
+                <label className="form-label">Mesaj İçeriği *</label>
+                <textarea
+                  className="form-textarea"
+                  rows={4}
+                  value={whatsAppForm.message}
+                  onChange={e => setWhatsAppForm({ ...whatsAppForm, message: e.target.value })}
+                  placeholder="Mesajınızı yazın..."
+                  required
+                />
+              </div>
+
+              <div className="text-xs text-muted mb-4">
+                💡 Mesaj otomatik olarak CRM müşteri geçmişine kaydedilecek ve WhatsApp sohbetine aktarılacaktır.
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowWhatsAppModal(false)}>İptal</button>
+                <button type="submit" className="btn btn-success" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}>
+                  <FiMessageSquare size={14} /> Gönder & Kaydet
                 </button>
               </div>
             </form>
