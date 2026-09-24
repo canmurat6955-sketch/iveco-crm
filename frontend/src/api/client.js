@@ -233,6 +233,21 @@ export const salesApi = {
   getRoutePlan: (id) => api.get(`/sales/routes/${id}`),
   deleteRoutePlan: (id) => api.delete(`/sales/routes/${id}`),
   markStopVisited: (planId, stopId, visited) => api.put(`/sales/routes/${planId}/stops/${stopId}/visited`, null, { params: { visited } }),
+
+  // ── Çağrı Takip (Call Tracking) ──
+  createCallLog: (data) => api.post('/sales/calls', data),
+  syncCallLogs: (items) => api.post('/sales/calls/sync', { items }),
+  getCallLogs: (params) => api.get('/sales/calls', { params }),
+  getCallStats: () => api.get('/sales/calls/stats'),
+  convertCallToLead: (callId, data) => api.post(`/sales/calls/${callId}/convert-to-lead`, data),
+
+  // ── WhatsApp İletişim ──
+  sendWhatsAppMessage: (data) => api.post('/sales/whatsapp/send', data),
+  logWhatsAppMessage: (data) => api.post('/sales/whatsapp/log', data),
+  getWhatsAppMessages: (params) => api.get('/sales/whatsapp/messages', { params }),
+
+  // ── Birleşik İletişim Zaman Tüneli ──
+  getCommunicationsTimeline: (customerId, limit = 50) => api.get(`/sales/communications/timeline/${customerId}`, { params: { limit } }),
 };
 
 
