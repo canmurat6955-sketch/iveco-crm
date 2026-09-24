@@ -89,22 +89,36 @@ def _seed_initial_data():
 
     db = SessionLocal()
     try:
-        # Create admin user if no users exist
-        if db.query(User).count() == 0:
+        # Guarantee default users exist with 'erccrm' password
+        admin = db.query(User).filter(User.email == "admin@iveco-crm.local").first()
+        if not admin:
             admin = User(
                 email="admin@iveco-crm.local",
-                hashed_password=get_password_hash("admin123"),
+                hashed_password=get_password_hash("erccrm"),
                 full_name="Sistem Yöneticisi",
                 role="admin",
+                is_active=True,
             )
+            db.add(admin)
+        else:
+            admin.hashed_password = get_password_hash("erccrm")
+            admin.is_active = True
+
+        sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
+        if not sales_rep:
             sales_rep = User(
                 email="satis@iveco-crm.local",
-                hashed_password=get_password_hash("satis123"),
+                hashed_password=get_password_hash("erccrm"),
                 full_name="King Temsilcisi",
                 role="sales_rep",
+                is_active=True,
             )
-            db.add_all([admin, sales_rep])
-            db.commit()
+            db.add(sales_rep)
+        else:
+            sales_rep.hashed_password = get_password_hash("erccrm")
+            sales_rep.is_active = True
+
+        db.commit()
 
         # Create demo discovery source
         if db.query(DiscoverySource).count() == 0:

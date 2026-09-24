@@ -42,13 +42,30 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loginPasscode = async (code) => {
+    setLoading(true);
+    try {
+      const res = await authApi.loginPasscode(code);
+      const { access_token, user: userData } = res.data;
+      localStorage.setItem('token', access_token);
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      localStorage.removeItem('token');
+      setUser(null);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, loginPasscode, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
