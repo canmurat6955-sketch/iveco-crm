@@ -180,6 +180,7 @@ export default function DiscoveryList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [scanning, setScanning] = useState(false);
   const [scanResults, setScanResults] = useState([]);
+  const [billingNotice, setBillingNotice] = useState(null);
   const [sources, setSources] = useState([]);
   const [companies, setCompanies] = useState({ items: [], total: 0 });
   const [statusFilter, setStatusFilter] = useState('');
@@ -412,17 +413,23 @@ export default function DiscoveryList() {
       .then(r => setCompanies(r.data)).catch(() => {});
   };
 
-  const handleLiveSearch = async (e) => {
+  const handleLiveSearch = async (e, directQuery = null) => {
     if (e) e.preventDefault();
-    if (searchQuery.length < 3) {
+    const queryToUse = (typeof directQuery === 'string' ? directQuery : searchQuery).trim();
+    if (!queryToUse || queryToUse.length < 3) {
       toast.error("Arama terimi en az 3 karakter olmalıdır.");
       return;
     }
     setScanning(true);
+    setBillingNotice(null);
     try {
-      const res = await scannerApi.search({ query: searchQuery, max_results: searchLimit });
-      setScanResults(res.data.results || []);
-      toast.success(`${res.data.results?.length || 0} firma bulundu.`);
+      const res = await scannerApi.search({ query: queryToUse, max_results: searchLimit });
+      const results = res.data.results || [];
+      setScanResults(results);
+      if (res.data.billing_notice) {
+        setBillingNotice(res.data.billing_notice);
+      }
+      toast.success(`${results.length} gerçek firma bulundu.`);
     } catch {
       toast.error('Arama sırasında hata oluştu.');
     } finally {
@@ -994,54 +1001,263 @@ export default function DiscoveryList() {
         </div>
       )}
 
-      {/* ── TAB 5: SERBEST ARAMA (Google Places) ─────────────────────────── */}
+      {/* ── TAB 5: SERBEST ARAMA (Google Places & Canlı Firma Radarı) ─────────────────────────── */}
       {activeTab === 'live_search' && (
         <div className="flex flex-col gap-6">
           <div className="card glass-card">
             <div className="card-header">
-              <h3 className="card-title">Google Places Serbest Arama</h3>
+              <div>
+                <h3 className="card-title text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-heading)' }}>
+                  <span>🔍</span> Canlı Firma & Google Places Radarı
+                </h3>
+                <p className="text-xs text-muted mt-1">
+                  Samsun ve 9 ildeki tüm ticari işletmeleri, hazır beton tesislerini, lojistik depolarını serbestçe tarayın.
+                </p>
+              </div>
               <button className="btn btn-secondary btn-sm" onClick={getLocation} disabled={gpsLoading}>
                 <FiNavigation size={14} className={gpsLoading ? 'spin' : ''} /> {location ? 'Konum Aktif' : 'Konum Al'}
               </button>
             </div>
-            <form onSubmit={handleLiveSearch} className="flex gap-3">
-              <input 
-                type="text" 
-                className="input" 
-                placeholder="Örn: Çarşamba beton santrali, Bafra unlu mamuller..." 
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={{ background: 'var(--bg-input)' }}
-              />
-              <button type="submit" className="btn btn-primary" disabled={scanning}>
-                {scanning ? <FiLoader size={16} className="spin" /> : <FiSearch size={16} />} Ara
+
+            <form onSubmit={handleLiveSearch} className="flex gap-3 mt-3">
+              <div style={{ position: 'relative', flex: 1 }}>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Örn: Samsun beton santralleri, Çarşamba nakliyat, Tekkeköy hafriyat..." 
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    padding: '12px 40px 12px 16px',
+                    borderRadius: 10,
+                    border: '1.5px solid rgba(59, 130, 246, 0.45)',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: 12,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#94a3b8',
+                      cursor: 'pointer',
+                      padding: 4,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title="Temizle"
+                  >
+                    <FiX size={18} />
+                  </button>
+                )}
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={scanning}
+                style={{
+                  padding: '12px 24px',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {scanning ? <FiLoader size={16} className="spin" /> : <FiSearch size={16} />} 
+                {scanning ? 'Aranıyor...' : 'Firma Ara'}
               </button>
             </form>
+
+            {/* Hızlı Örnek Aramalar */}
+            <div style={{ marginTop: 14 }}>
+              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginBottom: 8 }}>
+                ⚡ Popüler Sektörel Aramalar (Tek Tıkla Tara):
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {[
+                  { label: '🏗️ Samsun Beton Santralleri', q: 'Samsun beton santralleri' },
+                  { label: '🚛 Çarşamba Nakliyat & Lojistik', q: 'Çarşamba nakliyat lojistik' },
+                  { label: '🚜 Tekkeköy Hafriyat', q: 'Tekkeköy hafriyat' },
+                  { label: '❄️ Bafra Soğuk Hava Deposu', q: 'Bafra soğuk hava deposu' },
+                  { label: '🏭 Samsun OSB Fabrikaları', q: 'Samsun OSB sanayi' },
+                  { label: '🌾 Çorum Un & Yem Sanayi', q: 'Çorum un fabrikaları' },
+                  { label: '⛏️ Kavak Madencilik & Taşocağı', q: 'Kavak madencilik taş ocağı' }
+                ].map(item => (
+                  <button
+                    key={item.q}
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery(item.q);
+                      handleLiveSearch(null, item.q);
+                    }}
+                    style={{
+                      background: 'rgba(30, 41, 59, 0.7)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      color: '#cbd5e1',
+                      borderRadius: 8,
+                      padding: '6px 12px',
+                      fontSize: 12,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = '#3b82f6';
+                      e.currentTarget.style.color = '#fff';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.color = '#cbd5e1';
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Google Haritalar Billing Bilgilendirme Kutusu (varsa) */}
+            {billingNotice && (
+              <div style={{
+                marginTop: 16,
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: 10,
+                padding: '12px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                fontSize: 12,
+                color: '#93c5fd'
+              }}>
+                <FiInfo size={18} style={{ flexShrink: 0, color: '#60a5fa' }} />
+                <div>
+                  <strong>Bilgi: </strong>{billingNotice}
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Arama Sonuçları */}
           <div className="card glass-card">
             <div className="card-header">
-              <h3 className="card-title">Arama Sonuçları</h3>
-              <span className="badge badge-blue">{scanResults.length} Sonuç</span>
+              <h3 className="card-title">Bulunan Gerçek İşletmeler</h3>
+              <span className="badge badge-blue">{scanResults.length} Firma</span>
             </div>
             {scanResults.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {scanResults.map((biz, idx) => (
-                  <div key={idx} className="list-item" style={{ padding: '1rem', background: 'var(--bg-input)' }}>
-                    <div className="flex justify-between items-center w-full">
-                      <div>
-                        <div className="font-semibold text-sm">{biz.company_name}</div>
-                        <div className="text-xs text-muted">{biz.address} {biz.phone && `· ${biz.phone}`}</div>
+                  <div key={idx} className="list-item" style={{
+                    padding: '1.25rem',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    borderRadius: 12,
+                    border: '1px solid rgba(255, 255, 255, 0.07)',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <div className="flex justify-between items-start w-full gap-4 flex-wrap">
+                      <div style={{ flex: 1, minWidth: 260 }}>
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="font-bold text-base" style={{ color: '#fff' }}>
+                            {biz.company_name}
+                          </span>
+                          <span className="badge" style={{
+                            background: biz.source === 'verified_db' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                            color: biz.source === 'verified_db' ? '#34d399' : '#60a5fa',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            border: `1px solid ${biz.source === 'verified_db' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`
+                          }}>
+                            {biz.source === 'verified_db' ? '🏛️ Doğrulanmış Sanayi Sicil' : '📍 Google Haritalar'}
+                          </span>
+                          {biz.sector && (
+                            <span className="badge badge-secondary" style={{ fontSize: 10 }}>
+                              {biz.sector}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-xs" style={{ color: '#94a3b8', marginTop: 4, lineHeight: 1.5 }}>
+                          📍 {biz.address || `${biz.district || ''} ${biz.city || ''}`}
+                        </div>
+
+                        {biz.phone && (
+                          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 14 }}>
+                            <a 
+                              href={`tel:${biz.phone}`} 
+                              style={{ 
+                                color: '#38bdf8', 
+                                fontWeight: 600, 
+                                fontSize: 13, 
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 5
+                              }}
+                            >
+                              <FiPhoneCall size={13} /> {biz.phone}
+                            </a>
+                            <a
+                              href={`https://wa.me/90${biz.phone.replace(/\D/g, '').slice(-10)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: '#4ade80', fontSize: 11, fontWeight: 500, textDecoration: 'none' }}
+                            >
+                              WhatsApp Mesajı
+                            </a>
+                          </div>
+                        )}
                       </div>
-                      <button className="btn btn-primary btn-sm" onClick={() => addOsbToCrm(biz)}>
-                        + CRM\'e Ekle
-                      </button>
+
+                      <div className="flex items-center gap-2">
+                        {biz.google_maps_url && (
+                          <a 
+                            href={biz.google_maps_url} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="btn btn-secondary btn-sm"
+                            style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                          >
+                            <FiMapPin size={12} /> Haritada Gör
+                          </a>
+                        )}
+                        <button 
+                          className="btn btn-primary btn-sm" 
+                          onClick={() => addOsbToCrm(biz)}
+                          style={{
+                            fontWeight: 600,
+                            fontSize: 12,
+                            padding: '8px 14px',
+                            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'
+                          }}
+                        >
+                          <FiPlus size={14} /> CRM'e Ekle
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="empty-state"><p>Arama yapmak için yukarıya bir ifade yazın.</p></div>
+              <div className="empty-state" style={{ padding: '3rem 1rem' }}>
+                <FiSearch size={32} style={{ marginBottom: 12, opacity: 0.4, color: '#60a5fa' }} />
+                <p style={{ color: '#94a3b8', fontSize: 14 }}>
+                  Arama yapmak için yukarıdaki kutucuğa bir sektör veya bölge yazın ya da popüler arama butonlarına dokunun.
+                </p>
+              </div>
             )}
           </div>
         </div>
