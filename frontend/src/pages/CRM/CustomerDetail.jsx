@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { crmApi, salesApi } from '../../api/client';
+import { crmApi, salesApi, vehiclesApi } from '../../api/client';
 import { useVisit } from '../../contexts/VisitContext';
+import VehicleInterestModal from './VehicleInterestModal';
+import StockMatchModal from '../Vehicles/StockMatchModal';
 import toast from 'react-hot-toast';
 import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw } from 'react-icons/fi';
 
@@ -77,6 +79,18 @@ export default function CustomerDetail() {
     template_name: ''
   });
 
+  // ── Araç İhtiyaçları & İlgileri (Satış Zekâsı) State'leri ──
+  const [vehicleInterests, setVehicleInterests] = useState([]);
+  const [showVehicleModal, setShowVehicleModal] = useState(false);
+  const [editingInterest, setEditingInterest] = useState(null);
+  const [selectedStockMatchId, setSelectedStockMatchId] = useState(null);
+
+  const loadVehicleInterests = () => {
+    vehiclesApi.getCustomerInterests(id)
+      .then(r => setVehicleInterests(r.data || []))
+      .catch(() => {});
+  };
+
   const loadCommunications = () => {
     salesApi.getCommunicationsTimeline(id)
       .then(r => setCommunications(r.data || []))
@@ -93,6 +107,7 @@ export default function CustomerDetail() {
     crmApi.getCustomerProformas(id).then(r => setProformas(r.data)).catch(() => {});
     crmApi.getFleet(id).then(r => setFleet(r.data)).catch(() => {});
     crmApi.getReminders(id).then(r => setReminders(r.data)).catch(() => {});
+    loadVehicleInterests();
     loadCommunications();
   }, [id]);
 
@@ -297,6 +312,44 @@ export default function CustomerDetail() {
     const cleanPhone = phone.startsWith('0') ? '9' + phone : phone.startsWith('90') ? phone : '90' + phone;
     const msg = `Merhaba ${customer.company_name} yetkilisi, ERC Samsun Otomotiv adına iletişime geçiyorum. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dileriz.`;
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  // ── Vehicle Interest Handlers (Satış Zekâsı) ──
+  const handleDeleteInterest = async (interestId) => {
+    if (!confirm('Bu araç ilgisini silmek istediğinize emin misiniz?')) return;
+    try {
+      await vehiclesApi.deleteCustomerInterest(interestId);
+      toast.success('Araç ilgisi silindi');
+      loadVehicleInterests();
+    } catch {
+      toast.error('Silme işlemi başarısız');
+    }
+  };
+
+  const handleCreateActivityFromInterest = (inter) => {
+    const vTitle = inter.vehicle?.display_title || `${inter.vehicle?.vehicle_group} ${inter.vehicle?.model_code}`;
+    const tfLabel = {
+      immediate: 'Hemen Alıcı',
+      '0_30_days': '0-30 Gün İçi',
+      '1_3_months': '1-3 Ay İçi',
+      '3_6_months': '3-6 Ay',
+      '6_12_months': '6-12 Ay',
+      unknown: 'Tarih Belirsiz'
+    }[inter.purchase_timeframe] || inter.purchase_timeframe;
+
+    setCallForm({
+      phone_number: customer?.phone || '',
+      direction: 'outbound',
+      duration_minutes: 2,
+      duration_seconds: 30,
+      outcome: 'Olumlu',
+      notes: `🚚 İlgilenilen Araç: ${vTitle}\nİlgi Seviyesi: ${inter.interest_level.toUpperCase()}\nAlım Zamanı: ${tfLabel}\nAdet: ${inter.estimated_quantity}\nÖzel Not: ${inter.customer_note || '-'}`
+    });
+    setShowCallModal(true);
+  };
+
+  const handleCreateProformaFromInterest = (inter) => {
+    navigate(`/customers/${id}/proforma/new?model=${inter.vehicle?.model_code || ''}`);
   };
 
   const openEditModal = () => {
@@ -783,6 +836,200 @@ export default function CustomerDetail() {
             ))}
           </div>
         ) : <div className="empty-state"><p>Henüz proforma fatura oluşturulmamış</p></div>}
+      </div>
+
+      {/* ── ARAÇ İHTİYAÇLARI & SATIŞ FIRSATLARI MODÜLÜ ── */}
+      <div className="card mt-6" style={{ border: '1px solid rgba(59, 130, 246, 0.25)', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)' }}>
+        <div className="card-header" style={{ background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.6))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiTruck size={18} style={{ color: '#60a5fa' }} /> ARAÇ İHTİYAÇLARI (Satış Fırsatları)
+            </h3>
+            {vehicleInterests.length > 0 && (
+              <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', border: '1px solid #3b82f6' }}>
+                {vehicleInterests.length} Araç İlgisi
+              </span>
+            )}
+            {vehicleInterests.some(i => i.has_active_campaign) && (
+              <span className="badge" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid #ef4444', display: 'flex', alignItems: 'center', gap: 4 }}>
+                🔥 Aktif Kampanya Fırsatı
+              </span>
+            )}
+          </div>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => { setEditingInterest(null); setShowVehicleModal(true); }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+          >
+            <FiPlus size={14} /> + Araç İlgisi Ekle
+          </button>
+        </div>
+
+        {vehicleInterests.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem', padding: '1.25rem' }}>
+            {vehicleInterests.map(inter => {
+              const v = inter.vehicle;
+              const vTitle = v?.display_title || `${v?.vehicle_group || 'IVECO'} ${v?.model_code || ''}`;
+              
+              const isHeavy = v?.vehicle_group === 'S-Way' || v?.vehicle_group === 'T-Way' || v?.vehicle_group === 'X-Way';
+              const isMedium = v?.vehicle_group === 'Eurocargo';
+              const vehIcon = isHeavy ? '🚜' : isMedium ? '🚛' : '🚚';
+
+              const levelStyles = {
+                purchase_ready: { bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', text: '#f87171', label: 'Satın Alma Aşamasında 🔥' },
+                high: { bg: 'rgba(249, 115, 22, 0.15)', border: '#f97316', text: '#fb923c', label: 'Yüksek İlgi' },
+                medium: { bg: 'rgba(245, 158, 11, 0.15)', border: '#f59e0b', text: '#fbbf24', label: 'Orta İlgi' },
+                low: { bg: 'rgba(59, 130, 246, 0.15)', border: '#3b82f6', text: '#60a5fa', label: 'Düşük İlgi' },
+                very_low: { bg: 'rgba(100, 116, 139, 0.15)', border: '#64748b', text: '#94a3b8', label: 'Çok Düşük' }
+              };
+              const lStyle = levelStyles[inter.interest_level] || levelStyles.medium;
+
+              const tfLabels = {
+                immediate: 'Hemen (Hazır)',
+                '0_30_days': '0–30 Gün',
+                '1_3_months': '1–3 Ay',
+                '3_6_months': '3–6 Ay',
+                '6_12_months': '6–12 Ay',
+                unknown: 'Belirsiz'
+              };
+              const tfText = tfLabels[inter.purchase_timeframe] || inter.purchase_timeframe;
+
+              return (
+                <div key={inter.id} style={{
+                  background: 'var(--bg-input)',
+                  borderRadius: 12,
+                  padding: '1.1rem',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderLeft: `4px solid ${lStyle.border}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
+                  position: 'relative'
+                }}>
+                  <div className="flex items-center justify-between">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '1.25rem' }}>{vehIcon}</span>
+                      <span style={{ fontWeight: 800, fontSize: '1rem', color: '#f8fafc' }}>
+                        {vTitle}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button
+                        onClick={() => { setEditingInterest(inter); setShowVehicleModal(true); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}
+                        title="Düzenle"
+                      >
+                        <FiEdit2 size={13} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInterest(inter.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: 4 }}
+                        title="Sil"
+                      >
+                        <FiTrash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <span style={{
+                      background: lStyle.bg, border: `1px solid ${lStyle.border}`,
+                      color: lStyle.text, padding: '2px 8px', borderRadius: 4,
+                      fontSize: '0.72rem', fontWeight: 700
+                    }}>
+                      İlgi: {lStyle.label}
+                    </span>
+                    <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.06)', color: 'var(--text-secondary)', fontSize: '0.72rem' }}>
+                      Alım: {tfText}
+                    </span>
+                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa', fontSize: '0.72rem' }}>
+                      Adet: {inter.estimated_quantity}
+                    </span>
+                    {inter.usage_type && (
+                      <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#34d399', fontSize: '0.72rem' }}>
+                        {inter.usage_type}
+                      </span>
+                    )}
+                  </div>
+
+                  {inter.has_active_campaign && (
+                    <div
+                      onClick={() => navigate('/campaigns')}
+                      style={{
+                        background: 'rgba(239, 68, 68, 0.12)',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        borderRadius: 6,
+                        padding: '6px 10px',
+                        fontSize: '0.75rem',
+                        color: '#f87171',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer'
+                      }}
+                      title="Kampanyaya Git"
+                    >
+                      <span>🔥 <strong>Aktif Kampanya:</strong> {inter.active_campaign_title}</span>
+                      <span style={{ textDecoration: 'underline', fontSize: '0.7rem' }}>İncele →</span>
+                    </div>
+                  )}
+
+                  {inter.matching_stock_count > 0 && (
+                    <div
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.12)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        borderRadius: 6,
+                        padding: '6px 10px',
+                        fontSize: '0.75rem',
+                        color: '#34d399',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <span>📦 <strong>Stokta {inter.matching_stock_count} Araç Mevcut!</strong> (Hemen Teslim)</span>
+                    </div>
+                  )}
+
+                  {inter.customer_note && (
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-muted)',
+                      background: 'rgba(0, 0, 0, 0.2)',
+                      padding: '6px 8px',
+                      borderRadius: 6,
+                      borderLeft: '2px solid #3b82f6'
+                    }}>
+                      {inter.customer_note}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4, paddingTop: 8, borderTop: '1px dashed rgba(255, 255, 255, 0.08)' }}>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => handleCreateActivityFromInterest(inter)}
+                      style={{ flex: 1, padding: '5px 8px', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
+                    >
+                      <FiPhone size={12} /> Aktivite Oluştur
+                    </button>
+                    <button
+                      className="btn btn-sm btn-secondary"
+                      onClick={() => handleCreateProformaFromInterest(inter)}
+                      style={{ flex: 1, padding: '5px 8px', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}
+                    >
+                      <FiFileText size={12} /> Teklif Hazırla
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state" style={{ padding: '2rem' }}>
+            <p>Müşterinin henüz kayıtlı bir araç ihtiyacı veya ilgisi yok. <strong>+ Araç İlgisi Ekle</strong> butonuna tıklayarak ilgilendiği aracı saniyeler içinde kaydedebilirsiniz.</p>
+          </div>
+        )}
       </div>
 
       {/* ── FLEET SECTION ── */}
@@ -1545,6 +1792,24 @@ export default function CustomerDetail() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* ── VEHICLE INTEREST MODAL ── */}
+      {showVehicleModal && (
+        <VehicleInterestModal
+          customerId={parseInt(id)}
+          existingInterest={editingInterest}
+          onClose={() => { setShowVehicleModal(false); setEditingInterest(null); }}
+          onSuccess={() => loadVehicleInterests()}
+        />
+      )}
+
+      {/* ── STOCK MATCH MODAL ── */}
+      {selectedStockMatchId && (
+        <StockMatchModal
+          stockId={selectedStockMatchId}
+          onClose={() => setSelectedStockMatchId(null)}
+        />
       )}
     </div>
   );

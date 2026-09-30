@@ -31,6 +31,10 @@ class CustomerFilterParams:
         potential_level: Optional[str] = Query(None, description="Potansiyel seviyesi"),
         source: Optional[str] = Query(None, description="Kaynak (manual/import/discovery)"),
         assigned_to_id: Optional[int] = Query(None, description="Atanan temsilci ID"),
+        vehicle_group: Optional[str] = Query(None, description="İlgilenilen araç grubu (Daily, Eurocargo, S-Way...)"),
+        model_code: Optional[str] = Query(None, description="İlgilenilen model kodu (35C16, 150E21...)"),
+        interest_level: Optional[str] = Query(None, description="İlgi seviyesi"),
+        purchase_timeframe: Optional[str] = Query(None, description="Satın alma zamanı"),
         sort_by: str = Query("created_at", description="Sıralama alanı"),
         sort_order: str = Query("desc", description="Sıralama yönü (asc/desc)"),
     ):
@@ -41,5 +45,9 @@ class CustomerFilterParams:
         self.potential_level = potential_level
         self.source = source
         self.assigned_to_id = assigned_to_id
+        self.vehicle_group = vehicle_group
+        self.model_code = model_code
+        self.interest_level = interest_level
+        self.purchase_timeframe = purchase_timeframe
         self.sort_by = sort_by
         self.sort_order = sort_order

@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -71,6 +71,10 @@ export default function Sidebar() {
           <NavLink to="/proforma/quick" className={`nav-item ${isActive('/proforma/quick') ? 'active' : ''}`}>
             <span className="nav-icon"><FiFileText size={18} /></span>
             Hızlı Proforma
+          </NavLink>
+          <NavLink to="/vehicles/management" className={`nav-item ${isActive('/vehicles/management') ? 'active' : ''}`}>
+            <span className="nav-icon"><FiTruck size={18} /></span>
+            Araç Yönetimi
           </NavLink>
         </div>
 

@@ -18,6 +18,7 @@ import MapPage from './pages/CRM/Map';
 import ProformaNew from './pages/CRM/ProformaNew';
 import ProformaDetail from './pages/CRM/ProformaDetail';
 import ProformaQuick from './pages/CRM/ProformaQuick';
+import VehicleManagement from './pages/Vehicles/VehicleManagement';
 
 
 
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="customers/:customerId/proforma/new" element={<ProformaNew />} />
             <Route path="proformas/:id" element={<ProformaDetail />} />
             <Route path="proforma/quick" element={<ProformaQuick />} />
+            <Route path="vehicles/management" element={<VehicleManagement />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

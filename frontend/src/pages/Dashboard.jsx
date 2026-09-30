@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dashboardApi, crmApi } from '../api/client';
+import { dashboardApi, crmApi, vehiclesApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
@@ -29,6 +29,11 @@ export default function Dashboard() {
   // Filo Yenileme & Akıllı Takip State'leri
   const [upcomingReminders, setUpcomingReminders] = useState([]);
   const [renewalOpportunities, setRenewalOpportunities] = useState([]);
+
+  // Araç Odaklı Satış Fırsatları & Pipeline State'leri
+  const [opportunities, setOpportunities] = useState(null);
+  const [activeOppTab, setActiveOppTab] = useState('hot_leads'); // 'hot_leads', 'stock_matches', 'follow_up_needed', 'quote_pending', 'campaign_opportunities'
+  const [vehiclePipeline, setVehiclePipeline] = useState(null);
   
   // GPS ve Yakınım State'leri
   const { location, error: gpsError, loading: gpsLoading } = useGeolocation();
@@ -54,6 +59,8 @@ export default function Dashboard() {
       dashboardApi.getTodayCalls().then(r => setTodayCalls(r.data)),
       crmApi.getUpcomingReminders(14).then(r => setUpcomingReminders(r.data || [])),
       crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
+      vehiclesApi.getTodayOpportunities().then(r => setOpportunities(r.data)).catch(() => {}),
+      vehiclesApi.getVehiclePipeline().then(r => setVehiclePipeline(r.data)).catch(() => {}),
     ]).catch((err) => {
       console.error("Dashboard yüklenirken hata:", err);
       setLoadError(true);
@@ -285,8 +292,200 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç Odaklı Satış Zekâsı) ── */}
+      <div className="card glass-card mt-6" style={{ border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}>
+        <div className="card-header" style={{ background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.7))', padding: '1rem 1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>
+              <FiZap style={{ color: '#38bdf8' }} size={20} /> BUGÜNÜN SATIŞ FIRSATLARI
+            </h3>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              Araç ihtiyacı ve satın alma zamanı eşleşen öncelikli aksiyonlar
+            </span>
+          </div>
+        </div>
+
+        {/* Opportunity Category Tabs */}
+        <div style={{ display: 'flex', gap: 8, padding: '0.85rem 1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', overflowX: 'auto' }}>
+          {[
+            { key: 'hot_leads', label: '🔥 Sıcak Müşteriler', count: opportunities?.counts?.hot_leads || 0, color: '#ef4444' },
+            { key: 'stock_matches', label: '📦 Stokla Eşleşenler', count: opportunities?.counts?.stock_matches || 0, color: '#10b981' },
+            { key: 'follow_up_needed', label: '⏰ Takip Gerekenler', count: opportunities?.counts?.follow_up_needed || 0, color: '#f59e0b' },
+            { key: 'quote_pending', label: '📑 Teklif Bekleyenler', count: opportunities?.counts?.quote_pending || 0, color: '#3b82f6' },
+            { key: 'campaign_opportunities', label: '🎁 Kampanya Fırsatları', count: opportunities?.counts?.campaign_opportunities || 0, color: '#8b5cf6' },
+          ].map(tab => {
+            const active = activeOppTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveOppTab(tab.key)}
+                style={{
+                  padding: '7px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 700,
+                  border: active ? `2px solid ${tab.color}` : '1px solid rgba(255, 255, 255, 0.1)',
+                  background: active ? `${tab.color}20` : 'rgba(255, 255, 255, 0.03)',
+                  color: active ? '#f8fafc' : '#94a3b8',
+                  cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+                  transition: 'all 0.15s ease', whiteSpace: 'nowrap'
+                }}
+              >
+                <span>{tab.label}</span>
+                <span style={{
+                  background: active ? tab.color : 'rgba(255,255,255,0.1)',
+                  color: '#fff', padding: '1px 6px', borderRadius: 10, fontSize: '0.7rem'
+                }}>
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Opportunity Items List */}
+        <div style={{ padding: '1.25rem' }}>
+          {opportunities?.[activeOppTab]?.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.85rem' }}>
+              {opportunities[activeOppTab].map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: 'var(--bg-input)', borderRadius: 10, padding: '1rem',
+                    border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex',
+                    flexDirection: 'column', gap: 8, transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <h4
+                        onClick={() => navigate(`/customers/${item.customer_id}`)}
+                        style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', cursor: 'pointer' }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#38bdf8'}
+                        onMouseLeave={e => e.currentTarget.style.color = '#f8fafc'}
+                      >
+                        {item.company_name}
+                      </h4>
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                        {item.city || 'Şehir Yok'} • Tel: {item.phone || '-'}
+                      </span>
+                    </div>
+                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontSize: '0.72rem' }}>
+                      {item.interest_level}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#38bdf8', fontWeight: 600 }}>
+                    <FiTruck size={14} /> {item.vehicle_title}
+                  </div>
+
+                  <div style={{
+                    fontSize: '0.75rem', color: '#cbd5e1', background: 'rgba(0, 0, 0, 0.2)',
+                    padding: '6px 8px', borderRadius: 6, borderLeft: '3px solid #f59e0b'
+                  }}>
+                    {item.reason}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 4 }}>
+                    {item.phone && (
+                      <a
+                        href={`tel:${item.phone}`}
+                        className="btn btn-sm btn-primary"
+                        style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      >
+                        <FiPhone size={11} /> Ara
+                      </a>
+                    )}
+                    {item.phone && (
+                      <a
+                        href={`https://wa.me/90${item.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Sayın Yetkili, IVECO ${item.vehicle_title} aracımızla ilgili görüşmek isteriz.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-success"
+                        style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
+                      >
+                        <FiMessageSquare size={11} /> WhatsApp
+                      </a>
+                    )}
+                    <button
+                      className="btn btn-sm btn-secondary"
+                      onClick={() => navigate(`/customers/${item.customer_id}`)}
+                      style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                    >
+                      Kartı Aç
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8' }}>
+              <FiCheckCircle size={28} style={{ color: '#10b981', marginBottom: 6 }} />
+              <p style={{ margin: 0, fontSize: '0.85rem' }}>Bu kategoride şu anda bekleyen acil fırsat bulunmamaktadır.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── ARAÇ BAZLI SATIŞ PIPELINE (Canlı Talep Dağılımı) ── */}
+      {vehiclePipeline && (
+        <div className="card glass-card mt-6" style={{ border: '1px solid rgba(139, 92, 246, 0.25)' }}>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FiTruck style={{ color: '#c084fc' }} size={18} />
+              <h3 className="card-title" style={{ margin: 0 }}>ARAÇ BAZLI SATIŞ PIPELINE</h3>
+            </div>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              Toplam Aktif Talep: <strong style={{ color: '#f8fafc' }}>{vehiclePipeline.total_demand_count} Müşteri</strong>
+            </span>
+          </div>
+
+          <div style={{ padding: '1.25rem' }}>
+            {/* Group Summary Badges */}
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+              {Object.entries(vehiclePipeline.group_counts || {}).map(([grp, cnt]) => (
+                <div key={grp} style={{
+                  background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10
+                }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc' }}>{grp}</span>
+                  <span style={{ background: '#3b82f6', color: '#fff', padding: '2px 8px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 800 }}>
+                    {cnt} müşteri
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Detailed Model Breakdown Bars */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.85rem' }}>
+              {vehiclePipeline.breakdown?.slice(0, 8).map((b, i) => (
+                <div key={i} style={{
+                  background: 'var(--bg-input)', padding: '0.85rem 1rem', borderRadius: 8,
+                  border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column', gap: 6
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f8fafc' }}>
+                      {b.vehicle_group} {b.model_or_type}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#60a5fa' }}>
+                      {b.customer_count} müşteri ({b.total_vehicle_count} adet)
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${Math.min(100, b.percentage * 2)}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                      borderRadius: 3
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pipeline + Trend Row */}
-      <div className="dashboard-row-2">
+      <div className="dashboard-row-2 mt-6">
         <div className="card glass-card">
           <div className="card-header">
             <h3 className="card-title"><FiTrendingUp style={{ marginRight: 8 }} /> Satış Pipeline</h3>

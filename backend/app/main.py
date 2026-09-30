@@ -22,6 +22,7 @@ async def lifespan(app: FastAPI):
     import app.modules.discovery.models
     import app.modules.campaigns.models
     import app.modules.notifications.models
+    import app.modules.vehicles.models
     create_all_tables()
     _seed_initial_data()
     os.makedirs(settings.FILE_STORAGE_PATH, exist_ok=True)
@@ -62,6 +63,7 @@ from app.modules.campaigns.router import router as campaigns_router
 from app.modules.sales_activity.router import router as sales_router
 from app.modules.dashboard.router import router as dashboard_router
 from app.modules.scanner.router import router as scanner_router
+from app.modules.vehicles.router import router as vehicles_router
 
 app.include_router(auth_router)
 app.include_router(crm_router)
@@ -72,6 +74,7 @@ app.include_router(campaigns_router)
 app.include_router(sales_router)
 app.include_router(dashboard_router)
 app.include_router(scanner_router)
+app.include_router(vehicles_router)
 
 
 
@@ -179,6 +182,10 @@ def _seed_initial_data():
             ]
             db.add_all(templates)
             db.commit()
+
+        # Seed Vehicle Master Data
+        from app.modules.vehicles.service import VehicleService
+        VehicleService(db).seed_master_data()
 
     finally:
         db.close()

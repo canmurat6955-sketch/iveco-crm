@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { salesApi, crmApi } from '../../api/client';
+import { salesApi, crmApi, vehiclesApi } from '../../api/client';
 import useGeolocation from '../../hooks/useGeolocation';
 import { useVisit } from '../../contexts/VisitContext';
-import { FiMapPin, FiCalendar, FiPlus, FiTrash2, FiCheckCircle, FiPlay, FiMap, FiChevronRight, FiList, FiNavigation } from 'react-icons/fi';
+import { FiMapPin, FiCalendar, FiPlus, FiTrash2, FiCheckCircle, FiPlay, FiMap, FiChevronRight, FiList, FiNavigation, FiTruck, FiZap } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function RoutePlanner() {
@@ -21,7 +21,36 @@ export default function RoutePlanner() {
   const [allCustomers, setAllCustomers] = useState([]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [optimizedStops, setOptimizedStops] = useState([]);
-  const [optimizing, setOptimizing] = useState(false);
+  // Araç İlgisine Göre Rota Filtresi State'leri
+  const [vehicleQuery, setVehicleQuery] = useState('');
+  const [filterNotContacted30, setFilterNotContacted30] = useState(false);
+  const [searchingVehicles, setSearchingVehicles] = useState(false);
+
+  const handleFilterByVehicleDemand = async () => {
+    if (!vehicleQuery.trim()) {
+      toast.error('Lütfen bir araç modeli veya arama terimi yazın (Örn: 35C16, Daily, Eurocargo)');
+      return;
+    }
+    setSearchingVehicles(true);
+    try {
+      let queryStr = vehicleQuery.trim();
+      if (filterNotContacted30) {
+        queryStr += ' son 30 gündür görüşmediğimiz müşteriler';
+      }
+      const res = await vehiclesApi.aiSearch(queryStr);
+      const foundIds = (res.data.results || []).map(r => r.id);
+      if (foundIds.length === 0) {
+        toast.error('Kriterlere uyan müşteri bulunamadı');
+      } else {
+        setSelectedCustomerIds(prev => Array.from(new Set([...prev, ...foundIds])));
+        toast.success(`${foundIds.length} müşteri bulundu ve rotaya eklendi! 🎉`);
+      }
+    } catch {
+      toast.error('Araç ilgisine göre müşteri aranırken hata oluştu');
+    } finally {
+      setSearchingVehicles(false);
+    }
+  };
 
   // Güzergah Boyunca Arama State'leri
   const [startCity, setStartCity] = useState('Samsun');
@@ -294,8 +323,48 @@ export default function RoutePlanner() {
               />
             </div>
 
+            {/* Araç Odaklı Saha Satışı Filtresi */}
+            <div style={{
+              background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)',
+              borderRadius: 8, padding: '10px 12px', marginBottom: 4
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <FiZap color="#38bdf8" size={14} />
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#38bdf8' }}>
+                  Araç İlgisine Göre Müşteri Bul & Rotaya Ekle
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Örn: 35C16, Daily, 16m3, Eurocargo 150..."
+                  value={vehicleQuery}
+                  onChange={(e) => setVehicleQuery(e.target.value)}
+                  style={{ flex: 1, minWidth: 200, fontSize: '0.8rem', padding: '6px 10px' }}
+                />
+                <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.74rem', color: '#cbd5e1', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={filterNotContacted30}
+                    onChange={(e) => setFilterNotContacted30(e.target.checked)}
+                  />
+                  Son 30 gündür görüşülmemiş
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={handleFilterByVehicleDemand}
+                  disabled={searchingVehicles}
+                  style={{ padding: '6px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  {searchingVehicles ? 'Aranıyor...' : 'Müşterileri Ekle'}
+                </button>
+              </div>
+            </div>
+
             <div className="form-group">
-              <label className="form-label">Duraklar Seçin (CRM Müşterileri)</label>
+              <label className="form-label">Duraklar Seçin ({selectedCustomerIds.length} Müşteri Seçili)</label>
               <div className="customer-selection-list" style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 8, padding: 8 }}>
                 {allCustomers.map(c => (
                   <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
