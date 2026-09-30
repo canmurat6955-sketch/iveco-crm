@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, FiUsers } from 'react-icons/fi';
+import { FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, FiUsers, FiZap, FiTruck } from 'react-icons/fi';
+import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
 
 const SEGMENTS = { A: 'badge-green', B: 'badge-blue', C: 'badge-amber', D: 'badge-red' };
 const POTENTIALS = { very_high: 'Çok Yüksek', high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
@@ -12,6 +13,10 @@ export default function CustomerList() {
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
   const [sector, setSector] = useState('');
+  const [vehicleGroup, setVehicleGroup] = useState('');
+  const [interestLevel, setInterestLevel] = useState('');
+  const [purchaseTimeframe, setPurchaseTimeframe] = useState('');
+  const [showAiModal, setShowAiModal] = useState(false);
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
   const [selected, setSelected] = useState(new Set());
@@ -26,15 +31,23 @@ export default function CustomerList() {
   const navigate = useNavigate();
 
   const load = () => {
-    crmApi.getCustomers({ page, page_size: 15, search: search || undefined, city: city || undefined, sector: sector || undefined })
+    crmApi.getCustomers({
+      page, page_size: 15,
+      search: search || undefined,
+      city: city || undefined,
+      sector: sector || undefined,
+      vehicle_group: vehicleGroup || undefined,
+      interest_level: interestLevel || undefined,
+      purchase_timeframe: purchaseTimeframe || undefined
+    })
       .then(r => setCustomers(r.data))
       .catch(() => toast.error('Müşteriler yüklenemedi'));
   };
 
-  useEffect(() => { load(); }, [page, search, city, sector]);
+  useEffect(() => { load(); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe]);
 
   // Seçim değişince sayfayı temizle
-  useEffect(() => { setSelected(new Set()); }, [page, search, city, sector]);
+  useEffect(() => { setSelected(new Set()); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe]);
 
   const toggleSelect = (id, e) => {
     e.stopPropagation();
@@ -207,6 +220,33 @@ export default function CustomerList() {
             <option value="Turizm">Turizm / Konaklama</option>
             <option value="Diğer">Diğer</option>
           </select>
+          <select className="form-select" style={{ width: 140 }} value={vehicleGroup} onChange={e => { setVehicleGroup(e.target.value); setPage(1); }}>
+            <option value="">Tüm Araçlar</option>
+            <option value="Daily">Daily</option>
+            <option value="Eurocargo">Eurocargo</option>
+            <option value="S-Way">S-Way</option>
+            <option value="X-Way">X-Way</option>
+            <option value="T-Way">T-Way</option>
+          </select>
+          <select className="form-select" style={{ width: 150 }} value={interestLevel} onChange={e => { setInterestLevel(e.target.value); setPage(1); }}>
+            <option value="">Tüm İlgiler</option>
+            <option value="purchase_ready">🔥 Satın Almada</option>
+            <option value="high">Yüksek İlgi</option>
+            <option value="medium">Orta İlgi</option>
+            <option value="low">Düşük İlgi</option>
+          </select>
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={() => setShowAiModal(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'rgba(56, 189, 248, 0.15)', border: '1px solid #38bdf8',
+              color: '#38bdf8', fontWeight: 600, padding: '0 12px', whiteSpace: 'nowrap'
+            }}
+          >
+            <FiZap size={14} /> AI Araç Araması
+          </button>
         </div>
         <div className="flex gap-3">
           {selected.size > 0 && (
@@ -453,6 +493,8 @@ export default function CustomerList() {
           </div>
         </div>
       )}
+
+      <VehicleAISearchModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
     </div>
   );
 }

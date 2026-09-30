@@ -57,6 +57,7 @@ class Customer(Base):
     proformas = relationship("ProformaInvoice", back_populates="customer", cascade="all, delete-orphan")
     fleet_vehicles = relationship("CustomerFleetVehicle", back_populates="customer", cascade="all, delete-orphan")
     reminders = relationship("CustomerReminder", back_populates="customer", cascade="all, delete-orphan")
+    vehicle_interests = relationship("CustomerVehicleInterest", back_populates="customer", cascade="all, delete-orphan")
 
     # Composite indexes for duplicate detection
     __table_args__ = (

@@ -20,3 +20,5 @@ backend/uploads/
 .vscode/
 .idea/
 *.log
+*.db
+scratch/

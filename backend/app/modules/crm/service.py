@@ -47,6 +47,22 @@ class CRMService:
         if filters.assigned_to_id:
             query = query.filter(Customer.assigned_to_id == filters.assigned_to_id)
 
+        # Araç Odaklı Satış Zekâsı Filtreleri
+        if filters.vehicle_group or filters.model_code or filters.interest_level or filters.purchase_timeframe:
+            from app.modules.vehicles.models import CustomerVehicleInterest, VehicleMaster
+            query = query.join(CustomerVehicleInterest, Customer.id == CustomerVehicleInterest.customer_id)
+            if filters.vehicle_group or filters.model_code:
+                query = query.join(VehicleMaster, CustomerVehicleInterest.vehicle_id == VehicleMaster.id)
+                if filters.vehicle_group:
+                    query = query.filter(VehicleMaster.vehicle_group == filters.vehicle_group)
+                if filters.model_code:
+                    query = query.filter(VehicleMaster.model_code.ilike(f"%{filters.model_code}%"))
+            if filters.interest_level:
+                query = query.filter(CustomerVehicleInterest.interest_level == filters.interest_level)
+            if filters.purchase_timeframe:
+                query = query.filter(CustomerVehicleInterest.purchase_timeframe == filters.purchase_timeframe)
+            query = query.distinct()
+
         total = query.count()
         sort_col = getattr(Customer, filters.sort_by, Customer.created_at)
         query = query.order_by(asc(sort_col) if filters.sort_order == "asc" else desc(sort_col))

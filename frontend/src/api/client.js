@@ -292,4 +292,36 @@ export const scannerApi = {
   }
 };
 
+// ── Vehicles Module API (Araç Odaklı Satış Zekâsı) ───────────────
+export const vehiclesApi = {
+  // Master Catalog & Cascade
+  getMasterVehicles: (params) => api.get('/vehicles/master', { params }),
+  createMasterVehicle: (data) => api.post('/vehicles/master', data),
+  updateMasterVehicle: (id, data) => api.put(`/vehicles/master/${id}`, data),
+  deleteMasterVehicle: (id) => api.delete(`/vehicles/master/${id}`),
+  getCascadeData: () => api.get('/vehicles/cascade-data'),
+  parseVehicleCode: (code) => api.get('/vehicles/parse-code', { params: { code } }),
+
+  // Customer Vehicle Interests
+  getCustomerInterests: (customerId) => api.get(`/vehicles/customers/${customerId}/interests`),
+  createCustomerInterest: (customerId, data) => api.post(`/vehicles/customers/${customerId}/interests`, data),
+  updateCustomerInterest: (interestId, data) => api.put(`/vehicles/interests/${interestId}`, data),
+  deleteCustomerInterest: (interestId) => api.delete(`/vehicles/interests/${interestId}`),
+
+  // Physical Stock Inventory & Matchmaking
+  getStockList: (params) => api.get('/vehicles/stock', { params }),
+  createStock: (data) => api.post('/vehicles/stock', data),
+  updateStock: (id, data) => api.put(`/vehicles/stock/${id}`, data),
+  deleteStock: (id) => api.delete(`/vehicles/stock/${id}`),
+  getStockMatchingCustomers: (stockId) => api.get(`/vehicles/stock/${stockId}/matching-customers`),
+
+  // AI Natural Language Search
+  aiSearch: (query) => api.post('/vehicles/ai-search', { query }),
+
+  // Opportunities & Demand Pipeline
+  getTodayOpportunities: () => api.get('/vehicles/opportunities/today'),
+  getVehiclePipeline: () => api.get('/vehicles/pipeline'),
+  getDemandReports: (params) => api.get('/vehicles/reports/demand', { params }),
+};
+
 
