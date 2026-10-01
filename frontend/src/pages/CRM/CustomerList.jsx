@@ -28,9 +28,13 @@ export default function CustomerList() {
     sector: '', segment: 'C', potential_level: 'medium',
     latitude: '', longitude: '' 
   });
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
 
   const load = () => {
+    setLoading(true);
+    setLoadError(false);
     crmApi.getCustomers({
       page, page_size: 15,
       search: search || undefined,
@@ -41,7 +45,11 @@ export default function CustomerList() {
       purchase_timeframe: purchaseTimeframe || undefined
     })
       .then(r => setCustomers(r.data))
-      .catch(() => toast.error('Müşteriler yüklenemedi'));
+      .catch(() => {
+        setLoadError(true);
+        toast.error('Müşteriler yüklenemedi - sunucu bağlantısını kontrol edin');
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe]);
@@ -289,7 +297,18 @@ export default function CustomerList() {
             </tr>
           </thead>
           <tbody>
-            {customers.items.length > 0 ? customers.items.map(c => (
+            {loading ? (
+              <tr><td colSpan={10} className="empty-state py-8">Müşteriler yükleniyor...</td></tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={10} className="empty-state py-8" style={{ color: '#f87171' }}>
+                  ⚠️ Sunucuya bağlanılamadı. Lütfen CRM backend servisinin (port 8000) açık olduğunu kontrol edin.
+                  <div style={{ marginTop: '0.6rem' }}>
+                    <button className="btn btn-sm btn-primary" onClick={load}>Tekrar Dene</button>
+                  </div>
+                </td>
+              </tr>
+            ) : customers.items.length > 0 ? customers.items.map(c => (
               <tr key={c.id} className="clickable-row" onClick={() => navigate(`/customers/${c.id}`)}
                 style={selected.has(c.id) ? { background: 'rgba(59,130,246,0.08)' } : undefined}>
                 <td style={{ textAlign: 'center' }} onClick={e => toggleSelect(c.id, e)}>
@@ -331,7 +350,7 @@ export default function CustomerList() {
                 </td>
               </tr>
             )) : (
-              <tr><td colSpan={10} className="empty-state">Müşteri bulunamadı</td></tr>
+              <tr><td colSpan={10} className="empty-state">Kriterlere uygun müşteri bulunamadı</td></tr>
             )}
           </tbody>
         </table>
