@@ -4,7 +4,7 @@ import { dashboardApi, crmApi, vehiclesApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
-import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight } from 'react-icons/fi';
+import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
 

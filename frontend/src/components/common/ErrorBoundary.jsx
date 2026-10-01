@@ -53,6 +53,14 @@ export default class ErrorBoundary extends React.Component {
             <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1.5rem', lineHeight: 1.5 }}>
               Uygulama çalışırken beklenmeyen bir aksaklık meydana geldi. Sayfayı yenileyebilir veya ana sayfaya dönebilirsiniz.
             </p>
+            {this.state.error && (
+              <details style={{ textAlign: 'left', marginBottom: '1.5rem', background: 'rgba(0, 0, 0, 0.3)', padding: '0.75rem', borderRadius: 8, fontSize: '0.75rem', color: '#fca5a5' }}>
+                <summary style={{ cursor: 'pointer', color: '#94a3b8', marginBottom: 4 }}>Teknik Hata Detayı</summary>
+                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0, fontFamily: 'monospace' }}>
+                  {this.state.error?.toString()}
+                </pre>
+              </details>
+            )}
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
               <button
                 onClick={this.handleReload}
