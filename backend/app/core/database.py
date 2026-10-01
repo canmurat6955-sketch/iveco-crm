@@ -7,7 +7,18 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
+from pathlib import Path
+
+BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+SQLITE_DB_PATH = BACKEND_DIR / "iveco_crm.db"
+DEFAULT_SQLITE_URL = f"sqlite:///{SQLITE_DB_PATH.as_posix()}"
+
 db_url = settings.DATABASE_URL
+if db_url.startswith("sqlite:///."):
+    # Always resolve relative sqlite paths to BACKEND_DIR
+    rel = db_url.replace("sqlite:///.", "").lstrip("/\\")
+    db_url = f"sqlite:///{(BACKEND_DIR / rel).resolve().as_posix()}"
+
 is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
@@ -24,8 +35,8 @@ try:
         pass
 except Exception as e:
     # Uzak veritabanı kapalıysa veya ulaşılamıyorsa yerel SQLite'a güvenle geç
-    print(f"[!] Veritabanı bağlantı hatası ({db_url}): {e}. Yerel SQLite veritabanına (iveco_crm.db) geçiliyor.")
-    db_url = "sqlite:///./iveco_crm.db"
+    print(f"[!] Veritabanı bağlantı hatası ({db_url}): {e}. Yerel SQLite veritabanına ({SQLITE_DB_PATH}) geçiliyor.")
+    db_url = DEFAULT_SQLITE_URL
     is_sqlite = True
     connect_args = {"check_same_thread": False}
     engine = create_engine(
