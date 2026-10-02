@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { crmApi } from '../../api/client';
+import { crmApi, vehiclesApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, FiUsers, FiZap, FiTruck } from 'react-icons/fi';
 import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
@@ -23,14 +23,22 @@ export default function CustomerList() {
   const [deleting, setDeleting] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
   const [merging, setMerging] = useState(false);
+  const [masterVehicles, setMasterVehicles] = useState([]);
   const [form, setForm] = useState({ 
     company_name: '', tax_number: '', vergi_dairesi: '', city: '', district: '', phone: '', email: '', 
-    sector: '', segment: 'C', potential_level: 'medium',
-    latitude: '', longitude: '' 
+    sector: '', segment: 'C', potential_level: 'medium', sales_notes: '',
+    latitude: '', longitude: '',
+    vehicle_group: '', vehicle_id: '', interest_level: 'high', purchase_timeframe: '0_30_days', estimated_quantity: 1
   });
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    vehiclesApi.getMasterVehicles({ limit: 200 })
+      .then(r => setMasterVehicles(r.data || []))
+      .catch(() => {});
+  }, []);
 
   const load = () => {
     setLoading(true);
@@ -110,13 +118,38 @@ export default function CustomerList() {
         latitude: form.latitude ? parseFloat(form.latitude) : null,
         longitude: form.longitude ? parseFloat(form.longitude) : null
       };
-      await crmApi.createCustomer(submitData);
-      toast.success('Müşteri eklendi');
+      const vehicleId = submitData.vehicle_id ? parseInt(submitData.vehicle_id) : null;
+      const interestLevel = submitData.interest_level || 'high';
+      const purchaseTimeframe = submitData.purchase_timeframe || '0_30_days';
+      const estQty = parseInt(submitData.estimated_quantity) || 1;
+
+      delete submitData.vehicle_group;
+      delete submitData.vehicle_id;
+      delete submitData.interest_level;
+      delete submitData.purchase_timeframe;
+      delete submitData.estimated_quantity;
+
+      const res = await crmApi.createCustomer(submitData);
+      const newCustomerId = res.data?.id;
+
+      if (newCustomerId && vehicleId) {
+        await vehiclesApi.createCustomerInterest(newCustomerId, {
+          vehicle_id: vehicleId,
+          interest_level: interestLevel,
+          purchase_timeframe: purchaseTimeframe,
+          estimated_quantity: estQty
+        });
+        toast.success('Müşteri ve araç ilgisi başarıyla eklendi 🎉');
+      } else {
+        toast.success('Müşteri eklendi');
+      }
+
       setShowAdd(false);
       setForm({ 
-        company_name: '', city: '', district: '', phone: '', email: '', 
-        sector: '', segment: 'C', potential_level: 'medium',
-        latitude: '', longitude: '' 
+        company_name: '', tax_number: '', vergi_dairesi: '', city: '', district: '', phone: '', email: '', 
+        sector: '', segment: 'C', potential_level: 'medium', sales_notes: '',
+        latitude: '', longitude: '',
+        vehicle_group: '', vehicle_id: '', interest_level: 'high', purchase_timeframe: '0_30_days', estimated_quantity: 1
       });
       load();
     } catch (err) {
@@ -460,6 +493,107 @@ export default function CustomerList() {
                   </select>
                 </div>
               </div>
+
+              {/* 🚚 İlgilenebileceği / Aradığı Araç */}
+              <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: 8, padding: '0.85rem 1rem', marginBottom: 15 }}>
+                <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, color: '#60a5fa', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <FiTruck size={15} /> İlgilenebileceği / Aradığı Araç (Opsiyonel)
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Araç Grubu</label>
+                    <select
+                      className="form-select"
+                      value={form.vehicle_group || ''}
+                      onChange={e => {
+                        const grp = e.target.value;
+                        const firstInGroup = masterVehicles.find(v => v.vehicle_group === grp);
+                        setForm(prev => ({
+                          ...prev,
+                          vehicle_group: grp,
+                          vehicle_id: firstInGroup ? String(firstInGroup.id) : ''
+                        }));
+                      }}
+                    >
+                      <option value="">-- Araç Grubu Seçin (Opsiyonel) --</option>
+                      <option value="Daily">Daily (Hafif Ticari / Panelvan / Şasi)</option>
+                      <option value="Eurocargo">Eurocargo (Orta Segment Kamyon)</option>
+                      <option value="S-Way">S-Way (Ağır Vasıta / TIR Çekici)</option>
+                      <option value="T-Way">T-Way (İnşaat / Hafriyat / Mikser)</option>
+                      <option value="X-Way">X-Way (Şantiye / Karma Taşımacılık)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Model / Kasa</label>
+                    <select
+                      className="form-select"
+                      value={form.vehicle_id || ''}
+                      onChange={e => {
+                        const vid = e.target.value;
+                        const matched = masterVehicles.find(v => String(v.id) === String(vid));
+                        setForm(prev => ({
+                          ...prev,
+                          vehicle_id: vid,
+                          vehicle_group: matched ? matched.vehicle_group : prev.vehicle_group
+                        }));
+                      }}
+                      disabled={!form.vehicle_group && masterVehicles.length === 0}
+                    >
+                      <option value="">-- Model Seçin --</option>
+                      {masterVehicles
+                        .filter(v => !form.vehicle_group || v.vehicle_group === form.vehicle_group)
+                        .map(v => (
+                          <option key={v.id} value={v.id}>
+                            {v.display_title || `${v.vehicle_group} ${v.model_code} (${v.vehicle_sub_group || ''})`}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+                {form.vehicle_id && (
+                  <div className="form-row" style={{ marginTop: 8 }}>
+                    <div className="form-group">
+                      <label className="form-label">İlgi Seviyesi</label>
+                      <select
+                        className="form-select"
+                        value={form.interest_level || 'high'}
+                        onChange={e => setForm(prev => ({ ...prev, interest_level: e.target.value }))}
+                      >
+                        <option value="purchase_ready">Satın Alma Aşamasında 🔥</option>
+                        <option value="high">Yüksek İlgi</option>
+                        <option value="medium">Orta İlgi</option>
+                        <option value="low">Düşük İlgi</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Alım Zamanı</label>
+                      <select
+                        className="form-select"
+                        value={form.purchase_timeframe || '0_30_days'}
+                        onChange={e => setForm(prev => ({ ...prev, purchase_timeframe: e.target.value }))}
+                      >
+                        <option value="immediate">Hemen (Hazır)</option>
+                        <option value="0_30_days">0 - 30 Gün İçi</option>
+                        <option value="1_3_months">1 - 3 Ay İçi</option>
+                        <option value="3_6_months">3 - 6 Ay İçi</option>
+                        <option value="6_12_months">6 - 12 Ay İçi</option>
+                        <option value="unknown">Belirsiz</option>
+                      </select>
+                    </div>
+                    <div className="form-group" style={{ maxWidth: 100 }}>
+                      <label className="form-label">Adet</label>
+                      <input
+                        className="form-input"
+                        type="number"
+                        min="1"
+                        value={form.estimated_quantity || 1}
+                        onChange={e => setForm(prev => ({ ...prev, estimated_quantity: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="form-group">
                 <label className="form-label">Notlar</label>
                 <textarea className="form-textarea" value={form.sales_notes || ''} onChange={e => setForm({ ...form, sales_notes: e.target.value })} />

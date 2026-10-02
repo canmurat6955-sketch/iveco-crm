@@ -85,6 +85,7 @@ export default function CustomerDetail() {
   const [showVehicleModal, setShowVehicleModal] = useState(false);
   const [editingInterest, setEditingInterest] = useState(null);
   const [selectedStockMatchId, setSelectedStockMatchId] = useState(null);
+  const [allMasterVehicles, setAllMasterVehicles] = useState([]);
 
   const loadVehicleInterests = () => {
     vehiclesApi.getCustomerInterests(id)
@@ -110,6 +111,9 @@ export default function CustomerDetail() {
     crmApi.getReminders(id).then(r => setReminders(r.data)).catch(() => {});
     loadVehicleInterests();
     loadCommunications();
+    vehiclesApi.getMasterVehicles({ limit: 200 })
+      .then(r => setAllMasterVehicles(r.data || []))
+      .catch(() => {});
   }, [id]);
 
   const handleSaveCall = async (e) => {
@@ -352,6 +356,7 @@ export default function CustomerDetail() {
   };
 
   const openEditModal = () => {
+    const primaryInterest = vehicleInterests.length > 0 ? vehicleInterests[0] : null;
     setEditForm({
       company_name: customer.company_name || '',
       phone: customer.phone || '',
@@ -370,6 +375,13 @@ export default function CustomerDetail() {
       potential_level: customer.potential_level || 'medium',
       potential_score: customer.potential_score || 0,
       sales_notes: customer.sales_notes || '',
+      // Vehicle interest fields
+      interest_id: primaryInterest ? primaryInterest.id : null,
+      vehicle_group: primaryInterest?.vehicle?.vehicle_group || '',
+      vehicle_id: primaryInterest ? String(primaryInterest.vehicle_id) : '',
+      interest_level: primaryInterest?.interest_level || 'high',
+      purchase_timeframe: primaryInterest?.purchase_timeframe || '0_30_days',
+      estimated_quantity: primaryInterest?.estimated_quantity || 1,
     });
     setShowEdit(true);
   };
@@ -379,13 +391,44 @@ export default function CustomerDetail() {
     setSaving(true);
     try {
       const data = { ...editForm };
+      const vehicleId = data.vehicle_id ? parseInt(data.vehicle_id) : null;
+      const interestLevel = data.interest_level || 'high';
+      const purchaseTimeframe = data.purchase_timeframe || '0_30_days';
+      const estQty = parseInt(data.estimated_quantity) || 1;
+      const existingInterestId = data.interest_id;
+
+      // Clean vehicle interest fields from customer update data
+      delete data.vehicle_group;
+      delete data.vehicle_id;
+      delete data.interest_level;
+      delete data.purchase_timeframe;
+      delete data.estimated_quantity;
+      delete data.interest_id;
+
       // Convert empty strings to null for optional fields
       Object.keys(data).forEach(k => { if (data[k] === '') data[k] = null; });
       // estimated_fleet_size should be int or null
       if (data.estimated_fleet_size) data.estimated_fleet_size = parseInt(data.estimated_fleet_size) || null;
       if (data.potential_score) data.potential_score = parseInt(data.potential_score) || 0;
       await crmApi.updateCustomer(id, data);
-      toast.success('Müşteri bilgileri güncellendi');
+
+      // Save or update vehicle interest if a vehicle was selected
+      if (vehicleId) {
+        const payload = {
+          vehicle_id: vehicleId,
+          interest_level: interestLevel,
+          purchase_timeframe: purchaseTimeframe,
+          estimated_quantity: estQty,
+        };
+        if (existingInterestId) {
+          await vehiclesApi.updateCustomerInterest(existingInterestId, payload);
+        } else {
+          await vehiclesApi.createCustomerInterest(id, payload);
+        }
+        loadVehicleInterests();
+      }
+
+      toast.success('Müşteri ve araç bilgileri güncellendi');
       setShowEdit(false);
       crmApi.getCustomer(id).then(r => setCustomer(r.data));
     } catch (err) {
@@ -528,6 +571,147 @@ export default function CustomerDetail() {
             </div>
           </div>
 
+          {/* ── İLGİLENDİĞİ ARAÇLAR & TALEP BİLGİSİ (HIZLI ERİŞİM) ── */}
+          <div style={{
+            marginTop: '1.25rem',
+            padding: '1rem 1.15rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.18), rgba(15, 23, 42, 0.4))',
+            border: '1px solid rgba(59, 130, 246, 0.35)',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, color: '#60a5fa' }}>
+                <FiTruck size={17} /> İlgilenebileceği / Talep Ettiği Araç(lar)
+              </div>
+              <button
+                type="button"
+                className="btn btn-xs btn-primary"
+                onClick={() => { setEditingInterest(null); setShowVehicleModal(true); }}
+                style={{ fontSize: '0.75rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+              >
+                <FiPlus size={13} /> {vehicleInterests.length > 0 ? '+ Farklı Araç Ekle' : '🎯 İlgilendiği Aracı Seç'}
+              </button>
+            </div>
+
+            {vehicleInterests.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {vehicleInterests.map(inter => {
+                  const v = inter.vehicle;
+                  const vTitle = v?.display_title || `${v?.vehicle_group || 'IVECO'} ${v?.model_code || ''}`;
+                  const isHeavy = v?.vehicle_group === 'S-Way' || v?.vehicle_group === 'T-Way' || v?.vehicle_group === 'X-Way';
+                  const isMed = v?.vehicle_group === 'Eurocargo';
+                  const icon = isHeavy ? '🚜' : isMed ? '🚛' : '🚚';
+                  
+                  const levelConfig = {
+                    purchase_ready: { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444', text: '#f87171', label: '🔥 Satın Alma' },
+                    high: { bg: 'rgba(249, 115, 22, 0.2)', border: '#f97316', text: '#fb923c', label: 'Yüksek İlgi' },
+                    medium: { bg: 'rgba(245, 158, 11, 0.2)', border: '#f59e0b', text: '#fbbf24', label: 'Orta İlgi' },
+                    low: { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', text: '#60a5fa', label: 'Düşük İlgi' },
+                    very_low: { bg: 'rgba(100, 116, 139, 0.2)', border: '#64748b', text: '#94a3b8', label: 'Çok Düşük' }
+                  }[inter.interest_level] || { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', text: '#60a5fa', label: inter.interest_level };
+
+                  const tfLabels = {
+                    immediate: 'Hemen (Hazır)',
+                    '0_30_days': '0–30 Gün',
+                    '1_3_months': '1–3 Ay',
+                    '3_6_months': '3–6 Ay',
+                    '6_12_months': '6–12 Ay',
+                    unknown: 'Belirsiz'
+                  };
+                  const tfText = tfLabels[inter.purchase_timeframe] || inter.purchase_timeframe;
+
+                  return (
+                    <div
+                      key={inter.id}
+                      onClick={() => { setEditingInterest(inter); setShowVehicleModal(true); }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        background: 'var(--bg-input)',
+                        border: '1px solid rgba(59, 130, 246, 0.35)',
+                        borderRadius: 10,
+                        padding: '8px 14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                      }}
+                      title="Değiştirmek veya detayları düzenlemek için tıklayın"
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.35)'; e.currentTarget.style.transform = 'none'; }}
+                    >
+                      <span style={{ fontSize: '1.4rem' }}>{icon}</span>
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>{vTitle}</span>
+                          {inter.estimated_quantity > 1 && (
+                            <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '1px 6px', borderRadius: 4, fontSize: '0.72rem', fontWeight: 700 }}>
+                              {inter.estimated_quantity} Adet
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                          <span style={{
+                            fontSize: '0.7rem',
+                            padding: '1px 7px',
+                            borderRadius: 4,
+                            fontWeight: 700,
+                            background: levelConfig.bg,
+                            color: levelConfig.text,
+                            border: `1px solid ${levelConfig.border}`
+                          }}>
+                            {levelConfig.label}
+                          </span>
+                          {tfText && tfText !== 'Belirsiz' && (
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              ⏱️ {tfText}
+                            </span>
+                          )}
+                          {inter.has_active_campaign && (
+                            <span style={{ fontSize: '0.7rem', color: '#f87171', fontWeight: 700 }}>
+                              🔥 Kampanyalı
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ marginLeft: 6, color: '#3b82f6', display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.75rem', fontWeight: 600 }}>
+                        <FiEdit2 size={13} /> Düzenle
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(255, 255, 255, 0.02)',
+                padding: '10px 14px',
+                borderRadius: 8,
+                border: '1px dashed rgba(59, 130, 246, 0.4)',
+                fontSize: '0.85rem',
+                color: 'var(--text-muted)',
+                flexWrap: 'wrap',
+                gap: 10
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>⚠️</span>
+                  <span>Bu müşterinin ilgilendiği araç henüz seçilmemiş. Hemen bir araç seçerek satış fırsatını başlatabilirsiniz.</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={() => { setEditingInterest(null); setShowVehicleModal(true); }}
+                  style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+                >
+                  <FiPlus size={14} /> 🎯 İlgilenebileceği Aracı Seç
+                </button>
+              </div>
+            )}
+          </div>
+
           {customer.sales_notes && (
             <div className="mt-6" style={{ background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: '1rem', borderLeft: `3px solid ${scoreColor}` }}>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>Satış Notları</div>
@@ -594,6 +778,22 @@ export default function CustomerDetail() {
           <div className="card">
             <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>Hızlı İşlemler</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button
+                className="btn btn-primary btn-sm w-full"
+                onClick={() => { setEditingInterest(null); setShowVehicleModal(true); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+                  borderColor: '#3b82f6',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 6px rgba(59, 130, 246, 0.3)'
+                }}
+              >
+                <FiTruck size={15} /> 🚚 İlgilendiği Aracı Seç / Yönet
+              </button>
               <button className="btn btn-primary btn-sm w-full" onClick={() => setShowCallModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiPhone size={14} /> 📞 Arama Kaydı Ekle
               </button>
@@ -1433,6 +1633,122 @@ export default function CustomerDetail() {
                     <input className="form-input" type="number" min="0" max="100" value={editForm.potential_score} onChange={e => handleEditChange('potential_score', e.target.value)} />
                   </div>
                 </div>
+              </div>
+
+              {/* İlgilenebileceği / Talep Ettiği Araç */}
+              <div style={{ background: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div className="text-xs" style={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, color: '#60a5fa', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <FiTruck size={15} /> İlgilenebileceği / Talep Ettiği Araç (Satış İhtiyacı)
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-xs btn-secondary"
+                    onClick={() => { setShowEdit(false); setEditingInterest(null); setShowVehicleModal(true); }}
+                    style={{ fontSize: '0.72rem', padding: '3px 8px', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)' }}
+                  >
+                    🔍 Detaylı Sihirbaz
+                  </button>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Araç Grubu / Serisi</label>
+                    <select
+                      className="form-select"
+                      value={editForm.vehicle_group || ''}
+                      onChange={e => {
+                        const grp = e.target.value;
+                        const firstInGroup = allMasterVehicles.find(v => v.vehicle_group === grp);
+                        setEditForm(prev => ({
+                          ...prev,
+                          vehicle_group: grp,
+                          vehicle_id: firstInGroup ? String(firstInGroup.id) : ''
+                        }));
+                      }}
+                    >
+                      <option value="">-- Araç Grubu Seçin (Opsiyonel) --</option>
+                      <option value="Daily">Daily (Hafif Ticari / Panelvan / Şasi)</option>
+                      <option value="Eurocargo">Eurocargo (Orta Segment Kamyon)</option>
+                      <option value="S-Way">S-Way (Ağır Vasıta / TIR Çekici)</option>
+                      <option value="T-Way">T-Way (İnşaat / Hafriyat / Mikser)</option>
+                      <option value="X-Way">X-Way (Şantiye / Karma Taşımacılık)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Model / Kasa / Güç</label>
+                    <select
+                      className="form-select"
+                      value={editForm.vehicle_id || ''}
+                      onChange={e => {
+                        const vid = e.target.value;
+                        const matched = allMasterVehicles.find(v => String(v.id) === String(vid));
+                        setEditForm(prev => ({
+                          ...prev,
+                          vehicle_id: vid,
+                          vehicle_group: matched ? matched.vehicle_group : prev.vehicle_group
+                        }));
+                      }}
+                      disabled={!editForm.vehicle_group && allMasterVehicles.length === 0}
+                    >
+                      <option value="">-- Model Seçin --</option>
+                      {allMasterVehicles
+                        .filter(v => !editForm.vehicle_group || v.vehicle_group === editForm.vehicle_group)
+                        .map(v => (
+                          <option key={v.id} value={v.id}>
+                            {v.display_title || `${v.vehicle_group} ${v.model_code} (${v.vehicle_sub_group || ''})`}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+
+                {editForm.vehicle_id && (
+                  <div className="form-row" style={{ marginTop: 8 }}>
+                    <div className="form-group">
+                      <label className="form-label">İlgi Seviyesi</label>
+                      <select
+                        className="form-select"
+                        value={editForm.interest_level || 'high'}
+                        onChange={e => handleEditChange('interest_level', e.target.value)}
+                      >
+                        <option value="purchase_ready">Satın Alma Aşamasında 🔥</option>
+                        <option value="high">Yüksek İlgi</option>
+                        <option value="medium">Orta İlgi</option>
+                        <option value="low">Düşük İlgi</option>
+                        <option value="very_low">Çok Düşük</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Tahmini Alım Zamanı</label>
+                      <select
+                        className="form-select"
+                        value={editForm.purchase_timeframe || '0_30_days'}
+                        onChange={e => handleEditChange('purchase_timeframe', e.target.value)}
+                      >
+                        <option value="immediate">Hemen (Hazır)</option>
+                        <option value="0_30_days">0 - 30 Gün İçi</option>
+                        <option value="1_3_months">1 - 3 Ay İçi</option>
+                        <option value="3_6_months">3 - 6 Ay İçi</option>
+                        <option value="6_12_months">6 - 12 Ay İçi</option>
+                        <option value="unknown">Belirsiz</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group" style={{ maxWidth: 120 }}>
+                      <label className="form-label">Adet</label>
+                      <input
+                        className="form-input"
+                        type="number"
+                        min="1"
+                        value={editForm.estimated_quantity || 1}
+                        onChange={e => handleEditChange('estimated_quantity', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Notlar */}
