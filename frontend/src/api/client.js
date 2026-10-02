@@ -61,6 +61,17 @@ api.interceptors.response.use(
       });
     }
     
+    // 401 Unauthorized handling: session expired or invalid token
+    if (error.response?.status === 401) {
+      const isAuthUrl = config?.url && (config.url.includes('/auth/login') || config.url.includes('/auth/passcode'));
+      if (!isAuthUrl) {
+        localStorage.removeItem('token');
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
+      }
+    }
+    
     return Promise.reject(error);
   }
 );
