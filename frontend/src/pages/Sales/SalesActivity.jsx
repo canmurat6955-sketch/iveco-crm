@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { salesApi, crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
+import { openWhatsApp } from '../../utils/whatsapp';
 import {
   FiPhone, FiPhoneCall, FiPhoneIncoming, FiPhoneOutgoing, FiPhoneMissed,
   FiMessageSquare, FiPlus, FiClock, FiUser, FiCheckCircle, FiAlertCircle,
@@ -522,7 +523,7 @@ export default function SalesActivityPage() {
                         ) : (
                           <button
                             className="btn btn-secondary btn-sm"
-                            onClick={() => window.open(`https://wa.me/90${m.normalized_phone}`, '_blank')}
+                            onClick={() => openWhatsApp(m.normalized_phone)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', fontSize: '0.72rem' }}
                           >
                             <FiMessageSquare size={12} /> WhatsApp'ta Aç

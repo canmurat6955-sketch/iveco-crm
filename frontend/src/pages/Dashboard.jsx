@@ -7,6 +7,7 @@ import useGeolocation from '../hooks/useGeolocation';
 import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const STAT_CARDS = [
   { key: 'total_customers', label: 'Toplam Müşteri', icon: FiUsers, gradient: 'linear-gradient(135deg, #1e3a5f, #2b7de9)' },
@@ -396,9 +397,7 @@ export default function Dashboard() {
                     )}
                     {item.phone && (
                       <a
-                        href={`https://wa.me/90${item.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Sayın Yetkili, IVECO ${item.vehicle_title} aracımızla ilgili görüşmek isteriz.`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={getWhatsAppUrl(item.phone, `Sayın Yetkili, IVECO ${item.vehicle_title} aracımızla ilgili görüşmek isteriz.`)}
                         className="btn btn-sm btn-success"
                         style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
                       >

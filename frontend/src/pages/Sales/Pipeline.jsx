@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
+import { openWhatsApp as triggerWhatsApp } from '../../utils/whatsapp';
 import { FiPhone, FiMapPin, FiArrowRight, FiMessageSquare, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const STAGES = [
@@ -49,9 +50,7 @@ export default function Pipeline() {
 
   const openWhatsApp = (phone, name) => {
     if (!phone) return toast.error('Telefon yok');
-    const num = phone.replace(/\D/g, '');
-    const full = num.startsWith('0') ? '90' + num.slice(1) : num.startsWith('90') ? num : '90' + num;
-    window.open(`https://wa.me/${full}?text=${encodeURIComponent(`Merhaba, ${name} hakkında bilgi almak istiyorum.`)}`, '_blank');
+    triggerWhatsApp(phone, `Merhaba, ${name} hakkında bilgi almak istiyorum.`);
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>Yükleniyor...</div>;

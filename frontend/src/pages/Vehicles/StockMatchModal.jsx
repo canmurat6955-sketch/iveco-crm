@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { vehiclesApi } from '../../api/client';
 import { FiX, FiCheckCircle, FiPhone, FiMessageSquare, FiTruck, FiAlertCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { getWhatsAppUrl } from '../../utils/whatsapp';
 
 export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) {
   const [loading, setLoading] = useState(true);
@@ -183,9 +184,7 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
                   )}
                   {item.phone && (
                     <a
-                      href={`https://wa.me/90${item.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Sayın Yetkili, IVECO ${data?.stock_vehicle_title || ''} aracımız hemen teslim bayii stoklarımızda mevcuttur. Bilgi almak ister misiniz?`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={getWhatsAppUrl(item.phone, `Sayın Yetkili, IVECO ${data?.stock_vehicle_title || ''} aracımız hemen teslim bayii stoklarımızda mevcuttur. Bilgi almak ister misiniz?`)}
                       className="btn btn-sm btn-success"
                       style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
                     >
