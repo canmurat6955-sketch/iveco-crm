@@ -5,6 +5,7 @@ import useGeolocation from '../../hooks/useGeolocation';
 import { searchIntentParser } from '../../services/searchIntentParser';
 import { duplicateDetection } from '../../services/duplicateDetection';
 import toast from 'react-hot-toast';
+import { getWhatsAppUrl } from '../../utils/whatsapp';
 import { 
   FiZap, FiPlay, FiLoader, FiCheck, FiX, FiChevronLeft, 
   FiChevronRight, FiSearch, FiMapPin, FiPlus, FiNavigation, 
@@ -850,9 +851,7 @@ export default function DiscoveryList() {
                         <div className="flex gap-2 items-center">
                           {r.customer_phone && (
                             <a 
-                              href={`https://wa.me/90${r.customer_phone.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              href={getWhatsAppUrl(r.customer_phone, `Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`)}
                               className="btn btn-secondary btn-sm"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
                             >
@@ -1211,9 +1210,7 @@ export default function DiscoveryList() {
                               <FiPhoneCall size={13} /> {biz.phone}
                             </a>
                             <a
-                              href={`https://wa.me/90${biz.phone.replace(/\D/g, '').slice(-10)}`}
-                              target="_blank"
-                              rel="noreferrer"
+                              href={getWhatsAppUrl(biz.phone)}
                               style={{ color: '#4ade80', fontSize: 11, fontWeight: 500, textDecoration: 'none' }}
                             >
                               WhatsApp Mesajı

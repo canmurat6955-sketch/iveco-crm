@@ -5,6 +5,7 @@ import { useVisit } from '../../contexts/VisitContext';
 import VehicleInterestModal from './VehicleInterestModal';
 import StockMatchModal from '../Vehicles/StockMatchModal';
 import toast from 'react-hot-toast';
+import { openWhatsApp } from '../../utils/whatsapp';
 import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw } from 'react-icons/fi';
 
 
@@ -304,14 +305,12 @@ export default function CustomerDetail() {
   };
 
   const sendReminderWhatsApp = (rem) => {
-    const phone = customer.phone ? customer.phone.replace(/[^0-9]/g, '') : '';
-    if (!phone) {
+    if (!customer.phone) {
       toast.error('Müşterinin telefon numarası kayıtlı değil');
       return;
     }
-    const cleanPhone = phone.startsWith('0') ? '9' + phone : phone.startsWith('90') ? phone : '90' + phone;
     const msg = `Merhaba ${customer.company_name} yetkilisi, ERC Samsun Otomotiv adına iletişime geçiyorum. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dileriz.`;
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    openWhatsApp(customer.phone, msg);
   };
 
   // ── Vehicle Interest Handlers (Satış Zekâsı) ──
