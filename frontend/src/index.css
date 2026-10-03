@@ -1522,6 +1522,20 @@ a:hover { text-decoration: underline; }
   .hide-on-mobile {
     display: none !important;
   }
+  .table-desktop-view {
+    display: none !important;
+  }
+  .cards-mobile-view {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .cards-mobile-view {
+    display: none !important;
+  }
 }
 
 

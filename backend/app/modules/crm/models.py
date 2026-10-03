@@ -58,6 +58,8 @@ class Customer(Base):
     fleet_vehicles = relationship("CustomerFleetVehicle", back_populates="customer", cascade="all, delete-orphan")
     reminders = relationship("CustomerReminder", back_populates="customer", cascade="all, delete-orphan")
     vehicle_interests = relationship("CustomerVehicleInterest", back_populates="customer", cascade="all, delete-orphan")
+    trade_ins = relationship("CustomerTradeIn", back_populates="customer", cascade="all, delete-orphan")
+    attachments = relationship("CustomerAttachment", back_populates="customer", cascade="all, delete-orphan")
 
     # Composite indexes for duplicate detection
     __table_args__ = (
@@ -225,6 +227,68 @@ class CustomerReminder(Base):
 
     def __repr__(self):
         return f"<Reminder {self.title} on {self.reminder_date} for Customer#{self.customer_id}>"
+
+
+class CustomerTradeIn(Base):
+    """Müşteri takas ve 2. el araç ekspertiz değerlendirmeleri."""
+    __tablename__ = "customer_trade_ins"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    
+    vehicle_brand = Column(String(100), nullable=False)  # Mercedes, Ford, Iveco, Scania, MAN, Isuzu, vb.
+    vehicle_model = Column(String(100), nullable=False)  # Cargo 1838, Atego 1518, Daily 35C15...
+    model_year = Column(Integer, nullable=True)
+    mileage_km = Column(Integer, nullable=True)
+    plate_number = Column(String(50), nullable=True)
+    body_type = Column(String(100), nullable=True)  # Açık Kasa, Kapalı Sac Kasa, Damper, Frigorifik, Çekici...
+    condition_notes = Column(Text, nullable=True)  # Hasar durumu, boya/değişen, lastik %, motor durumu
+    
+    customer_expected_price = Column(Float, nullable=True)  # Müşterinin talep ettiği fiyat
+    appraised_value = Column(Float, nullable=True)          # Bayi ekspertiz / takas teklif bedeli
+    currency = Column(String(10), default="TL")             # TL, EUR, USD
+    status = Column(String(50), default="pending")          # pending, appraised, accepted, rejected, completed
+    
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    customer = relationship("Customer", back_populates="trade_ins")
+    user = relationship("User", foreign_keys=[user_id])
+    attachments = relationship("CustomerAttachment", back_populates="trade_in")
+
+    def __repr__(self):
+        return f"<TradeIn {self.vehicle_brand} {self.vehicle_model} ({self.model_year}) for Customer#{self.customer_id}>"
+
+
+class CustomerAttachment(Base):
+    """Müşteri filo aracı fotoğrafları, kartvizitler, vergi levhaları ve evraklar."""
+    __tablename__ = "customer_attachments"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    fleet_id = Column(Integer, ForeignKey("customer_fleet_vehicles.id", ondelete="SET NULL"), nullable=True)
+    trade_in_id = Column(Integer, ForeignKey("customer_trade_ins.id", ondelete="SET NULL"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    file_url = Column(String(1000), nullable=False)
+    file_name = Column(String(255), nullable=False)
+    file_type = Column(String(100), nullable=True)  # image/jpeg, image/png, application/pdf
+    file_size = Column(Integer, nullable=True)
+    category = Column(String(50), default="general")  # fleet_photo, business_card, tax_plate, trade_in_photo, facility, general
+    title = Column(String(255), nullable=True)
+
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    customer = relationship("Customer", back_populates="attachments")
+    trade_in = relationship("CustomerTradeIn", back_populates="attachments")
+    user = relationship("User", foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f"<CustomerAttachment {self.file_name} ({self.category}) for Customer#{self.customer_id}>"
+
 
 
 

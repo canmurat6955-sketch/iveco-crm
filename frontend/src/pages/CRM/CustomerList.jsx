@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { crmApi, vehiclesApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, FiUsers, FiZap, FiTruck } from 'react-icons/fi';
+import { 
+  FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, 
+  FiUsers, FiZap, FiTruck, FiPhone, FiMessageSquare, FiNavigation, FiMapPin, FiChevronRight 
+} from 'react-icons/fi';
+import { openWhatsApp } from '../../utils/whatsapp';
 import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
 
 const SEGMENTS = { A: 'badge-green', B: 'badge-blue', C: 'badge-amber', D: 'badge-red' };
@@ -316,8 +320,158 @@ export default function CustomerList() {
         {selected.size > 0 && <span style={{ color: '#ef4444', fontWeight: 600 }}>{selected.size} seçili</span>}
       </div>
 
-      {/* Table */}
-      <div className="card" style={{ padding: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+      {/* Mobile Cards View (< 768px) */}
+      <div className="cards-mobile-view mb-6">
+        {loading ? (
+          <div className="card text-center py-8 text-muted">Müşteriler yükleniyor...</div>
+        ) : loadError ? (
+          <div className="card text-center py-8" style={{ color: '#f87171' }}>
+            ⚠️ Sunucuya bağlanılamadı.
+            <div style={{ marginTop: 8 }}>
+              <button className="btn btn-sm btn-primary" onClick={load}>Tekrar Dene</button>
+            </div>
+          </div>
+        ) : customers.items.length > 0 ? (
+          customers.items.map(c => {
+            const isSelected = selected.has(c.id);
+            const navUrl = c.latitude && c.longitude
+              ? `https://maps.apple.com/?daddr=${c.latitude},${c.longitude}&dirflg=d`
+              : `https://maps.apple.com/?daddr=${encodeURIComponent([c.address, c.district, c.city].filter(Boolean).join(' ') || c.company_name)}&dirflg=d`;
+
+            return (
+              <div
+                key={c.id}
+                className="card"
+                onClick={() => navigate(`/customers/${c.id}`)}
+                style={{
+                  padding: '1rem',
+                  border: isSelected ? '1px solid #3b82f6' : '1px solid var(--border-color)',
+                  background: isSelected ? 'rgba(59,130,246,0.06)' : 'var(--bg-card)',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1 }}>
+                    <div onClick={(e) => toggleSelect(c.id, e)} style={{ paddingTop: 2 }}>
+                      {isSelected ? (
+                        <FiCheckSquare size={18} style={{ color: '#38bdf8' }} />
+                      ) : (
+                        <FiSquare size={18} style={{ color: 'var(--text-muted)' }} />
+                      )}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-heading)' }}>
+                        {c.company_name}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        <FiMapPin size={12} />
+                        <span>{[c.district, c.city].filter(Boolean).join(' / ') || 'Konum belirtilmedi'}</span>
+                        {c.sector && <span>• {c.sector}</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>
+                      {c.segment}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: c.potential_score >= 50 ? '#10b981' : '#f59e0b' }}>
+                      %{c.potential_score || 0}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mobile Quick Action Strip */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: c.phone ? '1fr 1fr 1fr auto' : '1fr auto',
+                    gap: 6,
+                    marginTop: 12,
+                    paddingTop: 10,
+                    borderTop: '1px solid var(--border-color)'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {c.phone && (
+                    <a
+                      href={`tel:${c.phone}`}
+                      className="btn btn-xs"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: '#34d399',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        textDecoration: 'none',
+                        fontWeight: 700
+                      }}
+                    >
+                      <FiPhone size={13} /> Ara
+                    </a>
+                  )}
+
+                  {c.phone && (
+                    <button
+                      type="button"
+                      className="btn btn-xs"
+                      onClick={() => openWhatsApp(c.phone)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        background: 'rgba(37, 211, 102, 0.15)',
+                        color: '#25d366',
+                        border: '1px solid rgba(37, 211, 102, 0.3)',
+                        fontWeight: 700
+                      }}
+                    >
+                      <FiMessageSquare size={13} /> WA
+                    </button>
+                  )}
+
+                  <a
+                    href={navUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-xs"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      background: 'rgba(139, 92, 246, 0.15)',
+                      color: '#c084fc',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      textDecoration: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    <FiNavigation size={13} /> Rota
+                  </a>
+
+                  <button
+                    type="button"
+                    className="btn btn-xs btn-secondary"
+                    onClick={() => navigate(`/customers/${c.id}`)}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <FiChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="card text-center py-8 text-muted">Kriterlere uygun müşteri bulunamadı</div>
+        )}
+      </div>
+
+      {/* Desktop Table View (>= 769px) */}
+      <div className="card table-desktop-view" style={{ padding: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <table className="data-table">
           <thead>
             <tr>
