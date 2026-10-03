@@ -95,7 +95,6 @@ export const authApi = {
 export const crmApi = {
   getCustomers: (params) => api.get('/crm/customers', { params }),
   getMapMarkers: () => api.get('/crm/customers/map-markers'),
-  getNearbyCustomers: (params) => api.get('/crm/nearby', { params }),
   searchRouteAlong: (params) => api.get('/crm/route-search', { params }),
 
   getCustomer: (id) => api.get(`/crm/customers/${id}`),
@@ -167,9 +166,24 @@ export const crmApi = {
   deleteAttachment: (attachmentId) => api.delete(`/crm/attachments/${attachmentId}`),
 
   // GPS Radar (Yakınımdaki Müşteriler)
-  getNearbyCustomers: (lat, lng, radius_km = 25, limit = 50) => api.get('/crm/nearby', {
-    params: { lat, lng, radius_km, limit }
-  })
+  getNearbyCustomers: (latOrParams, lng, radius_km = 25, limit = 50) => {
+    if (typeof latOrParams === 'object' && latOrParams !== null) {
+      const p = { ...latOrParams };
+      const actualLng = p.lng !== undefined ? p.lng : p.lon;
+      const actualRadius = p.radius_km !== undefined ? p.radius_km : (p.radius > 500 ? p.radius / 1000 : (p.radius || 25));
+      return api.get('/crm/nearby', {
+        params: {
+          lat: p.lat,
+          lng: actualLng,
+          radius_km: actualRadius,
+          limit: p.limit || 50
+        }
+      });
+    }
+    return api.get('/crm/nearby', {
+      params: { lat: latOrParams, lng, radius_km, limit }
+    });
+  }
 };
 
 // ── Discovery API ───────────────────────────────────────────────
