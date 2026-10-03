@@ -28,21 +28,21 @@ export default function BottomNav({ onVisitStart }) {
             <span>Müşteriler</span>
           </NavLink>
           
-          <button className="bottom-nav-item visit-btn" onClick={onVisitStart}>
-            <div className="visit-icon-wrapper">
+          <div className="bottom-nav-item center-action-item">
+            <button className="visit-btn" onClick={onVisitStart} aria-label="Ziyaret Başlat">
               <FiMapPin size={22} color="#fff" />
-            </div>
-            <span>+ Ziyaret</span>
-          </button>
+            </button>
+            <span className="visit-btn-label">+ Ziyaret</span>
+          </div>
           
           <button 
             className="bottom-nav-item" 
             onClick={() => setShowRadar(true)}
             style={{ color: '#38bdf8' }}
           >
-            <div style={{ position: 'relative' }}>
-              <span className="animate-ping" style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
-              <span style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#0284c7' }}></span>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span className="animate-ping" style={{ position: 'absolute', top: -2, right: -4, width: 7, height: 7, borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
+              <span style={{ position: 'absolute', top: -2, right: -4, width: 7, height: 7, borderRadius: '50%', background: '#0284c7' }}></span>
               <FiMap size={20} />
             </div>
             <span style={{ fontWeight: 600 }}>Radar</span>
