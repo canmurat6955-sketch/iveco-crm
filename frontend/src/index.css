@@ -1048,15 +1048,17 @@ a:hover { text-decoration: underline; }
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-primary);
 }
 
 .main-content-mobile {
   flex: 1;
   padding: var(--space-4);
-  padding-bottom: 90px; /* BottomNav için safe area */
+  padding-bottom: calc(105px + env(safe-area-inset-bottom, 20px)); /* BottomNav + Safe Area */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  min-height: 0;
 }
 
 /* ── Bottom Nav ── */
@@ -1066,17 +1068,20 @@ a:hover { text-decoration: underline; }
   left: 0;
   right: 0;
   z-index: 100;
+  background: rgba(13, 18, 36, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color);
+  padding-bottom: env(safe-area-inset-bottom, 8px);
 }
 
 .bottom-nav {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  height: 68px;
-  background: rgba(13, 18, 36, 0.9);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-color);
-  padding: 0 var(--space-2);
+  height: 60px;
+  padding: 0 4px;
+  position: relative;
 }
 
 .bottom-nav-item {
@@ -1092,47 +1097,54 @@ a:hover { text-decoration: underline; }
   font-size: 10px;
   font-weight: 500;
   cursor: pointer;
-  gap: 4px;
+  gap: 3px;
   transition: all 0.2s ease;
+  min-width: 0;
+  padding: 2px 0;
 }
 
 .bottom-nav-item.active {
   color: var(--accent-blue-light);
 }
 
-/* Hızlı Ziyaret Ekle Orta Buton */
-.bottom-nav-item.visit-btn {
+/* Hızlı Ziyaret Ekle Orta Buton & Wrapper */
+.bottom-nav-item.center-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
   position: relative;
-  top: -12px;
-  flex: none;
-  width: 64px;
-  height: 64px;
-  background: var(--accent-blue);
+  overflow: visible;
+}
+
+.visit-btn {
+  width: 48px;
+  height: 48px;
+  margin-top: -16px;
+  background: linear-gradient(135deg, #0284c7, #004b93);
+  border: 3px solid rgba(13, 18, 36, 0.96);
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(0, 75, 147, 0.4), var(--shadow-glow-blue);
-  color: white;
-  transition: transform 0.2s ease;
-}
-
-.bottom-nav-item.visit-btn:active {
-  transform: scale(0.95);
-}
-
-.visit-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  box-shadow: 0 4px 14px rgba(0, 75, 147, 0.5), 0 0 12px rgba(2, 132, 199, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  color: white;
 }
 
-.bottom-nav-item.visit-btn span {
-  position: absolute;
-  bottom: -22px;
-  color: var(--text-secondary);
+.visit-btn:active {
+  transform: scale(0.92);
+}
+
+.visit-btn-label {
   font-size: 10px;
-  font-weight: 500;
-  width: 80px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  line-height: 1;
   text-align: center;
 }
 
@@ -1195,7 +1207,8 @@ a:hover { text-decoration: underline; }
 .mobile-dashboard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
 }
 
 .mobile-dashboard-header {
@@ -1255,14 +1268,15 @@ a:hover { text-decoration: underline; }
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: var(--space-4) var(--space-2);
+  padding: 10px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 3px;
   cursor: pointer;
   transition: transform 0.2s;
+  min-width: 0;
 }
 
 .today-stat-card:active {
@@ -1271,15 +1285,20 @@ a:hover { text-decoration: underline; }
 }
 
 .today-stat-card .stat-num {
-  font-size: var(--font-size-xl);
+  font-size: 20px;
   font-weight: 800;
   color: var(--text-heading);
+  line-height: 1.1;
 }
 
 .today-stat-card .stat-lbl {
   font-size: 10px;
   color: var(--text-secondary);
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Hızlı İşlemler */
@@ -1358,10 +1377,10 @@ a:hover { text-decoration: underline; }
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: var(--space-4);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 10px;
 }
 
 .nearby-stat {
