@@ -77,8 +77,8 @@ export default function Dashboard() {
     if (location) {
       crmApi.getNearbyCustomers({
         lat: location.latitude,
-        lon: location.longitude,
-        radius: 5000 // 5 km yarıçap
+        lng: location.longitude,
+        radius_km: 5
       })
       .then(res => {
         const list = res.data || [];

@@ -811,14 +811,26 @@ def delete_customer_attachment(
 @router.get("/nearby", response_model=List[NearbyCustomerResponse])
 def get_nearby_customers(
     lat: float = Query(..., description="Kullanıcının mevcut enlemi (latitude)"),
-    lng: float = Query(..., description="Kullanıcının mevcut boylamı (longitude)"),
-    radius_km: float = Query(25.0, ge=0.5, le=500.0, description="Arama yarıçapı (km)"),
+    lng: Optional[float] = Query(None, description="Kullanıcının mevcut boylamı (longitude)"),
+    lon: Optional[float] = Query(None, description="Alternatif boylam (longitude)"),
+    radius_km: Optional[float] = Query(None, description="Arama yarıçapı (km)"),
+    radius: Optional[float] = Query(None, description="Alternatif yarıçap (metre veya km)"),
     limit: int = Query(50, ge=1, le=200, description="Maksimum müşteri sayısı"),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
     """Mevcut GPS konumuna göre yakındaki müşterileri ve Apple/Google Maps navigasyon rotalarını getirir."""
-    return CRMService(db).get_nearby_customers(lat=lat, lng=lng, radius_km=radius_km, limit=limit)
+    actual_lng = lng if lng is not None else lon
+    if actual_lng is None:
+        raise HTTPException(status_code=400, detail="Boylam parametresi (lng veya lon) zorunludur.")
+
+    actual_radius_km = 25.0
+    if radius_km is not None:
+        actual_radius_km = radius_km
+    elif radius is not None:
+        actual_radius_km = radius / 1000.0 if radius > 500 else radius
+
+    return CRMService(db).get_nearby_customers(lat=lat, lng=actual_lng, radius_km=actual_radius_km, limit=limit)
 
 
 
