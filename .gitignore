@@ -22,3 +22,4 @@ backend/uploads/
 *.log
 *.db
 scratch/
+cloudflared.exe
