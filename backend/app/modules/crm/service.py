@@ -10,7 +10,10 @@ from fuzzywuzzy import fuzz
 from urllib.parse import urlparse
 from datetime import datetime, timedelta, timezone, date as date_type
 
-from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, ProformaInvoice, Vehicle, CustomerFleetVehicle, CustomerReminder
+from app.modules.crm.models import (
+    Customer, CustomerInteraction, CustomerContact, ProformaInvoice,
+    Vehicle, CustomerFleetVehicle, CustomerReminder, CustomerTradeIn, CustomerAttachment
+)
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerListResponse,
     CustomerResponse, InteractionCreate, CRMStats, DuplicateGroup,
@@ -18,6 +21,8 @@ from app.modules.crm.schemas import (
     ProformaCreate, ProformaUpdate, ProformaResponse,
     FleetVehicleCreate, FleetVehicleUpdate, FleetVehicleResponse,
     ReminderCreate, ReminderUpdate, ReminderResponse,
+    TradeInCreate, TradeInUpdate, TradeInResponse,
+    AttachmentResponse, NearbyCustomerResponse
 )
 from app.core.deps import PaginationParams, CustomerFilterParams
 
@@ -882,6 +887,168 @@ class CRMService:
                 "is_overdue": r.reminder_date < today
             })
         return result
+
+    # ── Trade-In (Takas / 2. El Değerlendirme) ──
+    def get_customer_trade_ins(self, customer_id: int) -> List[CustomerTradeIn]:
+        return self.db.query(CustomerTradeIn).filter(
+            CustomerTradeIn.customer_id == customer_id
+        ).order_by(CustomerTradeIn.created_at.desc()).all()
+
+    def create_customer_trade_in(self, customer_id: int, data: TradeInCreate, user_id: Optional[int] = None) -> CustomerTradeIn:
+        customer = self.db.query(Customer).filter(Customer.id == customer_id, Customer.is_active == True).first()
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Müşteri bulunamadı")
+
+        trade_in = CustomerTradeIn(
+            customer_id=customer_id,
+            user_id=user_id,
+            vehicle_brand=data.vehicle_brand,
+            vehicle_model=data.vehicle_model,
+            model_year=data.model_year,
+            mileage_km=data.mileage_km,
+            plate_number=data.plate_number,
+            body_type=data.body_type,
+            condition_notes=data.condition_notes,
+            customer_expected_price=data.customer_expected_price,
+            appraised_value=data.appraised_value,
+            currency=data.currency or "TL",
+            status=data.status or "pending"
+        )
+        self.db.add(trade_in)
+        self.db.commit()
+        self.db.refresh(trade_in)
+        return trade_in
+
+    def update_trade_in(self, trade_in_id: int, data: TradeInUpdate) -> CustomerTradeIn:
+        trade_in = self.db.query(CustomerTradeIn).filter(CustomerTradeIn.id == trade_in_id).first()
+        if not trade_in:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Takas kaydı bulunamadı")
+
+        update_data = data.model_dump(exclude_unset=True)
+        for key, val in update_data.items():
+            setattr(trade_in, key, val)
+
+        trade_in.updated_at = datetime.now(timezone.utc)
+        self.db.commit()
+        self.db.refresh(trade_in)
+        return trade_in
+
+    def delete_trade_in(self, trade_in_id: int):
+        trade_in = self.db.query(CustomerTradeIn).filter(CustomerTradeIn.id == trade_in_id).first()
+        if not trade_in:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Takas kaydı bulunamadı")
+        self.db.delete(trade_in)
+        self.db.commit()
+
+    # ── Customer Attachments (Fotoğraflar ve Evraklar) ──
+    def get_customer_attachments(self, customer_id: int, category: Optional[str] = None) -> List[CustomerAttachment]:
+        query = self.db.query(CustomerAttachment).filter(CustomerAttachment.customer_id == customer_id)
+        if category:
+            query = query.filter(CustomerAttachment.category == category)
+        return query.order_by(CustomerAttachment.created_at.desc()).all()
+
+    def create_customer_attachment(
+        self,
+        customer_id: int,
+        file_url: str,
+        file_name: str,
+        file_type: Optional[str] = None,
+        file_size: Optional[int] = None,
+        category: str = "general",
+        title: Optional[str] = None,
+        fleet_id: Optional[int] = None,
+        trade_in_id: Optional[int] = None,
+        user_id: Optional[int] = None
+    ) -> CustomerAttachment:
+        customer = self.db.query(Customer).filter(Customer.id == customer_id, Customer.is_active == True).first()
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Müşteri bulunamadı")
+
+        attachment = CustomerAttachment(
+            customer_id=customer_id,
+            fleet_id=fleet_id,
+            trade_in_id=trade_in_id,
+            user_id=user_id,
+            file_url=file_url,
+            file_name=file_name,
+            file_type=file_type,
+            file_size=file_size,
+            category=category,
+            title=title or file_name
+        )
+        self.db.add(attachment)
+        self.db.commit()
+        self.db.refresh(attachment)
+        return attachment
+
+    def delete_attachment(self, attachment_id: int):
+        attachment = self.db.query(CustomerAttachment).filter(CustomerAttachment.id == attachment_id).first()
+        if not attachment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ek dosya bulunamadı")
+        self.db.delete(attachment)
+        self.db.commit()
+
+    # ── Nearby Customers (GPS Radar) ──
+    def get_nearby_customers(self, lat: float, lng: float, radius_km: float = 25.0, limit: int = 50) -> List[dict]:
+        customers = self.db.query(Customer).filter(
+            Customer.is_active == True,
+            Customer.latitude.isnot(None),
+            Customer.longitude.isnot(None)
+        ).all()
+
+        def haversine(lat1, lon1, lat2, lon2):
+            R = 6371.0 # km
+            dlat = math.radians(lat2 - lat1)
+            dlon = math.radians(lon2 - lon1)
+            a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+            return R * c
+
+        results = []
+        for c in customers:
+            if c.latitude is None or c.longitude is None:
+                continue
+            try:
+                clat = float(c.latitude)
+                clng = float(c.longitude)
+                if clat == 0 and clng == 0:
+                    continue
+                dist = haversine(lat, lng, clat, clng)
+                if dist <= radius_km:
+                    interested_str = None
+                    if hasattr(c, "vehicle_interests") and c.vehicle_interests:
+                        v_names = []
+                        for vi in c.vehicle_interests:
+                            if vi.vehicle:
+                                grp = getattr(vi.vehicle, 'vehicle_group', '')
+                                code = getattr(vi.vehicle, 'model_code', '')
+                                v_names.append(f"{grp} {code}".strip() or "IVECO")
+                        if v_names:
+                            interested_str = ", ".join(v_names[:2])
+
+                    results.append({
+                        "id": c.id,
+                        "company_name": c.company_name,
+                        "city": c.city,
+                        "district": c.district,
+                        "address": c.address,
+                        "phone": c.phone,
+                        "sector": c.sector,
+                        "segment": c.segment or "C",
+                        "potential_score": c.potential_score or 0,
+                        "latitude": clat,
+                        "longitude": clng,
+                        "distance_km": round(dist, 2),
+                        "interested_vehicle": interested_str,
+                        "apple_maps_url": f"https://maps.apple.com/?daddr={clat},{clng}&dirflg=d",
+                        "google_maps_url": f"https://www.google.com/maps/dir/?api=1&destination={clat},{clng}"
+                    })
+            except (ValueError, TypeError):
+                continue
+
+        results.sort(key=lambda x: x["distance_km"])
+        return results[:limit]
+
 
 
 

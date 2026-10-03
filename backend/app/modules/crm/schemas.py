@@ -394,4 +394,94 @@ class ReminderResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# ── Customer Trade-In (Takas / 2. El) Schemas ───────────────────────
+
+class TradeInCreate(BaseModel):
+    vehicle_brand: str = Field(..., description="Araç Markası (Mercedes, Ford, Iveco, vb.)")
+    vehicle_model: str = Field(..., description="Model (Cargo 1838, Atego 1518, vb.)")
+    model_year: Optional[int] = None
+    mileage_km: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    condition_notes: Optional[str] = None
+    customer_expected_price: Optional[float] = None
+    appraised_value: Optional[float] = None
+    currency: str = "TL"
+    status: str = "pending"
+
+
+class TradeInUpdate(BaseModel):
+    vehicle_brand: Optional[str] = None
+    vehicle_model: Optional[str] = None
+    model_year: Optional[int] = None
+    mileage_km: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    condition_notes: Optional[str] = None
+    customer_expected_price: Optional[float] = None
+    appraised_value: Optional[float] = None
+    currency: Optional[str] = None
+    status: Optional[str] = None
+
+
+class TradeInResponse(BaseModel):
+    id: int
+    customer_id: int
+    user_id: Optional[int] = None
+    vehicle_brand: str
+    vehicle_model: str
+    model_year: Optional[int] = None
+    mileage_km: Optional[int] = None
+    plate_number: Optional[str] = None
+    body_type: Optional[str] = None
+    condition_notes: Optional[str] = None
+    customer_expected_price: Optional[float] = None
+    appraised_value: Optional[float] = None
+    currency: str = "TL"
+    status: str = "pending"
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Customer Attachment (Fotoğraf / Belge) Schemas ───────────────────
+
+class AttachmentResponse(BaseModel):
+    id: int
+    customer_id: int
+    fleet_id: Optional[int] = None
+    trade_in_id: Optional[int] = None
+    file_url: str
+    file_name: str
+    file_type: Optional[str] = None
+    file_size: Optional[int] = None
+    category: str = "general"
+    title: Optional[str] = None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ── Nearby Customer (GPS Radar) Schemas ─────────────────────────────
+
+class NearbyCustomerResponse(BaseModel):
+    id: int
+    company_name: str
+    city: Optional[str] = None
+    district: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    sector: Optional[str] = None
+    segment: str = "C"
+    potential_score: int = 0
+    latitude: float
+    longitude: float
+    distance_km: float
+    interested_vehicle: Optional[str] = None
+    apple_maps_url: str
+    google_maps_url: str
+
+
+
 

@@ -5,6 +5,7 @@ FastAPI Application Entry Point
 import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
@@ -76,7 +77,9 @@ app.include_router(dashboard_router)
 app.include_router(scanner_router)
 app.include_router(vehicles_router)
 
-
+# Mount static file uploads (photos, cards, docs)
+os.makedirs(settings.FILE_STORAGE_PATH, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.FILE_STORAGE_PATH), name="uploads")
 
 
 @app.get("/api/health")

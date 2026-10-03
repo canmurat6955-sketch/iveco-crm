@@ -1,14 +1,17 @@
 """
 CRM API endpoints: Customer CRUD, import, interactions, stats, duplicates.
 """
-from typing import List
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+import os
+import uuid
+import io
+from typing import List, Optional
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Query, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-import io
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.deps import PaginationParams, CustomerFilterParams
@@ -23,6 +26,8 @@ from app.modules.crm.schemas import (
     VehicleResponse,
     FleetVehicleCreate, FleetVehicleUpdate, FleetVehicleResponse,
     ReminderCreate, ReminderUpdate, ReminderResponse,
+    TradeInCreate, TradeInUpdate, TradeInResponse,
+    AttachmentResponse, NearbyCustomerResponse,
 )
 
 router = APIRouter(prefix="/api/crm", tags=["CRM"])
@@ -121,17 +126,6 @@ def get_stats(db: Session = Depends(get_db), current_user=Depends(get_current_us
     return CRMService(db).get_stats()
 
 
-@router.get("/nearby")
-def get_nearby_customers(
-    lat: float,
-    lon: float,
-    radius: float = 5000,
-    segment: str = None,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
-    """Konum bazlı yakındaki müşterileri getirir (saha satışı için)."""
-    return CRMService(db).get_nearby_customers(lat, lon, radius, segment)
 
 
 @router.get("/route-search")
@@ -592,5 +586,239 @@ async def import_vehicles(
 ):
     """Excel veya CSV dosyasından araç kataloğunu içe aktarır."""
     return await import_vehicles_from_file(file, db)
+
+
+# ── Fleet Vehicle Endpoints ──────────────────────────────────────────
+
+@router.get("/customers/{customer_id}/fleet", response_model=List[FleetVehicleResponse])
+def get_customer_fleet(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşterinin mevcut filo araçlarını listeler."""
+    return CRMService(db).get_fleet(customer_id)
+
+
+@router.post("/customers/{customer_id}/fleet", response_model=FleetVehicleResponse)
+def add_customer_fleet_vehicle(
+    customer_id: int,
+    data: FleetVehicleCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye yeni filo aracı ekler."""
+    return CRMService(db).add_fleet_vehicle(customer_id, data)
+
+
+@router.put("/fleet-vehicles/{vehicle_id}", response_model=FleetVehicleResponse)
+def update_customer_fleet_vehicle(
+    vehicle_id: int,
+    data: FleetVehicleUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Filo aracını günceller."""
+    return CRMService(db).update_fleet_vehicle(vehicle_id, data)
+
+
+@router.delete("/fleet-vehicles/{vehicle_id}")
+def delete_customer_fleet_vehicle(
+    vehicle_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Filo aracını siler."""
+    CRMService(db).delete_fleet_vehicle(vehicle_id)
+    return {"message": "Filo aracı başarıyla silindi"}
+
+
+@router.get("/fleet-renewal-opportunities")
+def get_fleet_renewal_opportunities(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Filosunda yenileme zamanı gelmiş (3+ yaş) araçları ve fırsatları listeler."""
+    return CRMService(db).get_fleet_renewal_opportunities()
+
+
+# ── Reminder Endpoints ───────────────────────────────────────────────
+
+@router.get("/customers/{customer_id}/reminders", response_model=List[ReminderResponse])
+def get_customer_reminders(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteri hatırlatıcılarını listeler."""
+    return CRMService(db).get_reminders(customer_id)
+
+
+@router.post("/customers/{customer_id}/reminders", response_model=ReminderResponse)
+def add_customer_reminder(
+    customer_id: int,
+    data: ReminderCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye yeni hatırlatıcı ekler."""
+    return CRMService(db).add_reminder(customer_id, current_user.id, data)
+
+
+@router.put("/reminders/{reminder_id}", response_model=ReminderResponse)
+def update_reminder(
+    reminder_id: int,
+    data: ReminderUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Hatırlatıcıyı günceller (tamamlandı vb.)."""
+    return CRMService(db).update_reminder(reminder_id, data)
+
+
+@router.delete("/reminders/{reminder_id}")
+def delete_reminder(
+    reminder_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Hatırlatıcıyı siler."""
+    CRMService(db).delete_reminder(reminder_id)
+    return {"message": "Hatırlatıcı başarıyla silindi"}
+
+
+@router.get("/upcoming-reminders")
+def get_upcoming_reminders(
+    days_ahead: int = Query(14, ge=1, le=90),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Yaklaşan veya vadesi geçmiş tüm müşteri hatırlatıcılarını getirir."""
+    return CRMService(db).get_upcoming_reminders(days_ahead=days_ahead)
+
+
+# ── Trade-In (Takas / 2. El Değerlendirme) Endpoints ──────────────────
+
+@router.get("/customers/{customer_id}/trade-ins", response_model=List[TradeInResponse])
+def get_customer_trade_ins(
+    customer_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye ait takas ve ekspertiz değerlendirmelerini listeler."""
+    return CRMService(db).get_customer_trade_ins(customer_id)
+
+
+@router.post("/customers/{customer_id}/trade-ins", response_model=TradeInResponse)
+def create_customer_trade_in(
+    customer_id: int,
+    data: TradeInCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye ait yeni takas / 2. el ekspertiz talebi oluşturur."""
+    return CRMService(db).create_customer_trade_in(customer_id, data, user_id=current_user.id)
+
+
+@router.put("/trade-ins/{trade_in_id}", response_model=TradeInResponse)
+def update_trade_in(
+    trade_in_id: int,
+    data: TradeInUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Takas / ekspertiz kaydını günceller."""
+    return CRMService(db).update_trade_in(trade_in_id, data)
+
+
+@router.delete("/trade-ins/{trade_in_id}")
+def delete_trade_in(
+    trade_in_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Takas kaydını siler."""
+    CRMService(db).delete_trade_in(trade_in_id)
+    return {"message": "Takas kaydı başarıyla silindi"}
+
+
+# ── Customer Attachments (Fotoğraflar ve Evraklar) Endpoints ──────────
+
+@router.get("/customers/{customer_id}/attachments", response_model=List[AttachmentResponse])
+def get_customer_attachments(
+    customer_id: int,
+    category: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye ait yüklenmiş fotoğraf ve belgeleri listeler."""
+    return CRMService(db).get_customer_attachments(customer_id, category=category)
+
+
+@router.post("/customers/{customer_id}/attachments", response_model=AttachmentResponse)
+async def upload_customer_attachment(
+    customer_id: int,
+    file: UploadFile = File(...),
+    category: str = Form("general"),
+    title: Optional[str] = Form(None),
+    fleet_id: Optional[int] = Form(None),
+    trade_in_id: Optional[int] = Form(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Mobil kamera veya galeriden müşteri fotoğrafı / evrak yükler."""
+    upload_dir = os.path.join(settings.FILE_STORAGE_PATH, "customer_attachments", str(customer_id))
+    os.makedirs(upload_dir, exist_ok=True)
+
+    original_ext = os.path.splitext(file.filename)[1] if file.filename else ".jpg"
+    safe_filename = f"{uuid.uuid4().hex[:12]}{original_ext}"
+    file_path = os.path.join(upload_dir, safe_filename)
+
+    file_content = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(file_content)
+
+    file_url = f"/uploads/customer_attachments/{customer_id}/{safe_filename}"
+
+    attachment = CRMService(db).create_customer_attachment(
+        customer_id=customer_id,
+        file_url=file_url,
+        file_name=file.filename or safe_filename,
+        file_type=file.content_type,
+        file_size=len(file_content),
+        category=category,
+        title=title or file.filename,
+        fleet_id=fleet_id,
+        trade_in_id=trade_in_id,
+        user_id=current_user.id
+    )
+    return attachment
+
+
+@router.delete("/attachments/{attachment_id}")
+def delete_customer_attachment(
+    attachment_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Yüklenen belge/fotoğrafı siler."""
+    CRMService(db).delete_attachment(attachment_id)
+    return {"message": "Fotoğraf/belge başarıyla silindi"}
+
+
+# ── GPS Radar (Yakınımdaki Müşteriler) Endpoints ─────────────────────
+
+@router.get("/nearby", response_model=List[NearbyCustomerResponse])
+def get_nearby_customers(
+    lat: float = Query(..., description="Kullanıcının mevcut enlemi (latitude)"),
+    lng: float = Query(..., description="Kullanıcının mevcut boylamı (longitude)"),
+    radius_km: float = Query(25.0, ge=0.5, le=500.0, description="Arama yarıçapı (km)"),
+    limit: int = Query(50, ge=1, le=200, description="Maksimum müşteri sayısı"),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Mevcut GPS konumuna göre yakındaki müşterileri ve Apple/Google Maps navigasyon rotalarını getirir."""
+    return CRMService(db).get_nearby_customers(lat=lat, lng=lng, radius_km=radius_km, limit=limit)
+
 
 

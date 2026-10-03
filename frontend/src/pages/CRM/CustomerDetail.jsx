@@ -4,9 +4,18 @@ import { crmApi, salesApi, vehiclesApi } from '../../api/client';
 import { useVisit } from '../../contexts/VisitContext';
 import VehicleInterestModal from './VehicleInterestModal';
 import StockMatchModal from '../Vehicles/StockMatchModal';
+import CustomerAttachmentModal from '../../components/CRM/CustomerAttachmentModal';
+import TradeInModal from '../../components/CRM/TradeInModal';
+import VoiceInputButton from '../../components/common/VoiceInputButton';
 import toast from 'react-hot-toast';
 import { openWhatsApp } from '../../utils/whatsapp';
-import { FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw } from 'react-icons/fi';
+import { 
+  FiArrowLeft, FiPhone, FiMail, FiGlobe, FiMapPin, FiBriefcase, FiHash, 
+  FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, 
+  FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, 
+  FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw,
+  FiCamera, FiNavigation, FiRepeat
+} from 'react-icons/fi';
 
 
 const INTERACTION_ICONS = {
@@ -99,6 +108,24 @@ export default function CustomerDetail() {
       .catch(() => {});
   };
 
+  // ── Fotoğraf & Evrak Galerisi State'leri ──
+  const [attachments, setAttachments] = useState([]);
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [attachmentCategory, setAttachmentCategory] = useState('fleet_photo');
+  const [attachmentTradeInId, setAttachmentTradeInId] = useState(null);
+
+  // ── Takas / 2. El Değerlendirme State'leri ──
+  const [tradeIns, setTradeIns] = useState([]);
+  const [showTradeIn, setShowTradeIn] = useState(false);
+
+  const loadAttachments = () => {
+    crmApi.getAttachments(id).then(r => setAttachments(r.data || [])).catch(() => {});
+  };
+
+  const loadTradeIns = () => {
+    crmApi.getTradeIns(id).then(r => setTradeIns(r.data || [])).catch(() => {});
+  };
+
   useEffect(() => {
     crmApi.getCustomer(id).then(r => {
       setCustomer(r.data);
@@ -111,6 +138,8 @@ export default function CustomerDetail() {
     crmApi.getReminders(id).then(r => setReminders(r.data)).catch(() => {});
     loadVehicleInterests();
     loadCommunications();
+    loadAttachments();
+    loadTradeIns();
     vehiclesApi.getMasterVehicles({ limit: 200 })
       .then(r => setAllMasterVehicles(r.data || []))
       .catch(() => {});
@@ -503,18 +532,63 @@ export default function CustomerDetail() {
                 <FiMapPin size={14} /> {customer.city}{customer.district ? ` / ${customer.district}` : ''}
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 flex-wrap">
               <button className="btn btn-primary btn-sm" onClick={openEditModal} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <FiEdit2 size={16} /> Düzenle
+                <FiEdit2 size={15} /> Düzenle
               </button>
+
+              {customer.phone && (
+                <a
+                  href={`tel:${customer.phone}`}
+                  className="btn btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#10b981', color: '#fff', textDecoration: 'none' }}
+                >
+                  <FiPhone size={15} /> Ara
+                </a>
+              )}
+
               <button className="btn btn-success btn-sm" onClick={openWhatsApp} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <FiMessageSquare size={16} /> WhatsApp
+                <FiMessageSquare size={15} /> WhatsApp
               </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={() => { setAttachmentCategory('fleet_photo'); setShowAttachments(true); }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.4)' }}
+                title="Müşteri ve filo araçlarının fotoğrafını çek veya yükle"
+              >
+                <FiCamera size={15} /> 📸 Fotoğraf ({attachments.length})
+              </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={() => setShowTradeIn(true)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)' }}
+                title="Takas ve 2. el ekspertiz değerlendirmeleri"
+              >
+                <FiRepeat size={15} /> 🔄 Takas ({tradeIns.length})
+              </button>
+
+              <a
+                href={
+                  customer.latitude && customer.longitude 
+                    ? `https://maps.apple.com/?daddr=${customer.latitude},${customer.longitude}&dirflg=d` 
+                    : `https://maps.apple.com/?daddr=${encodeURIComponent([customer.address, customer.district, customer.city].filter(Boolean).join(' ') || customer.company_name)}&dirflg=d`
+                }
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-sm"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(139, 92, 246, 0.15)', color: '#c084fc', border: '1px solid rgba(139, 92, 246, 0.4)', textDecoration: 'none' }}
+                title="Haritalar ile yol tarifi başlat"
+              >
+                <FiNavigation size={15} /> 📍 Yol Tarifi
+              </a>
+
               <button className="btn btn-sm" onClick={handleDelete}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ef4444'; }}>
-                <FiTrash2 size={16} /> Sil
+                <FiTrash2 size={15} /> Sil
               </button>
             </div>
           </div>
@@ -556,10 +630,34 @@ export default function CustomerDetail() {
           <div className="form-row" style={{ gap: '2rem' }}>
             <div>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>İletişim</div>
-              <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiPhone size={14} style={{ color: 'var(--accent-blue-light)' }} /> {customer.phone || '—'}</p>
+              <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiPhone size={14} style={{ color: 'var(--accent-blue-light)' }} /> 
+                {customer.phone ? (
+                  <a href={`tel:${customer.phone}`} style={{ color: '#38bdf8', fontWeight: 700, textDecoration: 'underline' }}>
+                    {customer.phone}
+                  </a>
+                ) : '—'}
+              </p>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiMail size={14} style={{ color: 'var(--accent-amber)' }} /> {customer.email || '—'}</p>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiGlobe size={14} style={{ color: 'var(--accent-green)' }} /> {customer.website || '—'}</p>
-              <p className="text-sm" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiMapPin size={14} style={{ color: 'var(--accent-purple)' }} /> {customer.address || '—'}</p>
+              <p className="text-sm" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiMapPin size={14} style={{ color: 'var(--accent-purple)' }} /> 
+                {customer.address || customer.city ? (
+                  <a
+                    href={
+                      customer.latitude && customer.longitude 
+                        ? `https://maps.apple.com/?daddr=${customer.latitude},${customer.longitude}&dirflg=d` 
+                        : `https://maps.apple.com/?daddr=${encodeURIComponent([customer.address, customer.district, customer.city].filter(Boolean).join(' ') || customer.company_name)}&dirflg=d`
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: '#c084fc', textDecoration: 'underline' }}
+                    title="Apple/Google Haritalarda Aç"
+                  >
+                    {[customer.address, customer.district, customer.city].filter(Boolean).join(' / ') || 'Haritada Aç'} ↗
+                  </a>
+                ) : '—'}
+              </p>
             </div>
             <div>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>İş Bilgileri</div>
@@ -805,6 +903,38 @@ export default function CustomerDetail() {
               </button>
               <button className="btn btn-secondary btn-sm w-full" onClick={openEditModal} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiEdit2 size={14} /> Bilgileri Düzenle
+              </button>
+              <button
+                className="btn btn-sm w-full"
+                onClick={() => { setAttachmentCategory('fleet_photo'); setShowAttachments(true); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  justifyContent: 'center',
+                  background: 'rgba(59, 130, 246, 0.12)',
+                  color: '#60a5fa',
+                  border: '1px solid rgba(59, 130, 246, 0.35)',
+                  fontWeight: 600
+                }}
+              >
+                <FiCamera size={14} /> 📸 Fotoğraf & Evrak Galerisi ({attachments.length})
+              </button>
+              <button
+                className="btn btn-sm w-full"
+                onClick={() => setShowTradeIn(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  justifyContent: 'center',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  color: '#fbbf24',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  fontWeight: 600
+                }}
+              >
+                <FiRepeat size={14} /> 🔄 Takas / 2. El Ekspertiz ({tradeIns.length})
               </button>
               <button className="btn btn-secondary btn-sm w-full" onClick={() => navigate(`/customers/${customer.id}/proforma/new`)} style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                 <FiFileText size={14} /> Proforma Fatura Hazırla
@@ -1457,6 +1587,193 @@ export default function CustomerDetail() {
         )}
       </div>
 
+      {/* ── FOTOĞRAF & BELGE ARŞİVİ KARTI ── */}
+      <div className="card mt-6">
+        <div className="card-header" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiCamera size={18} style={{ color: '#3b82f6' }} /> Müşteri Fotoğraf & Belge Arşivi
+            </h3>
+            <span className="badge badge-blue" style={{ fontSize: '0.75rem' }}>
+              {attachments.length} Dosya
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => { setAttachmentCategory('fleet_photo'); setShowAttachments(true); }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            >
+              <FiPlus size={14} /> Fotoğraf / Belge Ekle
+            </button>
+            {attachments.length > 0 && (
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowAttachments(true)}
+              >
+                Galeriyi Aç
+              </button>
+            )}
+          </div>
+        </div>
+
+        {attachments.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.75rem' }}>
+            {attachments.slice(0, 8).map(att => {
+              const isImg = att.file_type?.startsWith('image/') || att.file_url?.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+              return (
+                <div
+                  key={att.id}
+                  onClick={() => setShowAttachments(true)}
+                  style={{
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--bg-input)',
+                    cursor: 'pointer',
+                    position: 'relative'
+                  }}
+                  title={att.title || att.file_name}
+                >
+                  <div style={{ aspectRatio: '1/1', background: 'rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {isImg ? (
+                      <img src={att.file_url} alt={att.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: '1.8rem' }}>📑</span>
+                    )}
+                  </div>
+                  <div style={{ padding: '6px 8px', fontSize: '0.72rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {att.title || att.file_name}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state" style={{ padding: '2rem 1rem' }}>
+            <div style={{ fontSize: '2rem', marginBottom: 8 }}>📸</div>
+            <p>Müşteriye ait filo araçları, kartvizit veya evrak fotoğrafı yüklenmemiş.</p>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => { setAttachmentCategory('fleet_photo'); setShowAttachments(true); }}
+              style={{ marginTop: 10 }}
+            >
+              + Kamera ile Fotoğraf Çek / Yükle
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── TAKAS / 2. EL ARAÇ EKSPERTİZ DEĞERLENDİRMELERİ ── */}
+      <div className="card mt-6">
+        <div className="card-header" style={{ flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <FiRepeat size={18} style={{ color: '#f59e0b' }} /> Takas & 2. El Ekspertiz Değerlendirmeleri
+            </h3>
+            {tradeIns.length > 0 && (
+              <span className="badge badge-amber" style={{ fontSize: '0.75rem' }}>
+                {tradeIns.length} Takas Aracı
+              </span>
+            )}
+          </div>
+
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => setShowTradeIn(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          >
+            <FiPlus size={14} /> Yeni Takas Aracı Ekle
+          </button>
+        </div>
+
+        {tradeIns.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {tradeIns.map(ti => {
+              const statusMap = {
+                pending: { label: 'Ekspertiz Bekliyor', color: '#f59e0b' },
+                appraised: { label: 'Ekspertiz Fiyatlandı', color: '#3b82f6' },
+                accepted: { label: 'Takas Anlaşıldı', color: '#10b981' },
+                rejected: { label: 'Reddedildi / İptal', color: '#ef4444' },
+                completed: { label: 'Satışla Takaslandı', color: '#8b5cf6' }
+              };
+              const st = statusMap[ti.status] || statusMap.pending;
+
+              return (
+                <div
+                  key={ti.id}
+                  onClick={() => setShowTradeIn(true)}
+                  style={{
+                    background: 'var(--bg-input)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '0.9rem 1rem',
+                    borderLeft: `4px solid ${st.color}`,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>
+                        {ti.vehicle_brand} {ti.vehicle_model}
+                      </span>
+                      {ti.model_year && (
+                        <span className="badge" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                          {ti.model_year}
+                        </span>
+                      )}
+                      {ti.plate_number && (
+                        <span className="badge badge-blue font-mono">
+                          {ti.plate_number}
+                        </span>
+                      )}
+                      <span className="badge" style={{ background: `${st.color}20`, color: st.color, border: `1px solid ${st.color}40`, fontWeight: 700 }}>
+                        {st.label}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: '0.8rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                      {ti.mileage_km && <span>🛣️ {ti.mileage_km.toLocaleString('tr-TR')} km</span>}
+                      {ti.customer_expected_price && (
+                        <span>Müşteri Beklentisi: <strong style={{ color: 'var(--text-heading)' }}>{ti.customer_expected_price.toLocaleString('tr-TR')} TL</strong></span>
+                      )}
+                      {ti.appraised_value && (
+                        <span style={{ color: '#10b981', fontWeight: 700 }}>
+                          Bayi Ekspertiz Teklifi: {ti.appraised_value.toLocaleString('tr-TR')} TL
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    className="btn btn-xs btn-secondary"
+                    onClick={(e) => { e.stopPropagation(); setShowTradeIn(true); }}
+                  >
+                    Detay & Düzenle
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state" style={{ padding: '2rem 1rem' }}>
+            <div style={{ fontSize: '2rem', marginBottom: 8 }}>🔄</div>
+            <p>Müşterinin takasa sunmak istediği herhangi bir 2. el araç değerlendirmesi bulunmuyor.</p>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setShowTradeIn(true)}
+              style={{ marginTop: 10 }}
+            >
+              + Takas Ekspertiz Talebi Oluştur
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* ── ADD/EDIT CONTACT MODAL ── */}
       {showAddContact && (
@@ -1785,7 +2102,16 @@ export default function CustomerDetail() {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Not</label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label className="form-label" style={{ margin: 0 }}>Not</label>
+                  <VoiceInputButton
+                    size="sm"
+                    onTranscript={(text) => setInteractionForm(prev => ({
+                      ...prev,
+                      notes: prev.notes ? `${prev.notes} ${text}` : text
+                    }))}
+                  />
+                </div>
                 <textarea className="form-textarea" value={interactionForm.notes} onChange={e => setInteractionForm({ ...interactionForm, notes: e.target.value })} />
               </div>
               <div className="form-row">
@@ -2037,13 +2363,22 @@ export default function CustomerDetail() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Görüşme Notu</label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label className="form-label" style={{ margin: 0 }}>Görüşme Notu</label>
+                  <VoiceInputButton
+                    size="sm"
+                    onTranscript={(text) => setCallForm(prev => ({
+                      ...prev,
+                      notes: prev.notes ? `${prev.notes} ${text}` : text
+                    }))}
+                  />
+                </div>
                 <textarea
                   className="form-textarea"
                   rows={3}
                   value={callForm.notes}
                   onChange={e => setCallForm({ ...callForm, notes: e.target.value })}
-                  placeholder="Müşteri ne söyledi? Hangi araç modelini sordu? vb."
+                  placeholder="Müşteri ne söyledi? Hangi araç modelini sordu? vb. (Mikrofona basarak konuşabilirsiniz)"
                 />
               </div>
 
@@ -2083,13 +2418,22 @@ export default function CustomerDetail() {
 
             <form onSubmit={handleSendWhatsApp}>
               <div className="form-group">
-                <label className="form-label">Mesaj İçeriği *</label>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label className="form-label" style={{ margin: 0 }}>Mesaj İçeriği *</label>
+                  <VoiceInputButton
+                    size="sm"
+                    onTranscript={(text) => setWhatsAppForm(prev => ({
+                      ...prev,
+                      message: prev.message ? `${prev.message} ${text}` : text
+                    }))}
+                  />
+                </div>
                 <textarea
                   className="form-textarea"
                   rows={4}
                   value={whatsAppForm.message}
                   onChange={e => setWhatsAppForm({ ...whatsAppForm, message: e.target.value })}
-                  placeholder="Mesajınızı yazın..."
+                  placeholder="Mesajınızı yazın veya mikrofona basarak konuşun..."
                   required
                 />
               </div>
@@ -2124,6 +2468,33 @@ export default function CustomerDetail() {
         <StockMatchModal
           stockId={selectedStockMatchId}
           onClose={() => setSelectedStockMatchId(null)}
+        />
+      )}
+
+      {/* ── CUSTOMER ATTACHMENTS (FOTOĞRAF & BELGE) MODAL ── */}
+      {customer && (
+        <CustomerAttachmentModal
+          customerId={parseInt(id)}
+          customerName={customer.company_name}
+          isOpen={showAttachments}
+          onClose={() => { setShowAttachments(false); loadAttachments(); }}
+          initialCategory={attachmentCategory}
+          tradeInId={attachmentTradeInId}
+        />
+      )}
+
+      {/* ── CUSTOMER TRADE-IN (TAKAS / 2. EL) MODAL ── */}
+      {customer && (
+        <TradeInModal
+          customerId={parseInt(id)}
+          customerName={customer.company_name}
+          isOpen={showTradeIn}
+          onClose={() => { setShowTradeIn(false); loadTradeIns(); }}
+          onPhotoRequest={(tradeInId) => {
+            setAttachmentTradeInId(tradeInId);
+            setAttachmentCategory('trade_in_photo');
+            setShowAttachments(true);
+          }}
         />
       )}
     </div>
