@@ -63,6 +63,24 @@ class SalesActivityService:
 
         activity = SalesActivity(user_id=user_id, **data.model_dump())
         self.db.add(activity)
+
+        # Pipeline aşamasını ve son iletişim tarihini otomatik güncelle
+        customer.last_contact_date = datetime.now(timezone.utc).date()
+        customer.updated_at = datetime.utcnow()
+        if data.status in ["offer_given", "proposal", "quoted"]:
+            customer.pipeline_stage = "proposal"
+            customer.pipeline_note = data.notes or f"Teklif İletildi ({data.activity_type.upper()})"
+            customer.potential_score = max(customer.potential_score or 0, 95)
+            customer.potential_level = "very_high"
+        elif data.status == "won":
+            customer.pipeline_stage = "won"
+            customer.potential_score = 100
+        elif data.status == "lost":
+            customer.pipeline_stage = "lost"
+        elif customer.pipeline_stage == "lead":
+            customer.pipeline_stage = "contact"
+            customer.potential_score = max(customer.potential_score or 0, 75)
+
         self.db.commit()
         self.db.refresh(activity)
 
@@ -76,6 +94,21 @@ class SalesActivityService:
             raise HTTPException(status_code=404, detail="Aktivite bulunamadı")
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(activity, field, value)
+
+        if data.status:
+            customer = self.db.query(Customer).filter(Customer.id == activity.customer_id).first()
+            if customer:
+                customer.updated_at = datetime.utcnow()
+                if data.status in ["offer_given", "proposal", "quoted"]:
+                    customer.pipeline_stage = "proposal"
+                    customer.potential_score = max(customer.potential_score or 0, 95)
+                    customer.potential_level = "very_high"
+                elif data.status == "won":
+                    customer.pipeline_stage = "won"
+                    customer.potential_score = 100
+                elif data.status == "lost":
+                    customer.pipeline_stage = "lost"
+
         self.db.commit()
         self.db.refresh(activity)
 

@@ -11,11 +11,12 @@ import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
 
 const SEGMENTS = { A: 'badge-green', B: 'badge-blue', C: 'badge-amber', D: 'badge-red' };
 const POTENTIALS = { very_high: 'Çok Yüksek', high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
+const TARGET_PROVINCES = ['Samsun', 'Ordu', 'Sivas', 'Giresun', 'Çorum', 'Amasya', 'Sinop', 'Tokat', 'Kastamonu'];
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState({ items: [], total: 0, page: 1, total_pages: 1 });
   const [search, setSearch] = useState('');
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState('target_9');
   const [sector, setSector] = useState('');
   const [vehicleGroup, setVehicleGroup] = useState('');
   const [interestLevel, setInterestLevel] = useState('');
@@ -240,19 +241,67 @@ export default function CustomerList() {
 
   return (
     <div className="animate-in">
+      {/* ── HEDEF 9 İL YETKİ ALANI HIZLI FİLTRE ÇUBUĞU ── */}
+      <div style={{
+        background: 'rgba(30, 41, 59, 0.5)',
+        borderRadius: 'var(--radius-lg, 12px)',
+        border: '1px solid var(--border-color)',
+        padding: '8px 14px',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        flexWrap: 'wrap'
+      }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-blue-light)', display: 'inline-flex', alignItems: 'center', gap: 4, marginRight: 4 }}>
+          <FiMapPin size={14} /> Yetki Alanı:
+        </span>
+        <button
+          type="button"
+          className={`btn btn-xs ${city === 'target_9' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => { setCity('target_9'); setPage(1); }}
+          style={{ borderRadius: 14, fontWeight: city === 'target_9' ? 700 : 500, fontSize: '0.75rem' }}
+        >
+          🎯 Hedef 9 İl (Tümü)
+        </button>
+        {TARGET_PROVINCES.map(p => (
+          <button
+            key={p}
+            type="button"
+            className={`btn btn-xs ${city === p ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => { setCity(p); setPage(1); }}
+            style={{ borderRadius: 14, fontWeight: city === p ? 700 : 500, fontSize: '0.75rem' }}
+          >
+            {p}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`btn btn-xs ${city === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => { setCity('all'); setPage(1); }}
+          style={{ borderRadius: 14, fontWeight: city === 'all' ? 700 : 500, fontSize: '0.75rem' }}
+        >
+          🌐 Tüm İller
+        </button>
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6" style={{ flexWrap: 'wrap', gap: '1rem' }}>
-        <div className="flex gap-3" style={{ flex: 1, maxWidth: 700 }}>
-          <input className="form-input" placeholder="Firma adı, telefon veya e-posta ile ara..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
-          <select className="form-select" style={{ width: 150 }} value={city} onChange={e => { setCity(e.target.value); setPage(1); }}>
-            <option value="">Tüm Şehirler</option>
+        <div className="flex gap-3" style={{ flex: 1, maxWidth: 740, flexWrap: 'wrap' }}>
+          <input className="form-input" placeholder="Firma adı, telefon veya e-posta ile ara..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ minWidth: 200, flex: 1 }} />
+          <select className="form-select" style={{ width: 175 }} value={city} onChange={e => { setCity(e.target.value); setPage(1); }}>
+            <option value="target_9">🎯 Hedef 9 İl (Tümü)</option>
             <option value="Samsun">Samsun</option>
-            <option value="Amasya">Amasya</option>
-            <option value="Tokat">Tokat</option>
-            <option value="Çorum">Çorum</option>
             <option value="Ordu">Ordu</option>
+            <option value="Sivas">Sivas</option>
+            <option value="Giresun">Giresun</option>
+            <option value="Çorum">Çorum</option>
+            <option value="Amasya">Amasya</option>
             <option value="Sinop">Sinop</option>
-            <option value="Bilinmiyor">Bilinmiyor</option>
+            <option value="Tokat">Tokat</option>
+            <option value="Kastamonu">Kastamonu</option>
+            <option value="all">🌐 Tüm İller (Filtresiz)</option>
+            <option value="Bilinmiyor">❓ Şehir Belirtilmemiş</option>
           </select>
           <select className="form-select" style={{ width: 180 }} value={sector} onChange={e => { setSector(e.target.value); setPage(1); }}>
             <option value="">Tüm Sektörler</option>

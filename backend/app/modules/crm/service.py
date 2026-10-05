@@ -27,6 +27,11 @@ from app.modules.crm.schemas import (
 from app.core.deps import PaginationParams, CustomerFilterParams
 
 
+TARGET_PROVINCES = [
+    "Samsun", "Ordu", "Sivas", "Giresun", "Çorum", "Amasya", "Sinop", "Tokat", "Kastamonu"
+]
+
+
 class CRMService:
     def __init__(self, db: Session):
         self.db = db
@@ -40,7 +45,14 @@ class CRMService:
                 Customer.email.ilike(s), Customer.tax_number.ilike(s),
             ))
         if filters.city:
-            query = query.filter(Customer.city == filters.city)
+            if filters.city in ["target_9", "Hedef 9 İl", "9_il"]:
+                query = query.filter(or_(Customer.city.in_(TARGET_PROVINCES), Customer.pipeline_stage.in_(["proposal", "negotiation", "won", "contact"])))
+            elif filters.city in ["all", "Tüm İller", "Tümü"]:
+                pass
+            elif filters.city == "Bilinmiyor":
+                query = query.filter(or_(Customer.city == "Bilinmiyor", Customer.city.is_(None)))
+            else:
+                query = query.filter(Customer.city == filters.city)
         if filters.sector:
             query = query.filter(Customer.sector.ilike(f"%{filters.sector}%"))
         if filters.segment:
@@ -70,7 +82,13 @@ class CRMService:
 
         total = query.count()
         sort_col = getattr(Customer, filters.sort_by, Customer.created_at)
-        query = query.order_by(asc(sort_col) if filters.sort_order == "asc" else desc(sort_col))
+        from sqlalchemy import case
+        stage_priority = case(
+            (Customer.pipeline_stage.in_(["proposal", "negotiation", "won"]), 0),
+            (Customer.pipeline_stage == "contact", 1),
+            else_=2
+        )
+        query = query.order_by(stage_priority, asc(sort_col) if filters.sort_order == "asc" else desc(sort_col))
         items = query.offset(pagination.offset).limit(pagination.page_size).all()
 
         res_items = []
@@ -631,6 +649,10 @@ class CRMService:
             notes=data.notes
         )
         
+        # Müşterinin Pipeline aşamasını otomatik olarak Teklif (proposal) durumuna geçir
+        customer.pipeline_stage = "proposal"
+        customer.pipeline_note = f"Resmi Proforma Fatura Düzenlendi ({invoice_number})"
+
         self.db.add(db_proforma)
         self.db.commit()
         self.db.refresh(db_proforma)

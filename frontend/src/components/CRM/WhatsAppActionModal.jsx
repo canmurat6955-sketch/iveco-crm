@@ -176,6 +176,18 @@ export default function WhatsAppActionModal({
           notes: internalNote,
           next_follow_up: nextFollowUp || undefined
         });
+
+        // Pipeline aşamasını 'proposal' (Teklif) olarak CRM'e garanti işle
+        if (status === 'offer_given') {
+          try {
+            await crmApi.updateCustomer(custId, {
+              pipeline_stage: 'proposal',
+              pipeline_note: internalNote || 'WhatsApp ile resmi araç teklifi iletildi.'
+            });
+          } catch (e) {
+            console.warn('Customer pipeline stage update error:', e);
+          }
+        }
       }
 
       // 2. Eğer Araç İhtiyacı (Interest) ID'si varsa durumunu 'quoted' (Teklif Yapıldı) olarak güncelle
@@ -233,6 +245,9 @@ export default function WhatsAppActionModal({
       setSavingCustomer(true);
       const custId = activeCustomerId;
 
+      const pStage = status === 'offer_given' ? 'proposal' : 'contact';
+      const pNote = customerForm.sales_notes || internalNote || (status === 'offer_given' ? 'WhatsApp üzerinden teklif sunuldu.' : 'Görüşme sağlandı.');
+
       if (custId) {
         // Var olan müşteriyi güncelle
         await crmApi.updateCustomer(custId, {
@@ -245,7 +260,9 @@ export default function WhatsAppActionModal({
           vergi_dairesi: customerForm.vergi_dairesi,
           current_fleet: customerForm.current_fleet,
           segment: customerForm.segment,
-          sales_notes: customerForm.sales_notes
+          sales_notes: customerForm.sales_notes,
+          pipeline_stage: pStage,
+          pipeline_note: pNote
         });
 
         // Yetkili kişi varsa contact ekle/güncelle
@@ -261,7 +278,7 @@ export default function WhatsAppActionModal({
           }
         }
 
-        toast.success('Müşteri kaydı başarıyla güncellendi! ✅');
+        toast.success(`Müşteri kaydı güncellendi ve Pipeline (${pStage === 'proposal' ? 'Teklif' : 'Görüşme'}) aşamasına işlendi! 🎯`);
       } else {
         // Yeni Müşteri Oluştur
         const createRes = await crmApi.createCustomer({
@@ -274,7 +291,9 @@ export default function WhatsAppActionModal({
           vergi_dairesi: customerForm.vergi_dairesi,
           current_fleet: customerForm.current_fleet,
           segment: customerForm.segment || 'C',
-          sales_notes: customerForm.sales_notes
+          sales_notes: customerForm.sales_notes,
+          pipeline_stage: pStage,
+          pipeline_note: pNote
         });
 
         const newId = createRes.data?.id;
@@ -291,7 +310,21 @@ export default function WhatsAppActionModal({
           } catch {}
         }
 
-        toast.success('Yeni müşteri CRM sistemine kaydedildi! 🎯');
+        // Yeni müşteri için aktivite kaydı oluştur
+        if (newId) {
+          try {
+            await salesApi.createActivity({
+              customer_id: newId,
+              activity_type: 'whatsapp',
+              status: status,
+              message_content: message,
+              notes: pNote,
+              next_follow_up: nextFollowUp || undefined
+            });
+          } catch {}
+        }
+
+        toast.success(`Yeni müşteri CRM ve Satış Pipeline (${pStage === 'proposal' ? 'Teklif' : 'Görüşme'}) aşamasına eklendi! 🎯`);
       }
 
       setCustomerSaved(true);
