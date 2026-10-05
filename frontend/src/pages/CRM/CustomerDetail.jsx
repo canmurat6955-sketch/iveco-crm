@@ -6,6 +6,7 @@ import VehicleInterestModal from './VehicleInterestModal';
 import StockMatchModal from '../Vehicles/StockMatchModal';
 import CustomerAttachmentModal from '../../components/CRM/CustomerAttachmentModal';
 import TradeInModal from '../../components/CRM/TradeInModal';
+import WhatsAppActionModal from '../../components/CRM/WhatsAppActionModal';
 import VoiceInputButton from '../../components/common/VoiceInputButton';
 import toast from 'react-hot-toast';
 import { openWhatsApp } from '../../utils/whatsapp';
@@ -547,7 +548,7 @@ export default function CustomerDetail() {
                 </a>
               )}
 
-              <button className="btn btn-success btn-sm" onClick={openWhatsApp} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <button className="btn btn-success btn-sm" onClick={() => setShowWhatsAppModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}>
                 <FiMessageSquare size={15} /> WhatsApp
               </button>
 
@@ -2393,65 +2394,6 @@ export default function CustomerDetail() {
         </div>
       )}
 
-      {/* ── WHATSAPP MESSAGE MODAL ── */}
-      {showWhatsAppModal && (
-        <div className="modal-overlay" onClick={() => setShowWhatsAppModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-              <h3 className="modal-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <FiMessageSquare size={20} style={{ color: '#25d366' }} /> WhatsApp İletişimi
-              </h3>
-              <button onClick={() => setShowWhatsAppModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
-                <FiX size={20} />
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <label className="form-label text-xs">Hazır Şablon Seçin:</label>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('tanisma')}>👋 Tanışma</button>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('katalog')}>📄 Ürün Kataloğu</button>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('kampanya')}>🔥 Faiz Kampanyası</button>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => selectWhatsAppTemplate('proforma')}>💼 Teklif / Fiyat</button>
-              </div>
-            </div>
-
-            <form onSubmit={handleSendWhatsApp}>
-              <div className="form-group">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <label className="form-label" style={{ margin: 0 }}>Mesaj İçeriği *</label>
-                  <VoiceInputButton
-                    size="sm"
-                    onTranscript={(text) => setWhatsAppForm(prev => ({
-                      ...prev,
-                      message: prev.message ? `${prev.message} ${text}` : text
-                    }))}
-                  />
-                </div>
-                <textarea
-                  className="form-textarea"
-                  rows={4}
-                  value={whatsAppForm.message}
-                  onChange={e => setWhatsAppForm({ ...whatsAppForm, message: e.target.value })}
-                  placeholder="Mesajınızı yazın veya mikrofona basarak konuşun..."
-                  required
-                />
-              </div>
-
-              <div className="text-xs text-muted mb-4">
-                💡 Mesaj otomatik olarak CRM müşteri geçmişine kaydedilecek ve WhatsApp sohbetine aktarılacaktır.
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowWhatsAppModal(false)}>İptal</button>
-                <button type="submit" className="btn btn-success" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}>
-                  <FiMessageSquare size={14} /> Gönder & Kaydet
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* ── VEHICLE INTEREST MODAL ── */}
       {showVehicleModal && (
@@ -2494,6 +2436,23 @@ export default function CustomerDetail() {
             setAttachmentTradeInId(tradeInId);
             setAttachmentCategory('trade_in_photo');
             setShowAttachments(true);
+          }}
+        />
+      )}
+
+      {/* ── WHATSAPP TEKLİF & GÖRÜŞME MODALI ── */}
+      {customer && (
+        <WhatsAppActionModal
+          isOpen={showWhatsAppModal}
+          onClose={() => setShowWhatsAppModal(false)}
+          customer={customer}
+          vehicleTitle={vehicleInterests?.[0]?.vehicle ? `${vehicleInterests[0].vehicle.model_name || vehicleInterests[0].vehicle.model || vehicleInterests[0].vehicle.vehicle_group}` : ''}
+          interestId={vehicleInterests?.[0]?.id}
+          defaultStatus="offer_given"
+          onSuccess={() => {
+            crmApi.getCustomer(id).then(r => setCustomer(r.data));
+            crmApi.getInteractions(id).then(r => setInteractions(r.data));
+            loadVehicleInterests();
           }}
         />
       )}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { crmApi, vehiclesApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { 
@@ -37,6 +37,13 @@ export default function CustomerList() {
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('add') === 'true') {
+      setShowAdd(true);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     vehiclesApi.getMasterVehicles({ limit: 200 })

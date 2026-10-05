@@ -192,6 +192,27 @@ export default function Dashboard() {
               <div className="quick-btn-icon"><FiMap size={20} /></div>
               <span>Harita</span>
             </button>
+            <button 
+              className="quick-btn" 
+              style={{ background: 'rgba(37, 211, 102, 0.1)', borderColor: 'rgba(37, 211, 102, 0.3)' }}
+              onClick={() => setWhatsAppModalData({
+                customer: { company_name: '', phone: '', city: 'Samsun' },
+                vehicleTitle: '',
+                interestId: null,
+                defaultStatus: 'offer_given'
+              })}
+            >
+              <div className="quick-btn-icon" style={{ color: '#25d366' }}><FiMessageSquare size={20} /></div>
+              <span>WhatsApp & Kayıt</span>
+            </button>
+            <button 
+              className="quick-btn" 
+              style={{ background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)' }}
+              onClick={() => navigate('/customers?add=true')}
+            >
+              <div className="quick-btn-icon" style={{ color: '#60a5fa' }}><FiUsers size={20} /></div>
+              <span>Müşteri Ekle</span>
+            </button>
           </div>
         </section>
 
