@@ -32,8 +32,16 @@ self.addEventListener('activate', (event) => {
 
 // Fetch events: Network first, fallback to cache for HTML/assets
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests, bypass API calls to prevent breaking database reads/writes
-  if (event.request.method !== 'GET' || event.request.url.includes('/api/')) {
+  const url = event.request.url;
+  // Only handle GET requests, bypass API calls and dev server modules
+  if (
+    event.request.method !== 'GET' ||
+    url.includes('/api/') ||
+    url.includes('/@') ||
+    url.includes('/node_modules/') ||
+    url.includes('?v=') ||
+    url.includes('?t=')
+  ) {
     return;
   }
 
@@ -41,7 +49,7 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // Cache successful network responses
-        if (response.status === 200) {
+        if (response && response.status === 200) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
@@ -56,7 +64,8 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           }
           // If HTML request failed and not in cache, fallback to index
-          if (event.request.headers.get('accept').includes('text/html')) {
+          const accept = event.request.headers.get('accept') || '';
+          if (accept.includes('text/html')) {
             return caches.match('/index.html');
           }
         });
