@@ -24,6 +24,8 @@ import VehicleManagement from './pages/Vehicles/VehicleManagement';
 
 
 
+import { WhatsAppProvider } from './contexts/WhatsAppContext';
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) {
@@ -43,28 +45,30 @@ export default function App() {
   return (
     <AuthProvider>
       <VisitProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="customers" element={<CustomerList />} />
-            <Route path="customers/:id" element={<CustomerDetail />} />
-            <Route path="customers/import" element={<ImportCustomers />} />
-            <Route path="campaigns" element={<CampaignList />} />
-            <Route path="sales" element={<SalesActivity />} />
-            <Route path="pipeline" element={<Pipeline />} />
-            <Route path="notifications" element={<NotificationCenter />} />
-            <Route path="discovery" element={<DiscoveryList />} />
-            <Route path="routes" element={<RoutePlanner />} />
-            <Route path="scan-card" element={<CardScanner />} />
-            <Route path="map" element={<MapPage />} />
-            <Route path="customers/:customerId/proforma/new" element={<ProformaNew />} />
-            <Route path="proformas/:id" element={<ProformaDetail />} />
-            <Route path="proforma/quick" element={<ProformaQuick />} />
-            <Route path="vehicles/management" element={<VehicleManagement />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <WhatsAppProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+              <Route index element={<Dashboard />} />
+              <Route path="customers" element={<CustomerList />} />
+              <Route path="customers/:id" element={<CustomerDetail />} />
+              <Route path="customers/import" element={<ImportCustomers />} />
+              <Route path="campaigns" element={<CampaignList />} />
+              <Route path="sales" element={<SalesActivity />} />
+              <Route path="pipeline" element={<Pipeline />} />
+              <Route path="notifications" element={<NotificationCenter />} />
+              <Route path="discovery" element={<DiscoveryList />} />
+              <Route path="routes" element={<RoutePlanner />} />
+              <Route path="scan-card" element={<CardScanner />} />
+              <Route path="map" element={<MapPage />} />
+              <Route path="customers/:customerId/proforma/new" element={<ProformaNew />} />
+              <Route path="proformas/:id" element={<ProformaDetail />} />
+              <Route path="proforma/quick" element={<ProformaQuick />} />
+              <Route path="vehicles/management" element={<VehicleManagement />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </WhatsAppProvider>
       </VisitProvider>
     </AuthProvider>
   );

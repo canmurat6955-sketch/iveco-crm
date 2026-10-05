@@ -344,7 +344,7 @@ export default function CustomerDetail() {
       return;
     }
     const msg = `Merhaba ${customer.company_name} yetkilisi, ERC Samsun Otomotiv adına iletişime geçiyorum. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dileriz.`;
-    openWhatsApp(customer.phone, msg);
+    openWhatsApp(customer.phone, msg, { customer });
   };
 
   // ── Vehicle Interest Handlers (Satış Zekâsı) ──
@@ -484,19 +484,6 @@ export default function CustomerDetail() {
       crmApi.getInteractions(id).then(r => setInteractions(r.data));
       crmApi.getCustomer(id).then(r => setCustomer(r.data));
     } catch { toast.error('Hata oluştu'); }
-  };
-
-  const openWhatsApp = async () => {
-    try {
-      const msg = `Merhaba, Iveco yetkili bayisi olarak sizinle iletişime geçmek istiyoruz.`;
-      const res = await salesApi.getWhatsAppLink(parseInt(id), msg);
-      window.open(res.data.link, '_blank');
-      await salesApi.createActivity({
-        customer_id: parseInt(id), activity_type: 'whatsapp',
-        message_content: msg, status: 'sent',
-      });
-      toast.success('WhatsApp açıldı ve log kaydedildi');
-    } catch { toast.error('WhatsApp linki oluşturulamadı'); }
   };
 
   const handleDelete = async () => {

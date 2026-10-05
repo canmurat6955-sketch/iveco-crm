@@ -178,13 +178,19 @@ export default function SalesActivityPage() {
     } catch { toast.error('Güncelleme hatası'); }
   };
 
-  const openWhatsApp = async (customerId) => {
-    try {
-      const template = templates.find(t => t.category === 'introduction');
-      const msg = template ? template.content : 'Merhaba, Iveco yetkili bayisinden arıyoruz.';
-      const res = await salesApi.getWhatsAppLink(customerId, msg);
-      window.open(res.data.link, '_blank');
-    } catch { toast.error('WhatsApp linki oluşturulamadı'); }
+  const handleOpenWhatsApp = (customerDataOrId, phone = '') => {
+    let custObj = {};
+    let targetPhone = phone;
+    if (typeof customerDataOrId === 'object' && customerDataOrId !== null) {
+      custObj = customerDataOrId;
+      targetPhone = custObj.phone || targetPhone;
+    } else if (typeof customerDataOrId === 'number') {
+      custObj = { id: customerDataOrId };
+    } else if (typeof customerDataOrId === 'string') {
+      targetPhone = customerDataOrId;
+      custObj = { phone: targetPhone };
+    }
+    openWhatsApp(targetPhone, '', { customer: custObj, defaultStatus: 'offer_given' });
   };
 
   const selectTemplate = (templateId) => {
@@ -523,7 +529,7 @@ export default function SalesActivityPage() {
                         ) : (
                           <button
                             className="btn btn-secondary btn-sm"
-                            onClick={() => openWhatsApp(m.normalized_phone)}
+                            onClick={() => handleOpenWhatsApp({ phone: m.normalized_phone, company_name: m.sender_name || 'WhatsApp İletişim' })}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', fontSize: '0.72rem' }}
                           >
                             <FiMessageSquare size={12} /> WhatsApp'ta Aç
@@ -595,7 +601,7 @@ export default function SalesActivityPage() {
                     <td className="text-muted text-xs">{new Date(a.created_at).toLocaleDateString('tr-TR')}</td>
                     <td>
                       <div className="flex gap-2">
-                        <button className="btn btn-sm btn-secondary" onClick={() => openWhatsApp(a.customer_id)} title="WhatsApp" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 0 }}><FiMessageSquare size={14} /></button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => handleOpenWhatsApp({ id: a.customer_id, company_name: a.customer_name, phone: a.phone })} title="WhatsApp" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, padding: 0 }}><FiMessageSquare size={14} /></button>
                         <select className="form-select" style={{ width: 130, padding: '2px 6px', fontSize: '0.7rem' }}
                           value={a.status} onChange={e => updateStatus(a.id, e.target.value)}>
                           {Object.entries(STATUS_MAP).map(([k, { label }]) => <option key={k} value={k}>{label}</option>)}

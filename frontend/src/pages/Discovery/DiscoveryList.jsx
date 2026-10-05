@@ -5,7 +5,7 @@ import useGeolocation from '../../hooks/useGeolocation';
 import { searchIntentParser } from '../../services/searchIntentParser';
 import { duplicateDetection } from '../../services/duplicateDetection';
 import toast from 'react-hot-toast';
-import { getWhatsAppUrl } from '../../utils/whatsapp';
+import { getWhatsAppUrl, openWhatsApp } from '../../utils/whatsapp';
 import { 
   FiZap, FiPlay, FiLoader, FiCheck, FiX, FiChevronLeft, 
   FiChevronRight, FiSearch, FiMapPin, FiPlus, FiNavigation, 
@@ -850,13 +850,24 @@ export default function DiscoveryList() {
                         {/* Butonlar */}
                         <div className="flex gap-2 items-center">
                           {r.customer_phone && (
-                            <a 
-                              href={getWhatsAppUrl(r.customer_phone, `Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`)}
+                            <button 
+                              type="button"
+                              onClick={() => openWhatsApp(r.customer_phone, `Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`, {
+                                customer: {
+                                  id: r.crm_customer_id,
+                                  company_name: r.customer_name,
+                                  phone: r.customer_phone,
+                                  city: r.city || '',
+                                  notes: `Üst Yapıcı Referansı: ${r.bodybuilder_name}. Aranan Şasi: ${r.requested_chassis || '-'}`
+                                },
+                                vehicleTitle: r.requested_chassis || '',
+                                defaultStatus: 'offer_given'
+                              })}
                               className="btn btn-secondary btn-sm"
                               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
                             >
                               <FiMessageSquare size={14} /> WhatsApp
-                            </a>
+                            </button>
                           )}
 
                           {r.crm_customer_id ? (
@@ -1209,12 +1220,23 @@ export default function DiscoveryList() {
                             >
                               <FiPhoneCall size={13} /> {biz.phone}
                             </a>
-                            <a
-                              href={getWhatsAppUrl(biz.phone)}
-                              style={{ color: '#4ade80', fontSize: 11, fontWeight: 500, textDecoration: 'none' }}
+                            <button
+                              type="button"
+                              onClick={() => openWhatsApp(biz.phone, `Merhaba ${biz.name || 'Yetkili'}, IVECO ticari araçlarımız hakkında bilgi vermek için iletişime geçiyorum.`, {
+                                customer: {
+                                  company_name: biz.name || biz.company_name || 'İşletme',
+                                  phone: biz.phone,
+                                  city: biz.city || selectedOsbCity || '',
+                                  district: biz.district || '',
+                                  sector: biz.sector || 'Sanayi / Ticaret',
+                                  sales_notes: `OSB Keşfi: ${biz.address || ''}`
+                                },
+                                defaultStatus: 'offer_given'
+                              })}
+                              style={{ background: 'transparent', border: 'none', color: '#4ade80', fontSize: 11, fontWeight: 500, cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3 }}
                             >
-                              WhatsApp Mesajı
-                            </a>
+                              <FiMessageSquare size={11} /> WhatsApp Mesajı
+                            </button>
                           </div>
                         )}
                       </div>

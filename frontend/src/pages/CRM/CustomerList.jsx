@@ -424,7 +424,7 @@ export default function CustomerList() {
                     <button
                       type="button"
                       className="btn btn-xs"
-                      onClick={() => openWhatsApp(c.phone)}
+                      onClick={() => openWhatsApp(c.phone, '', { customer: c })}
                       style={{
                         display: 'flex',
                         alignItems: 'center',

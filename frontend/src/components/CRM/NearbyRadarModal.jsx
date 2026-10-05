@@ -256,6 +256,19 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
                       </a>
                     )}
 
+                    {/* WhatsApp with Customer Info Modal */}
+                    {c.phone && (
+                      <button
+                        type="button"
+                        onClick={() => openWhatsApp(c.phone, '', { customer: c, defaultStatus: 'offer_given' })}
+                        className="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95"
+                        title="WhatsApp & Bilgi Girişi"
+                      >
+                        <FiMessageSquare className="w-4 h-4 text-[#25d366]" />
+                        <span className="hidden sm:inline">WhatsApp</span>
+                      </button>
+                    )}
+
                     {/* Apple Maps 1-Tap Directions */}
                     <a
                       href={c.apple_maps_url}

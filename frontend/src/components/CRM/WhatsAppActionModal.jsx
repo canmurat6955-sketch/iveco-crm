@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import VoiceInputButton from '../common/VoiceInputButton';
 import { salesApi, vehiclesApi, crmApi } from '../../api/client';
-import { openWhatsApp } from '../../utils/whatsapp';
+import { launchNativeWhatsApp } from '../../utils/whatsapp';
 import toast from 'react-hot-toast';
 
 export default function WhatsAppActionModal({
@@ -194,7 +194,7 @@ export default function WhatsAppActionModal({
       }
 
       // 3. Yerel WhatsApp Uygulamasını Aç (Deep Link)
-      openWhatsApp(targetPhone, message);
+      launchNativeWhatsApp(targetPhone, message);
 
       if (status === 'offer_given') {
         toast.success("WhatsApp açıldı ve 'Teklif Yapıldı' olarak CRM'e kaydedildi! 🎯", { duration: 4000 });
@@ -296,7 +296,7 @@ export default function WhatsAppActionModal({
 
       setCustomerSaved(true);
       if (onSuccess) {
-        onSuccess({ customerId: activeCustomerId });
+        onSuccess({ customerId: custId || createdCustomerId });
       }
     } catch (err) {
       console.error('Müşteri kaydetme hatası:', err);

@@ -48,9 +48,12 @@ export default function Pipeline() {
     setCollapsedCols(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const openWhatsApp = (phone, name) => {
-    if (!phone) return toast.error('Telefon yok');
-    triggerWhatsApp(phone, `Merhaba, ${name} hakkında bilgi almak istiyorum.`);
+  const handleWhatsApp = (customer) => {
+    if (!customer?.phone) return toast.error('Telefon numarası bulunamadı');
+    triggerWhatsApp(customer.phone, `Merhaba Sayın Yetkili (${customer.company_name || ''}), IVECO araç teklifimiz hakkında görüşebilir miyiz?`, {
+      customer: customer,
+      defaultStatus: 'offer_given'
+    });
   };
 
   if (loading) return <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>Yükleniyor...</div>;
@@ -143,7 +146,7 @@ export default function Pipeline() {
                       {/* Actions */}
                       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                         {c.phone && (
-                          <button onClick={e => { e.stopPropagation(); openWhatsApp(c.phone, c.company_name); }}
+                          <button onClick={e => { e.stopPropagation(); handleWhatsApp(c); }}
                             style={{ fontSize: '0.65rem', padding: '3px 6px', borderRadius: 6, border: '1px solid #25D36620', background: '#25D36610', color: '#25D366', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
                             <FiMessageSquare size={10} /> WA
                           </button>

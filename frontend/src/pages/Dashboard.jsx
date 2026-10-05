@@ -388,13 +388,41 @@ export default function Dashboard() {
           </div>
           <div className="mobile-list">
             {todayCalls.length > 0 ? todayCalls.slice(0, 5).map((c, i) => (
-              <div key={i} className="mobile-list-item" onClick={() => navigate(`/customers/${c.customer_id}`)}>
-                <div className="item-avatar">{c.customer_name?.charAt(0)}</div>
-                <div className="item-details">
-                  <div className="item-name">{c.customer_name}</div>
-                  <div className="item-sub">{c.city} · {c.phone || 'Telefon Yok'}</div>
+              <div key={i} className="mobile-list-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/customers/${c.customer_id}`)}>
+                  <div className="item-avatar">{c.customer_name?.charAt(0)}</div>
+                  <div className="item-details">
+                    <div className="item-name">{c.customer_name}</div>
+                    <div className="item-sub">{c.city} · {c.phone || 'Telefon Yok'}</div>
+                  </div>
                 </div>
-                <span className="badge badge-amber">{c.status}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {c.phone && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWhatsAppModalData({
+                          customer: {
+                            id: c.customer_id,
+                            company_name: c.customer_name,
+                            phone: c.phone,
+                            city: c.city
+                          },
+                          vehicleTitle: '',
+                          interestId: null,
+                          defaultStatus: 'offer_given'
+                        });
+                      }}
+                      className="btn btn-sm btn-success"
+                      style={{ padding: '4px 8px', fontSize: '0.72rem', background: '#25d366', borderColor: '#25d366', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      title="WhatsApp & Kayıt"
+                    >
+                      <FiMessageSquare size={12} /> WA
+                    </button>
+                  )}
+                  <span className="badge badge-amber">{c.status}</span>
+                </div>
               </div>
             )) : (
               <div className="mobile-empty">
@@ -851,13 +879,41 @@ export default function Dashboard() {
             <span className="badge badge-purple">{todayCalls.length}</span>
           </div>
           {todayCalls.length > 0 ? todayCalls.slice(0, 5).map((c, i) => (
-            <div key={i} className="list-item" onClick={() => navigate(`/customers/${c.customer_id}`)}>
-              <div className="list-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>{c.customer_name?.charAt(0)}</div>
-              <div className="list-item-content">
-                <div className="list-item-title">{c.customer_name}</div>
-                <div className="list-item-subtitle">{c.city} · {c.phone || 'Tel yok'}</div>
+            <div key={i} className="list-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/customers/${c.customer_id}`)}>
+                <div className="list-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>{c.customer_name?.charAt(0)}</div>
+                <div className="list-item-content">
+                  <div className="list-item-title">{c.customer_name}</div>
+                  <div className="list-item-subtitle">{c.city} · {c.phone || 'Tel yok'}</div>
+                </div>
               </div>
-              <span className="badge badge-amber">{c.status}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {c.phone && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setWhatsAppModalData({
+                        customer: {
+                          id: c.customer_id,
+                          company_name: c.customer_name,
+                          phone: c.phone,
+                          city: c.city
+                        },
+                        vehicleTitle: '',
+                        interestId: null,
+                        defaultStatus: 'offer_given'
+                      });
+                    }}
+                    className="btn btn-sm btn-success"
+                    style={{ padding: '3px 8px', fontSize: '0.72rem', background: '#25d366', borderColor: '#25d366', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    title="WhatsApp & Kayıt"
+                  >
+                    <FiMessageSquare size={12} /> WA
+                  </button>
+                )}
+                <span className="badge badge-amber">{c.status}</span>
+              </div>
             </div>
           )) : <div className="empty-state"><p>Bugün takip yok</p></div>}
         </div>
