@@ -4,10 +4,11 @@ import { dashboardApi, crmApi, vehiclesApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
-import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle } from 'react-icons/fi';
+import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
 import { getWhatsAppUrl } from '../utils/whatsapp';
+import WhatsAppActionModal from '../components/CRM/WhatsAppActionModal';
 
 const STAT_CARDS = [
   { key: 'total_customers', label: 'Toplam Müşteri', icon: FiUsers, gradient: 'linear-gradient(135deg, #1e3a5f, #2b7de9)' },
@@ -36,6 +37,10 @@ export default function Dashboard() {
   const [activeOppTab, setActiveOppTab] = useState('hot_leads'); // 'hot_leads', 'stock_matches', 'follow_up_needed', 'quote_pending', 'campaign_opportunities'
   const [vehiclePipeline, setVehiclePipeline] = useState(null);
   
+  // WhatsApp Action Modal & Auto-Interest Cleanup State'leri
+  const [whatsAppModalData, setWhatsAppModalData] = useState(null);
+  const [cleaningAuto, setCleaningAuto] = useState(false);
+
   // GPS ve Yakınım State'leri
   const { location, error: gpsError, loading: gpsLoading } = useGeolocation();
   const [nearbyA, setNearbyA] = useState(0);
@@ -66,6 +71,23 @@ export default function Dashboard() {
       console.error("Dashboard yüklenirken hata:", err);
       setLoadError(true);
     });
+  };
+
+  const handleCleanupAutoInterests = async () => {
+    if (!window.confirm("Rehber aktarımından otomatik algılanan ilgi kayıtlarını silmek istiyor musunuz? Sadece sizin manuel eklediğiniz ve teklif hazırladığınız araç ilgileri korunacaktır.")) {
+      return;
+    }
+    try {
+      setCleaningAuto(true);
+      const res = await vehiclesApi.cleanupAutoInterests();
+      toast.success(res.data?.message || 'Rehber kaynaklı otomatik kayıtlar temizlendi!');
+      loadDashboard();
+    } catch (err) {
+      console.error("Temizleme hatası:", err);
+      toast.error("Temizleme işlemi sırasında bir hata oluştu.");
+    } finally {
+      setCleaningAuto(false);
+    }
   };
 
   useEffect(() => {
@@ -173,6 +195,150 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Mobil Saha Satış) ── */}
+        <section className="mobile-section mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <div className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#38bdf8' }}>
+              <FiZap size={16} /> BUGÜNÜN SATIŞ FIRSATLARI
+            </div>
+            <button
+              onClick={handleCleanupAutoInterests}
+              disabled={cleaningAuto}
+              className="btn btn-sm"
+              style={{
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                color: '#f87171',
+                fontSize: '0.68rem',
+                padding: '3px 8px',
+                borderRadius: 6,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+              }}
+              title="Rehber aktarımından gelen otomatik ilgileri sil"
+            >
+              <FiTrash2 size={11} /> {cleaningAuto ? 'Temizleniyor...' : 'Rehber Kayıtlarını Temizle'}
+            </button>
+          </div>
+
+          {/* Tab Seçimi (Kayan Menü) */}
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 6, marginBottom: 8, scrollbarWidth: 'none' }}>
+            {[
+              { key: 'hot_leads', label: '🔥 Sıcak', count: opportunities?.counts?.hot_leads || 0, color: '#ef4444' },
+              { key: 'stock_matches', label: '📦 Stok', count: opportunities?.counts?.stock_matches || 0, color: '#10b981' },
+              { key: 'follow_up_needed', label: '⏰ Takip', count: opportunities?.counts?.follow_up_needed || 0, color: '#f59e0b' },
+              { key: 'quote_pending', label: '📑 Teklif Bekleyen', count: opportunities?.counts?.quote_pending || 0, color: '#3b82f6' },
+              { key: 'campaign_opportunities', label: '🎁 Kampanya', count: opportunities?.counts?.campaign_opportunities || 0, color: '#8b5cf6' },
+            ].map(tab => {
+              const active = activeOppTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveOppTab(tab.key)}
+                  style={{
+                    padding: '5px 9px', borderRadius: 14, fontSize: '0.72rem', fontWeight: 700,
+                    border: active ? `2px solid ${tab.color}` : '1px solid rgba(255, 255, 255, 0.1)',
+                    background: active ? `${tab.color}25` : 'rgba(255, 255, 255, 0.05)',
+                    color: active ? '#f8fafc' : '#94a3b8',
+                    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <span>{tab.label}</span>
+                  <span style={{
+                    background: active ? tab.color : 'rgba(255,255,255,0.1)',
+                    color: '#fff', padding: '1px 5px', borderRadius: 8, fontSize: '0.65rem'
+                  }}>
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Fırsat Kartları Listesi */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {opportunities?.[activeOppTab]?.length > 0 ? (
+              opportunities[activeOppTab].slice(0, 15).map((item, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: 'var(--bg-input, #1e293b)', borderRadius: 10, padding: '10px 12px',
+                    border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: 6
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div onClick={() => navigate(`/customers/${item.customer_id}`)} style={{ cursor: 'pointer' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f8fafc' }}>{item.company_name}</div>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{item.city || 'Şehir Yok'} · {item.phone || '-'}</div>
+                    </div>
+                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontSize: '0.68rem' }}>
+                      {item.interest_level}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#38bdf8', fontWeight: 600 }}>
+                    <FiTruck size={13} /> {item.vehicle_title}
+                  </div>
+
+                  <div style={{
+                    fontSize: '0.72rem', color: '#cbd5e1', background: 'rgba(0, 0, 0, 0.25)',
+                    padding: '4px 8px', borderRadius: 6, borderLeft: '3px solid #f59e0b'
+                  }}>
+                    {item.reason}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 2 }}>
+                    {item.phone && (
+                      <a
+                        href={`tel:${item.phone}`}
+                        className="btn btn-sm btn-primary"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      >
+                        <FiPhone size={11} /> Ara
+                      </a>
+                    )}
+                    {item.phone && (
+                      <button
+                        type="button"
+                        onClick={() => setWhatsAppModalData({
+                          customer: {
+                            id: item.customer_id,
+                            company_name: item.company_name,
+                            phone: item.phone,
+                            city: item.city
+                          },
+                          vehicleTitle: item.vehicle_title,
+                          interestId: item.interest_id,
+                          defaultStatus: 'offer_given'
+                        })}
+                        className="btn btn-sm btn-success"
+                        style={{ padding: '4px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
+                      >
+                        <FiMessageSquare size={11} /> WhatsApp
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-sm btn-secondary"
+                      onClick={() => navigate(`/customers/${item.customer_id}`)}
+                      style={{ padding: '4px 8px', fontSize: '0.72rem' }}
+                    >
+                      Kartı Aç
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '1.25rem', color: '#94a3b8', fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 8 }}>
+                <FiCheckCircle size={20} style={{ color: '#10b981', marginBottom: 4 }} />
+                <p style={{ margin: 0 }}>Bu kategoride bekleyen fırsat bulunmamaktadır.</p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Yakınımda */}
         <section className="mobile-section">
           <div className="section-title">YAKINIMDAKİLER (5 KM)</div>
@@ -268,6 +434,19 @@ export default function Dashboard() {
             </div>
           </section>
         )}
+
+        {/* WhatsApp Teklif & Görüşme Modalı (Mobil) */}
+        <WhatsAppActionModal
+          isOpen={!!whatsAppModalData}
+          onClose={() => setWhatsAppModalData(null)}
+          customer={whatsAppModalData?.customer}
+          vehicleTitle={whatsAppModalData?.vehicleTitle}
+          interestId={whatsAppModalData?.interestId}
+          defaultStatus={whatsAppModalData?.defaultStatus || 'offer_given'}
+          onSuccess={() => {
+            loadDashboard();
+          }}
+        />
       </div>
     );
   }
@@ -295,7 +474,7 @@ export default function Dashboard() {
 
       {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç Odaklı Satış Zekâsı) ── */}
       <div className="card glass-card mt-6" style={{ border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}>
-        <div className="card-header" style={{ background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.7))', padding: '1rem 1.25rem' }}>
+        <div className="card-header" style={{ background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.7))', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>
               <FiZap style={{ color: '#38bdf8' }} size={20} /> BUGÜNÜN SATIŞ FIRSATLARI
@@ -304,6 +483,27 @@ export default function Dashboard() {
               Araç ihtiyacı ve satın alma zamanı eşleşen öncelikli aksiyonlar
             </span>
           </div>
+          <button
+            onClick={handleCleanupAutoInterests}
+            disabled={cleaningAuto}
+            className="btn btn-sm"
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              color: '#f87171',
+              fontSize: '0.74rem',
+              padding: '5px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer',
+              borderRadius: 6
+            }}
+            title="Rehber aktarımından otomatik algılanan ilgi kayıtlarını temizle"
+          >
+            <FiTrash2 size={13} />
+            {cleaningAuto ? 'Temizleniyor...' : 'Rehber Kayıtlarını Temizle'}
+          </button>
         </div>
 
         {/* Opportunity Category Tabs */}
@@ -396,13 +596,24 @@ export default function Dashboard() {
                       </a>
                     )}
                     {item.phone && (
-                      <a
-                        href={getWhatsAppUrl(item.phone, `Sayın Yetkili, IVECO ${item.vehicle_title} aracımızla ilgili görüşmek isteriz.`)}
+                      <button
+                        type="button"
+                        onClick={() => setWhatsAppModalData({
+                          customer: {
+                            id: item.customer_id,
+                            company_name: item.company_name,
+                            phone: item.phone,
+                            city: item.city
+                          },
+                          vehicleTitle: item.vehicle_title,
+                          interestId: item.interest_id,
+                          defaultStatus: 'offer_given'
+                        })}
                         className="btn btn-sm btn-success"
                         style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
                       >
                         <FiMessageSquare size={11} /> WhatsApp
-                      </a>
+                      </button>
                     )}
                     <button
                       className="btn btn-sm btn-secondary"
@@ -667,6 +878,19 @@ export default function Dashboard() {
           )) : <div className="empty-state"><p>Zenginleştirme yapılmamış</p></div>}
         </div>
       </div>
+
+      {/* WhatsApp Teklif & Görüşme Modalı (Desktop) */}
+      <WhatsAppActionModal
+        isOpen={!!whatsAppModalData}
+        onClose={() => setWhatsAppModalData(null)}
+        customer={whatsAppModalData?.customer}
+        vehicleTitle={whatsAppModalData?.vehicleTitle}
+        interestId={whatsAppModalData?.interestId}
+        defaultStatus={whatsAppModalData?.defaultStatus || 'offer_given'}
+        onSuccess={() => {
+          loadDashboard();
+        }}
+      />
     </div>
   );
 }

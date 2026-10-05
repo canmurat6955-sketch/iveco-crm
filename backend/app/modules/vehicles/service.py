@@ -525,6 +525,18 @@ class VehicleService:
         self.db.commit()
         return {"message": "Araç ilgisi silindi", "id": interest_id}
 
+    def cleanup_auto_interests(self) -> Dict[str, Any]:
+        """Cleans up auto-detected vehicle interest records created from phonebook notes."""
+        deleted_count = self.db.query(CustomerVehicleInterest).filter(
+            CustomerVehicleInterest.customer_note.ilike("%Rehber%")
+        ).delete(synchronize_session=False)
+        self.db.commit()
+        return {
+            "success": True,
+            "deleted_count": deleted_count,
+            "message": f"{deleted_count} adet rehberden otomatik algılanan araç ilgisi temizlendi."
+        }
+
     # ── 5. Stock Management & Matchmaking ─────────────────────────
     def list_stock(
         self,

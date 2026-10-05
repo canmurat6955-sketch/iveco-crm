@@ -149,6 +149,18 @@ def delete_customer_interest(
         raise HTTPException(status_code=404, detail=str(e))
 
 
+@router.post("/interests/cleanup-auto")
+def cleanup_auto_interests(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Cleans up auto-detected vehicle interest records created from phonebook notes."""
+    try:
+        return VehicleService(db).cleanup_auto_interests()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── 4. Stock Management & Matchmaking ────────────────────────────
 @router.get("/stock", response_model=List[VehicleStockResponse])
 def list_stock(

@@ -350,6 +350,7 @@ export const vehiclesApi = {
   createCustomerInterest: (customerId, data) => api.post(`/vehicles/customers/${customerId}/interests`, data),
   updateCustomerInterest: (interestId, data) => api.put(`/vehicles/interests/${interestId}`, data),
   deleteCustomerInterest: (interestId) => api.delete(`/vehicles/interests/${interestId}`),
+  cleanupAutoInterests: () => api.post('/vehicles/interests/cleanup-auto'),
 
   // Physical Stock Inventory & Matchmaking
   getStockList: (params) => api.get('/vehicles/stock', { params }),

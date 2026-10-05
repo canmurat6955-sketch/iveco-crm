@@ -3,10 +3,12 @@ import { vehiclesApi } from '../../api/client';
 import { FiX, FiCheckCircle, FiPhone, FiMessageSquare, FiTruck, FiAlertCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { getWhatsAppUrl } from '../../utils/whatsapp';
+import WhatsAppActionModal from '../../components/CRM/WhatsAppActionModal';
 
 export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+  const [whatsAppModalData, setWhatsAppModalData] = useState(null);
 
   useEffect(() => {
     if (!stockId) return;
@@ -183,13 +185,24 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
                     </a>
                   )}
                   {item.phone && (
-                    <a
-                      href={getWhatsAppUrl(item.phone, `Sayın Yetkili, IVECO ${data?.stock_vehicle_title || ''} aracımız hemen teslim bayii stoklarımızda mevcuttur. Bilgi almak ister misiniz?`)}
+                    <button
+                      type="button"
+                      onClick={() => setWhatsAppModalData({
+                        customer: {
+                          id: item.customer_id,
+                          company_name: item.company_name,
+                          phone: item.phone,
+                          city: item.city
+                        },
+                        vehicleTitle: data?.stock_vehicle_title || '',
+                        interestId: item.interest_id,
+                        defaultStatus: 'offer_given'
+                      })}
                       className="btn btn-sm btn-success"
                       style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
                     >
                       <FiMessageSquare size={12} /> WhatsApp
-                    </a>
+                    </button>
                   )}
                   {onCustomerSelect && (
                     <button
@@ -211,6 +224,24 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
           )}
         </div>
       </div>
+
+      {/* WhatsApp Teklif & Görüşme Modalı */}
+      <WhatsAppActionModal
+        isOpen={!!whatsAppModalData}
+        onClose={() => setWhatsAppModalData(null)}
+        customer={whatsAppModalData?.customer}
+        vehicleTitle={whatsAppModalData?.vehicleTitle}
+        interestId={whatsAppModalData?.interestId}
+        defaultStatus={whatsAppModalData?.defaultStatus || 'offer_given'}
+        onSuccess={() => {
+          // Re-fetch matching customers for this stock
+          if (stockId) {
+            vehiclesApi.getStockMatchingCustomers(stockId)
+              .then(res => setData(res.data))
+              .catch(() => {});
+          }
+        }}
+      />
     </div>
   );
 }
