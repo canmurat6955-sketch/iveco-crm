@@ -32,12 +32,13 @@ export default function Pipeline() {
   const load = async () => {
     setLoading(true);
     try {
-      // Get pipeline customers (B and A segments primarily, or any with non-lead stage)
+      // Yalnızca aktif pipeline aşamasındaki müşterileri getir (havuzdaki ham firmaları dahil etme)
       const r = await crmApi.getCustomers({ 
         page: 1, 
         page_size: 500, 
         city: cityFilter !== 'all' ? cityFilter : undefined,
         search: searchQuery || undefined,
+        pipeline_stage: 'active',
         sort_by: 'potential_score', 
         sort_order: 'desc' 
       });

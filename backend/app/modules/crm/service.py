@@ -63,6 +63,22 @@ class CRMService:
             query = query.filter(Customer.source == filters.source)
         if filters.assigned_to_id:
             query = query.filter(Customer.assigned_to_id == filters.assigned_to_id)
+        if filters.pipeline_stage:
+            if filters.pipeline_stage in ["active", "pipeline", "in_pipeline"]:
+                # Only customers with active pipeline stages (not empty/null, and not pool)
+                query = query.filter(
+                    Customer.pipeline_stage.isnot(None),
+                    Customer.pipeline_stage != "",
+                    Customer.pipeline_stage != "pool"
+                )
+            elif filters.pipeline_stage in ["pool", "unassigned", "havuz"]:
+                query = query.filter(or_(
+                    Customer.pipeline_stage.is_(None),
+                    Customer.pipeline_stage == "",
+                    Customer.pipeline_stage == "pool"
+                ))
+            else:
+                query = query.filter(Customer.pipeline_stage == filters.pipeline_stage)
 
         # Araç Odaklı Satış Zekâsı Filtreleri
         if filters.vehicle_group or filters.model_code or filters.interest_level or filters.purchase_timeframe:

@@ -35,6 +35,7 @@ class CustomerFilterParams:
         model_code: Optional[str] = Query(None, description="İlgilenilen model kodu (35C16, 150E21...)"),
         interest_level: Optional[str] = Query(None, description="İlgi seviyesi"),
         purchase_timeframe: Optional[str] = Query(None, description="Satın alma zamanı"),
+        pipeline_stage: Optional[str] = Query(None, description="Pipeline aşaması filtresi (active, pool, lead, contact, proposal, negotiation, won, lost)"),
         sort_by: str = Query("created_at", description="Sıralama alanı"),
         sort_order: str = Query("desc", description="Sıralama yönü (asc/desc)"),
     ):
@@ -49,5 +50,6 @@ class CustomerFilterParams:
         self.model_code = model_code
         self.interest_level = interest_level
         self.purchase_timeframe = purchase_timeframe
+        self.pipeline_stage = pipeline_stage
         self.sort_by = sort_by
         self.sort_order = sort_order

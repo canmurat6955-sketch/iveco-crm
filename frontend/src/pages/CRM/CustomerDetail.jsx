@@ -404,6 +404,7 @@ export default function CustomerDetail() {
       segment: customer.segment || 'C',
       potential_level: customer.potential_level || 'medium',
       potential_score: customer.potential_score || 0,
+      pipeline_stage: customer.pipeline_stage || '',
       sales_notes: customer.sales_notes || '',
       // Vehicle interest fields
       interest_id: primaryInterest ? primaryInterest.id : null,
@@ -523,6 +524,31 @@ export default function CustomerDetail() {
             <div className="flex gap-2 flex-wrap">
               <button className="btn btn-primary btn-sm" onClick={openEditModal} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 <FiEdit2 size={15} /> Düzenle
+              </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={async () => {
+                  const nextStage = !customer.pipeline_stage ? 'lead' :
+                                    customer.pipeline_stage === 'lead' ? 'contact' :
+                                    customer.pipeline_stage === 'contact' ? 'proposal' :
+                                    customer.pipeline_stage === 'proposal' ? 'negotiation' : 'won';
+                  try {
+                    await crmApi.updateCustomer(id, { pipeline_stage: nextStage });
+                    toast.success(`Pipeline güncellendi: ${nextStage.toUpperCase()} 🎯`);
+                    crmApi.getCustomer(id).then(r => setCustomer(r.data));
+                  } catch { toast.error('Güncellenemedi'); }
+                }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: customer.pipeline_stage ? 'rgba(245, 158, 11, 0.15)' : 'rgba(99, 102, 241, 0.15)',
+                  color: customer.pipeline_stage ? '#fbbf24' : '#a5b4fc',
+                  border: `1px solid ${customer.pipeline_stage ? 'rgba(245, 158, 11, 0.4)' : 'rgba(99, 102, 241, 0.4)'}`,
+                  fontWeight: 700
+                }}
+                title="Tıklayarak Pipeline aşamasını güncelleyebilirsiniz"
+              >
+                🎯 {customer.pipeline_stage ? `Pipeline: ${customer.pipeline_stage.toUpperCase()}` : '+ Pipeline\'a Ekle'}
               </button>
 
               {customer.phone && (
@@ -1937,6 +1963,18 @@ export default function CustomerDetail() {
                     <label className="form-label">Potansiyel Skor (0-100)</label>
                     <input className="form-input" type="number" min="0" max="100" value={editForm.potential_score} onChange={e => handleEditChange('potential_score', e.target.value)} />
                   </div>
+                </div>
+                <div className="form-group" style={{ marginTop: 8 }}>
+                  <label className="form-label" style={{ fontWeight: 700, color: '#fbbf24' }}>🎯 Satış Pipeline Aşaması</label>
+                  <select className="form-select" value={editForm.pipeline_stage || ''} onChange={e => handleEditChange('pipeline_stage', e.target.value)}>
+                    <option value="">📁 Havuzda (Pipeline Dışı / Ham Kayıt)</option>
+                    <option value="lead">🎯 Lead (Sıcak Fırsat / Takip)</option>
+                    <option value="contact">📞 İlk Görüşme Yapıldı</option>
+                    <option value="proposal">📋 Teklif İletildi</option>
+                    <option value="negotiation">🤝 Pazarlık Aşamasında</option>
+                    <option value="won">✅ Satış Kazanıldı</option>
+                    <option value="lost">❌ Kaybedildi</option>
+                  </select>
                 </div>
               </div>
 

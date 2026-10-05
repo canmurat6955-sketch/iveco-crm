@@ -21,6 +21,7 @@ export default function CustomerList() {
   const [vehicleGroup, setVehicleGroup] = useState('');
   const [interestLevel, setInterestLevel] = useState('');
   const [purchaseTimeframe, setPurchaseTimeframe] = useState('');
+  const [pipelineFilter, setPipelineFilter] = useState('');
   const [showAiModal, setShowAiModal] = useState(false);
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
@@ -62,7 +63,8 @@ export default function CustomerList() {
       sector: sector || undefined,
       vehicle_group: vehicleGroup || undefined,
       interest_level: interestLevel || undefined,
-      purchase_timeframe: purchaseTimeframe || undefined
+      purchase_timeframe: purchaseTimeframe || undefined,
+      pipeline_stage: pipelineFilter || undefined
     })
       .then(r => setCustomers(r.data))
       .catch(() => {
@@ -72,10 +74,10 @@ export default function CustomerList() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe]);
+  useEffect(() => { load(); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe, pipelineFilter]);
 
   // Seçim değişince sayfayı temizle
-  useEffect(() => { setSelected(new Set()); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe]);
+  useEffect(() => { setSelected(new Set()); }, [page, search, city, sector, vehicleGroup, interestLevel, purchaseTimeframe, pipelineFilter]);
 
   const toggleSelect = (id, e) => {
     e.stopPropagation();
@@ -336,6 +338,11 @@ export default function CustomerList() {
             <option value="medium">Orta İlgi</option>
             <option value="low">Düşük İlgi</option>
           </select>
+          <select className="form-select" style={{ width: 175 }} value={pipelineFilter} onChange={e => { setPipelineFilter(e.target.value); setPage(1); }}>
+            <option value="">Tüm Kayıtlar (5.800+)</option>
+            <option value="active">🔥 Aktif Pipeline (Fırsatlar)</option>
+            <option value="pool">📁 Yalnızca Havuz (İşlenmemişler)</option>
+          </select>
           <button
             type="button"
             className="btn btn-sm"
@@ -428,9 +435,18 @@ export default function CustomerList() {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                    <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>
-                      {c.segment}
-                    </span>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>
+                        {c.segment}
+                      </span>
+                      {c.pipeline_stage === 'proposal' ? (
+                        <span className="badge badge-amber" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>📋 Teklif</span>
+                      ) : c.pipeline_stage === 'contact' ? (
+                        <span className="badge badge-blue" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>📞 Görüşme</span>
+                      ) : c.pipeline_stage === 'lead' ? (
+                        <span className="badge badge-purple" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>🎯 Lead</span>
+                      ) : null}
+                    </div>
                     <span style={{ fontSize: '0.7rem', fontWeight: 700, color: c.potential_score >= 50 ? '#10b981' : '#f59e0b' }}>
                       %{c.potential_score || 0}
                     </span>
@@ -535,7 +551,7 @@ export default function CustomerList() {
                 {allChecked ? <FiCheckSquare size={16} style={{ color: 'var(--accent-blue-light)' }} /> : <FiSquare size={16} />}
               </th>
               <th>Firma Adı</th><th>Şehir</th><th>Sektör</th><th className="hide-on-mobile">Telefon</th>
-              <th>Segment</th><th className="hide-on-mobile">Öncelik</th><th>Potansiyel</th><th className="hide-on-mobile">Skor</th><th className="hide-on-mobile">Kaynak</th>
+              <th>Segment</th><th className="hide-on-mobile">Öncelik</th><th>Aşama</th><th className="hide-on-mobile">Skor</th><th className="hide-on-mobile">Kaynak</th>
               <th style={{ width: 50 }}></th>
             </tr>
           </thead>
@@ -572,7 +588,21 @@ export default function CustomerList() {
                     {c.priority_score}%
                   </span>
                 </td>
-                <td><span className="text-sm">{POTENTIALS[c.potential_level] || c.potential_level}</span></td>
+                <td>
+                  {c.pipeline_stage === 'proposal' ? (
+                    <span className="badge badge-amber" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>📋 Teklif</span>
+                  ) : c.pipeline_stage === 'contact' ? (
+                    <span className="badge badge-blue" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>📞 Görüşme</span>
+                  ) : c.pipeline_stage === 'lead' ? (
+                    <span className="badge badge-purple" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>🎯 Lead</span>
+                  ) : c.pipeline_stage === 'negotiation' ? (
+                    <span className="badge" style={{ background: 'rgba(249, 115, 22, 0.15)', color: '#f97316', fontSize: '0.72rem', padding: '2px 8px' }}>🤝 Pazarlık</span>
+                  ) : c.pipeline_stage === 'won' ? (
+                    <span className="badge badge-green" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>✅ Kazanıldı</span>
+                  ) : (
+                    <span className="badge" style={{ background: 'rgba(148, 163, 184, 0.12)', color: '#94a3b8', fontSize: '0.7rem', padding: '2px 6px' }}>📁 Havuz</span>
+                  )}
+                </td>
                 <td className="hide-on-mobile">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold">{c.potential_score}</span>
