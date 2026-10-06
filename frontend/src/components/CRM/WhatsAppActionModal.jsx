@@ -164,23 +164,69 @@ export default function WhatsAppActionModal({
 
     try {
       setSubmitting(true);
-      const custId = activeCustomerId;
+      let effectiveCustId = activeCustomerId;
+      const pStage = status === 'offer_given' ? 'proposal' : 'contact';
+      const pNote = customerForm.sales_notes || internalNote || (status === 'offer_given' ? 'WhatsApp üzerinden resmi araç teklifi iletildi.' : 'WhatsApp görüşmesi başlatıldı.');
 
-      // 1. CRM Satış Aktivitesi Kaydı Oluştur
-      if (custId) {
+      // 1. Eğer müşteri henüz CRM'de kayıtlı değilse (Firma Keşfi, OSB Radarı, Yeni Şirketler veya Referanslar)
+      // WhatsApp butonuna basıldığı an CRM'e ve Satış Pipeline'ına otomatik kaydet!
+      if (!effectiveCustId) {
+        try {
+          const compName = (customerForm.company_name || customer.company_name || customer.name || 'Yeni Keşif Adayı').trim();
+          const createRes = await crmApi.createCustomer({
+            company_name: compName,
+            phone: targetPhone,
+            city: customerForm.city || customer.city || 'Samsun',
+            district: customerForm.district || customer.district || '',
+            sector: customerForm.sector || customer.sector || 'Ticari Araç Adayı',
+            tax_number: customerForm.tax_number || customer.tax_number || '',
+            vergi_dairesi: customerForm.vergi_dairesi || customer.vergi_dairesi || '',
+            current_fleet: customerForm.current_fleet || (vehicleTitle ? `İlgilenilen: ${vehicleTitle}` : ''),
+            segment: customerForm.segment || 'A',
+            sales_notes: pNote,
+            pipeline_stage: pStage,
+            pipeline_note: pNote,
+            potential_score: 95,
+            potential_level: 'very_high',
+            source: 'discovery_whatsapp'
+          });
+
+          if (createRes.data?.id) {
+            effectiveCustId = createRes.data.id;
+            setCreatedCustomerId(effectiveCustId);
+            setCustomerSaved(true);
+
+            // Yetkili kişi varsa contact ekle
+            if (customerForm.contact_name?.trim()) {
+              try {
+                await crmApi.addContact(effectiveCustId, {
+                  contact_name: customerForm.contact_name,
+                  phone: targetPhone,
+                  is_primary: true
+                });
+              } catch {}
+            }
+          }
+        } catch (createErr) {
+          console.warn('Otomatik müşteri oluşturma uyarısı:', createErr);
+        }
+      }
+
+      // 2. CRM Satış Aktivitesi Kaydı Oluştur
+      if (effectiveCustId) {
         await salesApi.createActivity({
-          customer_id: custId,
+          customer_id: effectiveCustId,
           activity_type: 'whatsapp',
           status: status, // 'offer_given', 'sent', 'follow_up'
           message_content: message,
-          notes: internalNote,
+          notes: internalNote || pNote,
           next_follow_up: nextFollowUp || undefined
         });
 
         // Pipeline aşamasını 'proposal' (Teklif) olarak CRM'e garanti işle
         if (status === 'offer_given') {
           try {
-            await crmApi.updateCustomer(custId, {
+            await crmApi.updateCustomer(effectiveCustId, {
               pipeline_stage: 'proposal',
               pipeline_note: internalNote || 'WhatsApp ile resmi araç teklifi iletildi.'
             });
@@ -190,7 +236,7 @@ export default function WhatsAppActionModal({
         }
       }
 
-      // 2. Eğer Araç İhtiyacı (Interest) ID'si varsa durumunu 'quoted' (Teklif Yapıldı) olarak güncelle
+      // 3. Eğer Araç İhtiyacı (Interest) ID'si varsa durumunu 'quoted' (Teklif Yapıldı) olarak güncelle
       if (interestId && status === 'offer_given') {
         try {
           const today = new Date().toISOString().split('T')[0];
@@ -205,22 +251,22 @@ export default function WhatsAppActionModal({
         }
       }
 
-      // 3. Yerel WhatsApp Uygulamasını Aç (Deep Link)
+      // 4. Yerel WhatsApp Uygulamasını Aç (Deep Link)
       launchNativeWhatsApp(targetPhone, message);
 
       if (status === 'offer_given') {
-        toast.success("WhatsApp açıldı ve 'Teklif Yapıldı' olarak CRM'e kaydedildi! 🎯", { duration: 4000 });
+        toast.success("WhatsApp açıldı ve müşteri Satış Pipeline'ına (Teklif Aşaması) aktarıldı! 🎯", { duration: 5000 });
       } else {
         toast.success("WhatsApp açıldı ve görüşme geçmişe işlendi! 💬", { duration: 4000 });
       }
 
       if (onSuccess) {
-        onSuccess({ status, interestId, customerId: custId });
+        onSuccess({ status, interestId, customerId: effectiveCustId });
       }
 
-      if (navigateDirectly && custId) {
+      if (navigateDirectly && effectiveCustId) {
         onClose();
-        navigate(`/customers/${custId}`);
+        navigate(`/customers/${effectiveCustId}`);
       } else {
         // WhatsApp'a yönlendirdikten sonra MÜŞTERİ KAYDI GİRİŞ ekranına geçiş yap
         setStep('post_action');

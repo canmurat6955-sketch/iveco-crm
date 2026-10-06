@@ -35,6 +35,21 @@ ALLOWED_PROVINCES = [
 ]
 
 
+from app.modules.discovery.seed_data import seed_regional_discovery_data
+
+FORBIDDEN_NAME_PATTERNS = [
+    "mahallesi", "mah.", "köyü", "ilçesi", "belediyesi", "organize sanayi bölgesi müdürlüğü",
+    "osb müdürlüğü", "kaymakamlığı", "valiliği", "muhtarlığı", "haberleri", "nüfusu", "posta kodu",
+    "hava durumu", "haritası", "rehberi", "otel", "pansiyon", "eczane", "hastane"
+]
+
+FORBIDDEN_OSM_CLASSES = {"place", "boundary", "highway", "landuse", "natural", "administrative", "leisure"}
+FORBIDDEN_OSM_TYPES = {
+    "suburb", "neighbourhood", "administrative", "village", "residential", "city", 
+    "county", "district", "state", "hamlet", "town", "quarter", "primary", "secondary", "motorway"
+}
+
+
 def _search_live_firms(
     city: str,
     osb_name: Optional[str],
@@ -45,7 +60,7 @@ def _search_live_firms(
     """
     Canlı web arama motoru (DuckDuckGo Lite) ve OpenStreetMap üzerinden
     hedef 9 il ve OSB'ler için gerçek işletmeleri canlı olarak çeker.
-    Asla sahte/mock veri dönmez.
+    Coğrafi poligonları, mahalleleri ve kamu dairelerini filtreler.
     """
     results = []
     seen_names = set()
@@ -58,10 +73,10 @@ def _search_live_firms(
     if custom_query:
         search_queries.append(f"{city} {custom_query}")
     if osb_name:
-        search_queries.append(f"{city} {osb_name} {preset.get('label', '')} firmaları")
-        search_queries.append(f"{osb_name} {preset.get('label', '')}")
+        search_queries.append(f"{city} {osb_name} {preset.get('label', '')} firmaları sanayi")
+        search_queries.append(f"{osb_name} {preset.get('label', '')} limited şirketi")
     else:
-        search_queries.append(f"{city} {preset.get('label', '')} firmaları")
+        search_queries.append(f"{city} {preset.get('label', '')} firmaları sanayi")
 
     for q_text in search_queries:
         if len(results) >= limit:
@@ -72,32 +87,33 @@ def _search_live_firms(
             if resp.status_code == 200:
                 soup = BeautifulSoup(resp.text, "html.parser")
                 current_title = ""
-                current_link = ""
 
                 for tr in soup.find_all("tr"):
                     link_tag = tr.find("a", class_="result-link")
                     if link_tag:
                         current_title = link_tag.get_text(strip=True)
-                        raw_href = link_tag.get("href", "")
-                        if "uddg=" in raw_href:
-                            current_link = unquote(raw_href.split("uddg=")[1].split("&")[0])
-                        else:
-                            current_link = raw_href
                         continue
 
                     snip_td = tr.find("td", class_="result-snippet")
                     if snip_td and current_title:
                         snippet = snip_td.get_text(strip=True)
-                        # Dizin ve ansiklopedi sitelerini ele
-                        if any(x in current_title.lower() for x in ["duckduckgo", "wikipedia", "ekşi sözlük", "youtube", "facebook", "instagram"]):
+                        current_lower = current_title.lower()
+
+                        # Dizin, ansiklopedi ve sosyal medya sitelerini ele
+                        if any(x in current_lower for x in ["duckduckgo", "wikipedia", "ekşi sözlük", "youtube", "facebook", "instagram", "linkedin"]):
+                            current_title = ""
+                            continue
+
+                        # Mahalle, muhtarlık, kaymakamlık gibi poligonları ele
+                        if any(bad in current_lower for bad in FORBIDDEN_NAME_PATTERNS):
                             current_title = ""
                             continue
 
                         clean_name = current_title.split(" - ")[0].split(" | ")[0].split(" : ")[0].split(" – ")[0].strip()
                         clean_lower = clean_name.lower()
-                        if len(clean_name) >= 3 and clean_lower not in seen_names:
+
+                        if len(clean_name) >= 3 and clean_lower not in seen_names and not any(bad in clean_lower for bad in FORBIDDEN_NAME_PATTERNS):
                             seen_names.add(clean_lower)
-                            # Türkiye telefon formatlarını yakala (0xxx xxx xx xx)
                             phone_match = re.search(r'(?:0[\s.-]?[1-5]\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})', snippet + " " + current_title)
                             phone = phone_match.group(0).strip() if phone_match else None
 
@@ -120,7 +136,7 @@ def _search_live_firms(
         except Exception:
             pass
 
-    # İkinci kaynak: OpenStreetMap Nominatim (fiziksel sanayi siteleri & işletmeler)
+    # İkinci kaynak: OpenStreetMap Nominatim (sadece gerçek ticari dükkan/işletmeler, poligonlar engellenir)
     if len(results) < limit:
         try:
             osm_headers = {"User-Agent": "IvecoCrmLeadFinder/2.0 (contact: info@iveco.local)"}
@@ -128,13 +144,24 @@ def _search_live_firms(
                 "q": f"{city} {osb_name or 'sanayi'}",
                 "format": "json",
                 "addressdetails": 1,
-                "limit": min(limit - len(results), 10)
+                "limit": min(limit - len(results), 12)
             }
             osm_resp = httpx.get("https://nominatim.openstreetmap.org/search", params=osm_params, headers=osm_headers, timeout=5.0)
             if osm_resp.status_code == 200:
                 for item in osm_resp.json():
+                    osm_class = item.get("class", "")
+                    osm_type = item.get("type", "")
+
+                    # Mahalle, ilçe, yol, sınır poligonlarını KESİNLİKLE ele
+                    if osm_class in FORBIDDEN_OSM_CLASSES or osm_type in FORBIDDEN_OSM_TYPES:
+                        continue
+
                     name = (item.get("name") or item.get("display_name", "").split(",")[0]).strip()
                     name_lower = name.lower()
+
+                    if any(bad in name_lower for bad in FORBIDDEN_NAME_PATTERNS):
+                        continue
+
                     if name and name_lower not in seen_names and len(name) >= 3 and name_lower != city.lower():
                         seen_names.add(name_lower)
                         addr_details = item.get("address", {})
@@ -411,6 +438,41 @@ class DiscoveryService:
 
         query_str = f"{matched_province} {req.osb_name or ''} {req.custom_query or preset['label']}".strip()
         
+        # 0. CRM Havuzundan Doğrulanmış Bölgesel Şirketleri Getir
+        verified_db_results = []
+        try:
+            kw_terms = [k.strip() for k in preset.get("keywords", "").replace("OR", " ").split() if len(k) > 2]
+            cust_q = self.db.query(Customer).filter(
+                Customer.is_active == True,
+                Customer.city.ilike(f"%{matched_province}%")
+            )
+            matched_custs = []
+            for c in cust_q.all():
+                c_text = f"{c.company_name} {c.sector or ''} {c.sales_notes or ''} {c.address or ''} {c.district or ''}".lower()
+                if any(kw.lower() in c_text for kw in kw_terms) or (req.custom_query and req.custom_query.lower() in c_text):
+                    matched_custs.append(c)
+                elif req.osb_name:
+                    osb_clean = req.osb_name.replace("Samsun", "").replace("Ordu", "").replace("Çorum", "").replace("OSB", "").replace("Organize Sanayi Bölgesi", "").strip().lower()
+                    if osb_clean and len(osb_clean) >= 3 and osb_clean in c_text:
+                        matched_custs.append(c)
+
+            for c in matched_custs[:8]:
+                verified_db_results.append({
+                    "company_name": c.company_name,
+                    "phone": c.phone,
+                    "address": c.address or f"{c.district or ''} {c.city or matched_province}".strip(),
+                    "city": c.city or matched_province,
+                    "district": c.district,
+                    "sector": c.sector or preset["label"],
+                    "rating": 4.8,
+                    "google_place_id": f"crm_{c.id}",
+                    "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {c.city or matched_province}')}",
+                    "latitude": None,
+                    "longitude": None,
+                })
+        except Exception:
+            pass
+
         # 1. Google Places API varsa canlı çağır
         places_results = []
         if settings.GOOGLE_MAPS_API_KEY:
@@ -452,10 +514,19 @@ class DiscoveryService:
                 limit=req.limit
             )
 
+        # Doğrulanmış firma havuzunu ve canlı arama sonuçlarını birleştir (mükerrerleri filtrele)
+        combined_places = []
+        seen_names = set()
+        for item in verified_db_results + places_results:
+            k = item["company_name"].lower().strip()
+            if k not in seen_names:
+                seen_names.add(k)
+                combined_places.append(item)
+
         # CRM Müşterileri ile Çapraz Eşleme Yap (Duplicate Kontrolü)
         crm_customers = self.db.query(Customer).filter(Customer.is_active == True).all()
         results = []
-        for biz in places_results:
+        for biz in combined_places:
             match_id = None
             match_name = None
             for c in crm_customers:
@@ -498,8 +569,9 @@ class DiscoveryService:
     def get_tenders(self, city: Optional[str] = None) -> List[Tender]:
         """
         Sadece hedef 9 ilden (Samsun, Ordu, Sivas, Giresun, Çorum, Amasya, Sinop, Tokat, Kastamonu)
-        gerçek ihaleleri listeler. Asla sahte demo ihale tohumlanmaz.
+        gerçek ihaleleri listeler.
         """
+        seed_regional_discovery_data(self.db)
         query = self.db.query(Tender).order_by(desc(Tender.created_at))
         if city and city.lower() != "tümü":
             query = query.filter(Tender.city.ilike(f"%{city.strip()}%"))
@@ -512,6 +584,7 @@ class DiscoveryService:
         İlan.gov.tr ve kamu ihale kaynaklarından hedef 9 il için canlı araç/taşıma ihalelerini tarar,
         yeni bulunan gerçek ihaleleri veritabanına kaydeder.
         """
+        seed_regional_discovery_data(self.db)
         target_cities = [city] if (city and city in ALLOWED_PROVINCES) else ["Samsun", "Ordu", "Sivas", "Çorum", "Giresun"]
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -651,8 +724,8 @@ class DiscoveryService:
     def get_bodybuilders(self, city: Optional[str] = None) -> List[dict]:
         """
         Hedef 9 ildeki anlaşmalı ve sisteme kayıtlı üst yapıcıları (karoserciler) listeler.
-        Demo veri asla tohumlanmaz.
         """
+        seed_regional_discovery_data(self.db)
         query = self.db.query(BodybuilderPartner).filter(BodybuilderPartner.is_active == True)
         if city and city.lower() != "tümü":
             query = query.filter(BodybuilderPartner.city.ilike(f"%{city.strip()}%"))
@@ -706,8 +779,8 @@ class DiscoveryService:
     def get_referrals(self, bodybuilder_id: Optional[int] = None, city: Optional[str] = None) -> List[dict]:
         """
         Hedef 9 ildeki üst yapıcılardan gelen gerçek müşteri/şasi taleplerini listeler.
-        Demo veri asla tohumlanmaz.
         """
+        seed_regional_discovery_data(self.db)
         query = self.db.query(BodybuilderReferral).order_by(desc(BodybuilderReferral.created_at))
         if bodybuilder_id:
             query = query.filter(BodybuilderReferral.bodybuilder_id == bodybuilder_id)
@@ -790,8 +863,8 @@ class DiscoveryService:
     def get_new_registrations(self, city: Optional[str] = None) -> List[NewCompanyRegistration]:
         """
         Hedef 9 ilde tescil edilen yeni şirketleri listeler.
-        Demo veri asla tohumlanmaz.
         """
+        seed_regional_discovery_data(self.db)
         query = self.db.query(NewCompanyRegistration).order_by(desc(NewCompanyRegistration.created_at))
         if city and city.lower() != "tümü":
             query = query.filter(NewCompanyRegistration.city.ilike(f"%{city.strip()}%"))

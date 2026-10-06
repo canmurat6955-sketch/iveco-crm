@@ -670,7 +670,29 @@ export default function DiscoveryList() {
                       </div>
 
                       {/* Aksiyon */}
-                      <div>
+                      <div className="flex gap-2 items-center flex-wrap">
+                        {biz.phone && (
+                          <button 
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => openWhatsApp(biz.phone, `Sayın ${biz.company_name} yetkilisi, IVECO satış departmanından ulaşıyoruz. Firmanız için önerilen ${biz.recommended_iveco || 'Iveco ticari araç'} modelimiz hakkında özel filo teklifimizi iletmek isteriz.`, {
+                              customer: {
+                                id: biz.existing_customer_id,
+                                company_name: biz.company_name,
+                                phone: biz.phone,
+                                city: biz.city,
+                                district: biz.district,
+                                sector: biz.sector,
+                                sales_notes: `OSB Radar Taraması (${selectedOsb}). Önerilen: ${biz.recommended_iveco} ${biz.target_body_type || ''}`
+                              },
+                              vehicleTitle: biz.recommended_iveco || '',
+                              defaultStatus: 'offer_given'
+                            })}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
+                          >
+                            <FiMessageSquare size={14} /> WhatsApp
+                          </button>
+                        )}
                         {biz.is_existing_customer ? (
                           <button 
                             className="btn btn-secondary btn-sm" 
@@ -685,7 +707,7 @@ export default function DiscoveryList() {
                             onClick={() => addOsbToCrm(biz)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                           >
-                            <FiPlus size={14} /> CRM\'e Aday Ekle
+                            <FiPlus size={14} /> CRM'e Aday Ekle
                           </button>
                         )}
                       </div>
@@ -776,13 +798,39 @@ export default function DiscoveryList() {
 
                       {/* Aksiyon */}
                       <div className="flex flex-col gap-2 items-end">
+                        {t.contractor_phone && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => openWhatsApp(t.contractor_phone, `Sayın ${t.contractor_name || 'Yetkili'}, ${t.organization} tarafından ihalesi sonuçlanan "${t.title}" projeniz için tebrik ederiz. İhale şartnamesine uygun ${t.suggested_iveco_model || 'Iveco Şasi'} araçlarımız için özel filo teklifimizi görüşmek isteriz.`, {
+                              customer: {
+                                id: t.matched_customer_id,
+                                company_name: t.contractor_name,
+                                contact_name: t.contractor_contact,
+                                phone: t.contractor_phone,
+                                city: t.city,
+                                district: t.district,
+                                sector: t.category || 'Kamu Taşımacılığı',
+                                sales_notes: `İhale Referansı: ${t.title}. Araç İhtiyacı: ${t.estimated_vehicles} adet ${t.suggested_iveco_model || 'Iveco Şasi'}.`
+                              },
+                              vehicleTitle: t.suggested_iveco_model || 'Iveco Şasi',
+                              defaultStatus: 'offer_given',
+                              onSuccess: () => {
+                                loadTenders();
+                              }
+                            })}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
+                          >
+                            <FiMessageSquare size={14} /> WhatsApp
+                          </button>
+                        )}
                         {t.matched_customer_id ? (
                           <button 
                             className="btn btn-secondary btn-sm" 
                             onClick={() => navigate(`/customers/${t.matched_customer_id}`)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                           >
-                            ✅ CRM\'de Açık Teklif <FiArrowRight size={14} />
+                            ✅ CRM'de Açık Teklif <FiArrowRight size={14} />
                           </button>
                         ) : t.contractor_name ? (
                           <button 
@@ -790,7 +838,7 @@ export default function DiscoveryList() {
                             onClick={() => convertTenderToLead(t.id)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                           >
-                            🚀 Kazananı CRM\'e Aktar
+                            🚀 Kazananı CRM'e Aktar
                           </button>
                         ) : null}
                       </div>
@@ -986,14 +1034,39 @@ export default function DiscoveryList() {
                         )}
                       </div>
 
-                      <div>
+                      <div className="flex gap-2 items-center flex-wrap">
+                        {c.phone && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => openWhatsApp(c.phone, `Sayın ${c.company_name} yetkilisi, yeni şirket kuruluşunuz hayırlı olsun. Şirketinizin lojistik ve saha operasyonları için IVECO Daily şasi ve panelvan araçlarımıza özel filo indirimlerimizi paylaşmak isteriz.`, {
+                              customer: {
+                                id: c.matched_customer_id,
+                                company_name: c.company_name,
+                                phone: c.phone,
+                                city: c.city,
+                                district: c.district,
+                                sector: c.nace_description || 'Yeni Kurulan Şirket',
+                                sales_notes: `Ticaret Sicil Tescili (NACE: ${c.nace_code || '-'}). Sermaye: ${c.capital || '-'}`
+                              },
+                              vehicleTitle: 'Iveco Daily Şasi / Panelvan',
+                              defaultStatus: 'offer_given',
+                              onSuccess: () => {
+                                loadNewCompanies();
+                              }
+                            })}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366' }}
+                          >
+                            <FiMessageSquare size={14} /> WhatsApp
+                          </button>
+                        )}
                         {c.matched_customer_id ? (
                           <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/customers/${c.matched_customer_id}`)}>
-                            CRM\'de Kayıtlı →
+                            CRM'de Kayıtlı →
                           </button>
                         ) : (
                           <button className="btn btn-primary btn-sm" onClick={() => convertNewCompanyToLead(c.id)}>
-                            ➕ CRM\'e Aday Ekle
+                            ➕ CRM'e Aday Ekle
                           </button>
                         )}
                       </div>
