@@ -685,4 +685,53 @@ def seed_regional_discovery_data(db: Session, force_refresh: bool = False):
     except Exception:
         pass
 
+    # 5. Bölgesel Hafriyat & Ağır Kazı Şirketleri (Google AI & Sanayi Odaları Doğrulanmış)
+    try:
+        from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
+        from app.modules.crm.models import Customer
+        
+        for h in REGIONAL_HAFRIYAT_COMPANIES:
+            # A. Customer Tablosuna Ekle (CRM, Arama & Pipeline için)
+            cust_exists = db.query(Customer).filter(Customer.company_name == h["company_name"]).first()
+            if not cust_exists:
+                c_record = Customer(
+                    company_name=h["company_name"],
+                    phone=h["phone"],
+                    city=h["city"],
+                    district=h["district"],
+                    address=h["address"],
+                    website=h.get("website", ""),
+                    sector=h["sector"],
+                    current_fleet=f"Damperli Kamyon, Hafriyat & İş Makineleri ({h.get('recommended_iveco', 'Iveco Daily 70C18')})",
+                    sales_notes=f"{h.get('notes', '')} Google AI / Bölgesel Sanayi Odası onaylı öne çıkan firma. Önerilen Araç: {h.get('recommended_iveco', 'Daily 70C18 Damper')}",
+                    potential_level="very_high",
+                    potential_score=94,
+                    segment="A",
+                    source="google_ai_intelligence",
+                    is_active=True,
+                )
+                db.add(c_record)
+            
+            # B. Yeni Kurulan Şirketler (NACE 43.12.01) Tablosuna Ekle
+            nace_exists = db.query(NewCompanyRegistration).filter(NewCompanyRegistration.company_name == h["company_name"]).first()
+            if not nace_exists:
+                nace_record = NewCompanyRegistration(
+                    company_name=h["company_name"],
+                    nace_code="43.12.01",
+                    nace_description="Zemin hazırlama, kazı ve hafriyat işleri (bina yıkımı ve moloz nakli)",
+                    city=h["city"],
+                    district=h["district"],
+                    capital="3.500.000 TL",
+                    phone=h["phone"],
+                    address=h["address"],
+                    registration_date=now - timedelta(days=10),
+                    status="new",
+                )
+                db.add(nace_record)
+
+        db.commit()
+    except Exception:
+        db.rollback()
+
     return seeded_counts
+

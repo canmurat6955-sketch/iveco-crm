@@ -40,9 +40,16 @@ class CRMService:
         query = self.db.query(Customer).filter(Customer.is_active == True)
         if filters.search:
             s = f"%{filters.search}%"
+            from app.core.database import tr_norm
+            s_norm = f"%{tr_norm(filters.search)}%"
             query = query.filter(or_(
-                Customer.company_name.ilike(s), Customer.phone.ilike(s),
-                Customer.email.ilike(s), Customer.tax_number.ilike(s),
+                func.tr_norm(Customer.company_name).like(s_norm),
+                Customer.company_name.ilike(s),
+                Customer.phone.ilike(s),
+                Customer.email.ilike(s),
+                Customer.tax_number.ilike(s),
+                func.tr_norm(Customer.city).like(s_norm),
+                func.tr_norm(Customer.sector).like(s_norm),
             ))
         if filters.city:
             if filters.city in ["target_9", "Hedef 9 İl", "9_il"]:

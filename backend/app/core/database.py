@@ -22,6 +22,34 @@ if db_url.startswith("sqlite:///."):
 is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
+from sqlalchemy.engine import Engine
+
+
+def tr_norm(s):
+    """Türkçe karakterleri ve büyük/küçük harfleri standart ASCII forma dönüştürür."""
+    if not s:
+        return ""
+    tr_map = str.maketrans("ÇĞİÖŞÜIçğıöşü", "cgiosuicgiosu")
+    return str(s).translate(tr_map).lower()
+
+
+@event.listens_for(Engine, "connect")
+def configure_sqlite_connection(dbapi_connection, connection_record):
+    """Enable foreign keys, WAL mode and register Turkish tr_norm function for SQLite."""
+    if hasattr(dbapi_connection, "create_function"):
+        try:
+            dbapi_connection.create_function("tr_norm", 1, tr_norm)
+        except Exception:
+            pass
+    try:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.close()
+    except Exception:
+        pass
+
+
 try:
     engine = create_engine(
         db_url,
@@ -44,16 +72,6 @@ except Exception as e:
         connect_args=connect_args,
         echo=settings.DEBUG,
     )
-
-
-if is_sqlite:
-    @event.listens_for(engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """Enable foreign keys and WAL mode for SQLite."""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.close()
 
 
 

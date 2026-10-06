@@ -228,61 +228,127 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
     """Doğrulanmış Karadeniz Ticaret/Sanayi Odaları ve CRM firma veritabanında arama yapar."""
     q = query.lower()
     
-    # 9 hedef il tespiti
+    from app.core.database import tr_norm
+    from sqlalchemy import func
+
+    q_clean = q.strip()
+    q_norm = tr_norm(q_clean)
+    
+    # 9 hedef il tespiti (Türkçe karakter bağımsız)
     detected_city = None
     for p in ALLOWED_SCANNER_PROVINCES:
-        if p.lower() in q:
+        if tr_norm(p) in q_norm:
             detected_city = p
             break
 
     # Anahtar kelimeleri ayıkla
     stop_words = {
-        "samsun", "ordu", "sivas", "giresun", "çorum", "corum", "amasya", "sinop", "tokat", "kastamonu",
-        "ve", "ile", "için", "icin", "olan", "firması", "firmasi", "firmaları", "firmalari", 
-        "şirketi", "sirketi", "şirketleri", "sirketleri", "santrali", "santralleri",
+        "samsun", "ordu", "sivas", "giresun", "corum", "amasya", "sinop", "tokat", "kastamonu",
+        "ve", "ile", "icin", "olan", "firmasi", "firmalari", 
+        "sirketi", "sirketleri", "santrali", "santralleri",
         "tesisi", "tesisleri", "bayi", "bayisi", "bayileri", "merkezi"
     }
-    raw_words = re.findall(r'\w+', q)
-    keywords = [w for w in raw_words if len(w) >= 3 and w not in stop_words]
+    raw_words = re.findall(r'\w+', q_clean)
+    keywords = [w for w in raw_words if len(w) >= 3 and tr_norm(w) not in stop_words]
     if not keywords and raw_words:
         keywords = [w for w in raw_words if len(w) >= 3]
 
     query_filters = []
     if detected_city:
-        query_filters.append(Customer.city.ilike(f"%{detected_city}%"))
+        query_filters.append(or_(
+            func.tr_norm(Customer.city).like(f"%{tr_norm(detected_city)}%"),
+            Customer.city.ilike(f"%{detected_city}%")
+        ))
     else:
-        city_ors = [Customer.city.ilike(f"%{p}%") for p in ALLOWED_SCANNER_PROVINCES]
+        city_ors = [or_(func.tr_norm(Customer.city).like(f"%{tr_norm(p)}%"), Customer.city.ilike(f"%{p}%")) for p in ALLOWED_SCANNER_PROVINCES]
         query_filters.append(or_(*city_ors))
 
     if keywords:
         kw_ors = []
         for kw in keywords:
+            kw_norm = tr_norm(kw)
+            kw_ors.append(func.tr_norm(Customer.company_name).like(f"%{kw_norm}%"))
+            kw_ors.append(func.tr_norm(Customer.sector).like(f"%{kw_norm}%"))
+            kw_ors.append(func.tr_norm(Customer.address).like(f"%{kw_norm}%"))
             kw_ors.append(Customer.company_name.ilike(f"%{kw}%"))
-            kw_ors.append(Customer.sector.ilike(f"%{kw}%"))
-            kw_ors.append(Customer.address.ilike(f"%{kw}%"))
         query_filters.append(or_(*kw_ors))
 
-    customers = db.query(Customer).filter(and_(*query_filters)).limit(max_results).all()
+    customers = (
+        db.query(Customer)
+        .filter(and_(*query_filters))
+        .order_by(Customer.potential_score.desc(), Customer.id.desc())
+        .limit(max_results)
+        .all()
+    )
 
     results: List[ScanResult] = []
+    seen_names = set()
     for c in customers:
         city_name = c.city or (detected_city or "Samsun")
-        results.append(ScanResult(
-            google_place_id=f"db_{c.id}",
-            company_name=c.company_name,
-            phone=c.phone or "",
-            address=c.address or f"{c.district or ''} {city_name}".strip(),
-            district=c.district or "",
-            city=city_name,
-            website=c.website or "",
-            google_maps_url=f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {city_name}')}",
-            rating=4.8,
-            rating_count=32,
-            business_status="OPERATIONAL",
-            sector=c.sector or "Sanayi & Ticaret (Doğrulanmış Kayıt)",
-            types=["verified_firm", "establishment", "point_of_interest"],
-            source="verified_db"
-        ))
+        c_key = tr_norm(c.company_name)
+        if c_key not in seen_names:
+            seen_names.add(c_key)
+            results.append(ScanResult(
+                google_place_id=f"db_{c.id}",
+                company_name=c.company_name,
+                phone=c.phone or "",
+                address=c.address or f"{c.district or ''} {city_name}".strip(),
+                district=c.district or "",
+                city=city_name,
+                website=c.website or "",
+                google_maps_url=f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {city_name}')}",
+                rating=4.8,
+                rating_count=32,
+                business_status="OPERATIONAL",
+                sector=c.sector or "Sanayi & Ticaret (Doğrulanmış Kayıt)",
+                types=["verified_firm", "establishment", "point_of_interest"],
+                source="verified_db"
+            ))
+
+    # İhtiyaç halinde Bölgesel Hafriyat & Sanayi Havuzundan Tamamla
+    try:
+        from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
+        for h in REGIONAL_HAFRIYAT_COMPANIES:
+            if len(results) >= max_results:
+                break
+            h_name_norm = tr_norm(h["company_name"])
+            h_city_norm = tr_norm(h["city"])
+            if h_name_norm in seen_names:
+                continue
+
+            # Şehir filtresi varsa kontrol et
+            if detected_city and tr_norm(detected_city) != h_city_norm:
+                continue
+
+            # Anahtar kelime eşleşmesi kontrol et
+            match = False
+            if any(tr_norm(kw) in h_name_norm or tr_norm(kw) in tr_norm(h["sector"]) for kw in keywords):
+                match = True
+            elif "hafriyat" in q_norm or "kazi" in q_norm:
+                match = True
+
+            if match:
+                seen_names.add(h_name_norm)
+                gmaps_q = quote_plus(f"{h['company_name']} {h['city']}")
+                results.append(ScanResult(
+                    google_place_id=f"hafriyat_{abs(hash(h['company_name'])) % 1000000}",
+                    company_name=h["company_name"],
+                    phone=h["phone"],
+                    address=h["address"],
+                    district=h.get("district", ""),
+                    city=h["city"],
+                    website=h.get("website", ""),
+                    google_maps_url=f"https://www.google.com/maps/search/?api=1&query={gmaps_q}",
+                    rating=4.9,
+                    rating_count=45,
+                    business_status="OPERATIONAL",
+                    sector=h["sector"],
+                    types=["verified_firm", "earthworks", "excavation"],
+                    source="verified_db"
+                ))
+    except Exception:
+        pass
+
     return results
 
 

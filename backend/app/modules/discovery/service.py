@@ -86,71 +86,80 @@ def _search_live_firms(
     }
 
     search_queries = []
+    clean_label = re.sub(r'[^\w\s]', '', preset.get('label', '')).strip()
     if custom_query:
         search_queries.append(f"{city} {custom_query}")
     if osb_name:
-        search_queries.append(f"{city} {osb_name} {preset.get('label', '')} firmaları sanayi")
-        search_queries.append(f"{osb_name} {preset.get('label', '')} limited şirketi")
+        search_queries.append(f"{city} {osb_name} {clean_label} firmaları")
+        search_queries.append(f"{osb_name} {clean_label} sanayi ticaret")
     else:
-        search_queries.append(f"{city} {preset.get('label', '')} firmaları sanayi")
+        search_queries.append(f"{city} {clean_label} firmaları sanayi")
 
     for q_text in search_queries:
         if len(results) >= limit:
             break
+        # 1. Deneme: html.duckduckgo.com (Daha yüksek limit & kararlı HTML)
+        html_content = None
         try:
-            url = "https://lite.duckduckgo.com/lite/"
-            resp = httpx.post(url, data={"q": q_text}, headers=headers, timeout=7.0)
+            resp = httpx.post("https://html.duckduckgo.com/html/", data={"q": q_text}, headers=headers, timeout=8.0)
             if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, "html.parser")
-                current_title = ""
-
-                for tr in soup.find_all("tr"):
-                    link_tag = tr.find("a", class_="result-link")
-                    if link_tag:
-                        current_title = link_tag.get_text(strip=True)
-                        continue
-
-                    snip_td = tr.find("td", class_="result-snippet")
-                    if snip_td and current_title:
-                        snippet = snip_td.get_text(strip=True)
-                        current_lower = current_title.lower()
-
-                        # Dizin, ansiklopedi ve sosyal medya sitelerini ele
-                        if any(x in current_lower for x in ["duckduckgo", "wikipedia", "ekşi sözlük", "youtube", "facebook", "instagram", "linkedin"]):
-                            current_title = ""
-                            continue
-
-                        # Mahalle, muhtarlık, kaymakamlık gibi poligonları ele
-                        if any(bad in current_lower for bad in FORBIDDEN_NAME_PATTERNS):
-                            current_title = ""
-                            continue
-
-                        clean_name = _clean_company_title(current_title)
-                        clean_lower = clean_name.lower()
-
-                        if len(clean_name) >= 3 and clean_lower not in seen_names and not any(bad in clean_lower for bad in FORBIDDEN_NAME_PATTERNS):
-                            seen_names.add(clean_lower)
-                            phone_match = re.search(r'(?:0[\s.-]?[1-5]\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})', snippet + " " + current_title)
-                            phone = phone_match.group(0).strip() if phone_match else None
-
-                            results.append({
-                                "company_name": clean_name[:120],
-                                "phone": phone,
-                                "address": snippet[:150] or f"{osb_name or city}, {city}",
-                                "city": city,
-                                "district": None,
-                                "sector": preset.get("label", "Ticari İşletme"),
-                                "rating": 4.6,
-                                "google_place_id": f"real_web_{abs(hash(clean_name)) % 10000000}",
-                                "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{clean_name} {city}')}",
-                                "latitude": None,
-                                "longitude": None,
-                            })
-                        current_title = ""
-                        if len(results) >= limit:
-                            break
+                html_content = resp.text
         except Exception:
             pass
+
+        # 2. Deneme: lite.duckduckgo.com fallback
+        if not html_content:
+            try:
+                resp = httpx.post("https://lite.duckduckgo.com/lite/", data={"q": q_text}, headers=headers, timeout=7.0)
+                if resp.status_code == 200:
+                    html_content = resp.text
+            except Exception:
+                pass
+
+        if html_content:
+            soup = BeautifulSoup(html_content, "html.parser")
+            # Hem html hem lite sonuçlarını ayrıştır
+            for link in soup.select("a.result__url, a.result-link, a.result__snippet"):
+                pass  # anchor list
+            for res_div in soup.find_all(["div", "tr"], class_=lambda c: c and any(k in str(c) for k in ["result", "results_links"])):
+                title_elem = res_div.find(["a", "h2"], class_=lambda c: c and any(k in str(c) for k in ["title", "result__title", "result-link"]))
+                snip_elem = res_div.find(["div", "td", "span"], class_=lambda c: c and any(k in str(c) for k in ["snippet", "result__snippet", "result-snippet"]))
+                
+                raw_title = title_elem.get_text(strip=True) if title_elem else ""
+                snippet = snip_elem.get_text(strip=True) if snip_elem else ""
+                
+                if not raw_title:
+                    continue
+
+                current_lower = raw_title.lower()
+                if any(x in current_lower for x in ["duckduckgo", "wikipedia", "ekşi sözlük", "youtube", "facebook", "instagram", "linkedin"]):
+                    continue
+                if any(bad in current_lower for bad in FORBIDDEN_NAME_PATTERNS):
+                    continue
+
+                clean_name = _clean_company_title(raw_title)
+                clean_lower = clean_name.lower()
+
+                if len(clean_name) >= 3 and clean_lower not in seen_names and not any(bad in clean_lower for bad in FORBIDDEN_NAME_PATTERNS):
+                    seen_names.add(clean_lower)
+                    phone_match = re.search(r'(?:0[\s.-]?[1-5]\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})', snippet + " " + raw_title)
+                    phone = phone_match.group(0).strip() if phone_match else None
+
+                    results.append({
+                        "company_name": clean_name[:120],
+                        "phone": phone,
+                        "address": snippet[:150] or f"{osb_name or city}, {city}",
+                        "city": city,
+                        "district": None,
+                        "sector": preset.get("label", "Ticari İşletme"),
+                        "rating": 4.6,
+                        "google_place_id": f"real_web_{abs(hash(clean_name)) % 10000000}",
+                        "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{clean_name} {city}')}",
+                        "latitude": None,
+                        "longitude": None,
+                    })
+                if len(results) >= limit:
+                    break
 
     # İkinci kaynak: OpenStreetMap Nominatim (sadece gerçek ticari dükkan/işletmeler, poligonlar engellenir)
     if len(results) < limit:
@@ -408,10 +417,10 @@ class DiscoveryService:
             },
             "insaat_nalbur": {
                 "label": "İnşaat, Hafriyat & Nalburiye",
-                "keywords": "nalburiye hırdavat OR kereste yapı malzemeleri OR inşaat agrega",
+                "keywords": "hafriyat OR kazı OR zemin OR damper OR agrega OR nalburiye OR kereste OR inşaat",
                 "recommended": "Iveco Daily 35C16 Açık Sac Kasa / Daily 70C18 Damper",
                 "target_body": "Açık Sac Kasa / Damper",
-                "score": 88,
+                "score": 92,
             },
             "oto_kurtarma": {
                 "label": "Oto Kurtarma & Çekici",
@@ -456,6 +465,38 @@ class DiscoveryService:
         
         # 0. CRM Havuzundan Doğrulanmış Bölgesel Şirketleri Getir
         verified_db_results = []
+        seen_check = set()
+
+        # A. Google AI / Bölge Sanayi Odası Hafriyat & Ağır Sanayi İstihbarat Havuzu
+        is_hafriyat_query = (
+            req.sector_preset == "insaat_nalbur" or 
+            (req.custom_query and any(w in req.custom_query.lower() for w in ["hafriyat", "kazi", "kazı", "zemin", "yıkım", "yikim", "damper"]))
+        )
+        if is_hafriyat_query:
+            try:
+                from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
+                prov_hafriyat = [h for h in REGIONAL_HAFRIYAT_COMPANIES if h["city"].lower() == matched_province.lower()]
+                for h in prov_hafriyat:
+                    c_key = h["company_name"].lower().strip()
+                    if c_key not in seen_check:
+                        seen_check.add(c_key)
+                        gmaps_target = quote_plus(f"{h['company_name']} {h['city']}")
+                        verified_db_results.append({
+                            "company_name": h["company_name"],
+                            "phone": h["phone"],
+                            "address": h["address"],
+                            "city": h["city"],
+                            "district": h.get("district"),
+                            "sector": h["sector"],
+                            "rating": 4.9,
+                            "google_place_id": f"hafriyat_{abs(hash(h['company_name'])) % 1000000}",
+                            "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={gmaps_target}",
+                            "latitude": None,
+                            "longitude": None,
+                        })
+            except Exception:
+                pass
+
         try:
             kw_terms = [k.strip() for k in preset.get("keywords", "").replace("OR", " ").split() if len(k) > 2]
             cust_q = self.db.query(Customer).filter(
@@ -472,20 +513,23 @@ class DiscoveryService:
                     if osb_clean and len(osb_clean) >= 3 and osb_clean in c_text:
                         matched_custs.append(c)
 
-            for c in matched_custs[:8]:
-                verified_db_results.append({
-                    "company_name": c.company_name,
-                    "phone": c.phone,
-                    "address": c.address or f"{c.district or ''} {c.city or matched_province}".strip(),
-                    "city": c.city or matched_province,
-                    "district": c.district,
-                    "sector": c.sector or preset["label"],
-                    "rating": 4.8,
-                    "google_place_id": f"crm_{c.id}",
-                    "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {c.city or matched_province}')}",
-                    "latitude": None,
-                    "longitude": None,
-                })
+            for c in matched_custs[:req.limit]:
+                c_key = c.company_name.lower().strip()
+                if c_key not in seen_check:
+                    seen_check.add(c_key)
+                    verified_db_results.append({
+                        "company_name": c.company_name,
+                        "phone": c.phone,
+                        "address": c.address or f"{c.district or ''} {c.city or matched_province}".strip(),
+                        "city": c.city or matched_province,
+                        "district": c.district,
+                        "sector": c.sector or preset["label"],
+                        "rating": 4.8,
+                        "google_place_id": f"crm_{c.id}",
+                        "google_maps_url": f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {c.city or matched_province}')}",
+                        "latitude": None,
+                        "longitude": None,
+                    })
         except Exception:
             pass
 

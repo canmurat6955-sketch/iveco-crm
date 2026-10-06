@@ -1172,13 +1172,20 @@ export default function DiscoveryList() {
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {[
+                  { label: '🚜 Samsun Hafriyat', q: 'Samsun hafriyat' },
+                  { label: '🚜 Çorum Hafriyat', q: 'Çorum hafriyat' },
+                  { label: '🚜 Sivas Hafriyat', q: 'Sivas hafriyat' },
+                  { label: '🚜 Ordu Hafriyat', q: 'Ordu hafriyat' },
+                  { label: '🚜 Kastamonu Hafriyat', q: 'Kastamonu hafriyat' },
+                  { label: '🚜 Giresun Hafriyat', q: 'Giresun hafriyat' },
+                  { label: '🚜 Tokat Hafriyat', q: 'Tokat hafriyat' },
+                  { label: '🚜 Amasya Hafriyat', q: 'Amasya hafriyat' },
+                  { label: '🚜 Sinop Hafriyat', q: 'Sinop hafriyat' },
+                  { label: '🏢 Nurkaya Group (Çorum)', q: 'nurkaya' },
                   { label: '🏗️ Samsun Beton Santralleri', q: 'Samsun beton santralleri' },
                   { label: '🚛 Çarşamba Nakliyat & Lojistik', q: 'Çarşamba nakliyat lojistik' },
-                  { label: '🚜 Tekkeköy Hafriyat', q: 'Tekkeköy hafriyat' },
                   { label: '❄️ Bafra Soğuk Hava Deposu', q: 'Bafra soğuk hava deposu' },
                   { label: '🏭 Samsun OSB Fabrikaları', q: 'Samsun OSB sanayi' },
-                  { label: '🌾 Çorum Un & Yem Sanayi', q: 'Çorum un fabrikaları' },
-                  { label: '⛏️ Kavak Madencilik & Taşocağı', q: 'Kavak madencilik taş ocağı' }
                 ].map(item => (
                   <button
                     key={item.q}
