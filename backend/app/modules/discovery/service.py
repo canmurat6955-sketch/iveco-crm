@@ -50,6 +50,22 @@ FORBIDDEN_OSM_TYPES = {
 }
 
 
+def _clean_company_title(raw_title: str) -> str:
+    parts = re.split(r'\s*[-|–•:|]\s*', raw_title)
+    junk = {
+        'iletişim', 'iletisim', 'hakkımızda', 'hakkimizda', 'anasayfa', 'home', 
+        'contact', 'about', 'facebook', 'instagram', 'linkedin', 'yandex', 'google', 
+        'haritalar', 'placedigger', 'bulurum', 'turkeyturism', 'rehberi', 'listesi', 'firmaları'
+    }
+    meaningful = [p.strip() for p in parts if p.strip().lower() not in junk and len(p.strip()) >= 3]
+    if meaningful:
+        for m in meaningful:
+            if any(k in m.lower() for k in ['group', 'grup', 'inşaat', 'insaat', 'sanayi', 'ticaret', 'ltd', 'a.ş', 'petrol', 'lojistik', 'proje', 'taşımacılık']):
+                return m[:120]
+        return meaningful[0][:120]
+    return raw_title.strip()[:120]
+
+
 def _search_live_firms(
     city: str,
     osb_name: Optional[str],
@@ -109,7 +125,7 @@ def _search_live_firms(
                             current_title = ""
                             continue
 
-                        clean_name = current_title.split(" - ")[0].split(" | ")[0].split(" : ")[0].split(" – ")[0].strip()
+                        clean_name = _clean_company_title(current_title)
                         clean_lower = clean_name.lower()
 
                         if len(clean_name) >= 3 and clean_lower not in seen_names and not any(bad in clean_lower for bad in FORBIDDEN_NAME_PATTERNS):

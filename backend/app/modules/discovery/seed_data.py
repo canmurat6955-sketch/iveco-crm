@@ -104,6 +104,17 @@ REGIONAL_NEW_COMPANIES = [
 
     # Çorum
     {
+        "company_name": "Nurkaya Group (Nurkaya Proje İnşaat & Petrol A.Ş.)",
+        "nace_code": "41.20.02",
+        "nace_description": "İkamet amaçlı binaların inşaatı, altyapı projeleri, madencilik ve akaryakıt istasyonları",
+        "city": "Çorum",
+        "district": "Merkez",
+        "capital": "15.000.000 TL",
+        "phone": "0364 227 10 10",
+        "address": "Bahçelievler Mah. Çevre Yolu Blv. No:6, 19200 Çorum Merkez",
+        "registration_days_ago": 3
+    },
+    {
         "company_name": "Hitit Un ve Yem Dağıtım Lojistik Ltd. Şti.",
         "nace_code": "46.21.01",
         "nace_description": "Tahıl, tohum ve hayvan yemi toptan ticareti ve dağıtımı",
@@ -645,5 +656,33 @@ def seed_regional_discovery_data(db: Session, force_refresh: bool = False):
                 db.add(record)
                 seeded_counts["tenders"] += 1
         db.commit()
+
+    # 4. Nurkaya Group Çorum Müşteri Kontrolü ve Ekleme
+    try:
+        from app.modules.crm.models import Customer
+        nurkaya_cust = db.query(Customer).filter(Customer.company_name.ilike("%nurkaya%")).first()
+        if not nurkaya_cust:
+            nurkaya_cust = Customer(
+                company_name="Nurkaya Group (Nurkaya Proje İnşaat & Petrol)",
+                phone="0364 227 10 10",
+                city="Çorum",
+                district="Merkez",
+                address="Bahçelievler Mah. Çevre Yolu Blv. No:6, 19200 Çorum Merkez",
+                website="https://nurkayagroup.com.tr",
+                sector="İnşaat, Altyapı, Madencilik & Petrol",
+                current_fleet="Damperli Kamyon, Hafriyat & Akaryakıt Tankeri Filosu (Bey Lojistik)",
+                sales_notes="Çorum merkezli Zinnor Kaya tarafından kurulan büyük inşaat, madencilik, petrol ve lojistik grubu. Iveco Eurocargo ve Daily damper/şasi alım potansiyeli çok yüksek.",
+                potential_level="very_high",
+                potential_score=96,
+                segment="A",
+                source="ticaret_odasi_corum",
+                pipeline_stage="lead",
+                pipeline_note="Çorum bölge filo ziyareti ve şasi teklifi hazırlanacak.",
+                is_active=True,
+            )
+            db.add(nurkaya_cust)
+            db.commit()
+    except Exception:
+        pass
 
     return seeded_counts
