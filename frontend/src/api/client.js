@@ -100,7 +100,7 @@ export const contactsApi = {
   convertToCustomer: (id, data = {}) => api.post(`/contacts/${id}/convert`, data),
 };
 
-// ── Çalışma Masası (Workbench / Bugün Aranacaklar / Veri Temizliği) API ────
+// ── Çalışma Masası (Workbench / Bugün Aranacaklar / Veri Temizliği / Saha Asistanı) API ────
 export const workbenchApi = {
   getTodayQueue: (params) => api.get('/work/today', { params }),
   logCallOutcome: (data) => api.post('/work/call-outcome', data),
@@ -108,9 +108,14 @@ export const workbenchApi = {
   getMissingPhone: (params) => api.get('/work/missing-phone', { params }),
   setCustomerPhone: (id, phone) => api.put(`/work/customers/${id}/phone`, { phone }),
   getNameCleanupSuggestions: () => api.get('/work/name-cleanup'),
+  getNameCleanup: (params) => api.get('/work/name-cleanup', { params }),
   applyNameCleanup: (items) => api.post('/work/name-cleanup/apply', { items }),
+  applyNameClean: (data) => api.post('/work/name-cleanup/apply', data),
   getDuplicateGroups: () => api.get('/work/duplicates'),
+  getDuplicates: (params) => api.get('/work/duplicates', { params }),
   mergeDuplicates: (primary_id, secondary_ids) => api.post('/work/duplicates/merge', { primary_id, secondary_ids }),
+  mergeCustomers: (data) => api.post('/work/merge', data),
+  getFieldAssistant: (params) => api.get('/work/field-assistant', { params }),
 };
 
 // ── CRM API ─────────────────────────────────────────────────────
@@ -389,5 +394,7 @@ export const vehiclesApi = {
   getVehiclePipeline: () => api.get('/vehicles/pipeline'),
   getDemandReports: (params) => api.get('/vehicles/reports/demand', { params }),
 };
+
+
 
 

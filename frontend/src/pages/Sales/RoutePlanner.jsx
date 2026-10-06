@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { salesApi, crmApi, vehiclesApi } from '../../api/client';
 import useGeolocation from '../../hooks/useGeolocation';
 import { useVisit } from '../../contexts/VisitContext';
-import { FiMapPin, FiCalendar, FiPlus, FiTrash2, FiCheckCircle, FiPlay, FiMap, FiChevronRight, FiList, FiNavigation, FiTruck, FiZap } from 'react-icons/fi';
+import WhatsAppActionModal from '../../components/CRM/WhatsAppActionModal';
+import QuickVisitModal from '../../components/CRM/QuickVisitModal';
+import { 
+  FiMapPin, FiCalendar, FiPlus, FiTrash2, FiCheckCircle, FiPlay, 
+  FiMap, FiChevronRight, FiList, FiNavigation, FiTruck, FiZap, 
+  FiCompass, FiPhone, FiMessageSquare, FiExternalLink, FiDollarSign 
+} from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function RoutePlanner() {
@@ -21,10 +27,62 @@ export default function RoutePlanner() {
   const [allCustomers, setAllCustomers] = useState([]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [optimizedStops, setOptimizedStops] = useState([]);
+  const [optimizing, setOptimizing] = useState(false);
+
   // Araç İlgisine Göre Rota Filtresi State'leri
   const [vehicleQuery, setVehicleQuery] = useState('');
   const [filterNotContacted30, setFilterNotContacted30] = useState(false);
   const [searchingVehicles, setSearchingVehicles] = useState(false);
+
+  // Güzergah Boyunca Arama State'leri
+  const [startCity, setStartCity] = useState('Samsun');
+  const [endCity, setEndCity] = useState('Ordu');
+  const [alongThreshold, setAlongThreshold] = useState(5000); // 5 km
+  const [alongResults, setAlongResults] = useState([]);
+  const [searchingAlong, setSearchingAlong] = useState(false);
+  const [alongSectorFilter, setAlongSectorFilter] = useState('');
+
+  // Modals
+  const [quickVisitCustomer, setQuickVisitCustomer] = useState(null);
+  const [whatsAppModalData, setWhatsAppModalData] = useState(null);
+
+  const { location, getLocation, loading: gpsLoading } = useGeolocation();
+  const { startVisit } = useVisit();
+  const navigate = useNavigate();
+
+  const CITY_COORDS = {
+    "Samsun": { lat: 41.2582, lon: 36.4385 },
+    "Ordu": { lat: 40.9862, lon: 37.8797 },
+    "Çorum": { lat: 40.5284, lon: 34.9080 },
+    "Amasya": { lat: 40.6531, lon: 35.8331 },
+    "Tokat": { lat: 40.3160, lon: 36.5540 },
+    "Sivas": { lat: 39.7505, lon: 37.0150 },
+    "Giresun": { lat: 40.9169, lon: 38.3886 },
+    "Sinop": { lat: 41.9892, lon: 35.1950 },
+    "Kastamonu": { lat: 41.3766, lon: 33.7765 }
+  };
+
+  useEffect(() => {
+    fetchRoutes();
+    crmApi.getCustomers({ limit: 150 })
+      .then(res => setAllCustomers(res.data.items || []))
+      .catch(() => {});
+  }, []);
+
+  const fetchRoutes = async () => {
+    setLoading(true);
+    try {
+      const res = await salesApi.getRoutePlans();
+      setRoutes(res.data || []);
+      if (res.data && res.data.length > 0 && !selectedRoute) {
+        setSelectedRoute(res.data[0]);
+      }
+    } catch (err) {
+      toast.error("Rotalar yüklenemedi.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFilterByVehicleDemand = async () => {
     if (!vehicleQuery.trim()) {
@@ -52,61 +110,13 @@ export default function RoutePlanner() {
     }
   };
 
-  // Güzergah Boyunca Arama State'leri
-  const [startCity, setStartCity] = useState('Samsun');
-  const [endCity, setEndCity] = useState('Çorum');
-  const [alongThreshold, setAlongThreshold] = useState(3000); // 3 km yakınlık
-  const [alongResults, setAlongResults] = useState([]);
-  const [searchingAlong, setSearchingAlong] = useState(false);
-
-  const { location, getLocation, loading: gpsLoading } = useGeolocation();
-  const { startVisit } = useVisit();
-  const navigate = useNavigate();
-
-  const CITY_COORDS = {
-    "Samsun": { lat: 41.2582, lon: 36.4385 },
-    "Çorum": { lat: 40.5284, lon: 34.9080 },
-    "Sinop": { lat: 41.9892, lon: 35.1950 },
-    "Ordu": { lat: 40.9862, lon: 37.8797 },
-    "Amasya": { lat: 40.6531, lon: 35.8331 },
-    "Tokat": { lat: 40.3160, lon: 36.5540 },
-    "Giresun": { lat: 40.9169, lon: 38.3886 }
-  };
-
-
-  useEffect(() => {
-    fetchRoutes();
-    // Arama yapmak için tüm müşterileri çek (Bunun yerine fuzzy/arama kutusu da yapabiliriz ama hızlıca select için listeliyoruz)
-    crmApi.getCustomers({ limit: 100 })
-      .then(res => setAllCustomers(res.data.items || []))
-      .catch(() => {});
-  }, []);
-
-  const fetchRoutes = async () => {
-    setLoading(true);
-    try {
-      const res = await salesApi.getRoutePlans();
-      setRoutes(res.data || []);
-      if (res.data && res.data.length > 0 && !selectedRoute) {
-        setSelectedRoute(res.data[0]);
-      }
-    } catch (err) {
-      toast.error("Rotalar yüklenemedi.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleOptimize = async () => {
     if (selectedCustomerIds.length === 0) {
       toast.error("Lütfen rotaya eklemek için en az bir müşteri seçin.");
       return;
     }
-    
-    // GPS konumunu al
     getLocation();
-    
-    const startLat = location?.latitude || 41.2582; // Samsun OSB fallback
+    const startLat = location?.latitude || 41.2582;
     const startLon = location?.longitude || 36.4385;
 
     setOptimizing(true);
@@ -118,7 +128,6 @@ export default function RoutePlanner() {
         start_longitude: startLon,
         customer_ids: selectedCustomerIds
       });
-      
       setOptimizedStops(res.data.optimized_stops || []);
       toast.success("Rota başarıyla optimize edildi! En yakın noktalar sıraya dizildi.", { id: 'opt_load' });
     } catch (err) {
@@ -152,12 +161,9 @@ export default function RoutePlanner() {
 
       toast.success("Rota planı başarıyla kaydedildi! 🗺️");
       setShowCreate(false);
-      
-      // Formu temizle
       setRouteName('');
       setSelectedCustomerIds([]);
       setOptimizedStops([]);
-      
       fetchRoutes();
       setSelectedRoute(res.data);
     } catch (err) {
@@ -183,8 +189,6 @@ export default function RoutePlanner() {
     try {
       const nextStatus = !stop.visited;
       await salesApi.markStopVisited(selectedRoute.id, stop.id, nextStatus);
-      
-      // State'i güncelle
       const updatedStops = selectedRoute.stops.map(s => 
         s.id === stop.id ? { ...s, visited: nextStatus, visited_at: nextStatus ? new Date().toISOString() : null } : s
       );
@@ -192,7 +196,6 @@ export default function RoutePlanner() {
         ...selectedRoute,
         stops: updatedStops
       });
-      
       toast.success(nextStatus ? "Ziyaret edildi olarak işaretlendi!" : "Ziyaret geri alındı.");
     } catch (err) {
       toast.error("Güncelleme başarısız.");
@@ -213,7 +216,7 @@ export default function RoutePlanner() {
     const end = CITY_COORDS[endCity];
 
     setSearchingAlong(true);
-    toast.loading("Güzergah boyunca müşteriler tespit ediliyor...", { id: 'search_along_load' });
+    toast.loading(`${startCity} ➔ ${endCity} güzergahında firmalar taranıyor...`, { id: 'search_along_load' });
 
     try {
       const res = await crmApi.searchRouteAlong({
@@ -223,8 +226,12 @@ export default function RoutePlanner() {
         end_lon: end.lon,
         threshold: alongThreshold
       });
-      setAlongResults(res.data || []);
-      toast.success(`${res.data.length} müşteri güzergah üzerinde bulundu!`, { id: 'search_along_load' });
+      let items = res.data || [];
+      if (alongSectorFilter) {
+        items = items.filter(c => (c.sector || '').toLowerCase().includes(alongSectorFilter.toLowerCase()));
+      }
+      setAlongResults(items);
+      toast.success(`${items.length} potansiyel firma güzergah koridorunda bulundu!`, { id: 'search_along_load' });
     } catch (err) {
       toast.error("Güzergah araması başarısız.", { id: 'search_along_load' });
     } finally {
@@ -236,13 +243,24 @@ export default function RoutePlanner() {
     if (alongResults.length === 0) return;
     const ids = alongResults.map(r => r.id);
     setSelectedCustomerIds(ids);
-    setRouteName(`${startCity} - ${endCity} Güzergahı`);
+    setRouteName(`${startCity} - ${endCity} Satış Güzergahı`);
     setActiveTab('plans');
     setShowCreate(true);
-    toast.success("Güzergahtaki müşteriler yeni rota duraklarına eklendi. Şimdi sıralamayı optimize edebilirsiniz!");
+    toast.success("Güzergahtaki firmalar yeni rota duraklarına eklendi. Sıralamayı optimize edebilirsiniz!");
   };
 
-
+  // Google Maps Çoklu Durak Linki
+  const getFullGoogleMapsRouteUrl = (stops) => {
+    if (!stops || stops.length === 0) return null;
+    const coords = stops
+      .filter(s => s.latitude && s.longitude)
+      .map(s => `${s.latitude},${s.longitude}`);
+    if (coords.length === 0) return null;
+    const origin = location ? `${location.latitude},${location.longitude}` : coords[0];
+    const destination = coords[coords.length - 1];
+    const waypoints = coords.slice(0, coords.length - 1).join('|');
+    return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${waypoints}`;
+  };
 
   const getGoogleMapsDir = (stop) => {
     if (!stop.latitude || !stop.longitude) {
@@ -251,28 +269,57 @@ export default function RoutePlanner() {
     return `https://www.google.com/maps/dir/?api=1&destination=${stop.latitude},${stop.longitude}`;
   };
 
-  const handleStartVisit = (stop) => {
-    startVisit(stop.customer_id, stop.company_name);
-  };
-
   const toggleCustomerSelect = (id) => {
     if (selectedCustomerIds.includes(id)) {
       setSelectedCustomerIds(selectedCustomerIds.filter(cid => cid !== id));
     } else {
       setSelectedCustomerIds([...selectedCustomerIds, id]);
     }
-    // Optimizasyonu sıfırla
     setOptimizedStops([]);
+  };
+
+  // Rota Ticari Skoru ve Potansiyeli Hesaplama
+  const computeRouteCommercialScore = (stops) => {
+    if (!stops || stops.length === 0) return { score: 0, potentialEst: 0, aCount: 0, bCount: 0 };
+    let aCount = 0;
+    let bCount = 0;
+    let potentialEst = 0;
+
+    stops.forEach(s => {
+      if (s.segment === 'A') {
+        aCount += 1;
+        potentialEst += 180000;
+      } else if (s.segment === 'B') {
+        bCount += 1;
+        potentialEst += 90000;
+      } else {
+        potentialEst += 40000;
+      }
+    });
+
+    const commercialScore = Math.min(100, Math.round((aCount * 25 + bCount * 15 + stops.length * 10)));
+    return { score: commercialScore, potentialEst, aCount, bCount };
   };
 
   if (loading && routes.length === 0) {
     return <div className="dashboard-loading"><div className="loading-pulse" /><span>Rotalar yükleniyor...</span></div>;
   }
 
+  const currentRouteStats = selectedRoute ? computeRouteCommercialScore(selectedRoute.stops) : null;
+  const fullMapsUrl = selectedRoute ? getFullGoogleMapsRouteUrl(selectedRoute.stops) : null;
+
   return (
     <div className="mobile-page animate-in">
+      {/* Üst Başlık & Sekmeler */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="page-title" style={{ margin: 0 }}>📍 Rota Yönetimi</h2>
+        <div>
+          <h2 className="page-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FiCompass style={{ color: '#38bdf8' }} /> Satış Odaklı Rota & Güzergah
+          </h2>
+          <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
+            En kısa yol değil, en yüksek ticari potansiyelli saha planlaması
+          </span>
+        </div>
         {activeTab === 'plans' && (
           <button className="btn btn-primary btn-sm flex items-center gap-1" onClick={() => setShowCreate(true)}>
             <FiPlus size={16} /> Yeni Rota
@@ -280,274 +327,375 @@ export default function RoutePlanner() {
         )}
       </div>
 
-      {/* Tabs */}
+      {/* Sekmeler */}
       <div style={{ display: 'flex', gap: 8, marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>
         <button 
-          style={{ flex: 1, padding: '8px 12px', fontSize: 13, fontWeight: 600, border: 'none', background: activeTab === 'plans' ? 'rgba(43, 125, 233, 0.15)' : 'none', color: activeTab === 'plans' ? 'var(--accent-blue-light)' : 'var(--text-secondary)', borderRadius: 6, cursor: 'pointer' }}
+          style={{
+            flex: 1, padding: '10px 14px', fontSize: 13, fontWeight: 700, border: 'none',
+            background: activeTab === 'plans' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+            color: activeTab === 'plans' ? '#38bdf8' : 'var(--text-secondary)',
+            borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+          }}
           onClick={() => setActiveTab('plans')}
         >
-          🗺️ Rota Planları
+          <FiMap size={16} /> Bugünün Sahası & Rotalar ({routes.length})
         </button>
         <button 
-          style={{ flex: 1, padding: '8px 12px', fontSize: 13, fontWeight: 600, border: 'none', background: activeTab === 'along' ? 'rgba(43, 125, 233, 0.15)' : 'none', color: activeTab === 'along' ? 'var(--accent-blue-light)' : 'var(--text-secondary)', borderRadius: 6, cursor: 'pointer' }}
+          style={{
+            flex: 1, padding: '10px 14px', fontSize: 13, fontWeight: 700, border: 'none',
+            background: activeTab === 'along' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+            color: activeTab === 'along' ? '#38bdf8' : 'var(--text-secondary)',
+            borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+          }}
           onClick={() => setActiveTab('along')}
         >
-          🧭 Güzergah Arama
+          <FiNavigation size={16} /> 🧭 Yolum Üzerindeki Firmaları Bul
         </button>
       </div>
 
       {activeTab === 'plans' ? (
         <>
-          {showCreate ? (
-
-        <div className="card mb-4">
-          <h3 className="card-title">🗺️ Yeni Rota Planı</h3>
-          <div className="flex flex-col gap-4">
-            <div className="form-group">
-              <label className="form-label">Rota Adı / Başlığı</label>
-              <input 
-                className="form-input" 
-                value={routeName} 
-                onChange={e => setRouteName(e.target.value)} 
-                placeholder="Örn: Samsun OSB Ziyaret Grubu" 
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Ziyaret Tarihi</label>
-              <input 
-                type="date" 
-                className="form-input" 
-                value={routeDate} 
-                onChange={e => setRouteDate(e.target.value)} 
-              />
-            </div>
-
-            {/* Araç Odaklı Saha Satışı Filtresi */}
-            <div style={{
-              background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)',
-              borderRadius: 8, padding: '10px 12px', marginBottom: 4
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                <FiZap color="#38bdf8" size={14} />
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#38bdf8' }}>
-                  Araç İlgisine Göre Müşteri Bul & Rotaya Ekle
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Örn: 35C16, Daily, 16m3, Eurocargo 150..."
-                  value={vehicleQuery}
-                  onChange={(e) => setVehicleQuery(e.target.value)}
-                  style={{ flex: 1, minWidth: 200, fontSize: '0.8rem', padding: '6px 10px' }}
-                />
-                <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.74rem', color: '#cbd5e1', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={filterNotContacted30}
-                    onChange={(e) => setFilterNotContacted30(e.target.checked)}
-                  />
-                  Son 30 gündür görüşülmemiş
-                </label>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-primary"
-                  onClick={handleFilterByVehicleDemand}
-                  disabled={searchingVehicles}
-                  style={{ padding: '6px 12px', fontSize: '0.75rem', fontWeight: 600 }}
+          {showCreate && (
+            <div className="card mb-4" style={{ border: '1px solid rgba(56, 189, 248, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}>
+              <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 className="card-title" style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>
+                  🗺️ Yeni Saha Satış Rotası
+                </h3>
+                <button 
+                  type="button" 
+                  onClick={() => setShowCreate(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                 >
-                  {searchingVehicles ? 'Aranıyor...' : 'Müşterileri Ekle'}
+                  ✕
                 </button>
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="form-label">Duraklar Seçin ({selectedCustomerIds.length} Müşteri Seçili)</label>
-              <div className="customer-selection-list" style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 8, padding: 8 }}>
-                {allCustomers.map(c => (
-                  <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={selectedCustomerIds.includes(c.id)} 
-                      onChange={() => toggleCustomerSelect(c.id)}
+              <div className="flex flex-col gap-4 mt-3">
+                <div className="form-group">
+                  <label className="form-label">Rota Adı / Başlığı</label>
+                  <input 
+                    className="form-input" 
+                    value={routeName} 
+                    onChange={e => setRouteName(e.target.value)} 
+                    placeholder="Örn: Samsun OSB & Hafriyat Ziyaret Grubu" 
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label className="form-label">Planlanan Ziyaret Tarihi</label>
+                  <input 
+                    type="date" 
+                    className="form-input" 
+                    value={routeDate} 
+                    onChange={e => setRouteDate(e.target.value)} 
+                  />
+                </div>
+
+                {/* Araç Odaklı Saha Satışı Filtresi */}
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)',
+                  borderRadius: 10, padding: '12px', marginBottom: 4
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <FiZap color="#38bdf8" size={16} />
+                    <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#38bdf8' }}>
+                      Araç İlgisine Göre Müşteri Bul & Rotaya Ekle
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Örn: 35C16, Daily Damper, Eurocargo, S-Way..."
+                      value={vehicleQuery}
+                      onChange={(e) => setVehicleQuery(e.target.value)}
+                      style={{ flex: 1, minWidth: 200, fontSize: '0.82rem', padding: '8px 12px' }}
                     />
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600 }}>{c.company_name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.city} - {c.segment} Segmenti</div>
-                    </div>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#cbd5e1', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={filterNotContacted30}
+                        onChange={(e) => setFilterNotContacted30(e.target.checked)}
+                      />
+                      Son 30 gündür görüşülmemiş
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-primary"
+                      onClick={handleFilterByVehicleDemand}
+                      disabled={searchingVehicles}
+                      style={{ padding: '8px 14px', fontSize: '0.8rem', fontWeight: 700 }}
+                    >
+                      {searchingVehicles ? 'Taranıyor...' : 'Müşterileri Ekle'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Durak Seçimi ({selectedCustomerIds.length} Müşteri Seçildi)
                   </label>
+                  <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: 10, padding: 8, background: 'rgba(0,0,0,0.2)' }}>
+                    {allCustomers.map(c => (
+                      <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 6px', borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={selectedCustomerIds.includes(c.id)} 
+                          onChange={() => toggleCustomerSelect(c.id)}
+                          style={{ width: 16, height: 16 }}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#f8fafc' }}>{c.company_name}</div>
+                          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                            {c.city} · {c.sector || 'Genel Ticaret'} · <span style={{ color: c.segment === 'A' ? '#34d399' : '#60a5fa' }}>{c.segment || 'C'} Segment</span>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary w-full" 
+                    onClick={() => {
+                      setOptimizedStops([]);
+                      setSelectedCustomerIds([]);
+                      setShowCreate(false);
+                    }}
+                  >
+                    Vazgeç
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary w-full" 
+                    onClick={handleOptimize}
+                    disabled={optimizing || selectedCustomerIds.length === 0}
+                    style={{ fontWeight: 700, background: 'linear-gradient(135deg, #0284c7, #2563eb)' }}
+                  >
+                    {optimizing ? 'Algoritma Çalışıyor...' : '🎯 Sıralamayı & Rotayı Optimize Et'}
+                  </button>
+                </div>
+
+                {optimizedStops.length > 0 && (
+                  <div className="mt-3 p-3" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 10 }}>
+                    <h4 style={{ fontSize: '0.88rem', fontWeight: 800, marginBottom: 8, color: '#34d399' }}>
+                      ✓ Satış Odaklı Optimize Sıralama
+                    </h4>
+                    <ol style={{ fontSize: '0.8rem', paddingLeft: 18, color: '#cbd5e1' }}>
+                      {optimizedStops.map((stop, i) => {
+                        const cust = allCustomers.find(c => c.id === stop.customer_id);
+                        return (
+                          <li key={i} style={{ marginBottom: 6 }}>
+                            <strong>{cust?.company_name}</strong> 
+                            <span style={{ color: '#94a3b8' }}> (+{Math.round(stop.distance_from_previous)} m)</span>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    <button type="button" className="btn btn-success w-full mt-3" onClick={handleSaveRoute} style={{ fontWeight: 800 }}>
+                      💾 Rotayı Kaydet ve Başlat
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Rota Seçici */}
+          {routes.length > 0 ? (
+            <div className="form-group mb-4">
+              <label className="form-label" style={{ fontWeight: 700 }}>Aktif Rota Seçin</label>
+              <select 
+                className="form-select" 
+                value={selectedRoute?.id || ''} 
+                onChange={e => setSelectedRoute(routes.find(r => r.id === parseInt(e.target.value)))}
+                style={{ height: 42, fontSize: '0.9rem', fontWeight: 600 }}
+              >
+                {routes.map(r => (
+                  <option key={r.id} value={r.id}>{r.name} ({r.date}) — {r.stops?.length || 0} Durak</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="mobile-empty card">
+              <p>Henüz planlanmış bir rota bulunmuyor.</p>
+              <button className="btn btn-primary btn-sm mt-3" onClick={() => setShowCreate(true)}>İlk Rotamı Oluştur</button>
+            </div>
+          )}
+
+          {/* Seçili Rota Paneli & Satış Odaklı Skor */}
+          {selectedRoute && (
+            <div className="card animate-in" style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>
+                    {selectedRoute.name}
+                  </h3>
+                  <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
+                    📅 Tarih: {selectedRoute.date} · {selectedRoute.stops?.length || 0} Durak
+                  </p>
+                </div>
+                <button 
+                  className="btn btn-danger btn-sm" 
+                  onClick={() => handleDeleteRoute(selectedRoute.id)}
+                  title="Rotayı Sil"
+                >
+                  <FiTrash2 size={15} />
+                </button>
+              </div>
+
+              {/* ── SATIŞ ODAKLI ROTA SKORU & TİCARİ DEĞER KARTI ── */}
+              {currentRouteStats && (
+                <div 
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.3) 0%, rgba(15, 23, 42, 0.8) 100%)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    marginBottom: '1rem'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', fontWeight: 800, color: '#38bdf8' }}>
+                        <FiZap size={16} /> SATIŞ ODAKLI ROTA DEĞERLENDİRMESİ
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: 4 }}>
+                        💡 <strong>Saha Satış Tavsiyesi:</strong> Bu rotadaki {selectedRoute.stops?.length} firmayı gezmek, tahmini <strong>₺ {currentRouteStats.potentialEst.toLocaleString('tr-TR')}</strong> potansiyel ve araç ihtiyacı barındırıyor.
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: 8, textAlign: 'center' }}>
+                        <div style={{ fontSize: '0.66rem', color: '#6ee7b7' }}>Ticari Skor</div>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: '#34d399' }}>{currentRouteStats.score}/100</div>
+                      </div>
+                      <div style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '4px 10px', borderRadius: 8, textAlign: 'center' }}>
+                        <div style={{ fontSize: '0.66rem', color: '#7dd3fc' }}>A-Segment</div>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: '#38bdf8' }}>{currentRouteStats.aCount} Firma</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Çoklu Durak Google Maps Navigasyon Başlat Butonu */}
+                  {fullMapsUrl && (
+                    <a
+                      href={fullMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-primary w-full mt-3"
+                      style={{
+                        height: 42,
+                        borderRadius: 10,
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, #10b981, #059669)',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      <FiNavigation size={18} />
+                      Rotayı Google Maps'te Başlat (Tüm Duraklar)
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* Duraklar Zaman Çizelgesi */}
+              <div className="route-stops-timeline" style={{ position: 'relative', paddingLeft: 24 }}>
+                <div style={{ position: 'absolute', left: 8, top: 12, bottom: 12, width: 2, background: 'rgba(255,255,255,0.08)' }} />
+                
+                {selectedRoute.stops.map((stop, i) => (
+                  <div key={stop.id} style={{ position: 'relative', marginBottom: 20 }}>
+                    <div style={{
+                      position: 'absolute',
+                      left: -24,
+                      top: 2,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: stop.visited ? '#10b981' : 'var(--bg-card)',
+                      border: stop.visited ? 'none' : '2px solid rgba(56, 189, 248, 0.6)',
+                      color: stop.visited ? '#000' : '#38bdf8',
+                      fontSize: 10,
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 2
+                    }}>
+                      {stop.visited ? '✓' : stop.sequence_order}
+                    </div>
+
+                    <div className="flex justify-between items-start">
+                      <div onClick={() => navigate(`/customers/${stop.customer_id}`)} style={{ cursor: 'pointer', flex: 1 }}>
+                        <div style={{ fontSize: '0.92rem', fontWeight: 700, textDecoration: stop.visited ? 'line-through' : 'none', color: stop.visited ? 'var(--text-muted)' : '#f8fafc' }}>
+                          {stop.company_name}
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                          📍 {stop.district || 'Merkez'} · {stop.city}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 items-center">
+                        {/* Hızlı Ziyaret Başlat */}
+                        {!stop.visited && (
+                          <button 
+                            className="btn btn-success btn-sm" 
+                            onClick={() => setQuickVisitCustomer({ id: stop.customer_id, company_name: stop.company_name })}
+                            style={{ padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.74rem', borderRadius: 8 }}
+                            title="Ziyareti Başlat & Kaydet"
+                          >
+                            <FiPlay size={12} /> Ziyaret
+                          </button>
+                        )}
+
+                        {/* Yol Tarifi */}
+                        <a 
+                          href={getGoogleMapsDir(stop)} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="btn btn-secondary btn-sm"
+                          style={{ padding: '6px 8px', display: 'inline-flex', alignItems: 'center', borderRadius: 8 }}
+                          title="Navigasyon"
+                        >
+                          <FiNavigation size={13} />
+                        </a>
+
+                        {/* Checkbox Ziyaret Edildi */}
+                        <input 
+                          type="checkbox" 
+                          checked={stop.visited} 
+                          onChange={() => handleToggleVisited(stop)}
+                          style={{ width: 18, height: 18, cursor: 'pointer' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
-
-            <div className="flex gap-2">
-              <button 
-                type="button" 
-                className="btn btn-secondary w-full" 
-                onClick={() => {
-                  setOptimizedStops([]);
-                  setSelectedCustomerIds([]);
-                  setShowCreate(false);
-                }}
-              >
-                İptal
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-primary w-full" 
-                onClick={handleOptimize}
-                disabled={optimizing || selectedCustomerIds.length === 0}
-              >
-                {optimizing ? 'Hesaplanıyor...' : 'Sıralamayı Optimize Et'}
-              </button>
-            </div>
-
-            {optimizedStops.length > 0 && (
-              <div className="mt-3 p-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-                <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: 'var(--accent-green)' }}>✓ Optimize Edilen Sıralama</h4>
-                <ol style={{ fontSize: 12, paddingLeft: 16 }}>
-                  {optimizedStops.map((stop, i) => {
-                    const cust = allCustomers.find(c => c.id === stop.customer_id);
-                    return (
-                      <li key={i} style={{ marginBottom: 4 }}>
-                        <strong>{cust?.company_name}</strong> 
-                        <span style={{ color: 'var(--text-muted)' }}> (+{Math.round(stop.distance_from_previous)}m)</span>
-                      </li>
-                    );
-                  })}
-                </ol>
-                <button type="button" className="btn btn-success w-full mt-3" onClick={handleSaveRoute}>
-                  Rotayı Kaydet ve Başlat
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      {/* Rota Listesi / Seçici */}
-      {routes.length > 0 ? (
-        <div className="form-group mb-4">
-          <label className="form-label">Aktif Rota Seçin</label>
-          <select 
-            className="form-select" 
-            value={selectedRoute?.id || ''} 
-            onChange={e => setSelectedRoute(routes.find(r => r.id === parseInt(e.target.value)))}
-          >
-            {routes.map(r => (
-              <option key={r.id} value={r.id}>{r.name} ({r.date})</option>
-            ))}
-          </select>
-        </div>
+          )}
+        </>
       ) : (
-        <div className="mobile-empty card">
-          <p>Henüz planlanmış bir rota bulunmuyor.</p>
-          <button className="btn btn-primary btn-sm mt-3" onClick={() => setShowCreate(true)}>İlk Rotamı Oluştur</button>
-        </div>
-      )}
-
-      {/* Seçili Rota Detayı */}
-      {selectedRoute ? (
-        <div className="card animate-in">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{selectedRoute.name}</h3>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>📅 Plan Tarihi: {selectedRoute.date}</p>
-            </div>
-            <button className="btn btn-danger btn-sm" onClick={() => handleDeleteRoute(selectedRoute.id)}>
-              <FiTrash2 size={14} />
-            </button>
-          </div>
-
-          <div className="route-stops-timeline mt-4" style={{ position: 'relative', paddingLeft: 24 }}>
-            {/* Timeline çizgisi */}
-            <div style={{ position: 'absolute', left: 8, top: 12, bottom: 12, width: 2, background: 'rgba(255,255,255,0.06)' }} />
-            
-            {selectedRoute.stops.map((stop, i) => (
-              <div key={stop.id} style={{ position: 'relative', marginBottom: 20 }}>
-                {/* Durak sırası balonu */}
-                <div style={{
-                  position: 'absolute',
-                  left: -24,
-                  top: 2,
-                  width: 18,
-                  height: 18,
-                  borderRadius: '50%',
-                  background: stop.visited ? 'var(--accent-green)' : 'var(--bg-card)',
-                  border: stop.visited ? 'none' : '2px solid var(--border-color)',
-                  color: stop.visited ? 'black' : 'var(--text-secondary)',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 2
-                }}>
-                  {stop.visited ? '✓' : stop.sequence_order}
-                </div>
-
-                <div className="flex justify-between items-start">
-                  <div onClick={() => navigate(`/customers/${stop.customer_id}`)} style={{ cursor: 'pointer', flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, textDecoration: stop.visited ? 'line-through' : 'none', color: stop.visited ? 'var(--text-muted)' : 'var(--text-heading)' }}>
-                      {stop.company_name}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                      {stop.district} · {stop.city}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 items-center">
-                    {/* Yol Tarifi */}
-                    <a 
-                      href={getGoogleMapsDir(stop)} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="btn btn-secondary btn-sm"
-                      style={{ padding: 6, display: 'inline-flex', alignItems: 'center' }}
-                      title="Navigasyon"
-                    >
-                      <FiNavigation size={14} />
-                    </a>
-
-                    {/* Ziyaret Başlat */}
-                    {!stop.visited && (
-                      <button 
-                        className="btn btn-success btn-sm" 
-                        onClick={() => handleStartVisit(stop)}
-                        style={{ padding: 6, display: 'inline-flex', alignItems: 'center' }}
-                        title="Ziyareti Başlat"
-                      >
-                        <FiPlay size={14} />
-                      </button>
-                    )}
-
-                    {/* Checkbox Ziyaret Edildi */}
-                    <input 
-                      type="checkbox" 
-                      checked={stop.visited} 
-                      onChange={() => handleToggleVisited(stop)}
-                      style={{ width: 18, height: 18, cursor: 'pointer' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
-      </>
-
-      ) : (
+        /* ── GÜZERGAH BOYUNCA ARAMA (YOLUM ÜZERİNDEKİ FİRMALAR) ── */
         <div className="animate-in flex flex-col gap-4">
-          <div className="card">
-            <h3 className="card-title">🧭 Rota Boyunca Firma Bul</h3>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 15 }}>İki şehir arasındaki seyahat güzergahınızın yakınındaki firmaları bulun.</p>
+          <div className="card" style={{ border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+            <h3 className="card-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc' }}>
+              🧭 Yolum Üzerindeki Firmaları Bul
+            </h3>
+            <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 14 }}>
+              Örn: Samsun'dan Ordu'ya seyahat ederken yol koridorunun 5 km yakınındaki akaryakıt & lojistik firmalarını tespit edin.
+            </p>
             
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Başlangıç Şehri</label>
+                <label className="form-label" style={{ fontWeight: 700 }}>1. Çıkış Şehri</label>
                 <select className="form-select" value={startCity} onChange={e => setStartCity(e.target.value)}>
                   {Object.keys(CITY_COORDS).map(city => (
                     <option key={city} value={city}>{city}</option>
@@ -555,7 +703,7 @@ export default function RoutePlanner() {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Bitiş Şehri</label>
+                <label className="form-label" style={{ fontWeight: 700 }}>2. Varış Şehri</label>
                 <select className="form-select" value={endCity} onChange={e => setEndCity(e.target.value)}>
                   {Object.keys(CITY_COORDS).map(city => (
                     <option key={city} value={city}>{city}</option>
@@ -564,58 +712,142 @@ export default function RoutePlanner() {
               </div>
             </div>
 
-            <div className="form-group mt-3">
-              <label className="form-label">Yoldan Maksimum Uzaklık (Eşik Mesafe)</label>
-              <select className="form-select" value={alongThreshold} onChange={e => setAlongThreshold(parseInt(e.target.value))}>
-                <option value={1000}>1 km (Yol kenarı)</option>
-                <option value={2000}>2 km (Yakın)</option>
-                <option value={3000}>3 km (Normal)</option>
-                <option value={5000}>5 km (Geniş)</option>
-              </select>
+            <div className="form-row mt-3">
+              <div className="form-group">
+                <label className="form-label">Yoldan Koridor Sapma Mesafesi</label>
+                <select className="form-select" value={alongThreshold} onChange={e => setAlongThreshold(parseInt(e.target.value))}>
+                  <option value={2000}>2 km (Ana Yol Kenarı)</option>
+                  <option value={3000}>3 km (Yakın Koridor)</option>
+                  <option value={5000}>5 km (Önerilen - 10 Dk Sapma)</option>
+                  <option value={10000}>10 km (Geniş Bölge)</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Hedef Sektör Filtresi</label>
+                <select 
+                  className="form-select" 
+                  value={alongSectorFilter} 
+                  onChange={e => setAlongSectorFilter(e.target.value)}
+                >
+                  <option value="">Tüm Sektörler</option>
+                  <option value="Hafriyat">Hafriyat & İnşaat</option>
+                  <option value="Akaryakıt">Akaryakıt / Petrol</option>
+                  <option value="Lojistik">Lojistik & Nakliye</option>
+                  <option value="Gıda">Gıda / Dağıtım</option>
+                </select>
+              </div>
             </div>
 
-            <button className="btn btn-primary w-full mt-4" onClick={handleSearchAlong} disabled={searchingAlong}>
-              {searchingAlong ? 'Aranıyor...' : 'Güzergah Boyunca Müşterileri Bul'}
+            <button 
+              className="btn btn-primary w-full mt-4" 
+              onClick={handleSearchAlong} 
+              disabled={searchingAlong}
+              style={{
+                height: 44,
+                borderRadius: 10,
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #0284c7, #2563eb)'
+              }}
+            >
+              {searchingAlong ? 'Güzergah Taranıyor...' : `🧭 ${startCity} ➔ ${endCity} Yolundaki Firmaları Bul`}
             </button>
           </div>
 
           {alongResults.length > 0 ? (
             <div className="card">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="card-title" style={{ margin: 0, fontSize: 14 }}>🔍 Bulunan Potansiyel Firmalar ({alongResults.length})</h3>
-                <button className="btn btn-success btn-sm" onClick={handleApplyAlongToRoute}>
-                  Hepsini Rotaya Aktar
+                <h3 className="card-title" style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>
+                  🔍 Yol Koridorunda Bulunan Firmalar ({alongResults.length})
+                </h3>
+                <button className="btn btn-success btn-sm" onClick={handleApplyAlongToRoute} style={{ fontWeight: 700 }}>
+                  Tümünü Rotaya Aktar ({alongResults.length})
                 </button>
               </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {alongResults.map(c => (
-                  <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div 
+                    key={c.id} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      padding: '10px 12px', 
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      borderRadius: 10,
+                      border: '1px solid rgba(255, 255, 255, 0.06)'
+                    }}
+                  >
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 700 }}>{c.company_name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        Yola Uzaklık: <strong>{Math.round(c.distance_to_route)}m</strong> · {c.district} ({c.city})
+                      <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f8fafc' }}>
+                        {c.company_name}
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: 2 }}>
+                        Yoldan Sapma: <strong style={{ color: '#38bdf8' }}>{Math.round(c.distance_to_route)} m</strong> · {c.district} ({c.city}) · <span style={{ color: c.segment === 'A' ? '#34d399' : '#60a5fa' }}>{c.segment || 'C'} Segment</span>
                       </div>
                     </div>
-                    <span className="badge" style={{
-                      background: c.priority_score >= 70 ? 'rgba(239, 68, 68, 0.12)' : c.priority_score >= 40 ? 'rgba(245, 158, 11, 0.12)' : 'rgba(156, 163, 175, 0.12)',
-                      color: c.priority_score >= 70 ? '#f87171' : c.priority_score >= 40 ? '#fbbf24' : '#9ca3af',
-                      border: `1px solid ${c.priority_score >= 70 ? 'rgba(239, 68, 68, 0.25)' : c.priority_score >= 40 ? 'rgba(245, 158, 11, 0.25)' : 'rgba(156, 163, 175, 0.25)'}`,
-                      fontWeight: 700,
-                      fontSize: 11
-                    }}>{c.priority_score}%</span>
+
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      {c.phone && (
+                        <a
+                          href={`tel:${c.phone}`}
+                          className="btn btn-sm btn-secondary"
+                          style={{ padding: '6px 8px', borderRadius: 8 }}
+                          title="Ara"
+                        >
+                          <FiPhone size={13} />
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-primary"
+                        onClick={() => {
+                          setSelectedCustomerIds(prev => Array.from(new Set([...prev, c.id])));
+                          toast.success(`${c.company_name} rota listesine eklendi!`);
+                        }}
+                        style={{ padding: '6px 10px', fontSize: '0.74rem', fontWeight: 700, borderRadius: 8 }}
+                      >
+                        + Ekle
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : alongResults.length === 0 && !searchingAlong ? (
             <div className="mobile-empty card">
-              <p>Arama kriterlerinize göre güzergah üzerinde müşteri bulunamadı.</p>
+              <p>Arama kriterlerinize göre güzergah koridorunda firma bulunamadı.</p>
             </div>
           ) : null}
         </div>
       )}
+
+      {/* Hızlı Ziyaret Modalı */}
+      {quickVisitCustomer && (
+        <QuickVisitModal
+          isOpen={Boolean(quickVisitCustomer)}
+          onClose={() => setQuickVisitCustomer(null)}
+          initialCustomerId={quickVisitCustomer.id}
+          initialCompanyName={quickVisitCustomer.company_name}
+          onSuccess={() => {
+            fetchRoutes();
+          }}
+        />
+      )}
+
+      {/* WhatsApp Modal */}
+      {whatsAppModalData && (
+        <WhatsAppActionModal
+          isOpen={Boolean(whatsAppModalData)}
+          onClose={() => setWhatsAppModalData(null)}
+          customer={whatsAppModalData.customer}
+          vehicleTitle={whatsAppModalData.vehicleTitle}
+          interestId={whatsAppModalData.interestId}
+          defaultStatus={whatsAppModalData.defaultStatus}
+          onSuccess={() => {}}
+        />
+      )}
     </div>
   );
 }
-

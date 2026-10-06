@@ -35,18 +35,10 @@ export default function BottomNav({ onVisitStart }) {
             <span className="visit-btn-label">+ Ziyaret</span>
           </div>
           
-          <button 
-            className="bottom-nav-item" 
-            onClick={() => setShowRadar(true)}
-            style={{ color: '#38bdf8' }}
-          >
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="animate-ping" style={{ position: 'absolute', top: -2, right: -4, width: 7, height: 7, borderRadius: '50%', background: '#38bdf8', opacity: 0.75 }}></span>
-              <span style={{ position: 'absolute', top: -2, right: -4, width: 7, height: 7, borderRadius: '50%', background: '#0284c7' }}></span>
-              <FiMap size={20} />
-            </div>
-            <span style={{ fontWeight: 600 }}>Radar</span>
-          </button>
+          <NavLink to="/map" className="bottom-nav-item">
+            <FiMap size={20} />
+            <span>Harita</span>
+          </NavLink>
           
           <button className="bottom-nav-item" onClick={() => setShowMoreMenu(!showMoreMenu)}>
             <FiMoreHorizontal size={20} />

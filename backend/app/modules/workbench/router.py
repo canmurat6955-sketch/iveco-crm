@@ -486,3 +486,162 @@ def merge_duplicates(data: MergeRequest, db: Session = Depends(get_db), current_
     primary.potential_score = CRMService.calculate_priority_score(primary)
     db.commit()
     return {"ok": True, "primary_id": primary.id, "merged": len(secs), "moved_links": moved}
+
+
+# ── Saha Satış Asistanı & Akıllı Fırsat Motoru ────────────────────────────
+
+@router.get("/field-assistant")
+def get_field_assistant(
+    lat: Optional[float] = Query(None),
+    lng: Optional[float] = Query(None),
+    city: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """
+    Saha Satış Asistanı ve Akıllı Fırsat Motoru:
+      - 30+ gündür ziyaret edilmeyen A/B müşterileri
+      - Teklif / Proforma bekleyen müşteriler
+      - Takip tarihi gelenler
+      - Yüksek potansiyelli yeni keşifler
+      - GPS yakınındaki ticari fırsatlar
+    """
+    import math
+    today = date.today()
+    thirty_days_ago = today - timedelta(days=30)
+    
+    # 1. Ziyaret Edilmeyen A-Segment Müşteriler
+    unvisited_a_query = db.query(Customer).filter(
+        Customer.is_active == True,
+        Customer.segment == "A",
+        (Customer.last_contact_date.is_(None) | (Customer.last_contact_date <= thirty_days_ago))
+    )
+    if city and city not in ["Tümü", "all", "target_9"]:
+        unvisited_a_query = unvisited_a_query.filter(Customer.city == city)
+    
+    unvisited_a_total = unvisited_a_query.count()
+    unvisited_a_items = []
+    for c in unvisited_a_query.order_by(Customer.potential_score.desc(), Customer.id.desc()).limit(10).all():
+        days_ago = (today - c.last_contact_date).days if c.last_contact_date else None
+        sec_text = (c.sector or "") + " " + (c.company_name or "")
+        veh_opp = "Iveco Daily 70C18 Sac Damper / T-Way" if any(k in sec_text.lower() for k in ["hafriyat", "kazi", "kazı", "insaat", "inşaat", "maden", "tas", "taş"]) else ("Iveco Daily 35C16 / 50C18 Frigo" if any(k in sec_text.lower() for k in ["gida", "gıda", "frigo", "balik", "balık", "et", "sut", "süt"]) else "Iveco S-Way Çekici / Eurocargo")
+        unvisited_a_items.append({
+            "id": c.id,
+            "company_name": c.company_name,
+            "city": c.city,
+            "district": c.district,
+            "phone": c.phone,
+            "sector": c.sector,
+            "potential_score": c.potential_score or 92,
+            "days_since_visit": days_ago,
+            "vehicle_opportunity": veh_opp,
+        })
+
+    # 2. Teklif / Proforma Bekleyen Müşteriler
+    proposals_query = db.query(Customer).filter(
+        Customer.is_active == True,
+        Customer.pipeline_stage.in_(["proposal", "negotiation"])
+    )
+    if city and city not in ["Tümü", "all", "target_9"]:
+        proposals_query = proposals_query.filter(Customer.city == city)
+    proposals_total = proposals_query.count()
+    proposals_items = []
+    for c in proposals_query.order_by(Customer.id.desc()).limit(10).all():
+        proposals_items.append({
+            "id": c.id,
+            "company_name": c.company_name,
+            "city": c.city,
+            "district": c.district,
+            "phone": c.phone,
+            "stage": c.pipeline_stage,
+            "note": c.pipeline_note or "Teklif & Şasi fiyatı bekleniyor",
+            "potential_score": c.potential_score or 88
+        })
+
+    # 3. Takip Tarihi Gelen / Geçenler
+    acts = (
+        db.query(SalesActivity)
+        .filter(SalesActivity.next_follow_up.isnot(None), SalesActivity.next_follow_up <= today,
+                SalesActivity.status.notin_(["converted", "lost"]))
+        .order_by(SalesActivity.next_follow_up)
+        .limit(10)
+        .all()
+    )
+    follow_ups_items = []
+    for a in acts:
+        c = db.get(Customer, a.customer_id)
+        if c:
+            follow_ups_items.append({
+                "id": c.id,
+                "company_name": c.company_name,
+                "phone": c.phone,
+                "city": c.city,
+                "activity_type": a.activity_type,
+                "follow_up_date": str(a.next_follow_up),
+                "notes": a.notes
+            })
+
+    # 4. Yüksek Potansiyelli Yeni Keşifler (NACE + Google AI)
+    from app.modules.discovery.models import NewCompanyRegistration
+    new_disc_query = db.query(NewCompanyRegistration).filter(
+        NewCompanyRegistration.status == "new"
+    )
+    if city and city not in ["Tümü", "all", "target_9"]:
+        new_disc_query = new_disc_query.filter(NewCompanyRegistration.city == city)
+    new_disc_total = new_disc_query.count()
+    new_disc_items = []
+    for d in new_disc_query.order_by(NewCompanyRegistration.id.desc()).limit(10).all():
+        new_disc_items.append({
+            "id": d.id,
+            "company_name": d.company_name,
+            "city": d.city,
+            "district": d.district,
+            "phone": d.phone,
+            "nace_description": d.nace_description,
+            "capital": d.capital,
+            "source": "ticaret_sicil"
+        })
+
+    # 5. GPS Yakınlık Radarı (varsa)
+    nearby_items = []
+    if lat and lng:
+        all_geo_custs = db.query(Customer).filter(
+            Customer.is_active == True,
+            Customer.latitude.isnot(None),
+            Customer.longitude.isnot(None)
+        ).all()
+        for gc in all_geo_custs:
+            d_lat = math.radians(gc.latitude - lat)
+            d_lng = math.radians(gc.longitude - lng)
+            a_val = math.sin(d_lat/2)**2 + math.cos(math.radians(lat)) * math.cos(math.radians(gc.latitude)) * math.sin(d_lng/2)**2
+            c_val = 2 * math.atan2(math.sqrt(a_val), math.sqrt(1 - a_val))
+            dist_km = 6371.0 * c_val
+            if dist_km <= 5.0:
+                nearby_items.append({
+                    "id": gc.id,
+                    "company_name": gc.company_name,
+                    "distance_km": round(dist_km, 2),
+                    "segment": gc.segment or "B",
+                    "city": gc.city,
+                    "phone": gc.phone,
+                    "sector": gc.sector
+                })
+        nearby_items.sort(key=lambda x: x["distance_km"])
+
+    return {
+        "status": "ok",
+        "city": city or "Samsun",
+        "counts": {
+            "unvisited_a": unvisited_a_total,
+            "proposals_pending": proposals_total,
+            "follow_ups_due": len(follow_ups_items),
+            "new_discoveries": new_disc_total,
+            "nearby_5km": len(nearby_items)
+        },
+        "unvisited_a": unvisited_a_items,
+        "proposals_pending": proposals_items,
+        "follow_ups": follow_ups_items,
+        "new_discoveries": new_disc_items,
+        "nearby": nearby_items[:8]
+    }
+

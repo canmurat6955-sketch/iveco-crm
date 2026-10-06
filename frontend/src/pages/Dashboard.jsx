@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dashboardApi, crmApi, vehiclesApi } from '../api/client';
+import { dashboardApi, crmApi, vehiclesApi, workbenchApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
@@ -9,6 +9,10 @@ import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, Segment
 import toast from 'react-hot-toast';
 import { getWhatsAppUrl } from '../utils/whatsapp';
 import WhatsAppActionModal from '../components/CRM/WhatsAppActionModal';
+import FieldAssistantHero from '../components/CRM/FieldAssistantHero';
+import TodayOpportunitiesCard from '../components/CRM/TodayOpportunitiesCard';
+import QuickVisitModal from '../components/CRM/QuickVisitModal';
+import NearbyRadarModal from '../components/CRM/NearbyRadarModal';
 
 const STAT_CARDS = [
   { key: 'total_customers', label: 'Toplam Müşteri', icon: FiUsers, gradient: 'linear-gradient(135deg, #1e3a5f, #2b7de9)' },
@@ -41,6 +45,13 @@ export default function Dashboard() {
   const [whatsAppModalData, setWhatsAppModalData] = useState(null);
   const [cleaningAuto, setCleaningAuto] = useState(false);
 
+  // Saha Asistanı State'leri
+  const [selectedCity, setSelectedCity] = useState('Samsun');
+  const [fieldAssistant, setFieldAssistant] = useState(null);
+  const [quickVisitModalOpen, setQuickVisitModalOpen] = useState(false);
+  const [quickVisitCustomer, setQuickVisitCustomer] = useState(null);
+  const [radarOpen, setRadarOpen] = useState(false);
+
   // GPS ve Yakınım State'leri
   const { location, error: gpsError, loading: gpsLoading } = useGeolocation();
   const [nearbyA, setNearbyA] = useState(0);
@@ -54,7 +65,7 @@ export default function Dashboard() {
   const isMobile = useDeviceDetect();
   const navigate = useNavigate();
 
-  const loadDashboard = () => {
+  const loadDashboard = (city = selectedCity) => {
     setLoadError(false);
     Promise.all([
       dashboardApi.getSummary().then(r => setSummary(r.data)),
@@ -67,10 +78,24 @@ export default function Dashboard() {
       crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
       vehiclesApi.getTodayOpportunities().then(r => setOpportunities(r.data)).catch(() => {}),
       vehiclesApi.getVehiclePipeline().then(r => setVehiclePipeline(r.data)).catch(() => {}),
+      workbenchApi.getFieldAssistant({
+        city: city === 'Tümü' ? undefined : city,
+        lat: location?.latitude,
+        lng: location?.longitude
+      }).then(r => setFieldAssistant(r.data)).catch(() => {}),
     ]).catch((err) => {
       console.error("Dashboard yüklenirken hata:", err);
       setLoadError(true);
     });
+  };
+
+  const handleCityChange = (newCity) => {
+    setSelectedCity(newCity);
+    workbenchApi.getFieldAssistant({
+      city: newCity === 'Tümü' ? undefined : newCity,
+      lat: location?.latitude,
+      lng: location?.longitude
+    }).then(r => setFieldAssistant(r.data)).catch(() => {});
   };
 
   const handleCleanupAutoInterests = async () => {
@@ -135,230 +160,25 @@ export default function Dashboard() {
     
     return (
       <div className="mobile-dashboard animate-in">
-        <header className="mobile-dashboard-header">
-          <div className="welcome-text">
-            <h2>Merhaba, {firstName} 👋</h2>
-            <p className="app-subtitle">Bugün harika bir satış günü!</p>
-          </div>
-          <div className="location-indicator">
-            <FiMapPin size={14} className={gpsLoading ? "pulse-icon" : ""} />
-            <span>
-              {gpsLoading 
-                ? "Konum alınıyor..." 
-                : location 
-                  ? `Samsun (Konum Aktif)` 
-                  : "Konum Servisi Devre Dışı"}
-            </span>
-          </div>
-        </header>
-
-        {/* Bugün Widget'ı */}
-        <section className="mobile-section">
-          <div className="section-title">BUGÜNÜN ÖZETİ</div>
-          <div className="mobile-today-grid">
-            <div className="today-stat-card" onClick={() => navigate('/workbench')}>
-              <span className="stat-num">{todayCalls.length}</span>
-              <span className="stat-lbl">Takip Sırada</span>
-            </div>
-            <div className="today-stat-card" onClick={() => navigate('/pipeline')}>
-              <span className="stat-num">{summary.pipeline?.proposal || 0}</span>
-              <span className="stat-lbl">Açık Teklif</span>
-            </div>
-            <div className="today-stat-card">
-              <span className="stat-num">{summary.pipeline?.negotiation || 0}</span>
-              <span className="stat-lbl">Pazarlıkta</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Hızlı İşlemler */}
-        <section className="mobile-section">
-          <div className="section-title">HIZLI İŞLEMLER</div>
-          <div className="quick-actions-grid">
-            <button className="quick-btn start-visit" onClick={() => toast.success('Ziyaret başlatılıyor... GPS konumu alınıyor.')}>
-              <div className="quick-btn-icon"><FiMapPin size={20} /></div>
-              <span>Ziyaret Başlat</span>
-            </button>
-            <button className="quick-btn find-companies" onClick={() => navigate('/discovery')}>
-              <div className="quick-btn-icon"><FiSearch size={20} /></div>
-              <span>Firma Bul</span>
-            </button>
-            <button className="quick-btn scan-card" onClick={() => navigate('/scan-card')}>
-              <div className="quick-btn-icon"><FiCamera size={20} /></div>
-              <span>Kartvizit Tara</span>
-            </button>
-
-            <button className="quick-btn view-map" onClick={() => navigate('/map')}>
-              <div className="quick-btn-icon"><FiMap size={20} /></div>
-              <span>Harita</span>
-            </button>
-            <button 
-              className="quick-btn" 
-              style={{ background: 'rgba(37, 211, 102, 0.1)', borderColor: 'rgba(37, 211, 102, 0.3)' }}
-              onClick={() => setWhatsAppModalData({
-                customer: { company_name: '', phone: '', city: 'Samsun' },
-                vehicleTitle: '',
-                interestId: null,
-                defaultStatus: 'offer_given'
-              })}
-            >
-              <div className="quick-btn-icon" style={{ color: '#25d366' }}><FiMessageSquare size={20} /></div>
-              <span>WhatsApp & Kayıt</span>
-            </button>
-            <button 
-              className="quick-btn" 
-              style={{ background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)' }}
-              onClick={() => navigate('/customers?add=true')}
-            >
-              <div className="quick-btn-icon" style={{ color: '#60a5fa' }}><FiUsers size={20} /></div>
-              <span>Müşteri Ekle</span>
-            </button>
-          </div>
-        </section>
+        {/* ⚡ Saha Asistanı Hero (Mobil) */}
+        <FieldAssistantHero
+          stats={fieldAssistant?.counts || {}}
+          selectedCity={selectedCity}
+          onCityChange={handleCityChange}
+          onOpenVisitModal={() => setQuickVisitModalOpen(true)}
+          onOpenRadar={() => setRadarOpen(true)}
+        />
 
         {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Mobil Saha Satış) ── */}
-        <section className="mobile-section mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <div className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 6, color: '#38bdf8' }}>
-              <FiZap size={16} /> BUGÜNÜN SATIŞ FIRSATLARI
-            </div>
-            <button
-              onClick={handleCleanupAutoInterests}
-              disabled={cleaningAuto}
-              className="btn btn-sm"
-              style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.35)',
-                color: '#f87171',
-                fontSize: '0.68rem',
-                padding: '3px 8px',
-                borderRadius: 6,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4
-              }}
-              title="Rehber aktarımından gelen otomatik ilgileri sil"
-            >
-              <FiTrash2 size={11} /> {cleaningAuto ? 'Temizleniyor...' : 'Rehber Kayıtlarını Temizle'}
-            </button>
-          </div>
-
-          {/* Tab Seçimi (Kayan Menü) */}
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 6, marginBottom: 8, scrollbarWidth: 'none' }}>
-            {[
-              { key: 'hot_leads', label: '🔥 Sıcak', count: opportunities?.counts?.hot_leads || 0, color: '#ef4444' },
-              { key: 'stock_matches', label: '📦 Stok', count: opportunities?.counts?.stock_matches || 0, color: '#10b981' },
-              { key: 'follow_up_needed', label: '⏰ Takip', count: opportunities?.counts?.follow_up_needed || 0, color: '#f59e0b' },
-              { key: 'quote_pending', label: '📑 Teklif Bekleyen', count: opportunities?.counts?.quote_pending || 0, color: '#3b82f6' },
-              { key: 'campaign_opportunities', label: '🎁 Kampanya', count: opportunities?.counts?.campaign_opportunities || 0, color: '#8b5cf6' },
-            ].map(tab => {
-              const active = activeOppTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setActiveOppTab(tab.key)}
-                  style={{
-                    padding: '5px 9px', borderRadius: 14, fontSize: '0.72rem', fontWeight: 700,
-                    border: active ? `2px solid ${tab.color}` : '1px solid rgba(255, 255, 255, 0.1)',
-                    background: active ? `${tab.color}25` : 'rgba(255, 255, 255, 0.05)',
-                    color: active ? '#f8fafc' : '#94a3b8',
-                    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <span>{tab.label}</span>
-                  <span style={{
-                    background: active ? tab.color : 'rgba(255,255,255,0.1)',
-                    color: '#fff', padding: '1px 5px', borderRadius: 8, fontSize: '0.65rem'
-                  }}>
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Fırsat Kartları Listesi */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {opportunities?.[activeOppTab]?.length > 0 ? (
-              opportunities[activeOppTab].slice(0, 15).map((item, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: 'var(--bg-input, #1e293b)', borderRadius: 10, padding: '10px 12px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: 6
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div onClick={() => navigate(`/customers/${item.customer_id}`)} style={{ cursor: 'pointer' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f8fafc' }}>{item.company_name}</div>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{item.city || 'Şehir Yok'} · {item.phone || '-'}</div>
-                    </div>
-                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontSize: '0.68rem' }}>
-                      {item.interest_level}
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#38bdf8', fontWeight: 600 }}>
-                    <FiTruck size={13} /> {item.vehicle_title}
-                  </div>
-
-                  <div style={{
-                    fontSize: '0.72rem', color: '#cbd5e1', background: 'rgba(0, 0, 0, 0.25)',
-                    padding: '4px 8px', borderRadius: 6, borderLeft: '3px solid #f59e0b'
-                  }}>
-                    {item.reason}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 2 }}>
-                    {item.phone && (
-                      <a
-                        href={`tel:${item.phone}`}
-                        className="btn btn-sm btn-primary"
-                        style={{ padding: '4px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                      >
-                        <FiPhone size={11} /> Ara
-                      </a>
-                    )}
-                    {item.phone && (
-                      <button
-                        type="button"
-                        onClick={() => setWhatsAppModalData({
-                          customer: {
-                            id: item.customer_id,
-                            company_name: item.company_name,
-                            phone: item.phone,
-                            city: item.city
-                          },
-                          vehicleTitle: item.vehicle_title,
-                          interestId: item.interest_id,
-                          defaultStatus: 'offer_given'
-                        })}
-                        className="btn btn-sm btn-success"
-                        style={{ padding: '4px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
-                      >
-                        <FiMessageSquare size={11} /> WhatsApp
-                      </button>
-                    )}
-                    <button
-                      className="btn btn-sm btn-secondary"
-                      onClick={() => navigate(`/customers/${item.customer_id}`)}
-                      style={{ padding: '4px 8px', fontSize: '0.72rem' }}
-                    >
-                      Kartı Aç
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', padding: '1.25rem', color: '#94a3b8', fontSize: '0.8rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 8 }}>
-                <FiCheckCircle size={20} style={{ color: '#10b981', marginBottom: 4 }} />
-                <p style={{ margin: 0 }}>Bu kategoride bekleyen fırsat bulunmamaktadır.</p>
-              </div>
-            )}
-          </div>
-        </section>
+        <TodayOpportunitiesCard
+          fieldAssistant={fieldAssistant}
+          opportunities={opportunities}
+          onOpenWhatsApp={setWhatsAppModalData}
+          onOpenQuickVisit={setQuickVisitCustomer}
+          onCleanupAuto={handleCleanupAutoInterests}
+          cleaningAuto={cleaningAuto}
+          isMobile={true}
+        />
 
         {/* Yakınımda */}
         <section className="mobile-section">
@@ -496,6 +316,26 @@ export default function Dashboard() {
             loadDashboard();
           }}
         />
+
+        {/* Hızlı Ziyaret Modalı (Mobil) */}
+        <QuickVisitModal
+          isOpen={quickVisitModalOpen || !!quickVisitCustomer}
+          onClose={() => {
+            setQuickVisitModalOpen(false);
+            setQuickVisitCustomer(null);
+          }}
+          initialCustomerId={quickVisitCustomer?.id}
+          initialCompanyName={quickVisitCustomer?.company_name}
+          onSuccess={() => {
+            loadDashboard();
+          }}
+        />
+
+        {/* GPS Radar Modalı (Mobil) */}
+        <NearbyRadarModal
+          isOpen={radarOpen}
+          onClose={() => setRadarOpen(false)}
+        />
       </div>
     );
   }
@@ -503,6 +343,15 @@ export default function Dashboard() {
   // ── DESKTOP DASHBOARD (Mevcut Görünüm) ─────────────────────────────
   return (
     <div className="animate-in">
+      {/* ⚡ SAHA SATIŞ ASİSTANI (Desktop Hero) */}
+      <FieldAssistantHero
+        stats={fieldAssistant?.counts || {}}
+        selectedCity={selectedCity}
+        onCityChange={handleCityChange}
+        onOpenVisitModal={() => setQuickVisitModalOpen(true)}
+        onOpenRadar={() => setRadarOpen(true)}
+      />
+
       {/* KPI Stats */}
       <div className="kpi-grid">
         {STAT_CARDS.map((card, idx) => {
@@ -539,168 +388,16 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç Odaklı Satış Zekâsı) ── */}
-      <div className="card glass-card mt-6" style={{ border: '1px solid rgba(59, 130, 246, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}>
-        <div className="card-header" style={{ background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.7))', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>
-              <FiZap style={{ color: '#38bdf8' }} size={20} /> BUGÜNÜN SATIŞ FIRSATLARI
-            </h3>
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-              Araç ihtiyacı ve satın alma zamanı eşleşen öncelikli aksiyonlar
-            </span>
-          </div>
-          <button
-            onClick={handleCleanupAutoInterests}
-            disabled={cleaningAuto}
-            className="btn btn-sm"
-            style={{
-              background: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid rgba(239, 68, 68, 0.35)',
-              color: '#f87171',
-              fontSize: '0.74rem',
-              padding: '5px 12px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              cursor: 'pointer',
-              borderRadius: 6
-            }}
-            title="Rehber aktarımından otomatik algılanan ilgi kayıtlarını temizle"
-          >
-            <FiTrash2 size={13} />
-            {cleaningAuto ? 'Temizleniyor...' : 'Rehber Kayıtlarını Temizle'}
-          </button>
-        </div>
-
-        {/* Opportunity Category Tabs */}
-        <div style={{ display: 'flex', gap: 8, padding: '0.85rem 1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', overflowX: 'auto' }}>
-          {[
-            { key: 'hot_leads', label: '🔥 Sıcak Müşteriler', count: opportunities?.counts?.hot_leads || 0, color: '#ef4444' },
-            { key: 'stock_matches', label: '📦 Stokla Eşleşenler', count: opportunities?.counts?.stock_matches || 0, color: '#10b981' },
-            { key: 'follow_up_needed', label: '⏰ Takip Gerekenler', count: opportunities?.counts?.follow_up_needed || 0, color: '#f59e0b' },
-            { key: 'quote_pending', label: '📑 Teklif Bekleyenler', count: opportunities?.counts?.quote_pending || 0, color: '#3b82f6' },
-            { key: 'campaign_opportunities', label: '🎁 Kampanya Fırsatları', count: opportunities?.counts?.campaign_opportunities || 0, color: '#8b5cf6' },
-          ].map(tab => {
-            const active = activeOppTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveOppTab(tab.key)}
-                style={{
-                  padding: '7px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 700,
-                  border: active ? `2px solid ${tab.color}` : '1px solid rgba(255, 255, 255, 0.1)',
-                  background: active ? `${tab.color}20` : 'rgba(255, 255, 255, 0.03)',
-                  color: active ? '#f8fafc' : '#94a3b8',
-                  cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
-                  transition: 'all 0.15s ease', whiteSpace: 'nowrap'
-                }}
-              >
-                <span>{tab.label}</span>
-                <span style={{
-                  background: active ? tab.color : 'rgba(255,255,255,0.1)',
-                  color: '#fff', padding: '1px 6px', borderRadius: 10, fontSize: '0.7rem'
-                }}>
-                  {tab.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Opportunity Items List */}
-        <div style={{ padding: '1.25rem' }}>
-          {opportunities?.[activeOppTab]?.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.85rem' }}>
-              {opportunities[activeOppTab].map((item, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: 'var(--bg-input)', borderRadius: 10, padding: '1rem',
-                    border: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex',
-                    flexDirection: 'column', gap: 8, transition: 'all 0.15s ease'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h4
-                        onClick={() => navigate(`/customers/${item.customer_id}`)}
-                        style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', cursor: 'pointer' }}
-                        onMouseEnter={e => e.currentTarget.style.color = '#38bdf8'}
-                        onMouseLeave={e => e.currentTarget.style.color = '#f8fafc'}
-                      >
-                        {item.company_name}
-                      </h4>
-                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                        {item.city || 'Şehir Yok'} • Tel: {item.phone || '-'}
-                      </span>
-                    </div>
-                    <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontSize: '0.72rem' }}>
-                      {item.interest_level}
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#38bdf8', fontWeight: 600 }}>
-                    <FiTruck size={14} /> {item.vehicle_title}
-                  </div>
-
-                  <div style={{
-                    fontSize: '0.75rem', color: '#cbd5e1', background: 'rgba(0, 0, 0, 0.2)',
-                    padding: '6px 8px', borderRadius: 6, borderLeft: '3px solid #f59e0b'
-                  }}>
-                    {item.reason}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 4 }}>
-                    {item.phone && (
-                      <a
-                        href={`tel:${item.phone}`}
-                        className="btn btn-sm btn-primary"
-                        style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                      >
-                        <FiPhone size={11} /> Ara
-                      </a>
-                    )}
-                    {item.phone && (
-                      <button
-                        type="button"
-                        onClick={() => setWhatsAppModalData({
-                          customer: {
-                            id: item.customer_id,
-                            company_name: item.company_name,
-                            phone: item.phone,
-                            city: item.city
-                          },
-                          vehicleTitle: item.vehicle_title,
-                          interestId: item.interest_id,
-                          defaultStatus: 'offer_given'
-                        })}
-                        className="btn btn-sm btn-success"
-                        style={{ padding: '4px 10px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#25d366', borderColor: '#25d366' }}
-                      >
-                        <FiMessageSquare size={11} /> WhatsApp
-                      </button>
-                    )}
-                    <button
-                      className="btn btn-sm btn-secondary"
-                      onClick={() => navigate(`/customers/${item.customer_id}`)}
-                      style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-                    >
-                      Kartı Aç
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8' }}>
-              <FiCheckCircle size={28} style={{ color: '#10b981', marginBottom: 6 }} />
-              <p style={{ margin: 0, fontSize: '0.85rem' }}>Bu kategoride şu anda bekleyen acil fırsat bulunmamaktadır.</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç & Saha Zekâsı) ── */}
+      <TodayOpportunitiesCard
+        fieldAssistant={fieldAssistant}
+        opportunities={opportunities}
+        onOpenWhatsApp={setWhatsAppModalData}
+        onOpenQuickVisit={setQuickVisitCustomer}
+        onCleanupAuto={handleCleanupAutoInterests}
+        cleaningAuto={cleaningAuto}
+        isMobile={false}
+      />
 
       {/* ── ARAÇ BAZLI SATIŞ PIPELINE (Canlı Talep Dağılımı) ── */}
       {vehiclePipeline && (
@@ -985,6 +682,26 @@ export default function Dashboard() {
         onSuccess={() => {
           loadDashboard();
         }}
+      />
+
+      {/* Hızlı Ziyaret Modalı (Desktop) */}
+      <QuickVisitModal
+        isOpen={quickVisitModalOpen || !!quickVisitCustomer}
+        onClose={() => {
+          setQuickVisitModalOpen(false);
+          setQuickVisitCustomer(null);
+        }}
+        initialCustomerId={quickVisitCustomer?.id}
+        initialCompanyName={quickVisitCustomer?.company_name}
+        onSuccess={() => {
+          loadDashboard();
+        }}
+      />
+
+      {/* GPS Radar Modalı (Desktop) */}
+      <NearbyRadarModal
+        isOpen={radarOpen}
+        onClose={() => setRadarOpen(false)}
       />
     </div>
   );

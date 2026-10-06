@@ -7,8 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, desc, asc
 from fastapi import HTTPException, status
 from fuzzywuzzy import fuzz
-from urllib.parse import urlparse
-from datetime import datetime, timedelta, timezone, date as date_type
+from datetime import datetime, timedelta, timezone, date
 
 from app.modules.crm.models import (
     Customer, CustomerInteraction, CustomerContact, ProformaInvoice,
@@ -131,17 +130,44 @@ class CRMService:
             Customer.latitude.isnot(None),
             Customer.longitude.isnot(None),
         ).all()
-        return [
-            {
+        today = date.today()
+        result = []
+        for c in customers:
+            days_since = (today - c.last_contact_date).days if c.last_contact_date else None
+            is_overdue = False
+            if c.segment in ["A", "B"]:
+                if days_since is None or days_since >= 30:
+                    is_overdue = True
+
+            sec_text = ((c.sector or "") + " " + (c.company_name or "")).lower()
+            if any(k in sec_text for k in ["hafriyat", "kazi", "kazı", "insaat", "inşaat", "maden", "tas", "taş"]):
+                veh_opp = "Iveco Daily 70C18 Sac Damper / T-Way"
+            elif any(k in sec_text for k in ["gida", "gıda", "frigo", "balik", "balık", "et", "sut", "süt"]):
+                veh_opp = "Iveco Daily 35C16 / 50C18 Frigo"
+            elif any(k in sec_text for k in ["lojistik", "nakliyat", "uluslararasi", "uluslararası", "tasimacilik", "taşımacılık", "petrol", "akaryakit", "akaryakıt"]):
+                veh_opp = "Iveco S-Way 530 / 570 Çekici"
+            else:
+                veh_opp = "Iveco S-Way / Eurocargo / Daily"
+
+            result.append({
                 "id": c.id,
                 "company_name": c.company_name,
-                "latitude": str(c.latitude),
-                "longitude": str(c.longitude),
+                "latitude": float(c.latitude),
+                "longitude": float(c.longitude),
                 "city": c.city,
-                "sector": c.sector
-            }
-            for c in customers
-        ]
+                "district": c.district,
+                "phone": c.phone,
+                "sector": c.sector,
+                "segment": c.segment or "C",
+                "potential_score": c.potential_score or 70,
+                "pipeline_stage": c.pipeline_stage,
+                "last_contact_date": str(c.last_contact_date) if c.last_contact_date else None,
+                "days_since_visit": days_since,
+                "is_overdue": is_overdue,
+                "vehicle_opportunity": veh_opp,
+                "source": c.source or "manual",
+            })
+        return result
 
     def get_customer(self, customer_id: int) -> Customer:
         c = self.db.query(Customer).filter(Customer.id == customer_id).first()
