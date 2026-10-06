@@ -12,6 +12,8 @@ const PAGE_TITLES = {
   '/campaigns': 'Kampanya & Katalog',
   '/notifications': 'Bildirimler',
   '/vehicles/management': 'Araç Yönetimi & Talep Raporları',
+  '/contacts': 'Kişilerim',
+  '/pipeline': 'Satış Pipeline',
 };
 
 export default function Header() {
@@ -20,7 +22,8 @@ export default function Header() {
   const [showAiSearch, setShowAiSearch] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    // Saat sadece SS:DD gösteriyor; her saniye yeniden çizmeye gerek yok
+    const timer = setInterval(() => setTime(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 

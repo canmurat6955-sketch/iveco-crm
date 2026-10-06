@@ -91,6 +91,15 @@ export const authApi = {
   changePassword: (data) => api.post('/auth/change-password', data),
 };
 
+// ── Kişilerim (kişisel rehber) API ──────────────────────────────
+export const contactsApi = {
+  list: (params) => api.get('/contacts', { params }),
+  create: (data) => api.post('/contacts', data),
+  update: (id, data) => api.put(`/contacts/${id}`, data),
+  remove: (id) => api.delete(`/contacts/${id}`),
+  convertToCustomer: (id, data = {}) => api.post(`/contacts/${id}/convert`, data),
+};
+
 // ── CRM API ─────────────────────────────────────────────────────
 export const crmApi = {
   getCustomers: (params) => api.get('/crm/customers', { params }),

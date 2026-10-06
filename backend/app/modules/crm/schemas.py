@@ -28,7 +28,7 @@ class CustomerCreate(BaseModel):
     sales_notes: Optional[str] = None
     potential_level: str = Field(default="medium", description="very_high/high/medium/low")
     potential_score: int = Field(default=0, ge=0, le=100)
-    pipeline_stage: str = Field(default="lead", description="lead/contact/proposal/negotiation/won/lost")
+    pipeline_stage: Optional[str] = Field(default=None, description="Boş = havuz | lead/contact/proposal/negotiation/won/lost")
     pipeline_note: Optional[str] = None
     assigned_to_id: Optional[int] = None
     

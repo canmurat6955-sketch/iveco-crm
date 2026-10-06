@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -47,6 +47,10 @@ export default function Sidebar() {
           <NavLink to="/customers" className={`nav-item ${isActive('/customers') ? 'active' : ''}`}>
             <span className="nav-icon"><FiUsers size={18} /></span>
             Müşteriler
+          </NavLink>
+          <NavLink to="/contacts" className={`nav-item ${isActive('/contacts') ? 'active' : ''}`}>
+            <span className="nav-icon"><FiBookOpen size={18} /></span>
+            Kişilerim
           </NavLink>
         </div>
 

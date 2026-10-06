@@ -34,7 +34,7 @@ class Customer(Base):
     potential_level = Column(String(20), default="medium")  # very_high, high, medium, low
     potential_score = Column(Integer, default=0)
     source = Column(String(20), default="manual")  # manual, import, discovery
-    pipeline_stage = Column(String(30), default="lead")  # lead, contact, proposal, negotiation, won, lost
+    pipeline_stage = Column(String(30), nullable=True, default=None)  # NULL = havuz | lead, contact, proposal, negotiation, won, lost
     pipeline_note = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
     assigned_to_id = Column(Integer, ForeignKey("users.id"), nullable=True)

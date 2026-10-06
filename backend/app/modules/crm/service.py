@@ -442,43 +442,52 @@ class CRMService:
 
     @staticmethod
     def calculate_priority_score(c: Customer) -> int:
-        """Müşterinin dinamik satış öncelik skorunu hesaplar (0 - 100)."""
+        """
+        Müşterinin dinamik satış öncelik skoru (0 - 100).
+        Mantık: "Bugün bu firmayı aramam ne kadar mantıklı?"
+          - Ulaşılabilirlik (telefon var mı)      max 25
+          - Hedef 9 ilde mi                       max 15
+          - Segment                               max 20
+          - Pipeline aşaması                      max 25
+          - Takip gecikmesi                       max 15
+        """
         from datetime import date
         score = 0
-        
-        # 1. Segment Puanı (Max 40)
-        seg = c.segment or "C"
-        if seg == "A":
-            score += 40
-        elif seg == "B":
-            score += 30
-        elif seg == "C":
+
+        # 1. Ulaşılabilirlik: telefonu olmayan firma aranamaz
+        if c.phone and c.phone.strip():
+            score += 25
+
+        # 2. Yetki bölgesi
+        if c.city in TARGET_PROVINCES:
             score += 15
-        elif seg == "D":
-            score += 5
-            
-        # 2. Ziyaret Geçerliliği (Max 30)
-        if not c.last_contact_date:
-            score += 30
-        else:
-            days_ago = (date.today() - c.last_contact_date).days
-            if days_ago > 90:
-                score += 30
-            elif days_ago > 60:
-                score += 20
-            elif days_ago > 30:
-                score += 10
-                
-        # 3. Fırsat Durumu (Max 30)
-        stage = c.pipeline_stage or "lead"
-        if stage in ["proposal", "negotiation"]:
-            score += 30
+
+        # 3. Segment
+        score += {"A": 20, "B": 15, "C": 8, "D": 3}.get(c.segment or "C", 8)
+
+        # 4. Fırsat durumu (havuz = 0)
+        stage = c.pipeline_stage
+        if stage in ("proposal", "negotiation"):
+            score += 25
         elif stage == "contact":
             score += 15
         elif stage == "lead":
-            score += 5
-            
-        return score
+            score += 10
+
+        # 5. Takip gecikmesi: aktif fırsatta uzun süredir temas yoksa öne çıkar
+        days_ago = (date.today() - c.last_contact_date).days if c.last_contact_date else None
+        if stage in ("lead", "contact", "proposal", "negotiation"):
+            if days_ago is None or days_ago > 14:
+                score += 15
+            elif days_ago > 7:
+                score += 8
+        elif not stage and days_ago is None:
+            score += 5  # havuzda, hiç aranmamış
+
+        if stage in ("won", "lost"):
+            score = min(score, 30)
+
+        return min(score, 100)
 
     def get_route_along_customers(
         self, start_lat: float, start_lon: float, end_lat: float, end_lon: float, threshold: float = 2000

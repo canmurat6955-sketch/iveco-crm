@@ -291,7 +291,7 @@ export default function Pipeline() {
                               )}
                               <button 
                                 type="button"
-                                onClick={e => { e.stopPropagation(); moveStage(c.id, 'lost'); }}
+                                onClick={e => { e.stopPropagation(); if (confirm(`"${c.company_name}" Kaybedildi olarak işaretlensin mi?`)) moveStage(c.id, 'lost'); }}
                                 style={{ fontSize: '0.65rem', padding: '3px 6px', borderRadius: 6, border: '1px solid #ef444430', background: '#ef444410', color: '#ef4444', cursor: 'pointer' }}
                                 title="Kaybedildi olarak işaretle"
                               >

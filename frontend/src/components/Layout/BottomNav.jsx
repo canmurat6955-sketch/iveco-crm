@@ -70,6 +70,10 @@ export default function BottomNav({ onVisitStart }) {
               <button className="more-menu-item" onClick={() => { navigate('/proforma/quick'); setShowMoreMenu(false); }} style={{ fontWeight: 'bold', color: '#10b981' }}>
                 📄 1-Tıkla Proforma Sihirbazı
               </button>
+
+              <button className="more-menu-item" onClick={() => { navigate('/contacts'); setShowMoreMenu(false); }} style={{ fontWeight: 'bold' }}>
+                📇 Kişilerim (Rehber)
+              </button>
               
               <button className="more-menu-item" onClick={() => { navigate('/vehicles/management'); setShowMoreMenu(false); }}>
                 🚛 Araç Kataloğu, Stok & Talepler
