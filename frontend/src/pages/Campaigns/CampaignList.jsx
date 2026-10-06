@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { campaignsApi } from '../../api/client';
+import { campaignsApi, getBaseUrl } from '../../api/client';
 import toast from 'react-hot-toast';
 
 const CATEGORY_LABELS = {
@@ -74,7 +74,7 @@ export default function CampaignList() {
             <div className="flex gap-2">
               {c.file_name && (
                 <a 
-                  href={`${import.meta.env.VITE_API_URL || '/api'}/campaigns/${c.id}/download`} 
+                  href={`${getBaseUrl()}/campaigns/${c.id}/download`} 
                   className="btn btn-secondary btn-sm" 
                   target="_blank"
                   rel="noreferrer"

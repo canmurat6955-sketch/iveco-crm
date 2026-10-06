@@ -1,8 +1,18 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-// API temel URL'i (Bizim client.js'teki axios instance'ından alınabilir veya doğrudan yazılabilir)
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const getSyncApiUrl = () => {
+  const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.')
+  );
+  const defaultUrl = isLocal ? '/api' : 'https://iveco-crm.onrender.com/api';
+  const envUrl = (import.meta.env.VITE_API_URL || defaultUrl).trim().replace(/\/+$/, '');
+  if (!envUrl || envUrl === '/api') return '/api';
+  return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
+};
 
 export const offlineSync = {
   /**
@@ -45,7 +55,7 @@ export const offlineSync = {
     for (const req of queue) {
       try {
         await axios({
-          url: req.url.startsWith('http') ? req.url : `${API_URL}${req.url}`,
+          url: req.url.startsWith('http') ? req.url : `${getSyncApiUrl()}${req.url.startsWith('/') ? req.url : '/' + req.url}`,
           method: req.method,
           data: req.data,
           headers

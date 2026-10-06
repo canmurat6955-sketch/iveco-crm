@@ -1,8 +1,17 @@
 import axios from 'axios';
 import { offlineSync } from '../services/offlineSync';
 
-const getBaseUrl = () => {
-  const envUrl = (import.meta.env.VITE_API_URL || '/api').trim().replace(/\/+$/, '');
+export const getBaseUrl = () => {
+  const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.startsWith('192.168.') ||
+    window.location.hostname.startsWith('10.')
+  );
+  
+  const defaultUrl = isLocal ? '/api' : 'https://iveco-crm.onrender.com/api';
+  const envUrl = (import.meta.env.VITE_API_URL || defaultUrl).trim().replace(/\/+$/, '');
+  
   if (!envUrl || envUrl === '/api') return '/api';
   return envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`;
 };
