@@ -10,11 +10,18 @@ frontend/.env.local
 backend/venv/
 backend/.env
 backend/*.db
-!backend/data/seed_iveco_crm.db
 backend/*.db-journal
 backend/*.db-wal
 backend/*.db-shm
 backend/uploads/
+backend/backups/
+
+# Kişisel veri (telefon rehberi eşleşmeleri, veritabanı kopyaları) — ASLA repoya girmemeli
+backend/data/
+backend/contact_groups.json
+backend/contact_match_report.json
+backend/mega_match_report.json
+*.vcf
 
 # OS and IDE files
 .DS_Store
@@ -22,6 +29,6 @@ backend/uploads/
 .idea/
 *.log
 *.db
-!backend/data/seed_iveco_crm.db
+*.sqlite
 scratch/
 cloudflared.exe
