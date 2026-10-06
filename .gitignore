@@ -10,6 +10,7 @@ frontend/.env.local
 backend/venv/
 backend/.env
 backend/*.db
+!backend/data/seed_iveco_crm.db
 backend/*.db-journal
 backend/*.db-wal
 backend/*.db-shm
@@ -21,5 +22,6 @@ backend/uploads/
 .idea/
 *.log
 *.db
+!backend/data/seed_iveco_crm.db
 scratch/
 cloudflared.exe

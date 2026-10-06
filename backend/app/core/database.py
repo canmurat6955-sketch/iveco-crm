@@ -7,10 +7,12 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
+import shutil
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 SQLITE_DB_PATH = BACKEND_DIR / "iveco_crm.db"
+SEED_DB_PATH = BACKEND_DIR / "data" / "seed_iveco_crm.db"
 DEFAULT_SQLITE_URL = f"sqlite:///{SQLITE_DB_PATH.as_posix()}"
 
 db_url = settings.DATABASE_URL
@@ -21,6 +23,15 @@ if db_url.startswith("sqlite:///."):
 
 is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
+
+# Tohum SQLite veritabanı otomatik geri yükleme (Render veya taze bulut kurulumları için)
+if is_sqlite and SEED_DB_PATH.exists():
+    try:
+        if not SQLITE_DB_PATH.exists() or SQLITE_DB_PATH.stat().st_size < 500000:
+            print(f"[*] Eksik/küçük SQLite tespit edildi, tohum veritabanı yükleniyor: {SEED_DB_PATH} -> {SQLITE_DB_PATH}")
+            shutil.copy2(SEED_DB_PATH, SQLITE_DB_PATH)
+    except Exception as copy_err:
+        print(f"[!] Tohum veritabanı yükleme hatası: {copy_err}")
 
 from sqlalchemy.engine import Engine
 
@@ -89,6 +100,27 @@ def get_db():
         db.close()
 
 
+def import_all_models():
+    """Tüm modelleri hafızaya alarak SQLAlchemy mapper ilişkilerinin düzgün çözümlenmesini sağlar."""
+    import app.modules.auth.models
+    import app.modules.crm.models
+    import app.modules.sales_activity.models
+    import app.modules.discovery.models
+    import app.modules.campaigns.models
+    import app.modules.notifications.models
+    import app.modules.vehicles.models
+    import app.modules.contacts.models
+
+
 def create_all_tables():
     """Create all tables in the database. Used for initial setup."""
+    import_all_models()
     Base.metadata.create_all(bind=engine)
+
+
+# Modelleri uygulama ilk ayağa kalkarken otomatik yükle
+try:
+    import_all_models()
+except Exception:
+    pass
+

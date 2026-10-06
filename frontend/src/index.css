@@ -1062,7 +1062,9 @@ a:hover { text-decoration: underline; }
 
 .main-content-mobile {
   flex: 1;
-  padding: var(--space-4);
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+  padding-top: calc(env(safe-area-inset-top, 24px) + 16px);
   padding-bottom: calc(105px + env(safe-area-inset-bottom, 20px)); /* BottomNav + Safe Area */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

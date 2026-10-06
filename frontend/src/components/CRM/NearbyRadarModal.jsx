@@ -91,8 +91,8 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[120] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[88dvh] my-auto">
         {/* Header with Radar Animation */}
         <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-blue-900 to-indigo-950 text-white relative overflow-hidden">
           {/* Subtle radar pulse effect */}
@@ -103,7 +103,7 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
               <FiRadio className="w-5 h-5 text-blue-300 animate-pulse" />
             </div>
             <div>
-              <h2 className="text-lg font-bold flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
                 Yakınımdaki Müşteriler
                 <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-200 font-mono">
                   GPS RADAR
@@ -137,12 +137,12 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Radius Filter Chips */}
-        <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+        {/* Radius Filter Chips - Mobil Uyumlu */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 shrink-0">
             <FiCompass className="w-3.5 h-3.5" /> Arama Yarıçapı:
           </span>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center flex-wrap gap-1.5">
             {RADIUS_OPTIONS.map(opt => (
               <button
                 key={opt.value}

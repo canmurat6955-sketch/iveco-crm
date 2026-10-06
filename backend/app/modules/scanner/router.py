@@ -225,13 +225,12 @@ def _search_live_scanner(query: str, max_results: int = 20) -> List[ScanResult]:
 
 
 def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[ScanResult]:
-    """Doğrulanmış Karadeniz Ticaret/Sanayi Odaları ve CRM firma veritabanında arama yapar."""
-    q = query.lower()
-    
-    from app.core.database import tr_norm
+    """Doğrulanmış Karadeniz Ticaret/Sanayi Odaları ve CRM firma veritabanında akıllı alaka skorlamasıyla arama yapar."""
+    from app.core.database import tr_norm, import_all_models
     from sqlalchemy import func
+    import_all_models()
 
-    q_clean = q.strip()
+    q_clean = query.strip()
     q_norm = tr_norm(q_clean)
     
     # 9 hedef il tespiti (Türkçe karakter bağımsız)
@@ -249,9 +248,16 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
         "tesisi", "tesisleri", "bayi", "bayisi", "bayileri", "merkezi"
     }
     raw_words = re.findall(r'\w+', q_clean)
-    keywords = [w for w in raw_words if len(w) >= 3 and tr_norm(w) not in stop_words]
+    keywords = [tr_norm(w) for w in raw_words if len(w) >= 3 and tr_norm(w) not in stop_words]
     if not keywords and raw_words:
-        keywords = [w for w in raw_words if len(w) >= 3]
+        keywords = [tr_norm(w) for w in raw_words if len(w) >= 3]
+
+    # Sektörel niyet tespiti (kelime bazlı set eşleşmesi - substring çakışmalarını önler)
+    q_words_set = set(tr_norm(w) for w in raw_words)
+    food_stems = {"gida", "un", "bakliyat", "makarna", "kuruyemis", "mesrubat", "sekerleme", "helva", "sut", "et", "balik", "market", "manav"}
+    is_food_query = bool(q_words_set & food_stems) or any(phrase in q_norm for phrase in ["toptan gida", "gida toptan", "soguk hava", "un fabrikasi"])
+    excavation_stems = {"hafriyat", "kazi", "zemin", "asfalt", "kirici", "dozer", "ekskavator", "yikim"}
+    is_excavation_query = bool(q_words_set & excavation_stems) or any(phrase in q_norm for phrase in ["yol insaat", "altyapi insaat", "agrega ocagi"])
 
     query_filters = []
     if detected_city:
@@ -263,27 +269,47 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
         city_ors = [or_(func.tr_norm(Customer.city).like(f"%{tr_norm(p)}%"), Customer.city.ilike(f"%{p}%")) for p in ALLOWED_SCANNER_PROVINCES]
         query_filters.append(or_(*city_ors))
 
-    if keywords:
-        kw_ors = []
-        for kw in keywords:
-            kw_norm = tr_norm(kw)
-            kw_ors.append(func.tr_norm(Customer.company_name).like(f"%{kw_norm}%"))
-            kw_ors.append(func.tr_norm(Customer.sector).like(f"%{kw_norm}%"))
-            kw_ors.append(func.tr_norm(Customer.address).like(f"%{kw_norm}%"))
-            kw_ors.append(Customer.company_name.ilike(f"%{kw}%"))
-        query_filters.append(or_(*kw_ors))
+    # Geniş aday havuzunu çek
+    candidates = db.query(Customer).filter(and_(*query_filters)).all()
 
-    customers = (
-        db.query(Customer)
-        .filter(and_(*query_filters))
-        .order_by(Customer.potential_score.desc(), Customer.id.desc())
-        .limit(max_results)
-        .all()
-    )
+    ranked_candidates = []
+    for c in candidates:
+        c_name_norm = tr_norm(c.company_name or "")
+        c_sec_norm = tr_norm(c.sector or "")
+        c_addr_norm = tr_norm(c.address or "")
+
+        # Çatışma filtreleri (Örn: Gıda aramasında hafriyat/maden çıkmamalı)
+        if is_food_query:
+            if any(bad in c_sec_norm or bad in c_name_norm for bad in ["hafriyat", "kazi", "is makineleri", "maden", "tas ocagi"]):
+                continue
+        if is_excavation_query:
+            if any(bad in c_sec_norm or bad in c_name_norm for bad in ["gida", "un", "ekmek", "pasta", "lokanta"]):
+                continue
+
+        score = 0
+        matches_name = [k for k in keywords if k in c_name_norm]
+        matches_sec = [k for k in keywords if k in c_sec_norm]
+
+        score += len(matches_name) * 50
+        score += len(matches_sec) * 40
+
+        # Eğer sorgudaki tüm kelimeler isimde veya sektörde geçiyorsa devasa bonus
+        if keywords and all(k in (c_name_norm + " " + c_sec_norm) for k in keywords):
+            score += 100
+
+        # Adres eşleşmesi: Yalnızca genel kelimeler (toptan, sanayi) değilse
+        for k in keywords:
+            if k not in ["toptan", "sanayi", "merkez", "sitesi", "bolgesi"] and k in c_addr_norm:
+                score += 10
+
+        if score > 0:
+            ranked_candidates.append((score, c))
+
+    ranked_candidates.sort(key=lambda x: (x[0], x[1].potential_score or 0), reverse=True)
 
     results: List[ScanResult] = []
     seen_names = set()
-    for c in customers:
+    for score, c in ranked_candidates[:max_results]:
         city_name = c.city or (detected_city or "Samsun")
         c_key = tr_norm(c.company_name)
         if c_key not in seen_names:
@@ -305,49 +331,48 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
                 source="verified_db"
             ))
 
-    # İhtiyaç halinde Bölgesel Hafriyat & Sanayi Havuzundan Tamamla
-    try:
-        from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
-        for h in REGIONAL_HAFRIYAT_COMPANIES:
-            if len(results) >= max_results:
-                break
-            h_name_norm = tr_norm(h["company_name"])
-            h_city_norm = tr_norm(h["city"])
-            if h_name_norm in seen_names:
-                continue
+    # YALNIZCA gıda dışı veya hafriyat sorgularında bölgesel hafriyat havuzundan tamamla
+    if not is_food_query:
+        try:
+            from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
+            for h in REGIONAL_HAFRIYAT_COMPANIES:
+                if len(results) >= max_results:
+                    break
+                h_name_norm = tr_norm(h["company_name"])
+                h_city_norm = tr_norm(h["city"])
+                if h_name_norm in seen_names:
+                    continue
 
-            # Şehir filtresi varsa kontrol et
-            if detected_city and tr_norm(detected_city) != h_city_norm:
-                continue
+                if detected_city and tr_norm(detected_city) != h_city_norm:
+                    continue
 
-            # Anahtar kelime eşleşmesi kontrol et
-            match = False
-            if any(tr_norm(kw) in h_name_norm or tr_norm(kw) in tr_norm(h["sector"]) for kw in keywords):
-                match = True
-            elif "hafriyat" in q_norm or "kazi" in q_norm:
-                match = True
+                match = False
+                if any(tr_norm(kw) in h_name_norm or tr_norm(kw) in tr_norm(h["sector"]) for kw in keywords):
+                    match = True
+                elif "hafriyat" in q_norm or "kazi" in q_norm:
+                    match = True
 
-            if match:
-                seen_names.add(h_name_norm)
-                gmaps_q = quote_plus(f"{h['company_name']} {h['city']}")
-                results.append(ScanResult(
-                    google_place_id=f"hafriyat_{abs(hash(h['company_name'])) % 1000000}",
-                    company_name=h["company_name"],
-                    phone=h["phone"],
-                    address=h["address"],
-                    district=h.get("district", ""),
-                    city=h["city"],
-                    website=h.get("website", ""),
-                    google_maps_url=f"https://www.google.com/maps/search/?api=1&query={gmaps_q}",
-                    rating=4.9,
-                    rating_count=45,
-                    business_status="OPERATIONAL",
-                    sector=h["sector"],
-                    types=["verified_firm", "earthworks", "excavation"],
-                    source="verified_db"
-                ))
-    except Exception:
-        pass
+                if match:
+                    seen_names.add(h_name_norm)
+                    gmaps_q = quote_plus(f"{h['company_name']} {h['city']}")
+                    results.append(ScanResult(
+                        google_place_id=f"hafriyat_{abs(hash(h['company_name'])) % 1000000}",
+                        company_name=h["company_name"],
+                        phone=h["phone"],
+                        address=h["address"],
+                        district=h.get("district", ""),
+                        city=h["city"],
+                        website=h.get("website", ""),
+                        google_maps_url=f"https://www.google.com/maps/search/?api=1&query={gmaps_q}",
+                        rating=4.9,
+                        rating_count=45,
+                        business_status="OPERATIONAL",
+                        sector=h["sector"],
+                        types=["verified_firm", "earthworks", "excavation"],
+                        source="verified_db"
+                    ))
+        except Exception:
+            pass
 
     return results
 

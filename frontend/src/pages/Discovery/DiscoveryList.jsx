@@ -440,52 +440,65 @@ export default function DiscoveryList() {
 
   return (
     <div className="animate-in">
-      {/* Sayfa Başlığı */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Sayfa Başlığı - Mobil Uyumlu */}
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-heading)' }}>Müşteri İstihbaratı & Lead Radarı</h2>
-          <p className="text-sm text-muted">Samsun ve Karadeniz bölgesinde ticari araç alım potansiyeli olan sıcak firmaları yakalayın.</p>
+          <h2 className="text-lg sm:text-2xl font-extrabold break-words" style={{ color: 'var(--text-heading)' }}>
+            Müşteri İstihbaratı & Lead Radarı
+          </h2>
+          <p className="text-xs sm:text-sm text-muted">
+            Samsun ve Karadeniz bölgesinde ticari araç alım potansiyeli olan sıcak firmaları yakalayın.
+          </p>
         </div>
       </div>
 
-      {/* Ana Tab Menüsü */}
-      <div className="flex gap-2 mb-6 flex-wrap" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+      {/* Ana Tab Menüsü - Mobil Uyumlu Yatay Kaydırılabilir */}
+      <div 
+        className="flex gap-2 mb-4" 
+        style={{ 
+          borderBottom: '1px solid var(--border-color)', 
+          paddingBottom: '0.5rem',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         <button 
-          className={`btn ${activeTab === 'osb_radar' ? 'btn-primary' : 'btn-secondary'}`}
+          className={`btn btn-sm ${activeTab === 'osb_radar' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('osb_radar')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <FiTarget size={16} /> 🎯 OSB & Sektörel Radar
+          <FiTarget size={15} /> 🎯 OSB & Sektörel Radar
         </button>
         <button 
-          className={`btn ${activeTab === 'tenders' ? 'btn-primary' : 'btn-secondary'}`}
+          className={`btn btn-sm ${activeTab === 'tenders' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('tenders')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <FiFileText size={16} /> 🏛️ Kamu & Belediye İhale Radarı
+          <FiFileText size={15} /> 🏛️ Kamu & Belediye İhale
           {tenders.length > 0 && <span className="badge badge-amber" style={{ marginLeft: 4 }}>{tenders.length}</span>}
         </button>
         <button 
-          className={`btn ${activeTab === 'bodybuilders' ? 'btn-primary' : 'btn-secondary'}`}
+          className={`btn btn-sm ${activeTab === 'bodybuilders' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('bodybuilders')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <FiTool size={16} /> 🛠️ Üst Yapıcı Partner Ağı & Talepler
+          <FiTool size={15} /> 🛠️ Üst Yapıcı Partnerleri
           {referrals.length > 0 && <span className="badge badge-green" style={{ marginLeft: 4 }}>{referrals.length}</span>}
         </button>
         <button 
-          className={`btn ${activeTab === 'new_registrations' ? 'btn-primary' : 'btn-secondary'}`}
+          className={`btn btn-sm ${activeTab === 'new_registrations' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('new_registrations')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <FiBriefcase size={16} /> 🏢 Yeni Kurulan Şirketler (NACE)
+          <FiBriefcase size={15} /> 🏢 Yeni Kurulan Şirketler
         </button>
         <button 
-          className={`btn ${activeTab === 'live_search' ? 'btn-primary' : 'btn-secondary'}`}
+          className={`btn btn-sm ${activeTab === 'live_search' ? 'btn-primary' : 'btn-secondary'}`}
           onClick={() => setActiveTab('live_search')}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0 }}
         >
-          <FiSearch size={16} /> 🔎 Serbest Arama
+          <FiSearch size={15} /> 🔎 Serbest Canlı Arama
         </button>
       </div>
 
@@ -494,17 +507,19 @@ export default function DiscoveryList() {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
-          flexWrap: 'wrap',
-          padding: '0.75rem 1rem',
+          gap: '0.4rem',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          padding: '0.6rem 0.85rem',
           background: 'rgba(30, 41, 59, 0.5)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-color)',
-          marginBottom: '1.25rem'
+          marginBottom: '1rem'
         }}
       >
-        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-blue-light)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <FiMapPin size={15} /> HEDEF İL FİLTRESİ:
+        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-blue-light)', display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <FiMapPin size={14} /> İL:
         </span>
         {['Tümü', ...ALLOWED_PROVINCES].map(prov => (
           <button
@@ -514,9 +529,11 @@ export default function DiscoveryList() {
             onClick={() => handleProvinceFilterChange(prov)}
             style={{
               borderRadius: 16,
-              padding: '0.25rem 0.85rem',
-              fontSize: '0.8rem',
-              fontWeight: selectedProvinceFilter === prov ? 700 : 500
+              padding: '0.2rem 0.75rem',
+              fontSize: '0.78rem',
+              fontWeight: selectedProvinceFilter === prov ? 700 : 500,
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
           >
             {prov === 'Tümü' ? '🌐 Tümü (9 İl)' : prov}
@@ -1165,22 +1182,28 @@ export default function DiscoveryList() {
               </button>
             </form>
 
-            {/* Hızlı Örnek Aramalar */}
+            {/* Hızlı Örnek Aramalar - Mobil Uyumlu Yatay Kaydırılabilir Çipler */}
             <div style={{ marginTop: 14 }}>
-              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginBottom: 8 }}>
-                ⚡ Popüler Sektörel Aramalar (Tek Tıkla Tara):
+              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>⚡ Popüler Sektörel Aramalar (Tek Tıkla Tara):</span>
+                <span className="text-[10px] text-blue-400 sm:hidden">👈 Kaydırın 👉</span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ 
+                display: 'flex', 
+                overflowX: 'auto', 
+                gap: 8, 
+                paddingBottom: 6,
+                scrollbarWidth: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}>
                 {[
+                  { label: '🥫 Gıda Toptan (Samsun & Çorum)', q: 'Gıda toptan' },
+                  { label: '🌾 Un & Bakliyat Fabrikaları', q: 'Un fabrikaları' },
+                  { label: '🥩 Et, Tavuk & Süt Ürünleri', q: 'Süt et toptan' },
                   { label: '🚜 Samsun Hafriyat', q: 'Samsun hafriyat' },
                   { label: '🚜 Çorum Hafriyat', q: 'Çorum hafriyat' },
                   { label: '🚜 Sivas Hafriyat', q: 'Sivas hafriyat' },
                   { label: '🚜 Ordu Hafriyat', q: 'Ordu hafriyat' },
-                  { label: '🚜 Kastamonu Hafriyat', q: 'Kastamonu hafriyat' },
-                  { label: '🚜 Giresun Hafriyat', q: 'Giresun hafriyat' },
-                  { label: '🚜 Tokat Hafriyat', q: 'Tokat hafriyat' },
-                  { label: '🚜 Amasya Hafriyat', q: 'Amasya hafriyat' },
-                  { label: '🚜 Sinop Hafriyat', q: 'Sinop hafriyat' },
                   { label: '🏢 Nurkaya Group (Çorum)', q: 'nurkaya' },
                   { label: '🏗️ Samsun Beton Santralleri', q: 'Samsun beton santralleri' },
                   { label: '🚛 Çarşamba Nakliyat & Lojistik', q: 'Çarşamba nakliyat lojistik' },
@@ -1195,23 +1218,17 @@ export default function DiscoveryList() {
                       handleLiveSearch(null, item.q);
                     }}
                     style={{
-                      background: 'rgba(30, 41, 59, 0.7)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: '#cbd5e1',
+                      background: searchQuery.toLowerCase() === item.q.toLowerCase() ? 'rgba(59, 130, 246, 0.25)' : 'rgba(30, 41, 59, 0.7)',
+                      border: `1px solid ${searchQuery.toLowerCase() === item.q.toLowerCase() ? '#3b82f6' : 'rgba(255, 255, 255, 0.1)'}`,
+                      color: searchQuery.toLowerCase() === item.q.toLowerCase() ? '#60a5fa' : '#cbd5e1',
                       borderRadius: 8,
-                      padding: '6px 12px',
+                      padding: '7px 13px',
                       fontSize: 12,
-                      fontWeight: 500,
+                      fontWeight: 600,
                       cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
                       transition: 'all 0.15s ease'
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = '#3b82f6';
-                      e.currentTarget.style.color = '#fff';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                      e.currentTarget.style.color = '#cbd5e1';
                     }}
                   >
                     {item.label}
