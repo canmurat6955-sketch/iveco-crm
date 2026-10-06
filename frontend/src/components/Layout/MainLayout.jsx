@@ -7,7 +7,7 @@ import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
 
-import PwaInstallPrompt from '../Common/PwaInstallPrompt';
+import PwaInstallPrompt from '../common/PwaInstallPrompt';
 
 export default function MainLayout() {
   const isMobile = useDeviceDetect();
