@@ -554,6 +554,8 @@ export default function CustomerDetail() {
               {customer.phone && (
                 <a
                   href={`tel:${customer.phone}`}
+                  data-customer-id={customer.id}
+                  data-customer-name={customer.company_name}
                   className="btn btn-sm"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#10b981', color: '#fff', textDecoration: 'none' }}
                 >
@@ -647,7 +649,12 @@ export default function CustomerDetail() {
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <FiPhone size={14} style={{ color: 'var(--accent-blue-light)' }} /> 
                 {customer.phone ? (
-                  <a href={`tel:${customer.phone}`} style={{ color: '#38bdf8', fontWeight: 700, textDecoration: 'underline' }}>
+                  <a
+                    href={`tel:${customer.phone}`}
+                    data-customer-id={customer.id}
+                    data-customer-name={customer.company_name}
+                    style={{ color: '#38bdf8', fontWeight: 700, textDecoration: 'underline' }}
+                  >
                     {customer.phone}
                   </a>
                 ) : '—'}

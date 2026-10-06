@@ -91,3 +91,5 @@ export function useWhatsAppModal() {
   }
   return context;
 }
+
+export const useWhatsApp = useWhatsAppModal;

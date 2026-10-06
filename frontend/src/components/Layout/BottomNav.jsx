@@ -61,6 +61,14 @@ export default function BottomNav({ onVisitStart }) {
               
               <button 
                 className="more-menu-item" 
+                onClick={() => { navigate('/workbench'); setShowMoreMenu(false); }} 
+                style={{ fontWeight: 'bold', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.12)' }}
+              >
+                📞 Çalışma Masası (Bugün Aranacaklar)
+              </button>
+
+              <button 
+                className="more-menu-item" 
                 onClick={() => { setShowRadar(true); setShowMoreMenu(false); }} 
                 style={{ fontWeight: 'bold', color: '#0284c7', background: 'rgba(2, 132, 199, 0.08)' }}
               >

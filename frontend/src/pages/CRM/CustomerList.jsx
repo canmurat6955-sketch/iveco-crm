@@ -468,6 +468,8 @@ export default function CustomerList() {
                   {c.phone && (
                     <a
                       href={`tel:${c.phone}`}
+                      data-customer-id={c.id}
+                      data-customer-name={c.company_name}
                       className="btn btn-xs"
                       style={{
                         display: 'flex',

@@ -3,10 +3,13 @@ Iveco CRM — Müşteri İstihbarat + Satış Operasyon Platformu
 FastAPI Application Entry Point
 """
 import os
+from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from app.core.config import settings
 from app.core.database import create_all_tables, SessionLocal
@@ -67,6 +70,7 @@ from app.modules.dashboard.router import router as dashboard_router
 from app.modules.scanner.router import router as scanner_router
 from app.modules.vehicles.router import router as vehicles_router
 from app.modules.contacts.router import router as contacts_router
+from app.modules.workbench.router import router as workbench_router
 
 app.include_router(auth_router)
 app.include_router(crm_router)
@@ -79,6 +83,10 @@ app.include_router(dashboard_router)
 app.include_router(scanner_router)
 app.include_router(vehicles_router)
 app.include_router(contacts_router)
+app.include_router(workbench_router)
+
+# Yanıtları sıkıştır (mobil veri ve hız için)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Mount static file uploads (photos, cards, docs)
 os.makedirs(settings.FILE_STORAGE_PATH, exist_ok=True)
@@ -90,6 +98,33 @@ def health_check():
     return {"status": "ok", "app": settings.APP_NAME, "version": settings.APP_VERSION}
 
 
+# ── Derlenmiş arayüzü (frontend/dist) doğrudan backend'den sun ─────────
+# Böylece tek süreç yeterli olur; hash'li dosyalar 1 yıl önbelleğe alınır, index.html hiç alınmaz.
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+
+if FRONTEND_DIST.exists():
+    @app.middleware("http")
+    async def cache_headers(request: Request, call_next):
+        response = await call_next(request)
+        p = request.url.path
+        if p.startswith("/assets/"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        elif not p.startswith("/api") and not p.startswith("/uploads"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def spa(full_path: str):
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Bulunamadı")
+        candidate = (FRONTEND_DIST / full_path).resolve()
+        if full_path and candidate.is_file() and FRONTEND_DIST in candidate.parents:
+            return FileResponse(candidate)
+        return FileResponse(FRONTEND_DIST / "index.html")
+
+
 def _seed_initial_data():
     """Create default admin user and demo data if database is empty."""
     from app.modules.auth.models import User
@@ -98,7 +133,7 @@ def _seed_initial_data():
 
     db = SessionLocal()
     try:
-        # Guarantee default users exist with 'erccrm' password
+        # Varsayılan kullanıcılar yoksa oluştur (mevcut şifreler artık her açılışta SIFIRLANMAZ)
         admin = db.query(User).filter(User.email == "admin@iveco-crm.local").first()
         if not admin:
             admin = User(
@@ -109,9 +144,6 @@ def _seed_initial_data():
                 is_active=True,
             )
             db.add(admin)
-        else:
-            admin.hashed_password = get_password_hash("erccrm")
-            admin.is_active = True
 
         sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
         if not sales_rep:
@@ -123,9 +155,6 @@ def _seed_initial_data():
                 is_active=True,
             )
             db.add(sales_rep)
-        else:
-            sales_rep.hashed_password = get_password_hash("erccrm")
-            sales_rep.is_active = True
 
         db.commit()
 

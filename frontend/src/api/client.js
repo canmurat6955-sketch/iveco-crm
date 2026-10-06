@@ -100,6 +100,19 @@ export const contactsApi = {
   convertToCustomer: (id, data = {}) => api.post(`/contacts/${id}/convert`, data),
 };
 
+// ── Çalışma Masası (Workbench / Bugün Aranacaklar / Veri Temizliği) API ────
+export const workbenchApi = {
+  getTodayQueue: (params) => api.get('/work/today', { params }),
+  logCallOutcome: (data) => api.post('/work/call-outcome', data),
+  lookupPhone: (phone) => api.get('/work/lookup-phone', { params: { phone } }),
+  getMissingPhone: (params) => api.get('/work/missing-phone', { params }),
+  setCustomerPhone: (id, phone) => api.put(`/work/customers/${id}/phone`, { phone }),
+  getNameCleanupSuggestions: () => api.get('/work/name-cleanup'),
+  applyNameCleanup: (items) => api.post('/work/name-cleanup/apply', { items }),
+  getDuplicateGroups: () => api.get('/work/duplicates'),
+  mergeDuplicates: (primary_id, secondary_ids) => api.post('/work/duplicates/merge', { primary_id, secondary_ids }),
+};
+
 // ── CRM API ─────────────────────────────────────────────────────
 export const crmApi = {
   getCustomers: (params) => api.get('/crm/customers', { params }),

@@ -14,6 +14,7 @@ const PAGE_TITLES = {
   '/vehicles/management': 'Araç Yönetimi & Talep Raporları',
   '/contacts': 'Kişilerim',
   '/pipeline': 'Satış Pipeline',
+  '/workbench': 'Çalışma Masası & Operasyon',
 };
 
 export default function Header() {

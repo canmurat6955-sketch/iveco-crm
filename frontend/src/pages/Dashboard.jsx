@@ -156,7 +156,7 @@ export default function Dashboard() {
         <section className="mobile-section">
           <div className="section-title">BUGÜNÜN ÖZETİ</div>
           <div className="mobile-today-grid">
-            <div className="today-stat-card" onClick={() => navigate('/sales')}>
+            <div className="today-stat-card" onClick={() => navigate('/workbench')}>
               <span className="stat-num">{todayCalls.length}</span>
               <span className="stat-lbl">Takip Sırada</span>
             </div>
@@ -507,8 +507,26 @@ export default function Dashboard() {
       <div className="kpi-grid">
         {STAT_CARDS.map((card, idx) => {
           const Icon = card.icon;
+          const isFollowUp = card.key === 'today_follow_ups';
           return (
-            <div key={card.key} className="kpi-card" style={{ animationDelay: `${idx * 60}ms` }}>
+            <div
+              key={card.key}
+              className="kpi-card"
+              onClick={() => {
+                if (isFollowUp) navigate('/workbench');
+                else if (card.key === 'total_customers') navigate('/customers');
+                else if (card.key === 'new_discoveries') navigate('/discovery');
+                else if (card.key === 'unread_notifications') navigate('/notifications');
+                else if (card.key === 'active_campaigns') navigate('/campaigns');
+              }}
+              style={{
+                animationDelay: `${idx * 60}ms`,
+                cursor: 'pointer',
+                border: isFollowUp ? '1.5px solid rgba(139, 92, 246, 0.4)' : undefined,
+                boxShadow: isFollowUp ? '0 4px 20px rgba(139, 92, 246, 0.15)' : undefined
+              }}
+              title={isFollowUp ? "Bugün Aranacaklar listesini aç" : undefined}
+            >
               <div className="kpi-icon-wrap" style={{ background: card.gradient }}>
                 <Icon size={22} />
               </div>

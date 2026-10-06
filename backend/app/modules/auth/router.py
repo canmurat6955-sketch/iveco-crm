@@ -2,7 +2,8 @@
 Authentication API endpoints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import time
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -20,16 +21,44 @@ from app.modules.auth.schemas import (
 
 router = APIRouter(prefix="/api/auth", tags=["Kimlik Doğrulama"])
 
+# ── Basit giriş denemesi sınırı (IP başına 15 dakikada 8 hatalı deneme) ──
+_FAILED: dict = {}
+_WINDOW = 15 * 60
+_MAX_FAIL = 8
+
+
+def _client_ip(request: Request) -> str:
+    return (request.headers.get("cf-connecting-ip")
+            or (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+            or (request.client.host if request.client else "?"))
+
+
+def _check_rate(request: Request):
+    ip = _client_ip(request)
+    now = time.time()
+    hits = [t for t in _FAILED.get(ip, []) if now - t < _WINDOW]
+    _FAILED[ip] = hits
+    if len(hits) >= _MAX_FAIL:
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin.")
+    return ip
+
+
+def _register_fail(ip: str):
+    _FAILED.setdefault(ip, []).append(time.time())
+
 
 @router.post("/login", response_model=TokenResponse)
 def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     """Kullanıcı girişi — JWT token alır."""
+    ip = _check_rate(request)
     service = AuthService(db)
     user = service.authenticate_user(form_data.username, form_data.password)
     if not user:
+        _register_fail(ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-posta veya şifre hatalı",
@@ -49,15 +78,18 @@ class PasscodeLoginRequest(BaseModel):
 @router.post("/passcode", response_model=TokenResponse)
 def login_with_passcode(
     payload: PasscodeLoginRequest,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """Giriş kodu (erccrm / admin.erccrm) ile doğrudan mobil hızlı giriş."""
+    ip = _check_rate(request)
     service = AuthService(db)
     user = service.authenticate_user(payload.code, payload.code)
     if not user:
+        _register_fail(ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Geçersiz giriş kodu. Lütfen 'erccrm' yazın.",
+            detail="Geçersiz giriş kodu.",
         )
     token = create_access_token(data={"sub": str(user.id)})
     return TokenResponse(

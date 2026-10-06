@@ -7,6 +7,8 @@ import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
 
+import PwaInstallPrompt from '../Common/PwaInstallPrompt';
+
 export default function MainLayout() {
   const isMobile = useDeviceDetect();
   const { activeVisit, startVisit } = useVisit();
@@ -22,6 +24,7 @@ export default function MainLayout() {
         <main className="main-content-mobile">
           <Outlet />
         </main>
+        <PwaInstallPrompt />
         <BottomNav onVisitStart={handleQuickVisit} />
       </div>
     );
