@@ -19,7 +19,18 @@ export const getBaseUrl = () => {
 const api = axios.create({
   baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
+  timeout: 60000, // Render ücretsiz sunucu uyanırken ~50 sn sürebilir
 });
+
+// Sunucu uyanıyor bildirimi (ServerWakeBanner dinler)
+let wakingCount = 0;
+const emitWaking = (delta) => {
+  wakingCount = Math.max(0, wakingCount + delta);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('iveco:server-waking', { detail: { active: wakingCount > 0 } }));
+  }
+};
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 
 // Request interceptor: attach JWT token
@@ -33,15 +44,41 @@ api.interceptors.request.use((config) => {
 
 // Response interceptor: handle errors and offline queueing
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response) => {
+    if (response.config?.__wakingFlag) {
+      response.config.__wakingFlag = false;
+      emitWaking(-1);
+    }
+    return response;
+  },
+  async (error) => {
     const { config } = error;
+    const deviceOffline = typeof navigator !== 'undefined' && !navigator.onLine;
     
     // Sadece veri değiştirici istekler (POST, PUT, DELETE) ve Ağ hataları / Çevrimdışı modda çalış
     const isMutation = ['post', 'put', 'delete'].includes(config?.method?.toLowerCase());
     const isNetworkError = !error.response || 
                            error.code === 'ERR_NETWORK' || 
+                           error.code === 'ECONNABORTED' ||
                            [502, 503, 504].includes(error.response?.status);
+
+    // Cihaz çevrimiçi ama sunucu uyuyor/uyanıyor → bekleyip yeniden dene (en fazla 3 kez)
+    if (config && isNetworkError && !deviceOffline) {
+      config.__retryCount = config.__retryCount || 0;
+      if (config.__retryCount < 3) {
+        config.__retryCount += 1;
+        if (!config.__wakingFlag) {
+          config.__wakingFlag = true;
+          emitWaking(1);
+        }
+        await sleep(2000 * config.__retryCount + 1000);
+        return api(config);
+      }
+    }
+    if (config?.__wakingFlag) {
+      config.__wakingFlag = false;
+      emitWaking(-1);
+    }
     
     // Giriş, arama ve doğrulama gibi kritik canlı istekler çevrimdışı kuyruğa alınmamalıdır
     const isExcluded = config?.url && (
@@ -55,7 +92,7 @@ api.interceptors.response.use(
       config.url.includes('/vehicles')
     );
     
-    if (isMutation && !isExcluded && (isNetworkError || (typeof navigator !== 'undefined' && !navigator.onLine))) {
+    if (isMutation && !isExcluded && (isNetworkError || deviceOffline)) {
       let description = "Veri Değişikliği";
       if (config.url.includes('/visits/start')) description = "Ziyaret Başlatma";
       else if (config.url.includes('/end')) description = "Ziyaret Sonlandırma";
@@ -70,9 +107,9 @@ api.interceptors.response.use(
       }
       offlineSync.queueRequest(config.url, config.method, parsedData, description);
       
-      // Hata fırlatmak yerine, uygulamanın devam etmesi için başarılıymış gibi simüle edilmiş response dön
+      // Hata fırlatmak yerine, uygulamanın devam etmesi için kuyruğa alındı yanıtı dön (is_offline ile işaretli)
       return Promise.resolve({
-        data: { id: "offline-" + Date.now(), message: "Çevrimdışı kaydedildi", is_offline: true }
+        data: { id: null, offline_ref: "offline-" + Date.now(), message: "Bağlantı yok — kaydedildi, bağlantı gelince gönderilecek", is_offline: true }
       });
     }
     
@@ -129,7 +166,7 @@ export const workbenchApi = {
   getDuplicateGroups: () => api.get('/work/duplicates'),
   getDuplicates: (params) => api.get('/work/duplicates', { params }),
   mergeDuplicates: (primary_id, secondary_ids) => api.post('/work/duplicates/merge', { primary_id, secondary_ids }),
-  mergeCustomers: (data) => api.post('/work/merge', data),
+  mergeCustomers: (data) => api.post('/work/duplicates/merge', data),
   getFieldAssistant: (params) => api.get('/work/field-assistant', { params }),
 };
 

@@ -742,6 +742,17 @@ export default function DiscoveryList() {
         </div>
       )}
 
+      {['tenders', 'bodybuilders', 'new_registrations'].includes(activeTab) && (
+        <div style={{
+          padding: '10px 14px', marginBottom: 14, borderRadius: 10,
+          background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.35)',
+          color: '#fbbf24', fontSize: 12.5, lineHeight: 1.5
+        }}>
+          ⚠️ <strong>Doğrulanmamış örnek veri:</strong> Bu sekmedeki kayıtların bir kısmı demo amaçlı oluşturuldu
+          (yetkili adı/telefon gerçek olmayabilir). Aramadan önce firmayı Google'da doğrulayın; kendi eklediğiniz kayıtlar etkilenmez.
+        </div>
+      )}
+
       {/* ── TAB 2: KAMU & BELEDİYE İHALE RADARI ───────────────────────────── */}
       {activeTab === 'tenders' && (
         <div className="flex flex-col gap-6">
@@ -1262,7 +1273,7 @@ export default function DiscoveryList() {
           {/* Arama Sonuçları */}
           <div className="card glass-card">
             <div className="card-header">
-              <h3 className="card-title">Bulunan Gerçek İşletmeler</h3>
+              <h3 className="card-title">Bulunan İşletmeler</h3>
               <span className="badge badge-blue">{scanResults.length} Firma</span>
             </div>
             {scanResults.length > 0 ? (
@@ -1282,14 +1293,25 @@ export default function DiscoveryList() {
                             {biz.company_name}
                           </span>
                           <span className="badge" style={{
-                            background: biz.source === 'verified_db' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-                            color: biz.source === 'verified_db' ? '#34d399' : '#60a5fa',
+                            background: biz.verified === false ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                            color: biz.verified === false ? '#fbbf24' : '#34d399',
                             fontSize: 10,
                             fontWeight: 600,
-                            border: `1px solid ${biz.source === 'verified_db' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`
-                          }}>
-                            {biz.source === 'verified_db' ? '🏛️ Doğrulanmış Sanayi Sicil' : '📍 Google Haritalar'}
+                            border: `1px solid ${biz.verified === false ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.3)'}`
+                          }} title={biz.verified === false ? 'Bu kaydın telefon/adres bilgisi doğrulanmadı. Aramadan önce Google\'da kontrol edin.' : ''}>
+                            {biz.verified === false ? '⚠️ ' : '✓ '}{biz.source_label || (biz.source === 'google_places' ? 'Google Haritalar' : 'Kayıt')}
                           </span>
+                          {biz.verified === false && (
+                            <a
+                              href={`https://www.google.com/search?q=${encodeURIComponent(`${biz.company_name} ${biz.city || ''} telefon`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="badge"
+                              style={{ fontSize: 10, background: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.3)', textDecoration: 'none' }}
+                            >
+                              🔎 Google'da doğrula
+                            </a>
+                          )}
                           {biz.sector && (
                             <span className="badge badge-secondary" style={{ fontSize: 10 }}>
                               {biz.sector}

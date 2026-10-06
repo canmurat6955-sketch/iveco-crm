@@ -44,6 +44,8 @@ class ScanResult(BaseModel):
     sector: str = ""
     types: List[str] = []
     source: str = "google_places"
+    verified: bool = True
+    source_label: str = "Google Haritalar"
 
 
 class ScanResponse(BaseModel):
@@ -182,7 +184,7 @@ def _search_live_scanner(query: str, max_results: int = 20) -> List[ScanResult]:
                     phone_match = re.search(r'(?:\+?90|0)?\s*(3\d{2}|4\d{2}|5\d{2})[\s.-]?(\d{3})[\s.-]?(\d{2})[\s.-]?(\d{2})', combined_text)
                 phone = phone_match.group(0).strip() if phone_match else ""
 
-                city_val = next((p for p in ALLOWED_SCANNER_PROVINCES if p.lower() in combined_text.lower()), detected_city or ("Çorum" if "nurkaya" in clean_lower else "Samsun"))
+                city_val = next((p for p in ALLOWED_SCANNER_PROVINCES if p.lower() in combined_text.lower()), detected_city or "")
 
                 website_val = ""
                 if current_link and not any(bad in current_link for bad in ["facebook.com", "instagram.com", "yandex", "google", "duckduckgo", "placedigger", "bulurum"]):
@@ -192,7 +194,8 @@ def _search_live_scanner(query: str, max_results: int = 20) -> List[ScanResult]:
 
                 sector_val = "Ticari İşletme"
                 c_lower_all = (clean_lower + " " + text.lower())
-                if any(k in c_lower_all for k in ["inşaat", "insaat", "proje", "hafriyat", "müteahhit"]):
+                c_words = set(re.findall(r"[0-9a-zçğıöşü]+", c_lower_all))
+                if any(k in c_lower_all for k in ["inşaat", "insaat", "hafriyat", "müteahhit"]):
                     sector_val = "İnşaat, Altyapı & Hafriyat"
                 elif any(k in c_lower_all for k in ["petrol", "akaryakıt", "yakıt"]):
                     sector_val = "Akaryakıt & Enerji"
@@ -200,23 +203,29 @@ def _search_live_scanner(query: str, max_results: int = 20) -> List[ScanResult]:
                     sector_val = "Lojistik & Nakliyat"
                 elif any(k in c_lower_all for k in ["maden", "madencilik", "taş ocağı"]):
                     sector_val = "Madencilik & Agrega"
-                elif any(k in c_lower_all for k in ["gıda", "un", "yem", "bakliyat"]):
+                elif c_words & {"gıda", "gida", "un", "yem", "bakliyat", "toptan", "süt", "sut"}:
                     sector_val = "Gıda & Tarım Sanayi"
 
+                import hashlib
+                stable_id = hashlib.md5(clean_lower.encode("utf-8")).hexdigest()[:12]
+                maps_q = f"{clean_name} {city_val}".strip()
                 results.append(ScanResult(
-                    google_place_id=f"real_scanner_{abs(hash(clean_name)) % 10000000}",
+                    google_place_id=f"web_{stable_id}",
                     company_name=clean_name[:120],
                     phone=phone,
                     address=text[:150],
                     district="",
                     city=city_val,
                     website=website_val,
-                    google_maps_url=f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{clean_name} {city_val}')}",
-                    rating=4.7,
-                    rating_count=28,
-                    business_status="OPERATIONAL",
+                    google_maps_url=f"https://www.google.com/maps/search/?api=1&query={quote_plus(maps_q)}",
+                    rating=None,
+                    rating_count=None,
+                    business_status="",
                     sector=sector_val,
-                    types=["establishment", "point_of_interest"]
+                    types=["establishment"],
+                    source="web_search",
+                    verified=False,
+                    source_label="Web araması — doğrulanmamış",
                 ))
             if len(results) >= max_results:
                 break
@@ -307,13 +316,24 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
 
     ranked_candidates.sort(key=lambda x: (x[0], x[1].potential_score or 0), reverse=True)
 
+    UNVERIFIED_SOURCES = {"google_ai_intelligence", "manual_intel", "discovery"}
+    SOURCE_LABELS = {
+        "sinop_tso": "Sinop TSO üye kaydı",
+        "corum_tb": "Çorum Ticaret Borsası kaydı",
+        "import": "CRM kaydı (içe aktarım)",
+        "import_ihracat": "İhracatçı listesi",
+    }
     results: List[ScanResult] = []
     seen_names = set()
     for score, c in ranked_candidates[:max_results]:
-        city_name = c.city or (detected_city or "Samsun")
+        city_name = c.city or (detected_city or "")
         c_key = tr_norm(c.company_name)
         if c_key not in seen_names:
             seen_names.add(c_key)
+            src = (c.source or "").strip()
+            is_verified = src not in UNVERIFIED_SOURCES
+            label = SOURCE_LABELS.get(src, "CRM kaydı") if is_verified else "CRM kaydı — doğrulanmamış"
+            maps_q = f"{c.company_name} {city_name}".strip()
             results.append(ScanResult(
                 google_place_id=f"db_{c.id}",
                 company_name=c.company_name,
@@ -322,18 +342,22 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
                 district=c.district or "",
                 city=city_name,
                 website=c.website or "",
-                google_maps_url=f"https://www.google.com/maps/search/?api=1&query={quote_plus(f'{c.company_name} {city_name}')}",
-                rating=4.8,
-                rating_count=32,
-                business_status="OPERATIONAL",
-                sector=c.sector or "Sanayi & Ticaret (Doğrulanmış Kayıt)",
-                types=["verified_firm", "establishment", "point_of_interest"],
-                source="verified_db"
+                google_maps_url=c.google_maps_url or f"https://www.google.com/maps/search/?api=1&query={quote_plus(maps_q)}",
+                rating=None,
+                rating_count=None,
+                business_status="",
+                sector=c.sector or "",
+                types=["crm_record"],
+                source="crm_db",
+                verified=is_verified,
+                source_label=label,
             ))
 
     # YALNIZCA gıda dışı veya hafriyat sorgularında bölgesel hafriyat havuzundan tamamla
+    # NOT: Bu liste yapay zekâ özetinden derlendi; telefon/adresler doğrulanmadı.
     if not is_food_query:
         try:
+            import hashlib
             from app.modules.discovery.hafriyat_data import REGIONAL_HAFRIYAT_COMPANIES
             for h in REGIONAL_HAFRIYAT_COMPANIES:
                 if len(results) >= max_results:
@@ -356,7 +380,7 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
                     seen_names.add(h_name_norm)
                     gmaps_q = quote_plus(f"{h['company_name']} {h['city']}")
                     results.append(ScanResult(
-                        google_place_id=f"hafriyat_{abs(hash(h['company_name'])) % 1000000}",
+                        google_place_id=f"hafriyat_{hashlib.md5(h_name_norm.encode('utf-8')).hexdigest()[:10]}",
                         company_name=h["company_name"],
                         phone=h["phone"],
                         address=h["address"],
@@ -364,12 +388,14 @@ def _search_db_scanner(db: Session, query: str, max_results: int = 20) -> List[S
                         city=h["city"],
                         website=h.get("website", ""),
                         google_maps_url=f"https://www.google.com/maps/search/?api=1&query={gmaps_q}",
-                        rating=4.9,
-                        rating_count=45,
-                        business_status="OPERATIONAL",
+                        rating=None,
+                        rating_count=None,
+                        business_status="",
                         sector=h["sector"],
-                        types=["verified_firm", "earthworks", "excavation"],
-                        source="verified_db"
+                        types=["earthworks"],
+                        source="ai_list",
+                        verified=False,
+                        source_label="Yapay zekâ listesi — telefon/adres doğrulanmamış",
                     ))
         except Exception:
             pass

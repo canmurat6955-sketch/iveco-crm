@@ -70,13 +70,21 @@ def list_contacts(
     current_user=Depends(get_current_user),
 ):
     q = db.query(PersonalContact).filter(PersonalContact.converted_customer_id.is_(None))
-    if search:
-        s = f"%{search}%"
+    if search and search.strip():
+        from sqlalchemy import func
+        from app.core.database import tr_norm
+        s_norm = f"%{tr_norm(search.strip())}%"
         digits = "".join(ch for ch in search if ch.isdigit())
-        conds = [PersonalContact.full_name.ilike(s), PersonalContact.notes.ilike(s), PersonalContact.city.ilike(s)]
-        if digits:
-            conds.append(PersonalContact.phone.ilike(f"%{digits[-7:]}%"))
-            conds.append(PersonalContact.phone.ilike(s))
+        conds = [
+            func.tr_norm(PersonalContact.full_name).like(s_norm),
+            func.tr_norm(PersonalContact.notes).like(s_norm),
+            func.tr_norm(PersonalContact.city).like(s_norm),
+            func.tr_norm(PersonalContact.district).like(s_norm),
+        ]
+        if len(digits) >= 3:
+            phone_clean = func.replace(func.replace(func.replace(func.replace(
+                func.coalesce(PersonalContact.phone, ""), " ", ""), "-", ""), "(", ""), ")", "")
+            conds.append(phone_clean.like(f"%{digits[-10:]}%"))
         q = q.filter(or_(*conds))
     total = q.count()
     items = q.order_by(PersonalContact.full_name).offset((page - 1) * page_size).limit(page_size).all()

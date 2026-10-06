@@ -588,27 +588,8 @@ async def import_vehicles(
     return await import_vehicles_from_file(file, db)
 
 
-# ── Fleet Vehicle Endpoints ──────────────────────────────────────────
-
-@router.get("/customers/{customer_id}/fleet", response_model=List[FleetVehicleResponse])
-def get_customer_fleet(
-    customer_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Müşterinin mevcut filo araçlarını listeler."""
-    return CRMService(db).get_fleet(customer_id)
-
-
-@router.post("/customers/{customer_id}/fleet", response_model=FleetVehicleResponse)
-def add_customer_fleet_vehicle(
-    customer_id: int,
-    data: FleetVehicleCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Müşteriye yeni filo aracı ekler."""
-    return CRMService(db).add_fleet_vehicle(customer_id, data)
+# ── Fleet Vehicle Endpoints (alternatif yollar) ───────────────────────
+# GET/POST /customers/{id}/fleet yukarıda tanımlı.
 
 
 @router.put("/fleet-vehicles/{vehicle_id}", response_model=FleetVehicleResponse)
@@ -634,7 +615,7 @@ def delete_customer_fleet_vehicle(
 
 
 @router.get("/fleet-renewal-opportunities")
-def get_fleet_renewal_opportunities(
+def get_fleet_renewal_opportunities_alias(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
@@ -643,52 +624,11 @@ def get_fleet_renewal_opportunities(
 
 
 # ── Reminder Endpoints ───────────────────────────────────────────────
-
-@router.get("/customers/{customer_id}/reminders", response_model=List[ReminderResponse])
-def get_customer_reminders(
-    customer_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Müşteri hatırlatıcılarını listeler."""
-    return CRMService(db).get_reminders(customer_id)
-
-
-@router.post("/customers/{customer_id}/reminders", response_model=ReminderResponse)
-def add_customer_reminder(
-    customer_id: int,
-    data: ReminderCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Müşteriye yeni hatırlatıcı ekler."""
-    return CRMService(db).add_reminder(customer_id, current_user.id, data)
-
-
-@router.put("/reminders/{reminder_id}", response_model=ReminderResponse)
-def update_reminder(
-    reminder_id: int,
-    data: ReminderUpdate,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Hatırlatıcıyı günceller (tamamlandı vb.)."""
-    return CRMService(db).update_reminder(reminder_id, data)
-
-
-@router.delete("/reminders/{reminder_id}")
-def delete_reminder(
-    reminder_id: int,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Hatırlatıcıyı siler."""
-    CRMService(db).delete_reminder(reminder_id)
-    return {"message": "Hatırlatıcı başarıyla silindi"}
+# (Müşteri hatırlatıcı CRUD uçları yukarıda tanımlı — burada tekrar edilmez.)
 
 
 @router.get("/upcoming-reminders")
-def get_upcoming_reminders(
+def get_upcoming_reminders_alias(
     days_ahead: int = Query(14, ge=1, le=90),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)

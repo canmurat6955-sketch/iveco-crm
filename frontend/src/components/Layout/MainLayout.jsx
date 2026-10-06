@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import BottomNav from './BottomNav';
 import ActiveVisitBanner from './ActiveVisitBanner';
+import SystemStatusBanner from './SystemStatusBanner';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
@@ -20,6 +21,7 @@ export default function MainLayout() {
   if (isMobile) {
     return (
       <div className="app-layout mobile-layout">
+        <SystemStatusBanner />
         <ActiveVisitBanner />
         <main className="main-content-mobile">
           <Outlet />
@@ -34,6 +36,7 @@ export default function MainLayout() {
     <div className="app-layout">
       <Sidebar />
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+        <SystemStatusBanner />
         <ActiveVisitBanner />
         <Header />
         <main className="main-content" style={{ flex: 1 }}>

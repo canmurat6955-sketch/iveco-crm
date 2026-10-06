@@ -95,7 +95,15 @@ app.mount("/uploads", StaticFiles(directory=settings.FILE_STORAGE_PATH), name="u
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "app": settings.APP_NAME, "version": settings.APP_VERSION}
+    from app.core.database import storage_status
+    return {
+        "status": "ok",
+        "app": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "storage": storage_status(),
+        "google_places": bool(settings.GOOGLE_MAPS_API_KEY and settings.GOOGLE_MAPS_API_KEY != "MOCK_GOOGLE_MAPS_API_KEY"),
+        "secret_key_default": settings.SECRET_KEY == "iveco-crm-secret-key-change-in-production",
+    }
 
 
 # ── Derlenmiş arayüzü (frontend/dist) doğrudan backend'den sun ─────────
@@ -138,7 +146,7 @@ def _seed_initial_data():
         if not admin:
             admin = User(
                 email="admin@iveco-crm.local",
-                hashed_password=get_password_hash("erccrm"),
+                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "erccrm")),
                 full_name="Sistem Yöneticisi",
                 role="admin",
                 is_active=True,
@@ -149,7 +157,7 @@ def _seed_initial_data():
         if not sales_rep:
             sales_rep = User(
                 email="satis@iveco-crm.local",
-                hashed_password=get_password_hash("erccrm"),
+                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "erccrm")),
                 full_name="King Temsilcisi",
                 role="sales_rep",
                 is_active=True,
@@ -221,59 +229,6 @@ def _seed_initial_data():
         # Seed Vehicle Master Data
         from app.modules.vehicles.service import VehicleService
         VehicleService(db).seed_master_data()
-
-        # Seed Personal Contacts if empty
-        from app.modules.contacts.models import PersonalContact
-        if db.query(PersonalContact).count() == 0:
-            import sqlite3
-            seed_path = Path(__file__).resolve().parent.parent.parent / "data" / "seed_iveco_crm.db"
-            if seed_path.exists():
-                try:
-                    s_conn = sqlite3.connect(seed_path)
-                    s_cur = s_conn.cursor()
-                    s_cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='personal_contacts'")
-                    if s_cur.fetchone():
-                        s_cur.execute("SELECT id, full_name, phone, city, district, notes, source, original_customer_id, converted_customer_id FROM personal_contacts")
-                        rows = s_cur.fetchall()
-                        contacts_to_add = [
-                            PersonalContact(
-                                id=r[0], full_name=r[1], phone=r[2], city=r[3], district=r[4],
-                                notes=r[5], source=r[6], original_customer_id=r[7], converted_customer_id=r[8]
-                            ) for r in rows
-                        ]
-                        db.bulk_save_objects(contacts_to_add)
-                        db.commit()
-                        print(f"[*] {len(contacts_to_add)} kisilik rehber tohum veritabanindan basariyla aktarildi.")
-                    s_conn.close()
-                except Exception as seed_err:
-                    print(f"[!] Rehber tohum aktarim hatasi: {seed_err}")
-
-        # Seed Customers if empty or low
-        from app.modules.crm.models import Customer
-        if db.query(Customer).count() < 500:
-            import sqlite3
-            seed_path = Path(__file__).resolve().parent.parent.parent / "data" / "seed_iveco_crm.db"
-            if seed_path.exists():
-                try:
-                    s_conn = sqlite3.connect(seed_path)
-                    s_cur = s_conn.cursor()
-                    s_cur.execute("SELECT id, company_name, authorized_person, phone, email, city, district, address, tax_office, tax_number, sector, status, potential_score FROM customers")
-                    existing_ids = set(c[0] for c in db.query(Customer.id).all())
-                    new_custs = []
-                    for r in s_cur.fetchall():
-                        if r[0] not in existing_ids:
-                            new_custs.append(Customer(
-                                id=r[0], company_name=r[1], authorized_person=r[2], phone=r[3], email=r[4],
-                                city=r[5], district=r[6], address=r[7], tax_office=r[8], tax_number=r[9],
-                                sector=r[10], status=r[11], potential_score=r[12]
-                            ))
-                    if new_custs:
-                        db.bulk_save_objects(new_custs)
-                        db.commit()
-                        print(f"[*] {len(new_custs)} musteri tohum veritabanindan aktarildi.")
-                    s_conn.close()
-                except Exception as cust_err:
-                    print(f"[!] Musteri tohum aktarim hatasi: {cust_err}")
 
     finally:
         db.close()

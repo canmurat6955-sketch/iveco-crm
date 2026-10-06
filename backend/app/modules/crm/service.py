@@ -8,6 +8,7 @@ from sqlalchemy import func, or_, desc, asc
 from fastapi import HTTPException, status
 from fuzzywuzzy import fuzz
 from datetime import datetime, timedelta, timezone, date
+from datetime import date as date_type
 
 from app.modules.crm.models import (
     Customer, CustomerInteraction, CustomerContact, ProformaInvoice,
@@ -253,48 +254,97 @@ class CRMService:
         return "".join(c for c in phone if c.isdigit())[-10:]
 
     def _extract_domain(self, url: str) -> str:
+        from urllib.parse import urlparse
         if not url: return ""
+        url = url.strip()
         if not url.startswith("http"): url = "http://" + url
         try:
             parsed = urlparse(url)
             return (parsed.netloc or parsed.path).replace("www.", "").lower().strip()
-        except: return ""
+        except Exception:
+            return ""
+
+    _NAME_STOP = {
+        "ltd", "şti", "sti", "a.ş", "aş", "as", "a.s", "san", "tic", "ve", "limited", "şirketi",
+        "sirketi", "anonim", "inş", "ins", "nak", "taş", "tas", "gıda", "gida", "ticaret",
+        "sanayi", "insaat", "inşaat", "nakliyat", "ltd.şti", "ltd.", "şti.", "san.", "tic.",
+    }
+
+    def _name_key_tokens(self, name: str) -> list:
+        import re
+        tokens = re.findall(r"[0-9a-zçğıöşü]+", (name or "").lower())
+        return [t for t in tokens if len(t) > 2 and t not in self._NAME_STOP]
 
     def check_duplicate(self, data: CustomerCreate) -> list:
         matches = []
+        new_name = (data.company_name or "").lower()
+        new_phone = self._normalize_phone(data.phone) if data.phone else ""
+        new_domain = self._extract_domain(data.website) if data.website else ""
         customers = self.db.query(Customer).filter(Customer.is_active == True).all()
         for ex in customers:
-            score = fuzz.token_sort_ratio(data.company_name.lower(), ex.company_name.lower())
+            ex_name = (ex.company_name or "").lower()
+            score = fuzz.token_sort_ratio(new_name, ex_name)
             if score >= 85:
                 matches.append({"match_type": "name", "match_score": score, "customer_id": ex.id, "customer_name": ex.company_name})
                 continue
-            if data.phone and ex.phone and self._normalize_phone(data.phone) == self._normalize_phone(ex.phone):
+            if len(new_phone) >= 10 and ex.phone and self._normalize_phone(ex.phone) == new_phone:
                 matches.append({"match_type": "phone", "match_score": 100, "customer_id": ex.id, "customer_name": ex.company_name})
                 continue
-            if data.website and ex.website and self._extract_domain(data.website) == self._extract_domain(ex.website):
+            if new_domain and ex.website and self._extract_domain(ex.website) == new_domain:
                 matches.append({"match_type": "domain", "match_score": 100, "customer_id": ex.id, "customer_name": ex.company_name})
                 continue
             if data.city and data.city == ex.city and data.district and data.district == ex.district:
-                loc_score = fuzz.token_sort_ratio(data.company_name.lower(), ex.company_name.lower())
-                if loc_score >= 70:
-                    matches.append({"match_type": "location", "match_score": loc_score, "customer_id": ex.id, "customer_name": ex.company_name})
+                if score >= 70:
+                    matches.append({"match_type": "location", "match_score": score, "customer_id": ex.id, "customer_name": ex.company_name})
         return matches
 
     def find_all_duplicates(self):
+        """Olası mükerrer kayıtlar. Tüm çiftleri karşılaştırmak yerine (3600² ≈ 6.5M)
+        telefon kovası + ilk anlamlı isim kelimesi kovası kullanılır."""
+        from collections import defaultdict
         customers = self.db.query(Customer).filter(Customer.is_active == True).order_by(Customer.company_name).all()
         groups = []
-        checked = set()
-        for i, c1 in enumerate(customers):
-            for c2 in customers[i+1:]:
-                pair = tuple(sorted([c1.id, c2.id]))
-                if pair in checked: continue
-                score = fuzz.token_sort_ratio(c1.company_name.lower(), c2.company_name.lower())
-                if score >= 80:
-                    checked.add(pair)
-                    groups.append(DuplicateGroup(match_type="name", match_score=score, customers=[CustomerResponse.model_validate(c1), CustomerResponse.model_validate(c2)]))
-                elif c1.phone and c2.phone and self._normalize_phone(c1.phone) == self._normalize_phone(c2.phone):
-                    checked.add(pair)
-                    groups.append(DuplicateGroup(match_type="phone", match_score=100, customers=[CustomerResponse.model_validate(c1), CustomerResponse.model_validate(c2)]))
+        seen_pairs = set()
+
+        def add(c1, c2, mtype, score):
+            pair = (min(c1.id, c2.id), max(c1.id, c2.id))
+            if pair in seen_pairs:
+                return
+            seen_pairs.add(pair)
+            groups.append(DuplicateGroup(match_type=mtype, match_score=score,
+                                         customers=[CustomerResponse.model_validate(c1), CustomerResponse.model_validate(c2)]))
+
+        # 1) Aynı telefon (en az 10 hane)
+        by_phone = defaultdict(list)
+        for c in customers:
+            p = self._normalize_phone(c.phone) if c.phone else ""
+            if len(p) >= 10:
+                by_phone[p].append(c)
+        for bucket in by_phone.values():
+            if 1 < len(bucket) <= 20:
+                for i, c1 in enumerate(bucket):
+                    for c2 in bucket[i + 1:]:
+                        add(c1, c2, "phone", 100)
+
+        # 2) İsim benzerliği — sadece ilk anlamlı kelimesi aynı olanlar arasında
+        by_token = defaultdict(list)
+        for c in customers:
+            toks = self._name_key_tokens(c.company_name)
+            if toks:
+                by_token[toks[0]].append(c)
+        for bucket in by_token.values():
+            if len(bucket) < 2 or len(bucket) > 150:
+                continue
+            for i, c1 in enumerate(bucket):
+                n1 = (c1.company_name or "").lower()
+                for c2 in bucket[i + 1:]:
+                    score = fuzz.token_sort_ratio(n1, (c2.company_name or "").lower())
+                    if score >= 88:
+                        add(c1, c2, "name", score)
+            if len(groups) >= 200:
+                break
+
+        groups.sort(key=lambda g: (g.match_type != "phone", -g.match_score))
         return groups[:50]
 
     # ── Contact Methods ──────────────────────────────────────────────────
@@ -419,7 +469,7 @@ class CRMService:
             "total_merged": len(merged_contacts),
         }
 
-    def get_nearby_customers(self, lat: float, lon: float, radius: float = 5000, segment: str = None) -> List[dict]:
+    def _get_nearby_customers_m(self, lat: float, lon: float, radius: float = 5000, segment: str = None) -> List[dict]:
         """GPS koordinatlarına göre yakındaki CRM müşterilerini listeler (Haversine formülü)."""
         from math import radians, cos, sin, asin, sqrt
         
@@ -550,7 +600,7 @@ class CRMService:
         
         line_len_sq = dx*dx + dy*dy
         if line_len_sq == 0:
-            return self.get_nearby_customers(start_lat, start_lon, threshold)
+            return self._get_nearby_customers_m(start_lat, start_lon, threshold)
 
         from math import radians, cos, sin, asin, sqrt
         
