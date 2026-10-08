@@ -435,8 +435,11 @@ export default function SalesActivityPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={8} className="empty-state" style={{ padding: '3rem' }}>
-                      Kayıtlı telefon görüşmesi bulunamadı.
+                    <td colSpan={8} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
+                      <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Kayıtlı telefon görüşmesi bulunamadı.</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                        Yapılan müşteri aramalarını kaydetmek için sağ üstteki <strong>"+ Arama Kaydı Ekle"</strong> butonunu kullanabilirsiniz.
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -458,9 +461,9 @@ export default function SalesActivityPage() {
                   <FiMessageSquare size={22} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontWeight: 700, color: 'var(--text-heading)' }}>Canlı WhatsApp İletişim Akışı</h4>
+                  <h4 style={{ margin: 0, fontWeight: 700, color: 'var(--text-heading)' }}>WhatsApp İletişim Geçmişi</h4>
                   <p className="text-xs text-muted" style={{ margin: '2px 0 0 0' }}>
-                    Meta WhatsApp Cloud API ve Webhook üzerinden gelen/giden tüm müşteri sohbet kayıtları
+                    Saha ekibi tarafından müşterilere gönderilen WhatsApp mesajları ve görüşme geçmişi
                   </p>
                 </div>
               </div>
@@ -540,8 +543,11 @@ export default function SalesActivityPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="empty-state" style={{ padding: '3rem' }}>
-                      Henüz WhatsApp mesaj kaydı bulunamadı.
+                    <td colSpan={7} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
+                      <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Henüz kayıtlı WhatsApp iletişimi bulunmuyor.</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                        Müşteriler veya Kişilerim ekranındaki <strong>"WhatsApp Mesajı"</strong> butonuna tıkladığınızda kayıtlar buraya otomatik düşer.
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -609,7 +615,16 @@ export default function SalesActivityPage() {
                       </div>
                     </td>
                   </tr>
-                )) : <tr><td colSpan={6} className="empty-state">Aktivite yok</td></tr>}
+                )) : (
+                  <tr>
+                    <td colSpan={6} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
+                      <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Henüz kayıtlı satış aktivitesi bulunmuyor.</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                        Müşterilerle yapılan görüşmeleri kaydetmek için sağ üstteki <strong>"+ Yeni Aktivite"</strong> butonunu kullanabilirsiniz.
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

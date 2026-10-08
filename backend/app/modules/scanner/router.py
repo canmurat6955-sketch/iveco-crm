@@ -98,7 +98,6 @@ def _clean_company_title(raw_title: str) -> str:
     return raw_title.strip()[:120]
 
 
-from app.modules.discovery.seed_data import seed_regional_discovery_data
 
 
 def _search_live_scanner(query: str, max_results: int = 20) -> List[ScanResult]:
@@ -412,7 +411,6 @@ async def scan_businesses(
     current_user=Depends(get_current_user),
 ):
     """Google Places API veya Doğrulanmış Ticaret/Sanayi İstihbaratı ile 100% gerçek firma ara."""
-    seed_regional_discovery_data(db)
     billing_notice = None
     all_results: List[ScanResult] = []
     seen_names = set()
