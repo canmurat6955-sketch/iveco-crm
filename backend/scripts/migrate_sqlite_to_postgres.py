@@ -39,7 +39,13 @@ print("[1/4] Hedef bağlantı testi…")
 with dst_engine.connect() as c:
     print("      ", c.execute(text("select version()")).scalar()[:60])
 
-print("[2/4] Tablolar ve tr_norm fonksiyonu oluşturuluyor…")
+print("[2/4] Tablolar ve tr_norm fonksiyonu hazırlanıyor…")
+if truncate:
+    print("      --truncate belirtildi: Eski tablolar temizleniyor...")
+    with dst_engine.begin() as c:
+        for t in reversed(Base.metadata.sorted_tables):
+            c.execute(text(f'DROP TABLE IF EXISTS "{t.name}" CASCADE'))
+
 Base.metadata.create_all(bind=dst_engine)
 with dst_engine.begin() as c:
     c.execute(text(PG_TR_NORM_SQL))
@@ -47,15 +53,12 @@ with dst_engine.begin() as c:
 tables = Base.metadata.sorted_tables  # FK bağımlılık sırası
 src_tables = set(inspect(src_engine).get_table_names())
 
-with dst_engine.connect() as c:
-    non_empty = [t.name for t in tables if c.execute(text(f'select count(*) from "{t.name}"')).scalar()]
-if non_empty and not truncate:
-    print(f"[!] Hedefte dolu tablolar var: {non_empty}\n    Üzerine yazmamak için durdum. Bilerek silmek için --truncate ekleyin.")
-    sys.exit(2)
-if non_empty and truncate:
-    with dst_engine.begin() as c:
-        c.execute(text("TRUNCATE " + ", ".join(f'"{t.name}"' for t in tables) + " RESTART IDENTITY CASCADE"))
-    print("      Hedef tablolar boşaltıldı.")
+if not truncate:
+    with dst_engine.connect() as c:
+        non_empty = [t.name for t in tables if c.execute(text(f'select count(*) from "{t.name}"')).scalar()]
+    if non_empty:
+        print(f"[!] Hedefte dolu tablolar var: {non_empty}\n    Üzerine yazmamak için durdum. Bilerek silmek için --truncate ekleyin.")
+        sys.exit(2)
 
 print("[3/4] Veri kopyalanıyor…")
 report = []

@@ -33,7 +33,7 @@ class Customer(Base):
     sales_notes = Column(Text, nullable=True)
     potential_level = Column(String(20), default="medium")  # very_high, high, medium, low
     potential_score = Column(Integer, default=0)
-    source = Column(String(20), default="manual")  # manual, import, discovery
+    source = Column(String(100), default="manual")  # manual, import, discovery, google_ai_intelligence...
     pipeline_stage = Column(String(30), nullable=True, default=None)  # NULL = havuz | lead, contact, proposal, negotiation, won, lost
     pipeline_note = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
