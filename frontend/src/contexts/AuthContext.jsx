@@ -29,7 +29,10 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await authApi.login(email, password);
-      const { access_token, user: userData } = res.data;
+      const { access_token, user: userData } = res?.data || {};
+      if (!access_token || !userData) {
+        throw new Error('Sunucu geçerli bir oturum anahtarı (token) döndürmedi.');
+      }
       localStorage.setItem('token', access_token);
       setUser(userData);
       return userData;
@@ -46,7 +49,10 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const res = await authApi.loginPasscode(code);
-      const { access_token, user: userData } = res.data;
+      const { access_token, user: userData } = res?.data || {};
+      if (!access_token || !userData) {
+        throw new Error('Sunucu geçerli bir oturum anahtarı (token) döndürmedi.');
+      }
       localStorage.setItem('token', access_token);
       setUser(userData);
       return userData;

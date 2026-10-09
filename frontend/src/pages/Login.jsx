@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { authApi } from '../api/client';
 import { FiEye, FiEyeOff, FiKey, FiLock, FiCheckCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -8,8 +9,35 @@ export default function Login() {
   const [accessCode, setAccessCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [waitSeconds, setWaitSeconds] = useState(0);
+  const [isWaking, setIsWaking] = useState(false);
   const { login, loginPasscode } = useAuth();
   const navigate = useNavigate();
+
+  // 1. Sayfa açılır açılmaz Render'ı uyandır (sessiz arka plan pre-warm)
+  useEffect(() => {
+    if (authApi.pingHealth) {
+      authApi.pingHealth().catch(() => {});
+    }
+  }, []);
+
+  // 2. Sunucu uyanıyor olayını dinle
+  useEffect(() => {
+    const onWake = (e) => setIsWaking(!!e.detail?.active);
+    window.addEventListener('iveco:server-waking', onWake);
+    return () => window.removeEventListener('iveco:server-waking', onWake);
+  }, []);
+
+  // 3. Giriş bekleme sayacı (kullanıcı ekran dondu sanmasın)
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setInterval(() => setWaitSeconds((s) => s + 1), 1000);
+    } else {
+      setWaitSeconds(0);
+    }
+    return () => clearInterval(timer);
+  }, [loading]);
 
   const performLogin = async (rawCode) => {
     if (!rawCode) {
@@ -26,64 +54,36 @@ export default function Login() {
 
     setLoading(true);
 
-    // Rol ve e-posta eşleştirmesi
-    let targetEmail = 'satis@iveco-crm.local';
-    const isAdmin = clean.includes('admin') || clean === 'yonetici';
-
-    if (isAdmin) {
-      targetEmail = 'admin@iveco-crm.local';
-    } else {
-      targetEmail = 'satis@iveco-crm.local';
-    }
-
     try {
-      // 1. YOL: Yeni hızlı passcode endpoint'i
-      if (typeof loginPasscode === 'function') {
-        try {
-          await loginPasscode(clean);
-          toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
-          navigate('/');
-          return;
-        } catch (e1) {
-          console.warn('Passcode endpoint yanıt vermedi, standart login deneniyor...', e1);
-        }
-      }
-
-      // 2. YOL: 'erccrm' şifresi ile standart OAuth2 girişi
-      try {
-        await login(targetEmail, 'erccrm');
-        toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
-        navigate('/');
-        return;
-      } catch (e2) {
-        console.warn('erccrm şifresi başarısız, geriye dönük tohum şifresi deneniyor...', e2);
-      }
-
-      // 3. YOL: Eski seed şifreleri (satis123 / admin123) için otomatik kurtarma
-      const fallbackPwd = isAdmin ? 'admin123' : 'satis123';
-      try {
-        await login(targetEmail, fallbackPwd);
-        toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
-        navigate('/');
-        return;
-      } catch (e3) {
-        // 4. YOL: Doğrudan yazılan kodu şifre olarak dene
-        try {
-          await login(clean, clean);
-          toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
-          navigate('/');
-          return;
-        } catch (e4) {
-          throw e2; // Esas hatayı fırlat
-        }
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      const isNetwork = !err.response || err.code === 'ERR_NETWORK' || [502, 503, 504].includes(err.response?.status);
+      // 1. YOL: Doğrudan hızlı passcode endpoint'i (backend erccrm / admin.erccrm ve takma adları tanır)
+      await loginPasscode(clean);
+      toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
+      navigate('/');
+      return;
+    } catch (err1) {
+      console.warn('Passcode girişi yanıt vermedi veya reddedildi:', err1);
+      
+      const isNetwork = !err1.response || err1.code === 'ERR_NETWORK' || err1.code === 'ECONNABORTED' || [502, 503, 504].includes(err1.response?.status);
+      
       if (isNetwork) {
-        toast.error('Bulut sunucusu (Render) uyanıyor olabilir. Lütfen 15 saniye bekleyip tekrar "Sisteme Bağlan" butonuna basın.', { duration: 6000 });
-      } else {
-        toast.error(err.response?.data?.detail || 'Hatalı giriş kodu! Lütfen "erccrm" yazın.');
+        toast.error('Bulut sunucusu (Render) şu anda uyanıyor. Lütfen 10-15 saniye bekleyip tekrar deneyin.', { duration: 6000 });
+        setLoading(false);
+        return;
+      }
+
+      // 2. YOL: Klasik OAuth2 form girişi ile tek bir geri dönüş denemesi
+      const isAdmin = clean.includes('admin') || clean === 'yonetici';
+      const targetEmail = isAdmin ? 'admin@iveco-crm.local' : 'satis@iveco-crm.local';
+
+      try {
+        await login(targetEmail, clean);
+        toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
+        navigate('/');
+        return;
+      } catch (err2) {
+        console.error('Login error:', err2);
+        const detail = err1.response?.data?.detail || err2.response?.data?.detail || 'Hatalı giriş kodu! Lütfen "erccrm" veya yönetici için "admin.erccrm" yazın.';
+        toast.error(detail);
       }
     } finally {
       setLoading(false);
@@ -292,19 +292,49 @@ export default function Login() {
               background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
               border: 'none',
               color: '#fff',
-              cursor: 'pointer',
+              cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s ease',
               boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 8
+              gap: 8,
+              opacity: loading ? 0.85 : 1
             }}
           >
             <FiLock size={16} />
-            {loading ? 'Giriş Yapılıyor...' : 'Sisteme Bağlan'}
+            {loading 
+              ? (waitSeconds > 2 ? `⏳ Sunucu Uyanıyor (${waitSeconds}s)...` : '🔒 Giriş Yapılıyor...') 
+              : 'Sisteme Bağlan'}
           </button>
         </form>
+
+        {(loading || isWaking) && (
+          <div style={{
+            marginTop: 14,
+            padding: '11px 13px',
+            borderRadius: 10,
+            background: 'rgba(59, 130, 246, 0.12)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            color: '#93c5fd',
+            fontSize: 12,
+            lineHeight: 1.45,
+            textAlign: 'left',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>⏳</span>
+            <div>
+              <strong style={{ color: '#fff', display: 'block', fontSize: 12.5 }}>
+                {waitSeconds > 2 ? `Bulut sunucusu uyanıyor (${waitSeconds} sn)...` : 'Sisteme bağlanılıyor...'}
+              </strong>
+              <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                Render ücretsiz sunucusu 15 dk boşta kalınca uyur; ilk açılış ~25-40 sn sürebilir. Lütfen bekleyin.
+              </span>
+            </div>
+          </div>
+        )}
 
         <p style={{
           marginTop: 22,

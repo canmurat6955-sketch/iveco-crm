@@ -82,7 +82,7 @@ api.interceptors.response.use(
     
     // Giriş, arama ve doğrulama gibi kritik canlı istekler çevrimdışı kuyruğa alınmamalıdır
     const isExcluded = config?.url && (
-      config.url.includes('/auth/login') ||
+      config.url.includes('/auth/') ||
       config.url.includes('/scanner/search') ||
       config.url.includes('/scanner/scan-card') ||
       config.url.includes('/scanner/scan-vergi-levhasi') ||
@@ -141,6 +141,7 @@ export const authApi = {
   loginPasscode: (code) => api.post('/auth/passcode', { code }),
   getMe: () => api.get('/auth/me'),
   changePassword: (data) => api.post('/auth/change-password', data),
+  pingHealth: () => api.get('/health', { timeout: 35000 }),
 };
 
 // ── Kişilerim (kişisel rehber) API ──────────────────────────────
