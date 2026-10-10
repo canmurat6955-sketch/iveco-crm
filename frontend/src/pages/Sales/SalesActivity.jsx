@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { salesApi, crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { openWhatsApp } from '../../utils/whatsapp';
+import PipelineOpportunityModal from '../../components/CRM/PipelineOpportunityModal';
 import {
   FiPhone, FiPhoneCall, FiPhoneIncoming, FiPhoneOutgoing, FiPhoneMissed,
   FiMessageSquare, FiPlus, FiClock, FiUser, FiCheckCircle, FiAlertCircle,
@@ -62,6 +63,7 @@ export default function SalesActivityPage() {
   const [pipeline, setPipeline] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [showPipelineModal, setShowPipelineModal] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState({
     customer_id: '',
@@ -588,8 +590,8 @@ export default function SalesActivityPage() {
                 <button key={k} className={`btn btn-sm ${statusFilter === k ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setStatusFilter(k)}>{label}</button>
               ))}
             </div>
-            <button className="btn btn-primary" onClick={openAddModal} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <FiPlus size={16} /> Yeni Aktivite
+            <button className="btn btn-primary" onClick={() => setShowPipelineModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <FiPlus size={16} /> Yeni Ziyaret / Fırsat Kaydı
             </button>
           </div>
 
@@ -873,6 +875,13 @@ export default function SalesActivityPage() {
           </div>
         </div>
       )}
+
+      {/* ── YENİ ZİYARET & FIRSAT MODALI (IVECO STANDARDI) ── */}
+      <PipelineOpportunityModal
+        isOpen={showPipelineModal}
+        onClose={() => setShowPipelineModal(false)}
+        onSuccess={() => { loadActivities(); loadCalls(); }}
+      />
     </div>
   );
 }

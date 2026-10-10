@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { openWhatsApp as triggerWhatsApp } from '../../utils/whatsapp';
+import PipelineOpportunityModal from '../../components/CRM/PipelineOpportunityModal';
 import { 
   FiPhone, FiMapPin, FiArrowRight, FiMessageSquare, 
-  FiChevronDown, FiChevronUp, FiSearch, FiRefreshCw, FiTruck 
+  FiChevronDown, FiChevronUp, FiSearch, FiRefreshCw, FiTruck, FiPlus 
 } from 'react-icons/fi';
 
 const TARGET_PROVINCES = [
@@ -27,6 +28,8 @@ export default function Pipeline() {
   const [collapsedCols, setCollapsedCols] = useState({});
   const [cityFilter, setCityFilter] = useState('target_9');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOpportunityModal, setShowOpportunityModal] = useState(false);
+  const [modalStage, setModalStage] = useState('lead');
   const navigate = useNavigate();
 
   const load = async () => {
@@ -110,10 +113,18 @@ export default function Pipeline() {
             type="button" 
             onClick={load} 
             className="btn btn-secondary btn-sm"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', fontSize: '0.75rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', fontSize: '0.75rem' }}
             title="Yenile"
           >
             <FiRefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Yenile
+          </button>
+          <button 
+            type="button" 
+            onClick={() => { setModalStage('lead'); setShowOpportunityModal(true); }}
+            className="btn btn-primary btn-sm"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', fontSize: '0.8rem', fontWeight: 700 }}
+          >
+            <FiPlus size={14} /> Yeni Fırsat / Ziyaret Ekle
           </button>
         </div>
       </div>
@@ -207,10 +218,25 @@ export default function Pipeline() {
                   <span style={{ fontWeight: 700, color: stage.color, fontSize: '0.85rem' }}>
                     {stage.emoji} {stage.label}
                   </span>
-                  <span style={{
-                    background: stage.color, color: '#fff', borderRadius: 12, padding: '2px 8px',
-                    fontSize: '0.72rem', fontWeight: 700
-                  }}>{items.length}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setModalStage(stage.key);
+                        setShowOpportunityModal(true);
+                      }}
+                      className="btn btn-ghost btn-xs"
+                      title={`${stage.label} aşamasına yeni fırsat/ziyaret ekle`}
+                      style={{ padding: '2px 5px', color: stage.color, borderRadius: 4, display: 'flex', alignItems: 'center' }}
+                    >
+                      <FiPlus size={13} />
+                    </button>
+                    <span style={{
+                      background: stage.color, color: '#fff', borderRadius: 12, padding: '2px 8px',
+                      fontSize: '0.72rem', fontWeight: 700
+                    }}>{items.length}</span>
+                  </div>
                 </div>
 
                 {/* Cards */}
@@ -318,6 +344,14 @@ export default function Pipeline() {
           })}
         </div>
       )}
+
+      {/* ── FIRSAT & ZİYARET KAYIT MODALI ── */}
+      <PipelineOpportunityModal
+        isOpen={showOpportunityModal}
+        onClose={() => setShowOpportunityModal(false)}
+        initialStage={modalStage}
+        onSuccess={() => load()}
+      />
     </div>
   );
 }
