@@ -1258,14 +1258,41 @@ export default function DiscoveryList() {
                 padding: '12px 16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
+                justifyContent: 'space-between',
+                gap: 12,
                 fontSize: 12,
                 color: '#93c5fd'
               }}>
-                <FiInfo size={18} style={{ flexShrink: 0, color: '#60a5fa' }} />
-                <div>
-                  <strong>Bilgi: </strong>{billingNotice}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <FiInfo size={18} style={{ flexShrink: 0, color: '#60a5fa' }} />
+                  <div>
+                    <strong>Bilgi: </strong>{billingNotice}{' '}
+                    <a
+                      href="https://console.cloud.google.com/billing/linkedaccount?project=710958211885"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#67e8f9', textDecoration: 'underline', fontWeight: 600, marginLeft: 4 }}
+                    >
+                      Kartı Projeye Bağla ↗
+                    </a>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setBillingNotice(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: 16,
+                    padding: '2px 6px',
+                    lineHeight: 1
+                  }}
+                  title="Bildirimi Kapat"
+                >
+                  ✕
+                </button>
               </div>
             )}
           </div>
