@@ -159,7 +159,7 @@ class CRMService:
                 "district": c.district,
                 "phone": c.phone,
                 "sector": c.sector,
-                "segment": c.segment or "C",
+                "segment": c.segment,
                 "potential_score": c.potential_score or 70,
                 "pipeline_stage": c.pipeline_stage,
                 "last_contact_date": str(c.last_contact_date) if c.last_contact_date else None,
@@ -546,7 +546,7 @@ class CRMService:
             score += 15
 
         # 3. Segment
-        score += {"A": 20, "B": 15, "C": 8, "D": 3}.get(c.segment or "C", 8)
+        score += {"A": 20, "B": 15, "C": 8, "D": 3}.get(c.segment, 5)
 
         # 4. Fırsat durumu (havuz = 0)
         stage = c.pipeline_stage
@@ -1164,7 +1164,7 @@ class CRMService:
                         "address": c.address,
                         "phone": c.phone,
                         "sector": c.sector,
-                        "segment": c.segment or "C",
+                        "segment": c.segment,
                         "potential_score": c.potential_score or 0,
                         "latitude": clat,
                         "longitude": clng,

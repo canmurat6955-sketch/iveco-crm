@@ -1,9 +1,9 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, AreaChart, Area, CartesianGrid } from 'recharts';
 
 const CHART_COLORS = ['#2b7de9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1'];
-const SEGMENT_COLORS = { A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444' };
-const POTENTIAL_COLORS = { very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444' };
-const POTENTIAL_LABELS = { very_high: 'Çok Yüksek', high: 'Yüksek', medium: 'Orta', low: 'Düşük' };
+const SEGMENT_COLORS = { A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#64748b' };
+const POTENTIAL_COLORS = { very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#64748b' };
+const POTENTIAL_LABELS = { very_high: 'Çok Yüksek', high: 'Yüksek', medium: 'Orta', low: 'Düşük', Belirlenmedi: 'Belirlenmedi' };
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;

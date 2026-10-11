@@ -134,7 +134,7 @@ def today_queue(
             if c.id in seen or c.id in touched or c.id in rejected or not phone_key(c.phone):
                 continue
             scored.append(c)
-        scored.sort(key=lambda c: (-CRMService.calculate_priority_score(c), {"A": 0, "B": 1, "C": 2, "D": 3}.get(c.segment or "C", 2), c.id))
+        scored.sort(key=lambda c: (-CRMService.calculate_priority_score(c), {"A": 0, "B": 1, "C": 2, "D": 3}.get(c.segment, 4), c.id))
         fresh = [_brief(c, "Yeni – hiç aranmamış") for c in scored[:new_limit]]
 
     done_today = db.query(func.count(SalesActivity.id)).filter(
@@ -604,7 +604,7 @@ def get_field_assistant(
 
     # 5. GPS Yakınlık Radarı (varsa)
     nearby_items = []
-    if lat and lng:
+    if lat and lng and isinstance(lat, (int, float)) and isinstance(lng, (int, float)):
         all_geo_custs = db.query(Customer).filter(
             Customer.is_active == True,
             Customer.latitude.isnot(None),
@@ -621,7 +621,7 @@ def get_field_assistant(
                     "id": gc.id,
                     "company_name": gc.company_name,
                     "distance_km": round(dist_km, 2),
-                    "segment": gc.segment or "B",
+                    "segment": gc.segment,
                     "city": gc.city,
                     "phone": gc.phone,
                     "sector": gc.sector

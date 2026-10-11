@@ -509,14 +509,14 @@ export default function Dashboard() {
             <div className="card-header"><h3 className="card-title">Segment Dağılımı</h3></div>
             <div className="flex items-center" style={{ gap: '2rem' }}>
               <SegmentChart data={analytics.segment_distribution} />
-              <ChartLegend data={analytics.segment_distribution} colors={{ A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444' }} />
+              <ChartLegend data={analytics.segment_distribution} colors={{ A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#64748b' }} />
             </div>
           </div>
           <div className="card glass-card">
             <div className="card-header"><h3 className="card-title">Potansiyel Dağılımı</h3></div>
             <div className="flex items-center" style={{ gap: '2rem' }}>
               <SegmentChart data={analytics.potential_distribution} />
-              <ChartLegend data={analytics.potential_distribution} colors={{ very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444' }} />
+              <ChartLegend data={analytics.potential_distribution} colors={{ very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#64748b' }} />
             </div>
           </div>
         </div>

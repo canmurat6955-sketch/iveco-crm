@@ -29,9 +29,9 @@ class Customer(Base):
     estimated_fleet_size = Column(Integer, nullable=True)
     previous_vehicles = Column(Text, nullable=True)
     last_contact_date = Column(Date, nullable=True)
-    segment = Column(String(10), default="C")  # A, B, C, D
+    segment = Column(String(10), default=None, nullable=True)  # A, B, C, D, or None (Belirlenmedi)
     sales_notes = Column(Text, nullable=True)
-    potential_level = Column(String(20), default="medium")  # very_high, high, medium, low
+    potential_level = Column(String(20), default=None, nullable=True)  # very_high, high, medium, low
     potential_score = Column(Integer, default=0)
     source = Column(String(100), default="manual")  # manual, import, discovery, google_ai_intelligence...
     pipeline_stage = Column(String(30), nullable=True, default=None)  # NULL = havuz | lead, contact, proposal, negotiation, won, lost

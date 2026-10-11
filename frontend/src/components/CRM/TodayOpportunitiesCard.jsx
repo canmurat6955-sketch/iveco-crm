@@ -24,7 +24,7 @@ export default function TodayOpportunitiesCard({
   const hotLeadsCount = (opportunities?.counts?.hot_leads ?? 0) + (opportunities?.counts?.stock_matches ?? 0);
 
   const TABS = [
-    { key: 'unvisited_a', label: '⚠️ Ziyaretsiz (A)', fullLabel: '⚠️ Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: '#ef4444' },
+    { key: 'unvisited_a', label: unvisitedACount > 0 ? '⚠️ Ziyaretsiz (A)' : '⭐ Ziyaretsiz (A)', fullLabel: '⭐ Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: unvisitedACount > 0 ? '#ef4444' : '#64748b' },
     { key: 'quote_pending', label: '📋 Teklif Bekleyen', fullLabel: '📋 Teklif & Şasi Bekleyenler', count: quotePendingCount, color: '#3b82f6' },
     { key: 'follow_ups', label: '⏰ Takip Günü', fullLabel: '⏰ Takip Tarihi Gelenler', count: followUpsCount, color: '#f59e0b' },
     { key: 'new_discoveries', label: '✨ Yeni Keşifler', fullLabel: '✨ Yeni Kurulan / Keşifler', count: newDiscoveriesCount, color: '#a855f7' },
@@ -232,7 +232,29 @@ export default function TodayOpportunitiesCard({
                 ))}
               </div>
             ) : (
-              <EmptyState message="Tebrikler! Bölgenizdeki tüm A-segment müşteriler yakın zamanda ziyaret edilmiş." />
+              <div style={{
+                textAlign: 'center',
+                padding: '2.5rem 1.5rem',
+                background: 'rgba(255, 255, 255, 0.02)',
+                borderRadius: 12,
+                border: '1px dashed rgba(255, 255, 255, 0.12)'
+              }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🎯</div>
+                <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.96rem', fontWeight: 700, color: '#f8fafc' }}>
+                  Ziyaret Bekleyen A-Segment Müşteri Yok
+                </h4>
+                <p style={{ margin: '0 auto 1.25rem auto', maxWidth: 460, fontSize: '0.82rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                  Henüz A-Segment olarak belirlediğiniz müşteri bulunmuyor. Müşteri detay kartlarından veya yeni görüşmelerinizden firmalara segment atadıkça, 30 gündür ziyaret edilmeyen öncelikli müşteriler burada listelenecektir.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={() => navigate('/customers')}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', padding: '6px 14px' }}
+                >
+                  Müşteri Listesine Git & Segment Belirle
+                </button>
+              </div>
             )}
           </div>
         )}

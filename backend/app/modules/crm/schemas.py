@@ -24,9 +24,9 @@ class CustomerCreate(BaseModel):
     estimated_fleet_size: Optional[int] = None
     previous_vehicles: Optional[str] = None
     last_contact_date: Optional[dt_date] = None
-    segment: str = Field(default="C", description="Müşteri segmenti: A/B/C/D")
+    segment: Optional[str] = Field(default=None, description="Müşteri segmenti: A/B/C/D veya None")
     sales_notes: Optional[str] = None
-    potential_level: str = Field(default="medium", description="very_high/high/medium/low")
+    potential_level: Optional[str] = Field(default=None, description="very_high/high/medium/low")
     potential_score: int = Field(default=0, ge=0, le=100)
     pipeline_stage: Optional[str] = Field(default=None, description="Boş = havuz | lead/contact/proposal/negotiation/won/lost")
     pipeline_note: Optional[str] = None
@@ -88,9 +88,9 @@ class CustomerResponse(BaseModel):
     estimated_fleet_size: Optional[int] = None
     previous_vehicles: Optional[str] = None
     last_contact_date: Optional[dt_date] = None
-    segment: str
+    segment: Optional[str] = None
     sales_notes: Optional[str] = None
-    potential_level: str
+    potential_level: Optional[str] = None
     potential_score: int
     source: str
     pipeline_stage: Optional[str] = "lead"
@@ -473,7 +473,7 @@ class NearbyCustomerResponse(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     sector: Optional[str] = None
-    segment: str = "C"
+    segment: Optional[str] = None
     potential_score: int = 0
     latitude: float
     longitude: float

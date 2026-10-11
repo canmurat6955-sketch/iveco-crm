@@ -81,7 +81,7 @@ def get_analytics(db: Session = Depends(get_db), current_user=Depends(get_curren
     segment_rows = db.query(Customer.segment, func.count(Customer.id)).filter(
         Customer.is_active == True
     ).group_by(Customer.segment).all()
-    segment_distribution = [{"name": s or "C", "value": v} for s, v in segment_rows]
+    segment_distribution = [{"name": s or "Belirlenmedi", "value": v} for s, v in segment_rows]
 
     # Potential distribution
     potential_rows = db.query(Customer.potential_level, func.count(Customer.id)).filter(

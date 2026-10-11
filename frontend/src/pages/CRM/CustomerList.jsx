@@ -32,7 +32,7 @@ export default function CustomerList() {
   const [masterVehicles, setMasterVehicles] = useState([]);
   const [form, setForm] = useState({ 
     company_name: '', tax_number: '', vergi_dairesi: '', city: '', district: '', phone: '', email: '', 
-    sector: '', segment: 'C', potential_level: 'medium', sales_notes: '',
+    sector: '', segment: '', potential_level: '', sales_notes: '',
     latitude: '', longitude: '',
     vehicle_group: '', vehicle_id: '', interest_level: 'high', purchase_timeframe: '0_30_days', estimated_quantity: 1
   });
@@ -436,9 +436,11 @@ export default function CustomerList() {
 
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                     <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                      <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>
-                        {c.segment}
-                      </span>
+                      {c.segment && (
+                        <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>
+                          {c.segment}
+                        </span>
+                      )}
                       {c.pipeline_stage === 'proposal' ? (
                         <span className="badge badge-amber" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>📋 Teklif</span>
                       ) : c.pipeline_stage === 'contact' ? (
@@ -579,7 +581,13 @@ export default function CustomerList() {
                 <td>{c.city || '—'} {c.district ? `/ ${c.district}` : ''}</td>
                 <td className="text-muted">{c.sector || '—'}</td>
                 <td className="hide-on-mobile">{c.phone || '—'}</td>
-                <td><span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>{c.segment}</span></td>
+                <td>
+                  {c.segment ? (
+                    <span className={`badge ${SEGMENTS[c.segment] || 'badge-blue'}`}>{c.segment}</span>
+                  ) : (
+                    <span className="badge" style={{ background: 'rgba(148, 163, 184, 0.1)', color: '#94a3b8' }}>—</span>
+                  )}
+                </td>
                 <td className="hide-on-mobile">
                   <span className="badge" style={{
                     background: c.priority_score >= 70 ? 'rgba(239, 68, 68, 0.12)' : c.priority_score >= 40 ? 'rgba(245, 158, 11, 0.12)' : 'rgba(156, 163, 175, 0.12)',
@@ -718,10 +726,11 @@ export default function CustomerList() {
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Segment</label>
-                  <select className="form-select" value={form.segment} onChange={e => setForm({ ...form, segment: e.target.value })}>
-                    <option value="A">A — Premium</option>
+                  <select className="form-select" value={form.segment || ''} onChange={e => setForm({ ...form, segment: e.target.value })}>
+                    <option value="">Belirlenmedi</option>
+                    <option value="A">A — Öncelikli Ziyaret</option>
                     <option value="B">B — Yüksek</option>
-                    <option value="C">C — Orta</option>
+                    <option value="C">C — Standart</option>
                     <option value="D">D — Düşük</option>
                   </select>
                 </div>

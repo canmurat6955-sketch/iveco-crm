@@ -147,8 +147,8 @@ def convert_to_customer(contact_id: int, data: ConvertRequest, db: Session = Dep
         sales_notes=f"Kişilerim listesinden firmaya dönüştürüldü. Kişi: {c.full_name}"
                     + (f" | {c.notes}" if c.notes else ""),
         potential_score=50,
-        potential_level="medium",
-        segment="C",
+        potential_level=None,
+        segment=None,
     )
     db.add(cust)
     db.flush()

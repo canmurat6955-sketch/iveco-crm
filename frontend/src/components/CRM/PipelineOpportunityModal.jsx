@@ -82,6 +82,7 @@ export default function PipelineOpportunityModal({
   const [targetFleet, setTargetFleet] = useState('');
   const [isHeavyVehicle, setIsHeavyVehicle] = useState(false);
   const [is7TonDaily, setIs7TonDaily] = useState('hayir');
+  const [customerSegment, setCustomerSegment] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -94,13 +95,16 @@ export default function PipelineOpportunityModal({
         crmApi.getCustomer(initialCustomerId)
           .then(res => {
             setSelectedCustomer(res.data);
+            setCustomerSegment(res.data.segment || '');
             loadCustomerContacts(res.data.id);
           })
           .catch(() => {
             setSelectedCustomer({ id: initialCustomerId, company_name: initialCompanyName || 'Müşteri' });
+            setCustomerSegment('');
           });
       } else {
         setSelectedCustomer(null);
+        setCustomerSegment('');
         setSearchQuery('');
         setSearchResults([]);
       }
@@ -155,6 +159,7 @@ export default function PipelineOpportunityModal({
 
   const handleSelectCustomer = (cust) => {
     setSelectedCustomer(cust);
+    setCustomerSegment(cust.segment || '');
     setSearchQuery('');
     setSearchResults([]);
     loadCustomerContacts(cust.id);
@@ -162,6 +167,7 @@ export default function PipelineOpportunityModal({
 
   const handleClearSelectedCustomer = () => {
     setSelectedCustomer(null);
+    setCustomerSegment('');
     setContacts([]);
     setSelectedContactId('');
   };
@@ -226,7 +232,8 @@ export default function PipelineOpportunityModal({
           potential_score: pipelineStage === 'proposal' ? 95 : (pipelineStage === 'contact' ? 75 : 60),
           potential_level: pipelineStage === 'proposal' ? 'very_high' : 'high',
           last_contact_date: visitDate,
-          sales_notes: notes || undefined
+          sales_notes: notes || undefined,
+          segment: customerSegment || undefined
         };
 
         const createRes = await crmApi.createCustomer(createPayload);
@@ -254,6 +261,9 @@ export default function PipelineOpportunityModal({
           last_contact_date: visitDate,
           potential_score: Math.max(selectedCustomer.potential_score || 0, pipelineStage === 'proposal' ? 95 : (pipelineStage === 'contact' ? 75 : 60)),
         };
+        if (customerSegment) {
+          updatePayload.segment = customerSegment;
+        }
         await crmApi.updateCustomer(customerId, updatePayload);
       }
 
@@ -958,6 +968,23 @@ export default function PipelineOpportunityModal({
                 {ACTIVITY_TYPES.map(t => (
                   <option key={t.key} value={t.key}>{t.label}</option>
                 ))}
+              </select>
+            </div>
+
+            {/* Müşteri Segmenti (A/B/C/D) */}
+            <div>
+              <label className="form-label" style={{ fontSize: 12 }}>Müşteri Segmenti (Opsiyonel)</label>
+              <select
+                className="form-select"
+                value={customerSegment}
+                onChange={e => setCustomerSegment(e.target.value)}
+                style={{ fontSize: 13 }}
+              >
+                <option value="">Belirlenmedi (Sonra Değerlendir)</option>
+                <option value="A">⭐ A-Segment (Öncelikli Ziyaret)</option>
+                <option value="B">🔹 B-Segment (Aktif Müşteri)</option>
+                <option value="C">🔸 C-Segment (Standart)</option>
+                <option value="D">⚪ D-Segment (Düşük)</option>
               </select>
             </div>
           </div>

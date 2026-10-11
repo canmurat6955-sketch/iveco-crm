@@ -497,15 +497,6 @@ def add_to_crm(
     
     score = min(score, 100)
     
-    if score >= 80:
-        segment, potential = "A", "very_high"
-    elif score >= 65:
-        segment, potential = "B", "high"
-    elif score >= 50:
-        segment, potential = "C", "medium"
-    else:
-        segment, potential = "D", "low"
-    
     notes_parts = ["Google Places Tarama ile bulundu"]
     if req.google_maps_url:
         notes_parts.append(f"Maps: {req.google_maps_url}")
@@ -522,8 +513,8 @@ def add_to_crm(
         city=req.city,
         website=req.website,
         sector=req.sector,
-        segment=segment,
-        potential_level=potential,
+        segment=None,
+        potential_level=None,
         potential_score=score,
         source="google_scan",
         sales_notes=" | ".join(notes_parts),
@@ -569,9 +560,6 @@ def bulk_add_to_crm(
             score += 15
         score = min(score, 100)
         
-        segment = "A" if score >= 80 else "B" if score >= 65 else "C" if score >= 50 else "D"
-        potential = "very_high" if score >= 80 else "high" if score >= 65 else "medium" if score >= 50 else "low"
-        
         customer = Customer(
             company_name=item.company_name,
             phone=item.phone,
@@ -580,8 +568,8 @@ def bulk_add_to_crm(
             city=item.city,
             website=item.website,
             sector=item.sector,
-            segment=segment,
-            potential_level=potential,
+            segment=None,
+            potential_level=None,
             potential_score=score,
             source="google_scan",
             sales_notes=f"Google Places Tarama | Maps: {item.google_maps_url or '-'}",

@@ -401,8 +401,8 @@ export default function CustomerDetail() {
       current_fleet: customer.current_fleet || '',
       estimated_fleet_size: customer.estimated_fleet_size || '',
       previous_vehicles: customer.previous_vehicles || '',
-      segment: customer.segment || 'C',
-      potential_level: customer.potential_level || 'medium',
+      segment: customer.segment || '',
+      potential_level: customer.potential_level || '',
       potential_score: customer.potential_score || 0,
       pipeline_stage: customer.pipeline_stage || '',
       sales_notes: customer.sales_notes || '',
@@ -610,7 +610,7 @@ export default function CustomerDetail() {
           </div>
 
           {/* Pipeline Stage */}
-          <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
             {[
               { key: 'lead', label: '🎯 Lead', color: '#6366f1' },
               { key: 'contact', label: '📞 Görüşme', color: '#3b82f6' },
@@ -638,6 +638,49 @@ export default function CustomerDetail() {
                   onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; }}}
                 >
                   {s.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Müşteri Segmenti (1-Tıkla Değiştir) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', marginRight: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              Segment:
+            </span>
+            {[
+              { key: 'A', label: '⭐ A-Segment (Öncelikli)', color: '#ef4444' },
+              { key: 'B', label: '🔹 B-Segment (Aktif)', color: '#3b82f6' },
+              { key: 'C', label: '🔸 C-Segment (Standart)', color: '#f59e0b' },
+              { key: 'D', label: '⚪ D-Segment (Düşük)', color: '#94a3b8' },
+              { key: null, label: 'Belirlenmedi', color: '#64748b' }
+            ].map(seg => {
+              const active = customer.segment === seg.key || (!customer.segment && seg.key === null);
+              return (
+                <button
+                  key={seg.key || 'none'}
+                  onClick={async () => {
+                    try {
+                      await crmApi.updateCustomer(id, { segment: seg.key });
+                      setCustomer(prev => ({ ...prev, segment: seg.key }));
+                      toast.success(seg.key ? `Müşteri Segmenti: ${seg.key} olarak güncellendi` : 'Segment kaldırıldı (Belirlenmedi)');
+                    } catch {
+                      toast.error('Segment güncellenemedi');
+                    }
+                  }}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: 16,
+                    fontSize: '0.74rem',
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                    border: `1.5px solid ${active ? seg.color : 'rgba(255, 255, 255, 0.12)'}`,
+                    background: active ? (seg.key === null ? 'rgba(100, 116, 139, 0.25)' : `${seg.color}25`) : 'transparent',
+                    color: active ? (seg.color === '#ef4444' ? '#f87171' : seg.color === '#64748b' ? '#cbd5e1' : seg.color) : 'var(--text-muted)',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {seg.label}
                 </button>
               );
             })}
@@ -866,7 +909,12 @@ export default function CustomerDetail() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted">Segment</span>
-                <span className={`badge ${customer.segment === 'A' ? 'badge-green' : customer.segment === 'B' ? 'badge-blue' : customer.segment === 'C' ? 'badge-amber' : 'badge-red'}`}>{customer.segment}</span>
+                <span
+                  className={`badge ${customer.segment === 'A' ? 'badge-green' : customer.segment === 'B' ? 'badge-blue' : customer.segment === 'C' ? 'badge-amber' : customer.segment === 'D' ? 'badge-red' : ''}`}
+                  style={!customer.segment ? { background: 'rgba(148, 163, 184, 0.12)', color: '#94a3b8' } : undefined}
+                >
+                  {customer.segment ? `${customer.segment}-Segment` : 'Belirlenmedi'}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted">Öncelik Skoru</span>
@@ -1934,10 +1982,11 @@ export default function CustomerDetail() {
                   </div>
                   <div className="form-group">
                     <label className="form-label">Segment</label>
-                    <select className="form-select" value={editForm.segment} onChange={e => handleEditChange('segment', e.target.value)}>
-                      <option value="A">A — Çok Yüksek</option>
-                      <option value="B">B — Yüksek</option>
-                      <option value="C">C — Orta</option>
+                    <select className="form-select" value={editForm.segment || ''} onChange={e => handleEditChange('segment', e.target.value)}>
+                      <option value="">Belirlenmedi</option>
+                      <option value="A">A — Çok Yüksek (Öncelikli Ziyaret)</option>
+                      <option value="B">B — Yüksek (Aktif Müşteri)</option>
+                      <option value="C">C — Standart</option>
                       <option value="D">D — Düşük</option>
                     </select>
                   </div>
