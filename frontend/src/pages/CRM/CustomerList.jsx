@@ -624,12 +624,43 @@ export default function CustomerList() {
                 </td>
                 <td className="hide-on-mobile"><span className="badge badge-blue">{c.source}</span></td>
                 <td onClick={e => e.stopPropagation()}>
-                  <button onClick={e => deleteSingle(c.id, c.company_name, e)} title="Sil"
-                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, borderRadius: 4, transition: 'color 0.2s' }}
-                    onMouseEnter={e => e.target.style.color = '#ef4444'}
-                    onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>
-                    <FiTrash2 size={14} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {c.phone && (
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          openWhatsApp(c.phone, '', { customer: c });
+                        }}
+                        title="WhatsApp ile İletişime Geç & Pipeline'a Ekle"
+                        style={{
+                          background: 'rgba(37, 211, 102, 0.12)',
+                          border: '1px solid rgba(37, 211, 102, 0.3)',
+                          color: '#25d366',
+                          cursor: 'pointer',
+                          padding: '3px 7px',
+                          borderRadius: 4,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(37, 211, 102, 0.25)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(37, 211, 102, 0.12)'}
+                      >
+                        <FiMessageSquare size={13} />
+                        <span>WA</span>
+                      </button>
+                    )}
+                    <button onClick={e => deleteSingle(c.id, c.company_name, e)} title="Sil"
+                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, borderRadius: 4, transition: 'color 0.2s' }}
+                      onMouseEnter={e => e.target.style.color = '#ef4444'}
+                      onMouseLeave={e => e.target.style.color = 'var(--text-muted)'}>
+                      <FiTrash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             )) : (

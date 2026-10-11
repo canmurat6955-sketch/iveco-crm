@@ -77,8 +77,9 @@ class SalesActivityService:
             customer.potential_score = 100
         elif data.status == "lost":
             customer.pipeline_stage = "lost"
-        elif customer.pipeline_stage == "lead":
+        elif customer.pipeline_stage in (None, "", "pool", "lead"):
             customer.pipeline_stage = "contact"
+            customer.pipeline_note = data.notes or f"İletişim Başlatıldı ({data.activity_type.upper()})"
             customer.potential_score = max(customer.potential_score or 0, 75)
 
         self.db.commit()

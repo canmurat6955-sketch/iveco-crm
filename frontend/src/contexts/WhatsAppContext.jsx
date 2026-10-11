@@ -67,6 +67,7 @@ export function WhatsAppProvider({ children }) {
           vehicleTitle={modalState.vehicleTitle}
           interestId={modalState.interestId}
           defaultStatus={modalState.defaultStatus}
+          defaultMessage={modalState.defaultMessage}
           onSuccess={(res) => {
             if (modalState.onSuccess) {
               modalState.onSuccess(res);

@@ -4,12 +4,29 @@ import {
   FiMessageSquare, FiX, FiCheckCircle, FiCalendar, FiClock,
   FiSend, FiTag, FiTruck, FiPhone, FiCheck, FiUser, FiBriefcase,
   FiMapPin, FiChevronDown, FiChevronUp, FiSave, FiExternalLink,
-  FiFileText, FiArrowRight
+  FiFileText, FiArrowRight, FiRefreshCw
 } from 'react-icons/fi';
 import VoiceInputButton from '../common/VoiceInputButton';
 import { salesApi, vehiclesApi, crmApi } from '../../api/client';
 import { launchNativeWhatsApp } from '../../utils/whatsapp';
 import toast from 'react-hot-toast';
+
+const PIPELINE_STAGES = [
+  { key: 'lead', label: 'Lead', color: '#818cf8', emoji: '🎯' },
+  { key: 'contact', label: 'İlk Görüşme', color: '#38bdf8', emoji: '📞' },
+  { key: 'proposal', label: 'Teklif', color: '#fbbf24', emoji: '📋' },
+  { key: 'negotiation', label: 'Pazarlık', color: '#fb923c', emoji: '🤝' },
+  { key: 'won', label: 'Kazanıldı', color: '#34d399', emoji: '✅' },
+];
+
+const STAGE_LABELS = {
+  lead: '🎯 Lead Adayı',
+  contact: '📞 İlk Görüşme',
+  proposal: '📋 Teklif Verildi',
+  negotiation: '🤝 Pazarlık Aşaması',
+  won: '✅ Kazanıldı (Satış)',
+  lost: '❌ Kaybedildi'
+};
 
 export default function WhatsAppActionModal({
   isOpen,
@@ -18,21 +35,24 @@ export default function WhatsAppActionModal({
   vehicleTitle = '',
   interestId = null,
   defaultStatus = 'offer_given',
+  defaultMessage = '',
   onSuccess
 }) {
   const navigate = useNavigate();
 
-  // Adım kontrolü: 'compose' (WhatsApp Mesajı) | 'post_action' (Görüşme Sonrası Müşteri Kaydı Girişi)
+  // Adım kontrolü: 'compose' (WhatsApp Mesajı & Hazırlık) | 'post_action' (Bilgi Kartı & Pipeline Onayı)
   const [step, setStep] = useState('compose');
 
-  // WhatsApp Mesaj State'leri
+  // Pipeline & Satış Aktivite State'leri
+  const [pipelineStage, setPipelineStage] = useState('proposal');
   const [status, setStatus] = useState(defaultStatus); // 'offer_given', 'sent', 'follow_up'
   const [message, setMessage] = useState('');
   const [internalNote, setInternalNote] = useState('');
   const [nextFollowUp, setNextFollowUp] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [changingStage, setChangingStage] = useState(false);
 
-  // Müşteri Bilgileri Akordeon & Form State'leri
+  // Müşteri Bilgileri & Akordeon State'leri
   const [showCustomerAccordion, setShowCustomerAccordion] = useState(false);
   const [savingCustomer, setSavingCustomer] = useState(false);
   const [customerSaved, setCustomerSaved] = useState(false);
@@ -48,7 +68,7 @@ export default function WhatsAppActionModal({
     tax_number: '',
     vergi_dairesi: '',
     current_fleet: '',
-    segment: 'C',
+    segment: '',
     sales_notes: ''
   });
 
@@ -59,26 +79,38 @@ export default function WhatsAppActionModal({
       setCreatedCustomerId(null);
       setShowCustomerAccordion(false);
 
-      // Default follow-up: 3 days later
+      // Default follow-up: 3 gün sonra
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate() + 3);
       setNextFollowUp(nextDate.toISOString().split('T')[0]);
 
-      // Set default proposal message
+      // Başlangıç pipeline aşaması
+      const existingStage = customer.pipeline_stage;
+      const initialStage = (existingStage && existingStage !== 'pool')
+        ? existingStage
+        : (defaultStatus === 'offer_given' ? 'proposal' : 'contact');
+      setPipelineStage(initialStage);
+      setStatus(defaultStatus);
+
+      // WhatsApp Mesajı ve Dahili Not
       const vText = vehicleTitle ? `IVECO ${vehicleTitle}` : 'IVECO ticari araç';
-      setMessage(
-        `Sayın ${customer.company_name || 'Yetkili'}, firmanız için ilgilendiğiniz ${vText} modelimizle ilgili özel fiyat teklifimizi hazırladık. Detayları görüşmek ve sorularınızı yanıtlamak üzere incelemenize sunuyoruz.`
-      );
+      if (defaultMessage) {
+        setMessage(defaultMessage);
+      } else {
+        setMessage(
+          `Sayın ${customer.company_name || 'Yetkili'}, firmanız için ilgilendiğiniz ${vText} modelimizle ilgili özel fiyat teklifimizi hazırladık. Detayları görüşmek ve sorularınızı yanıtlamak üzere incelemenize sunuyoruz.`
+        );
+      }
+
       setInternalNote(
         vehicleTitle 
-          ? `${vehicleTitle} aracı için WhatsApp üzerinden resmi fiyat teklifi iletildi.`
-          : 'Müşteriye WhatsApp üzerinden teklif iletildi.'
+          ? `${vehicleTitle} aracı için WhatsApp üzerinden resmi teklif yönlendirildi.`
+          : 'Müşteriye WhatsApp üzerinden görüşme/teklif yönlendirildi.'
       );
-      setStatus(defaultStatus);
 
       // Müşteri form başlangıç verileri
       const initialForm = {
-        company_name: customer.company_name || '',
+        company_name: customer.company_name || customer.name || '',
         contact_name: customer.contact_name || customer.contact_person || '',
         phone: customer.phone || '',
         city: customer.city || '',
@@ -86,19 +118,22 @@ export default function WhatsAppActionModal({
         sector: customer.sector || '',
         tax_number: customer.tax_number || '',
         vergi_dairesi: customer.vergi_dairesi || '',
-        current_fleet: customer.current_fleet || '',
-        segment: customer.segment || 'C',
+        current_fleet: customer.current_fleet || (vehicleTitle ? `İlgilenilen: ${vehicleTitle}` : ''),
+        segment: customer.segment || '',
         sales_notes: customer.sales_notes || ''
       };
       setCustomerForm(initialForm);
 
-      // Eğer mevcut müşteri ID'si varsa tam detayları CRM'den çek
+      // Eğer kayıtlı müşteri ID'si varsa CRM'den en güncel detayları çek
       const custId = customer.id || customer.customer_id;
       if (custId) {
         crmApi.getCustomer(custId)
           .then(res => {
             if (res.data) {
               const d = res.data;
+              if (d.pipeline_stage && d.pipeline_stage !== 'pool') {
+                setPipelineStage(d.pipeline_stage);
+              }
               setCustomerForm({
                 company_name: d.company_name || initialForm.company_name,
                 contact_name: d.contacts?.[0]?.contact_name || d.contacts?.[0]?.name || initialForm.contact_name,
@@ -108,8 +143,8 @@ export default function WhatsAppActionModal({
                 sector: d.sector || '',
                 tax_number: d.tax_number || '',
                 vergi_dairesi: d.vergi_dairesi || '',
-                current_fleet: d.current_fleet || '',
-                segment: d.segment || 'C',
+                current_fleet: d.current_fleet || initialForm.current_fleet,
+                segment: d.segment || '',
                 sales_notes: d.sales_notes || ''
               });
             }
@@ -117,7 +152,7 @@ export default function WhatsAppActionModal({
           .catch(() => {});
       }
     }
-  }, [isOpen, customer, vehicleTitle, defaultStatus]);
+  }, [isOpen, customer, vehicleTitle, defaultStatus, defaultMessage]);
 
   if (!isOpen || !customer) return null;
 
@@ -127,14 +162,17 @@ export default function WhatsAppActionModal({
     const vText = vehicleTitle ? `IVECO ${vehicleTitle}` : 'IVECO ticari araç';
     if (type === 'teklif') {
       setStatus('offer_given');
+      setPipelineStage('proposal');
       setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, firmanız için ilgilendiğiniz ${vText} modelimizle ilgili özel fiyat teklifimizi hazırladık. İnceleyip değerlendirmenizi rica ederiz.`);
       setInternalNote(`${vText} için fiyat teklifi iletildi, karar bekleniyor.`);
     } else if (type === 'katalog') {
       setStatus('sent');
+      setPipelineStage('contact');
       setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, IVECO ${vText} güncel ürün broşürünü, teknik özelliklerini ve avantajlı bayi finansman koşullarını bilginize sunuyoruz.`);
       setInternalNote(`${vText} ürün kataloğu ve teknik verileri gönderildi.`);
     } else if (type === 'kampanya') {
       setStatus('sent');
+      setPipelineStage('contact');
       setMessage(`Merhaba! IVECO ${vText} araçlarımızda bu aya özel düşük faiz ve takas destekli bayi kampanyamız başlamıştır. Stoktaki hemen teslim araçlarımız için detaylı bilgi alabilirsiniz.`);
       setInternalNote('Özel finansman ve takas kampanyası bilgisi paylaşıldı.');
     } else if (type === 'takip') {
@@ -150,7 +188,7 @@ export default function WhatsAppActionModal({
     setNextFollowUp(d.toISOString().split('T')[0]);
   };
 
-  // ── WhatsApp'a Yönlendir ve CRM Satış Aktivitesi Ekle ──
+  // ── WhatsApp'a Yönlendir ve Satış Pipeline'ına Garantili Ekle ──
   const handleLaunchWhatsApp = async ({ navigateDirectly = false } = {}) => {
     const targetPhone = customerForm.phone || customer.phone;
     if (!targetPhone) {
@@ -165,11 +203,11 @@ export default function WhatsAppActionModal({
     try {
       setSubmitting(true);
       let effectiveCustId = activeCustomerId;
-      const pStage = status === 'offer_given' ? 'proposal' : 'contact';
-      const pNote = customerForm.sales_notes || internalNote || (status === 'offer_given' ? 'WhatsApp üzerinden resmi araç teklifi iletildi.' : 'WhatsApp görüşmesi başlatıldı.');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const pStage = pipelineStage || (status === 'offer_given' ? 'proposal' : 'contact');
+      const pNote = customerForm.sales_notes || internalNote || (pStage === 'proposal' ? 'WhatsApp üzerinden teklif iletildi.' : 'WhatsApp görüşmesi başlatıldı.');
 
-      // 1. Eğer müşteri henüz CRM'de kayıtlı değilse (Firma Keşfi, OSB Radarı, Yeni Şirketler veya Referanslar)
-      // WhatsApp butonuna basıldığı an CRM'e ve Satış Pipeline'ına otomatik kaydet!
+      // 1. Müşteri henüz CRM'de kayıtlı değilse oluştur ve Pipeline'a ata
       if (!effectiveCustId) {
         try {
           const compName = (customerForm.company_name || customer.company_name || customer.name || 'Yeni Keşif Adayı').trim();
@@ -182,10 +220,11 @@ export default function WhatsAppActionModal({
             tax_number: customerForm.tax_number || customer.tax_number || '',
             vergi_dairesi: customerForm.vergi_dairesi || customer.vergi_dairesi || '',
             current_fleet: customerForm.current_fleet || (vehicleTitle ? `İlgilenilen: ${vehicleTitle}` : ''),
-            segment: customerForm.segment || 'A',
+            segment: customerForm.segment || null,
             sales_notes: pNote,
             pipeline_stage: pStage,
             pipeline_note: pNote,
+            last_contact_date: todayStr,
             potential_score: 95,
             potential_level: 'very_high',
             source: 'discovery_whatsapp'
@@ -210,39 +249,41 @@ export default function WhatsAppActionModal({
         } catch (createErr) {
           console.warn('Otomatik müşteri oluşturma uyarısı:', createErr);
         }
-      }
-
-      // 2. CRM Satış Aktivitesi Kaydı Oluştur
-      if (effectiveCustId) {
-        await salesApi.createActivity({
-          customer_id: effectiveCustId,
-          activity_type: 'whatsapp',
-          status: status, // 'offer_given', 'sent', 'follow_up'
-          message_content: message,
-          notes: internalNote || pNote,
-          next_follow_up: nextFollowUp || undefined
-        });
-
-        // Pipeline aşamasını 'proposal' (Teklif) olarak CRM'e garanti işle
-        if (status === 'offer_given') {
-          try {
-            await crmApi.updateCustomer(effectiveCustId, {
-              pipeline_stage: 'proposal',
-              pipeline_note: internalNote || 'WhatsApp ile resmi araç teklifi iletildi.'
-            });
-          } catch (e) {
-            console.warn('Customer pipeline stage update error:', e);
-          }
+      } else {
+        // 2. Mevcut müşteri ise Pipeline Aşaması, Not ve Son İletişim Tarihini GARANTİ GÜNCELLE!
+        try {
+          await crmApi.updateCustomer(effectiveCustId, {
+            pipeline_stage: pStage,
+            pipeline_note: pNote,
+            last_contact_date: todayStr
+          });
+        } catch (uErr) {
+          console.warn('Müşteri pipeline güncelleme uyarısı:', uErr);
         }
       }
 
-      // 3. Eğer Araç İhtiyacı (Interest) ID'si varsa durumunu 'quoted' (Teklif Yapıldı) olarak güncelle
-      if (interestId && status === 'offer_given') {
+      // 3. CRM Satış Aktivitesi Kaydı Oluştur
+      if (effectiveCustId) {
         try {
-          const today = new Date().toISOString().split('T')[0];
+          await salesApi.createActivity({
+            customer_id: effectiveCustId,
+            activity_type: 'whatsapp',
+            status: status, // 'offer_given', 'sent', 'follow_up'
+            message_content: message,
+            notes: internalNote || pNote,
+            next_follow_up: nextFollowUp || undefined
+          });
+        } catch (actErr) {
+          console.warn('Satış aktivitesi kayıt uyarısı:', actErr);
+        }
+      }
+
+      // 4. Araç Talebi (Interest) varsa durumunu 'quoted' veya 'contacted' yap
+      if (interestId) {
+        try {
           await vehiclesApi.updateCustomerInterest(interestId, {
-            opportunity_status: 'quoted',
-            last_activity_date: today,
+            opportunity_status: status === 'offer_given' ? 'quoted' : 'contacted',
+            last_activity_date: todayStr,
             next_activity_date: nextFollowUp || undefined,
             customer_note: internalNote
           });
@@ -251,24 +292,20 @@ export default function WhatsAppActionModal({
         }
       }
 
-      // 4. Yerel WhatsApp Uygulamasını Aç (Deep Link)
+      // 5. Yerel WhatsApp Uygulamasını Aç (Deep Link)
       launchNativeWhatsApp(targetPhone, message);
 
-      if (status === 'offer_given') {
-        toast.success("WhatsApp açıldı ve müşteri Satış Pipeline'ına (Teklif Aşaması) aktarıldı! 🎯", { duration: 5000 });
-      } else {
-        toast.success("WhatsApp açıldı ve görüşme geçmişe işlendi! 💬", { duration: 4000 });
-      }
+      toast.success(`WhatsApp açıldı ve müşteri Satış Pipeline'ına (${STAGE_LABELS[pStage] || pStage}) eklendi! 🎯`, { duration: 5000 });
 
       if (onSuccess) {
-        onSuccess({ status, interestId, customerId: effectiveCustId });
+        onSuccess({ status, interestId, customerId: effectiveCustId, pipeline_stage: pStage });
       }
 
       if (navigateDirectly && effectiveCustId) {
         onClose();
         navigate(`/customers/${effectiveCustId}`);
       } else {
-        // WhatsApp'a yönlendirdikten sonra MÜŞTERİ KAYDI GİRİŞ ekranına geçiş yap
+        // WhatsApp yönlendirmesinden sonra BİLGİ KARTINA geçiş yap
         setStep('post_action');
       }
     } catch (err) {
@@ -279,7 +316,30 @@ export default function WhatsAppActionModal({
     }
   };
 
-  // ── Müşteri Kaydını Güncelle veya Yeni Müşteri Oluştur ──
+  // ── 1-Tıkla Pipeline Aşamasını Değiştir (Bilgi Kartı İçinden) ──
+  const handleUpdateStage = async (newStage) => {
+    const custId = activeCustomerId;
+    if (!custId) return;
+    try {
+      setChangingStage(true);
+      await crmApi.updateCustomer(custId, {
+        pipeline_stage: newStage,
+        pipeline_note: `Aşama ${STAGE_LABELS[newStage] || newStage} olarak güncellendi.`
+      });
+      setPipelineStage(newStage);
+      toast.success(`Pipeline Aşaması "${STAGE_LABELS[newStage]}" olarak güncellendi! 🎯`);
+      if (onSuccess) {
+        onSuccess({ status, interestId, customerId: custId, pipeline_stage: newStage });
+      }
+    } catch (err) {
+      console.error('Aşama güncelleme hatası:', err);
+      toast.error('Aşama güncellenirken bir hata oluştu');
+    } finally {
+      setChangingStage(false);
+    }
+  };
+
+  // ── Müşteri Ek Bilgilerini Güncelle (Opsiyonel Akordeon) ──
   const handleSaveCustomerRecord = async (e) => {
     if (e) e.preventDefault();
     if (!customerForm.company_name?.trim()) {
@@ -290,12 +350,11 @@ export default function WhatsAppActionModal({
     try {
       setSavingCustomer(true);
       const custId = activeCustomerId;
-
-      const pStage = status === 'offer_given' ? 'proposal' : 'contact';
-      const pNote = customerForm.sales_notes || internalNote || (status === 'offer_given' ? 'WhatsApp üzerinden teklif sunuldu.' : 'Görüşme sağlandı.');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const pStage = pipelineStage || (status === 'offer_given' ? 'proposal' : 'contact');
+      const pNote = customerForm.sales_notes || internalNote || 'Bilgiler güncellendi.';
 
       if (custId) {
-        // Var olan müşteriyi güncelle
         await crmApi.updateCustomer(custId, {
           company_name: customerForm.company_name,
           phone: customerForm.phone,
@@ -305,13 +364,13 @@ export default function WhatsAppActionModal({
           tax_number: customerForm.tax_number,
           vergi_dairesi: customerForm.vergi_dairesi,
           current_fleet: customerForm.current_fleet,
-          segment: customerForm.segment,
+          segment: customerForm.segment || null,
           sales_notes: customerForm.sales_notes,
           pipeline_stage: pStage,
-          pipeline_note: pNote
+          pipeline_note: pNote,
+          last_contact_date: todayStr
         });
 
-        // Yetkili kişi varsa contact ekle/güncelle
         if (customerForm.contact_name?.trim()) {
           try {
             await crmApi.addContact(custId, {
@@ -319,221 +378,192 @@ export default function WhatsAppActionModal({
               phone: customerForm.phone,
               is_primary: true
             });
-          } catch {
-            // İrtibat kişisi ekleme çakışmasında sessizce devam et
-          }
-        }
-
-        toast.success(`Müşteri kaydı güncellendi ve Pipeline (${pStage === 'proposal' ? 'Teklif' : 'Görüşme'}) aşamasına işlendi! 🎯`);
-      } else {
-        // Yeni Müşteri Oluştur
-        const createRes = await crmApi.createCustomer({
-          company_name: customerForm.company_name,
-          phone: customerForm.phone,
-          city: customerForm.city,
-          district: customerForm.district,
-          sector: customerForm.sector,
-          tax_number: customerForm.tax_number,
-          vergi_dairesi: customerForm.vergi_dairesi,
-          current_fleet: customerForm.current_fleet,
-          segment: customerForm.segment || 'C',
-          sales_notes: customerForm.sales_notes,
-          pipeline_stage: pStage,
-          pipeline_note: pNote
-        });
-
-        const newId = createRes.data?.id;
-        setCreatedCustomerId(newId);
-
-        // İrtibat kişisi ekle
-        if (customerForm.contact_name?.trim() && newId) {
-          try {
-            await crmApi.addContact(newId, {
-              contact_name: customerForm.contact_name,
-              phone: customerForm.phone,
-              is_primary: true
-            });
           } catch {}
         }
 
-        // Yeni müşteri için aktivite kaydı oluştur
-        if (newId) {
-          try {
-            await salesApi.createActivity({
-              customer_id: newId,
-              activity_type: 'whatsapp',
-              status: status,
-              message_content: message,
-              notes: pNote,
-              next_follow_up: nextFollowUp || undefined
-            });
-          } catch {}
-        }
-
-        toast.success(`Yeni müşteri CRM ve Satış Pipeline (${pStage === 'proposal' ? 'Teklif' : 'Görüşme'}) aşamasına eklendi! 🎯`);
-      }
-
-      setCustomerSaved(true);
-      if (onSuccess) {
-        onSuccess({ customerId: custId || createdCustomerId });
+        setCustomerSaved(true);
+        toast.success(`Müşteri bilgileri güncellendi! 💾`);
       }
     } catch (err) {
       console.error('Müşteri kaydetme hatası:', err);
-      toast.error('Müşteri kaydı kaydedilirken bir hata oluştu.');
+      toast.error('Bilgiler kaydedilirken bir hata oluştu.');
     } finally {
       setSavingCustomer(false);
     }
   };
 
+  const targetPhone = customerForm.phone || customer.phone;
+
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 120 }}>
-      <div 
-        className="modal animate-in" 
-        onClick={e => e.stopPropagation()} 
-        style={{ maxWidth: 560, width: '96%', maxHeight: '92vh', overflowY: 'auto' }}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(5px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '16px'
+      }}
+      onClick={e => {
+        if (e.target === e.currentTarget && !submitting) onClose();
+      }}
+    >
+      <div
+        className="card"
+        style={{
+          width: '100%',
+          maxWidth: 640,
+          maxHeight: '92vh',
+          overflowY: 'auto',
+          margin: 0,
+          background: 'var(--bg-card, #1e293b)',
+          border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)',
+          borderRadius: 14,
+          padding: '1.25rem'
+        }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ 
-              width: 38, height: 38, borderRadius: 10, 
-              background: step === 'post_action' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(37, 211, 102, 0.15)', 
-              color: step === 'post_action' ? '#10b981' : '#25d366', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center' 
-            }}>
-              {step === 'post_action' ? <FiCheckCircle size={22} /> : <FiMessageSquare size={20} />}
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                background: step === 'post_action' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(37, 211, 102, 0.15)',
+                color: step === 'post_action' ? '#10b981' : '#25d366',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              {step === 'post_action' ? <FiCheckCircle size={20} /> : <FiMessageSquare size={18} />}
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-heading)' }}>
-                {step === 'post_action' ? 'WhatsApp Sonrası Müşteri Kaydı' : 'WhatsApp & Teklif Gönderimi'}
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                {step === 'compose' ? 'WhatsApp Mesajı & Satış Pipeline' : 'WhatsApp Yönlendirildi · Bilgi Kartı'}
               </h3>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                {step === 'post_action' 
-                  ? 'Görüşme sonucu edindiğiniz bilgileri sisteme kaydedin veya güncelleyin.' 
-                  : "Mesaj WhatsApp'a aktarılır ve CRM'e 'Teklif Yapıldı' olarak işlenir."}
+              <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {step === 'compose' ? "Yönlendirme yapıldığında müşteri doğrudan Satış Pipeline'ına işlenir." : "Müşteri Satış Pipeline'ına alındı, aşama ve iletişim özeti aşağıdadır."}
               </p>
             </div>
           </div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+            disabled={submitting}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: 4,
+              borderRadius: 6,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
             <FiX size={20} />
           </button>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
-            ADIM 1: WHATSAPP MESAJI & TEKLİF DÜZENLEME (COMPOSE)
+            ADIM 1: MESAJ HAZIRLIĞI & PIPELINE AŞAMA SEÇİMİ
            ═══════════════════════════════════════════════════════════════════ */}
         {step === 'compose' && (
           <div>
-            {/* Müşteri & Araç Bilgi Şeridi */}
-            <div style={{ background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.2)', borderRadius: 10, padding: '10px 12px', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            {/* Hedef Müşteri Özeti */}
+            <div
+              style={{
+                background: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                borderRadius: 8,
+                padding: '10px 12px',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 8
+              }}
+            >
               <div>
-                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-heading)' }}>
-                  {customerForm.company_name || customer.company_name}
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                  {customerForm.company_name || customer.company_name || 'İsimsiz Firma'}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                  <FiPhone size={11} /> {customerForm.phone || customer.phone || 'Telefon Yok'}
-                  {(customerForm.city || customer.city) && <span>· 📍 {customerForm.city || customer.city}</span>}
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  {customerForm.contact_name && <span>👤 {customerForm.contact_name}</span>}
+                  {targetPhone && <span>📞 {targetPhone}</span>}
+                  {customerForm.city && <span>📍 {customerForm.city} {customerForm.district ? `/ ${customerForm.district}` : ''}</span>}
                 </div>
               </div>
               {vehicleTitle && (
-                <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#10b981', padding: '4px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <FiTruck size={12} /> {vehicleTitle}
+                <div className="badge badge-amber" style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <FiTruck size={13} /> {vehicleTitle}
                 </div>
               )}
             </div>
 
-            {/* Aksiyon Durumu Seçimi */}
-            <div className="form-group mb-4">
-              <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, display: 'block' }}>
-                🎯 CRM'e İşlenecek Satış Aşaması:
+            {/* Pipeline Hedef Aşaması Seçici */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }}>
+                🎯 Eklenecek Pipeline Aşaması:
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                <button
-                  type="button"
-                  onClick={() => setStatus('offer_given')}
-                  style={{
-                    padding: '8px 6px',
-                    borderRadius: 8,
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    border: status === 'offer_given' ? '2px solid #10b981' : '1px solid var(--border-color)',
-                    background: status === 'offer_given' ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-card)',
-                    color: status === 'offer_given' ? '#10b981' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <FiTag size={14} />
-                  <span>Teklif Yapıldı</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setStatus('sent')}
-                  style={{
-                    padding: '8px 6px',
-                    borderRadius: 8,
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    border: status === 'sent' ? '2px solid #0284c7' : '1px solid var(--border-color)',
-                    background: status === 'sent' ? 'rgba(2, 132, 199, 0.15)' : 'var(--bg-card)',
-                    color: status === 'sent' ? '#0284c7' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <FiMessageSquare size={14} />
-                  <span>Bilgilendirme</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setStatus('follow_up')}
-                  style={{
-                    padding: '8px 6px',
-                    borderRadius: 8,
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    border: status === 'follow_up' ? '2px solid #f59e0b' : '1px solid var(--border-color)',
-                    background: status === 'follow_up' ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-card)',
-                    color: status === 'follow_up' ? '#f59e0b' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <FiClock size={14} />
-                  <span>Takip Aşaması</span>
-                </button>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                {[
+                  { key: 'contact', label: 'İlk Görüşme', emoji: '📞', color: '#38bdf8' },
+                  { key: 'proposal', label: 'Teklif', emoji: '📋', color: '#fbbf24' },
+                  { key: 'negotiation', label: 'Pazarlık', emoji: '🤝', color: '#fb923c' },
+                  { key: 'won', label: 'Kazanıldı', emoji: '✅', color: '#34d399' }
+                ].map(st => (
+                  <button
+                    key={st.key}
+                    type="button"
+                    onClick={() => {
+                      setPipelineStage(st.key);
+                      if (st.key === 'proposal') setStatus('offer_given');
+                      else if (st.key === 'contact') setStatus('sent');
+                    }}
+                    style={{
+                      padding: '8px 4px',
+                      borderRadius: 8,
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      border: pipelineStage === st.key ? `2px solid ${st.color}` : '1px solid var(--border-color)',
+                      background: pipelineStage === st.key ? `${st.color}20` : 'var(--bg-card)',
+                      color: pipelineStage === st.key ? st.color : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 3,
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <span>{st.emoji}</span>
+                    <span>{st.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Hazır Mesaj Şablonları */}
+            {/* Hızlı Şablonlar */}
             <div style={{ marginBottom: '0.85rem' }}>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
-                💡 Hızlı Şablonlar:
+                💡 Hızlı Şablonlar (Tek tıkla hazır metin):
               </span>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   onClick={() => selectTemplate('teklif')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.72rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.74rem', padding: '4px 10px' }}
                 >
                   💼 Fiyat Teklifi
                 </button>
@@ -541,7 +571,7 @@ export default function WhatsAppActionModal({
                   type="button"
                   onClick={() => selectTemplate('katalog')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.72rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.74rem', padding: '4px 10px' }}
                 >
                   📄 Katalog & Broşür
                 </button>
@@ -549,15 +579,15 @@ export default function WhatsAppActionModal({
                   type="button"
                   onClick={() => selectTemplate('kampanya')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.72rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.74rem', padding: '4px 10px' }}
                 >
-                  🔥 Faiz Kampanyası
+                  🔥 Kampanya Koşulları
                 </button>
                 <button
                   type="button"
                   onClick={() => selectTemplate('takip')}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.72rem', padding: '3px 8px' }}
+                  style={{ fontSize: '0.74rem', padding: '4px 10px' }}
                 >
                   ⏳ Karar Takibi
                 </button>
@@ -585,11 +615,11 @@ export default function WhatsAppActionModal({
               />
             </div>
 
-            {/* CRM Şirket İçi Görüşme Notu */}
+            {/* Dahili CRM Notu */}
             <div className="form-group mb-3">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>
-                  📝 Dahili CRM Notu (Müşteri Görmez):
+                  📝 Dahili Satış Notu (Pipeline kartında görünür):
                 </label>
                 <VoiceInputButton
                   onTranscript={t => setInternalNote(prev => (prev ? prev + ' ' + t : t))}
@@ -601,7 +631,7 @@ export default function WhatsAppActionModal({
                 className="form-input"
                 value={internalNote}
                 onChange={e => setInternalNote(e.target.value)}
-                placeholder="Örn: 2 adet 35S14 için özel indirimli teklif verildi..."
+                placeholder="Örn: 2 adet Daily için özel indirimli teklif iletildi..."
                 style={{ fontSize: '0.85rem' }}
               />
             </div>
@@ -610,7 +640,7 @@ export default function WhatsAppActionModal({
             <div className="form-group mb-4">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                 <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>
-                  📅 Sonraki Takip & Karar Tarihi:
+                  📅 Sonraki Takip Tarihi:
                 </label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <button type="button" onClick={() => handleAddDays(3)} className="btn btn-secondary btn-sm" style={{ padding: '2px 6px', fontSize: '0.7rem' }}>+3 Gün</button>
@@ -627,94 +657,7 @@ export default function WhatsAppActionModal({
               />
             </div>
 
-            {/* ── Opsiyonel: Göndermeden Önce Müşteri Bilgilerini Düzenle Akordeonu ── */}
-            <div style={{ marginBottom: '1rem', border: '1px solid var(--border-color)', borderRadius: 8, overflow: 'hidden' }}>
-              <button
-                type="button"
-                onClick={() => setShowCustomerAccordion(!showCustomerAccordion)}
-                style={{
-                  width: '100%', padding: '8px 12px', background: 'rgba(255, 255, 255, 0.03)',
-                  border: 'none', color: 'var(--text-secondary)', display: 'flex',
-                  alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
-                  fontSize: '0.8rem', fontWeight: 600
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <FiUser size={14} style={{ color: '#38bdf8' }} /> Müşteri Bilgilerini Önceden Düzenle (Opsiyonel)
-                </span>
-                {showCustomerAccordion ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-              </button>
-
-              {showCustomerAccordion && (
-                <div style={{ padding: '12px', background: 'var(--bg-input, #0f172a)', borderTop: '1px solid var(--border-color)' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Firma Adı</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.company_name} 
-                        onChange={e => setCustomerForm({ ...customerForm, company_name: e.target.value })} 
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Yetkili Kişi</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.contact_name} 
-                        onChange={e => setCustomerForm({ ...customerForm, contact_name: e.target.value })} 
-                        placeholder="Örn: Ahmet Bey"
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Telefon</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.phone} 
-                        onChange={e => setCustomerForm({ ...customerForm, phone: e.target.value })} 
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Şehir</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.city} 
-                        onChange={e => setCustomerForm({ ...customerForm, city: e.target.value })} 
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Sektör</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.sector} 
-                        onChange={e => setCustomerForm({ ...customerForm, sector: e.target.value })} 
-                        placeholder="Gıda, Nakliyat vb."
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label className="form-label" style={{ fontSize: '0.75rem' }}>Mevcut Filo</label>
-                      <input 
-                        className="form-input" 
-                        value={customerForm.current_fleet} 
-                        onChange={e => setCustomerForm({ ...customerForm, current_fleet: e.target.value })} 
-                        placeholder="Örn: 4 kamyon"
-                        style={{ fontSize: '0.8rem' }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Aksiyon Butonları */}
+            {/* Aksiyon Butonları */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem', flexWrap: 'wrap', gap: 8 }}>
               <button
                 type="button"
@@ -747,18 +690,19 @@ export default function WhatsAppActionModal({
                   disabled={submitting}
                   className="btn btn-success"
                   style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.88rem',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 6,
+                    gap: 7,
                     background: '#25d366',
                     borderColor: '#25d366',
-                    fontWeight: 700,
-                    padding: '8px 16px'
+                    fontWeight: 800,
+                    padding: '8px 18px',
+                    boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)'
                   }}
                 >
                   <FiSend size={15} />
-                  <span>{submitting ? 'Açılıyor...' : "WhatsApp'ı Aç ve Kaydet 🚀"}</span>
+                  <span>{submitting ? 'Yönlendiriliyor...' : "WhatsApp'a Yönlendir & Pipeline'a Ekle 🚀"}</span>
                 </button>
               </div>
             </div>
@@ -766,250 +710,356 @@ export default function WhatsAppActionModal({
         )}
 
         {/* ═══════════════════════════════════════════════════════════════════
-            ADIM 2: WHATSAPP YÖNLENDİRMESİ SONRASI MÜŞTERİ KAYDI GİRİŞİ
+            ADIM 2: BİLGİ KARTI & PİPELİNE YÖNLENDİRME (KULLANICI TALEBİ)
            ═══════════════════════════════════════════════════════════════════ */}
         {step === 'post_action' && (
           <div className="animate-in">
-            {/* Başarı Bildirimi */}
-            <div style={{
-              background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)',
-              borderRadius: 10, padding: '12px 14px', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: 12
-            }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <FiCheck size={20} />
+            {/* 1. Başarı & Pipeline Onay Banner'ı */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(59, 130, 246, 0.12) 100%)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                borderRadius: 12,
+                padding: '14px 16px',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14
+              }}
+            >
+              <div
+                style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: '50%',
+                  background: '#10b981',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
+                }}
+              >
+                <FiCheck size={24} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#10b981' }}>
-                  WhatsApp Açıldı ve Teklif CRM'e İşlendi! 🎯
+                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <span>WhatsApp Yönlendirildi · Satış Pipeline'ına Eklendi!</span>
+                  <span className="badge badge-green" style={{ fontSize: '0.7rem' }}>AKTİF TAKİPTE</span>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>
-                  Görüşme sırasında aldığınız bilgileri aşağıdan hemen kaydedebilir veya tam müşteri kartına geçebilirsiniz.
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 3 }}>
+                  Müşteri <strong>{STAGE_LABELS[pipelineStage] || pipelineStage}</strong> aşamasına aktarıldı ve satış aktivitesi kaydedildi.
                 </div>
               </div>
             </div>
 
-            {/* Müşteri Kayıt Formu */}
-            <form onSubmit={handleSaveCustomerRecord} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div className="form-group" style={{ margin: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>
-                      Firma / Müşteri Adı *
-                    </label>
-                    <VoiceInputButton 
-                      onTranscript={t => setCustomerForm(prev => ({ ...prev, company_name: prev.company_name ? prev.company_name + ' ' + t : t }))}
-                      title="Firma Adını Sesle Yazdır"
-                    />
-                  </div>
-                  <input
-                    className="form-input"
-                    required
-                    value={customerForm.company_name}
-                    onChange={e => setCustomerForm({ ...customerForm, company_name: e.target.value })}
-                    placeholder="Örn: Öz Karadeniz Nakliyat"
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ margin: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>
-                      Yetkili / İrtibat Kişisi
-                    </label>
-                    <VoiceInputButton 
-                      onTranscript={t => setCustomerForm(prev => ({ ...prev, contact_name: prev.contact_name ? prev.contact_name + ' ' + t : t }))}
-                      title="Yetkili Adını Sesle Yazdır"
-                    />
-                  </div>
-                  <input
-                    className="form-input"
-                    value={customerForm.contact_name}
-                    onChange={e => setCustomerForm({ ...customerForm, contact_name: e.target.value })}
-                    placeholder="Örn: Mustafa Bey (Firma Sahibi)"
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
+            {/* 2. Tek Tıkla Aşama Değiştirici */}
+            <div
+              style={{
+                background: 'var(--bg-input, #0f172a)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 10,
+                padding: '10px 12px',
+                marginBottom: '1rem'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  📊 Pipeline Aşaması (Değiştirmek için tıkla):
+                </span>
+                <span style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700 }}>
+                  {changingStage ? 'Güncelleniyor...' : STAGE_LABELS[pipelineStage] || pipelineStage}
+                </span>
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: 3 }}>
-                    Telefon
-                  </label>
-                  <input
-                    className="form-input"
-                    value={customerForm.phone}
-                    onChange={e => setCustomerForm({ ...customerForm, phone: e.target.value })}
-                    placeholder="05xx xxx xx xx"
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: 3 }}>
-                    Sektör / Faaliyet
-                  </label>
-                  <input
-                    className="form-input"
-                    value={customerForm.sector}
-                    onChange={e => setCustomerForm({ ...customerForm, sector: e.target.value })}
-                    placeholder="Örn: Gıda Dağıtım, İnşaat, Lojistik"
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: 3 }}>
-                    Şehir & İlçe
-                  </label>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <input
-                      className="form-input"
-                      value={customerForm.city}
-                      onChange={e => setCustomerForm({ ...customerForm, city: e.target.value })}
-                      placeholder="Şehir"
-                      style={{ fontSize: '0.85rem', flex: 1 }}
-                    />
-                    <input
-                      className="form-input"
-                      value={customerForm.district}
-                      onChange={e => setCustomerForm({ ...customerForm, district: e.target.value })}
-                      placeholder="İlçe"
-                      style={{ fontSize: '0.85rem', flex: 1 }}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: 3 }}>
-                    Vergi No & Dairesi
-                  </label>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <input
-                      className="form-input"
-                      value={customerForm.tax_number}
-                      onChange={e => setCustomerForm({ ...customerForm, tax_number: e.target.value })}
-                      placeholder="Vergi No / TC"
-                      style={{ fontSize: '0.85rem', flex: 1.2 }}
-                    />
-                    <input
-                      className="form-input"
-                      value={customerForm.vergi_dairesi}
-                      onChange={e => setCustomerForm({ ...customerForm, vergi_dairesi: e.target.value })}
-                      placeholder="V. Dairesi"
-                      style={{ fontSize: '0.85rem', flex: 1 }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 10 }}>
-                <div className="form-group" style={{ margin: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                    <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>
-                      Mevcut Filo / Araçlar
-                    </label>
-                    <VoiceInputButton 
-                      onTranscript={t => setCustomerForm(prev => ({ ...prev, current_fleet: prev.current_fleet ? prev.current_fleet + ' ' + t : t }))}
-                      title="Filoyu Sesle Yazdır"
-                    />
-                  </div>
-                  <input
-                    className="form-input"
-                    value={customerForm.current_fleet}
-                    onChange={e => setCustomerForm({ ...customerForm, current_fleet: e.target.value })}
-                    placeholder="Örn: 3 adet 2020 Daily, 1 çekici"
-                    style={{ fontSize: '0.85rem' }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ margin: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, marginBottom: 3 }}>
-                    Müşteri Segmenti
-                  </label>
-                  <select
-                    className="form-select"
-                    value={customerForm.segment}
-                    onChange={e => setCustomerForm({ ...customerForm, segment: e.target.value })}
-                    style={{ fontSize: '0.85rem' }}
-                  >
-                    <option value="A">A — Premium / Filo</option>
-                    <option value="B">B — Yüksek Potansiyel</option>
-                    <option value="C">C — Standart KOBİ</option>
-                    <option value="D">D — Düşük Hacim</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Görüşme Notu / Satış Notu (Sesli Dikte Destekli) */}
-              <div className="form-group" style={{ margin: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-                  <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, margin: 0 }}>
-                    🎙️ WhatsApp Görüşme Sonucu & Müşteri Notu:
-                  </label>
-                  <VoiceInputButton 
-                    onTranscript={t => setCustomerForm(prev => ({ ...prev, sales_notes: prev.sales_notes ? prev.sales_notes + ' ' + t : t }))}
-                    title="Görüşme Notunu Konuşarak Yazdır"
-                  />
-                </div>
-                <textarea
-                  className="form-textarea"
-                  rows={2}
-                  value={customerForm.sales_notes}
-                  onChange={e => setCustomerForm({ ...customerForm, sales_notes: e.target.value })}
-                  placeholder="Müşteriyle yapılan görüşme detayları, şartları, araç tercihleri ve bütçe notları..."
-                  style={{ fontSize: '0.85rem', lineHeight: '1.4' }}
-                />
-              </div>
-
-              {/* Kayıt Butonları */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem', marginTop: 6, flexWrap: 'wrap', gap: 8 }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={onClose}
-                  style={{ fontSize: '0.82rem' }}
-                >
-                  Kapat ve Listeye Dön
-                </button>
-
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {activeCustomerId && (
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        onClose();
-                        navigate(`/customers/${activeCustomerId}`);
-                      }}
-                      style={{ fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: 5 }}
-                    >
-                      <FiExternalLink size={13} />
-                      <span>Tam Müşteri Kartını Aç</span>
-                    </button>
-                  )}
-
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+                {PIPELINE_STAGES.map(st => (
                   <button
-                    type="submit"
-                    disabled={savingCustomer}
-                    className="btn btn-primary"
+                    key={st.key}
+                    type="button"
+                    onClick={() => handleUpdateStage(st.key)}
+                    disabled={changingStage}
                     style={{
-                      fontSize: '0.85rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
+                      padding: '8px 4px',
+                      borderRadius: 8,
+                      fontSize: '0.74rem',
                       fontWeight: 700,
-                      padding: '8px 16px'
+                      border: pipelineStage === st.key ? `2px solid ${st.color}` : '1px solid var(--border-color)',
+                      background: pipelineStage === st.key ? `${st.color}25` : 'rgba(255, 255, 255, 0.03)',
+                      color: pipelineStage === st.key ? st.color : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 3,
+                      transition: 'all 0.15s'
                     }}
                   >
-                    <FiSave size={15} />
-                    <span>{savingCustomer ? 'Kaydediliyor...' : customerSaved ? 'Kaydedildi ✓' : 'Müşteri Kaydını Güncelle 💾'}</span>
+                    <span style={{ fontSize: '0.95rem' }}>{st.emoji}</span>
+                    <span>{st.label}</span>
                   </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Müşteri & İletişim Bilgi Kartı */}
+            <div
+              style={{
+                background: 'var(--bg-card, #1e293b)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 10,
+                padding: '12px 14px',
+                marginBottom: '1rem'
+              }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>🏢 Firma / Müşteri:</span>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {customerForm.company_name || customer.company_name || '—'}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>👤 Yetkili Kişi:</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {customerForm.contact_name || customer.contact_name || 'Belirtilmedi'}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📱 Telefon:</span>
+                  <a href={`tel:${targetPhone}`} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#38bdf8', textDecoration: 'none' }}>
+                    {targetPhone || '—'}
+                  </a>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📍 Konum:</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    {[customerForm.city || customer.city, customerForm.district || customer.district].filter(Boolean).join(' / ') || 'Belirtilmedi'}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>🚛 İlgilenilen Araç:</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fbbf24' }}>
+                    {vehicleTitle || customerForm.current_fleet || 'IVECO Ticari Araç'}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📅 Sonraki Takip:</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#10b981' }}>
+                    {nextFollowUp || 'Planlanmadı'}
+                  </span>
                 </div>
               </div>
-            </form>
+
+              {/* İletilen WhatsApp Mesajı Özeti */}
+              {message && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    paddingTop: 10,
+                    borderTop: '1px dashed var(--border-color)',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <span style={{ fontSize: '0.72rem', color: '#25d366', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                    💬 İletilen WhatsApp Mesajı:
+                  </span>
+                  <div
+                    style={{
+                      background: 'rgba(37, 211, 102, 0.08)',
+                      borderLeft: '3px solid #25d366',
+                      padding: '7px 10px',
+                      borderRadius: '0 6px 6px 0',
+                      fontStyle: 'italic',
+                      lineHeight: 1.4
+                    }}
+                  >
+                    "{message}"
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Ana Hızlı Aksiyon & Yönlendirme Butonları */}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  navigate('/pipeline');
+                }}
+                className="btn btn-primary"
+                style={{
+                  flex: '1 1 180px',
+                  padding: '10px 14px',
+                  fontSize: '0.88rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  background: 'linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%)',
+                  boxShadow: '0 4px 14px rgba(79, 70, 229, 0.4)'
+                }}
+              >
+                <span>🎯 Satış Pipeline'ında Gör</span>
+                <FiArrowRight size={16} />
+              </button>
+
+              {activeCustomerId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    navigate(`/customers/${activeCustomerId}`);
+                  }}
+                  className="btn btn-secondary"
+                  style={{
+                    flex: '1 1 140px',
+                    padding: '10px 14px',
+                    fontSize: '0.84rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6
+                  }}
+                >
+                  <FiUser size={14} />
+                  <span>Müşteri Kartına Git</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => launchNativeWhatsApp(targetPhone, message)}
+                className="btn btn-secondary"
+                style={{
+                  padding: '10px 12px',
+                  fontSize: '0.82rem',
+                  color: '#25d366',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5
+                }}
+                title="WhatsApp uygulamasını tekrar aç"
+              >
+                <FiMessageSquare size={14} />
+                <span>Tekrar Aç</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-secondary"
+                style={{ padding: '10px 14px', fontSize: '0.84rem' }}
+              >
+                Kapat
+              </button>
+            </div>
+
+            {/* 5. Opsiyonel: Ek Firma Bilgilerini Düzenle Akordeonu */}
+            <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, overflow: 'hidden' }}>
+              <button
+                type="button"
+                onClick={() => setShowCustomerAccordion(!showCustomerAccordion)}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: 600
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <FiFileText size={14} style={{ color: '#c084fc' }} />
+                  Ek Müşteri Bilgilerini Tamamla (Vergi No, Filo vb.)
+                </span>
+                {showCustomerAccordion ? <FiChevronUp size={15} /> : <FiChevronDown size={15} />}
+              </button>
+
+              {showCustomerAccordion && (
+                <form onSubmit={handleSaveCustomerRecord} style={{ padding: '12px', background: 'var(--bg-input, #0f172a)', borderTop: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Vergi Numarası / TC</label>
+                      <input
+                        className="form-input"
+                        value={customerForm.tax_number}
+                        onChange={e => setCustomerForm({ ...customerForm, tax_number: e.target.value })}
+                        placeholder="Vergi No"
+                        style={{ fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Vergi Dairesi</label>
+                      <input
+                        className="form-input"
+                        value={customerForm.vergi_dairesi}
+                        onChange={e => setCustomerForm({ ...customerForm, vergi_dairesi: e.target.value })}
+                        placeholder="V. Dairesi"
+                        style={{ fontSize: '0.8rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 8 }}>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Mevcut Filo / Araçlar</label>
+                      <input
+                        className="form-input"
+                        value={customerForm.current_fleet}
+                        onChange={e => setCustomerForm({ ...customerForm, current_fleet: e.target.value })}
+                        placeholder="Örn: 3 adet Daily, 1 çekici"
+                        style={{ fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label" style={{ fontSize: '0.72rem' }}>Sektör</label>
+                      <input
+                        className="form-input"
+                        value={customerForm.sector}
+                        onChange={e => setCustomerForm({ ...customerForm, sector: e.target.value })}
+                        placeholder="Gıda, Nakliyat vb."
+                        style={{ fontSize: '0.8rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="form-label" style={{ fontSize: '0.72rem' }}>Müşteri Görüşme Notu</label>
+                    <textarea
+                      className="form-textarea"
+                      rows={2}
+                      value={customerForm.sales_notes}
+                      onChange={e => setCustomerForm({ ...customerForm, sales_notes: e.target.value })}
+                      placeholder="Görüşme notları..."
+                      style={{ fontSize: '0.8rem' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                    <button
+                      type="submit"
+                      disabled={savingCustomer}
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                    >
+                      <FiSave size={13} />
+                      <span>{savingCustomer ? 'Kaydediliyor...' : customerSaved ? 'Kaydedildi ✓' : 'Bilgileri Kaydet'}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         )}
       </div>
