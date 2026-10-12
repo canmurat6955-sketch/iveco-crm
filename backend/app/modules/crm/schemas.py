@@ -17,6 +17,7 @@ class CustomerCreate(BaseModel):
     district: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    landline_phone: Optional[str] = None  # Sabit hat / Ofis telefonu
     email: Optional[str] = None
     website: Optional[str] = None
     sector: Optional[str] = None
@@ -48,6 +49,7 @@ class CustomerUpdate(BaseModel):
     district: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    landline_phone: Optional[str] = None  # Sabit hat / Ofis telefonu
     email: Optional[str] = None
     website: Optional[str] = None
     sector: Optional[str] = None
@@ -81,6 +83,7 @@ class CustomerResponse(BaseModel):
     district: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
+    landline_phone: Optional[str] = None  # Sabit hat / Ofis telefonu
     email: Optional[str] = None
     website: Optional[str] = None
     sector: Optional[str] = None

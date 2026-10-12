@@ -595,7 +595,8 @@ def get_scanner_config(
 class CardScanResponse(BaseModel):
     contact_name: Optional[str] = None
     role: Optional[str] = None
-    phone: Optional[str] = None
+    phone: Optional[str] = None  # Cep telefonu (05xx) - WhatsApp yönlendirmesi için
+    landline_phone: Optional[str] = None  # Sabit hat / ofis (02xx, 03xx, 04xx, 0850)
     email: Optional[str] = None
     company_name: Optional[str] = None
     sector: Optional[str] = None
@@ -844,19 +845,37 @@ async def scan_card(
             if domain not in ["gmail.com", "hotmail.com", "yahoo.com", "outlook.com", "mail.com", "yandex.ru", "yandex.com", "mail.ru", "mynet.com"]:
                 website = f"www.{domain}"
 
-        # 3. Telefon numarası ayıkla (Türk cep veya sabit hat formatları)
-        phone_cands = re.findall(r'(?:\+90\s*|0\s*)?[2-5][0-9\s\(\)\.-]{8,14}[0-9]', ocr_text)
-        for cand in phone_cands:
+        # 3. Telefon numaralarını ayıkla (Cep telefonu vs. Sabit hat ayrımı)
+        # WhatsApp yönlendirmesi için 05xx ile başlayan cep telefonunu birincil (phone) yap,
+        # Varsa sabit hat (02xx, 03xx, 04xx, 0850) numarasını ayrı bir alanda (landline_phone) tut.
+        mobile_numbers = []
+        landline_numbers = []
+        seen_digits = set()
+
+        phone_cands = re.findall(r'(?:\+90[\s.-]*)?(?:\(?0?[2-58][0-9]{2}\)?[\s.-]*)?[0-9]{3}[\s.-]*[0-9]{2}[\s.-]*[0-9]{2}', ocr_text)
+        fallback_cands = re.findall(r'(?:\+90\s*|0\s*)?[2-58][0-9\s\(\)\.-]{7,16}[0-9]', ocr_text)
+        
+        for cand in (phone_cands + fallback_cands):
             digits = re.sub(r'\D', '', cand)
-            if len(digits) == 10 and digits.startswith(('5', '2', '3', '4')):
-                phone = f"0{digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]}"
-                break
-            elif len(digits) == 11 and digits.startswith('0'):
-                phone = f"{digits[:4]} {digits[4:7]} {digits[7:9]} {digits[9:11]}"
-                break
-            elif len(digits) == 12 and digits.startswith('90'):
-                phone = f"0{digits[2:5]} {digits[5:8]} {digits[8:10]} {digits[10:12]}"
-                break
+            if digits.startswith('90') and len(digits) >= 12:
+                digits = digits[2:]
+            if digits.startswith('0') and len(digits) >= 11:
+                digits = digits[1:]
+                
+            if len(digits) == 10:
+                if digits in seen_digits:
+                    continue
+                seen_digits.add(digits)
+                
+                formatted = f"0{digits[:3]} {digits[3:6]} {digits[6:8]} {digits[8:10]}"
+                if digits.startswith('5'):
+                    mobile_numbers.append(formatted)
+                elif digits.startswith(('2', '3', '4', '8')):
+                    landline_numbers.append(formatted)
+
+        # WhatsApp için cep telefonu önceliklidir
+        phone = mobile_numbers[0] if mobile_numbers else ""
+        landline_phone = landline_numbers[0] if landline_numbers else ""
 
         # 4. Firma, İsim ve Rol ayıklama kuralları (Akıllı Türkçe Kartvizit Ayrıştırma)
         COMMERCIAL_TERMS = [
@@ -1156,6 +1175,7 @@ async def scan_card(
             contact_name=contact_name or "",
             role=role or "",
             phone=phone or "",
+            landline_phone=landline_phone or "",
             email=email or "",
             company_name=company_name or "Yeni Müşteri Adayı",
             sector=detected_sector,

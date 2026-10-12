@@ -40,6 +40,7 @@ export default function CardScanner() {
   const [role, setRole] = useState('');
   const [sector, setSector] = useState('');
   const [phone, setPhone] = useState('');
+  const [landlinePhone, setLandlinePhone] = useState('');
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
   const [address, setAddress] = useState('');
@@ -116,6 +117,7 @@ export default function CardScanner() {
       setRole(data.role || '');
       setSector(data.sector || '');
       setPhone(data.phone || '');
+      setLandlinePhone(data.landline_phone || '');
       setEmail(data.email || '');
       setWebsite(data.website || '');
       setAddress(data.address || '');
@@ -214,6 +216,7 @@ export default function CardScanner() {
       const customerRes = await crmApi.createCustomer({
         company_name: companyName.trim(),
         phone: phone || null,
+        landline_phone: landlinePhone.trim() || null,
         email: email || null,
         website: website || null,
         address: address || null,
@@ -241,7 +244,7 @@ export default function CardScanner() {
           await crmApi.addContact(customerId, {
             contact_name: contactName.trim(),
             role: role || null,
-            phone: phone || null,
+            phone: phone || landlinePhone || null,
             email: email || null,
             notes: "Kartvizit taramasından gelen yetkili kişi.",
             is_primary: true
@@ -262,7 +265,11 @@ export default function CardScanner() {
   // ── YÖNLENDİRME 1: WhatsApp'a Yönlendir & Pipeline'a At (Önerilen) ──
   const handleRouteWhatsApp = async () => {
     if (!phone?.trim()) {
-      toast.error("WhatsApp yönlendirmesi için geçerli bir telefon numarası bulunmalıdır.");
+      if (landlinePhone?.trim()) {
+        toast.error(`WhatsApp yönlendirmesi için cep telefonu (05xx) gereklidir. Kartvizitte yalnızca sabit hat (${landlinePhone}) bulundu. Lütfen WhatsApp için cep numarası giriniz.`, { duration: 6000 });
+      } else {
+        toast.error("WhatsApp yönlendirmesi için geçerli bir cep telefonu numarası (05xx) bulunmalıdır.");
+      }
       return;
     }
 
@@ -294,6 +301,7 @@ export default function CardScanner() {
           company_name: companyName,
           contact_name: contactName,
           phone: phone,
+          landline_phone: landlinePhone,
           city: resolvedCity,
           district: resolvedDistrict
         },
@@ -599,13 +607,26 @@ export default function CardScanner() {
 
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <FiPhone size={13} style={{ color: '#25d366' }} /> Telefon Numarası *
+                <FiPhone size={13} style={{ color: '#25d366' }} /> Cep Telefonu (WhatsApp) {phone && phone.startsWith('05') ? '✓' : ''}
               </label>
               <input 
                 className="form-input" 
                 value={phone} 
                 onChange={e => setPhone(e.target.value)} 
-                placeholder="05xx xxx xx xx"
+                placeholder="05xx xxx xx xx (WhatsApp için)"
+                style={{ fontSize: '0.85rem' }}
+              />
+            </div>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiPhone size={13} style={{ color: '#38bdf8' }} /> Sabit Hat / Ofis No
+              </label>
+              <input 
+                className="form-input" 
+                value={landlinePhone} 
+                onChange={e => setLandlinePhone(e.target.value)} 
+                placeholder="02xx / 03xx / 04xx / 0850..."
                 style={{ fontSize: '0.85rem' }}
               />
             </div>

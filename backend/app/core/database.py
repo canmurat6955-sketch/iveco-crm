@@ -153,12 +153,18 @@ def import_all_models():
 
 
 def create_all_tables():
-    """Tabloları oluşturur; Postgres'te tr_norm SQL fonksiyonunu kurar."""
+    """Tabloları oluşturur; Postgres'te tr_norm SQL fonksiyonunu kurar; eksik sütunları güvenle ekler."""
     import_all_models()
     Base.metadata.create_all(bind=engine)
     if not is_sqlite:
         with engine.begin() as conn:
             conn.execute(text(PG_TR_NORM_SQL))
+    # customers tablosuna landline_phone sütununu güvenle ekle
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE customers ADD COLUMN landline_phone VARCHAR(50)"))
+    except Exception:
+        pass
 
 
 # Modelleri uygulama ilk ayağa kalkarken otomatik yükle

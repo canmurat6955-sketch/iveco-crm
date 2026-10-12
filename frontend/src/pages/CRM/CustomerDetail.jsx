@@ -390,6 +390,7 @@ export default function CustomerDetail() {
     setEditForm({
       company_name: customer.company_name || '',
       phone: customer.phone || '',
+      landline_phone: customer.landline_phone || '',
       email: customer.email || '',
       website: customer.website || '',
       address: customer.address || '',
@@ -690,7 +691,7 @@ export default function CustomerDetail() {
             <div>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>İletişim</div>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <FiPhone size={14} style={{ color: 'var(--accent-blue-light)' }} /> 
+                <FiPhone size={14} style={{ color: '#25d366' }} title="Cep Telefonu" /> 
                 {customer.phone ? (
                   <a
                     href={`tel:${customer.phone}`}
@@ -701,7 +702,20 @@ export default function CustomerDetail() {
                     {customer.phone}
                   </a>
                 ) : '—'}
+                {customer.phone && <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Cep / WhatsApp</span>}
               </p>
+              {customer.landline_phone && (
+                <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FiPhone size={14} style={{ color: '#38bdf8' }} title="Sabit Hat" />
+                  <a
+                    href={`tel:${customer.landline_phone}`}
+                    style={{ color: '#94a3b8', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    {customer.landline_phone}
+                  </a>
+                  <span className="badge badge-secondary" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Sabit Hat</span>
+                </p>
+              )}
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiMail size={14} style={{ color: 'var(--accent-amber)' }} /> {customer.email || '—'}</p>
               <p className="text-sm mb-4" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><FiGlobe size={14} style={{ color: 'var(--accent-green)' }} /> {customer.website || '—'}</p>
               <p className="text-sm" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1929,8 +1943,12 @@ export default function CustomerDetail() {
                 <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>İletişim Bilgileri</div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiPhone size={13} /> Telefon</label>
-                    <input className="form-input" value={editForm.phone || ''} onChange={e => handleEditChange('phone', e.target.value)} placeholder="0362 555 1234" />
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiPhone size={13} style={{ color: '#25d366' }} /> Cep Telefonu (WhatsApp)</label>
+                    <input className="form-input" value={editForm.phone || ''} onChange={e => handleEditChange('phone', e.target.value)} placeholder="05xx xxx xx xx" />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiPhone size={13} style={{ color: '#38bdf8' }} /> Sabit Hat / Ofis</label>
+                    <input className="form-input" value={editForm.landline_phone || ''} onChange={e => handleEditChange('landline_phone', e.target.value)} placeholder="02xx / 03xx / 04xx / 0850..." />
                   </div>
                   <div className="form-group">
                     <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FiMail size={13} /> E-posta</label>

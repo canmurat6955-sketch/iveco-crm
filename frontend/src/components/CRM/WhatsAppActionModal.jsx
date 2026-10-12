@@ -72,6 +72,7 @@ export default function WhatsAppActionModal({
     company_name: '',
     contact_name: '',
     phone: '',
+    landline_phone: '',
     city: '',
     district: '',
     sector: '',
@@ -124,6 +125,7 @@ export default function WhatsAppActionModal({
         company_name: customer.company_name || customer.name || '',
         contact_name: customer.contact_name || customer.contact_person || '',
         phone: customer.phone || '',
+        landline_phone: customer.landline_phone || '',
         city: customer.city || '',
         district: customer.district || '',
         sector: customer.sector || '',
@@ -149,6 +151,7 @@ export default function WhatsAppActionModal({
                 company_name: d.company_name || initialForm.company_name,
                 contact_name: d.contacts?.[0]?.contact_name || d.contacts?.[0]?.name || initialForm.contact_name,
                 phone: d.phone || initialForm.phone,
+                landline_phone: d.landline_phone || initialForm.landline_phone,
                 city: d.city || initialForm.city,
                 district: d.district || '',
                 sector: d.sector || '',
@@ -241,6 +244,7 @@ export default function WhatsAppActionModal({
           const createRes = await crmApi.createCustomer({
             company_name: compName,
             phone: targetPhone,
+            landline_phone: customerForm.landline_phone || customer.landline_phone || null,
             city: customerForm.city || customer.city || 'Samsun',
             district: customerForm.district || customer.district || '',
             sector: customerForm.sector || customer.sector || 'Ticari Araç Adayı',
@@ -526,7 +530,8 @@ export default function WhatsAppActionModal({
                 </div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                   {customerForm.contact_name && <span>👤 {customerForm.contact_name}</span>}
-                  {targetPhone && <span>📞 {targetPhone}</span>}
+                  {targetPhone && <span>📱 {targetPhone}</span>}
+                  {customerForm.landline_phone && <span>☎️ Sabit: {customerForm.landline_phone}</span>}
                   {customerForm.city && <span>📍 {customerForm.city} {customerForm.district ? `/ ${customerForm.district}` : ''}</span>}
                 </div>
               </div>
@@ -888,11 +893,19 @@ export default function WhatsAppActionModal({
                   </span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📱 Telefon:</span>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📱 Cep Telefonu (WhatsApp):</span>
                   <a href={`tel:${targetPhone}`} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#38bdf8', textDecoration: 'none' }}>
                     {targetPhone || '—'}
                   </a>
                 </div>
+                {customerForm.landline_phone && (
+                  <div>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>☎️ Sabit Hat / Ofis:</span>
+                    <a href={`tel:${customerForm.landline_phone}`} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#94a3b8', textDecoration: 'none' }}>
+                      {customerForm.landline_phone}
+                    </a>
+                  </div>
+                )}
                 <div>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block' }}>📍 Konum:</span>
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>

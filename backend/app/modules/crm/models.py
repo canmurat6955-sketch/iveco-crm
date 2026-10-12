@@ -22,6 +22,7 @@ class Customer(Base):
     district = Column(String(100), nullable=True)
     address = Column(Text, nullable=True)
     phone = Column(String(50), nullable=True, index=True)
+    landline_phone = Column(String(50), nullable=True)  # Sabit hat / Ofis / Santral
     email = Column(String(255), nullable=True)
     website = Column(String(500), nullable=True)
     sector = Column(String(200), nullable=True)
