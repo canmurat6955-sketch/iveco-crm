@@ -598,6 +598,7 @@ class CardScanResponse(BaseModel):
     phone: Optional[str] = None
     email: Optional[str] = None
     company_name: Optional[str] = None
+    sector: Optional[str] = None
     address: Optional[str] = None
     website: Optional[str] = None
     city: Optional[str] = "Samsun"
@@ -857,7 +858,23 @@ async def scan_card(
                 phone = f"0{digits[2:5]} {digits[5:8]} {digits[8:10]} {digits[10:12]}"
                 break
 
-        # 4. Firma, İsim ve Rol ayıklama kuralları
+        # 4. Firma, İsim ve Rol ayıklama kuralları (Akıllı Türkçe Kartvizit Ayrıştırma)
+        COMMERCIAL_TERMS = [
+            "ticaret", "ticareti", "tic", "komur", "komuru", "komurculuk", "maden", "madencilik",
+            "insaat", "yapi", "nakliyat", "nakliye", "lojistik", "tasimacilik", "tasima", "hafriyat",
+            "otomotiv", "oto", "galeri", "akaryakit", "petrol", "gida", "tarim", "hayvancilik",
+            "metal", "demir", "celik", "cimento", "beton", "hazir beton", "pazarlama", "tekstil",
+            "turizm", "seyahat", "kimya", "enerji", "makine", "makina", "elektrik", "elektronik",
+            "muhendislik", "mimarlik", "sanayi", "san", "imalat", "uretim", "dagitim", "kargo",
+            "kurye", "servis", "servisi", "yedek parca", "mobilya", "kereste", "orman", "unlu mamulleri",
+            "firin", "firini", "un", "yem", "gubre", "market", "magaza", "magazasi", "kasap", "manav",
+            "lokanta", "restaurant", "restoran", "otel", "pansiyon", "kuafor", "eczane", "poliklinik",
+            "hastane", "laboratuvar", "ltd", "sti", "sirketi", "as", "a.s.", "holding", "grup",
+            "grubu", "koop", "kooperatif", "subesi", "sube", "merkez", "merkezi", "bayi", "bayii",
+            "yetkili satici", "ithalat", "ihracat", "harfiyat", "ozel", "kamu", "belediye", "dernek", "vakif",
+            "yakacak", "odun", "pelet", "isi", "sogutma", "isitma", "hirdavat", "ambalaj", "kagit"
+        ]
+
         def clean_for_match(s: str) -> str:
             s = unicodedata.normalize("NFD", s)
             mappings = {
@@ -881,6 +898,18 @@ async def scan_card(
                     res_chars.append(char_lower)
             return "".join(res_chars).strip()
 
+        def contains_commercial_terms(text: str) -> bool:
+            """Metinde ticari/sektörel/şirket ifadesi var mı? Varsa şahıs adı olamaz!"""
+            t_norm = clean_for_match(text)
+            tokens = re.findall(r'[a-zçğıöşü]+', t_norm)
+            for tok in tokens:
+                if tok in COMMERCIAL_TERMS:
+                    return True
+                for ct in COMMERCIAL_TERMS:
+                    if len(ct) >= 4 and (tok.startswith(ct) or tok.endswith(ct) or ct in tok):
+                        return True
+            return False
+
         def is_address_line(line_str: str) -> bool:
             line_lower = clean_for_match(line_str)
             address_keywords = [
@@ -892,7 +921,6 @@ async def scan_card(
             
             if re.search(r'\b\d{5}\b', line_lower):
                 return True
-            
             if re.search(r'\bno\s*:\s*\d+', line_lower) or re.search(r'\b\d+/\d+\b', line_lower) or re.search(r'\bno\s*\d+\b', line_lower):
                 return True
                 
@@ -916,7 +944,8 @@ async def scan_card(
                 "mudur", "yonetici", "sef", "sorumlu", "temsilci", "kurucu", "ceo", "muhendis", 
                 "danisman", "baskan", "uzman", "founder", "manager", "director", "coordinator", 
                 "koordinator", "muhasebe", "pazarlama", "satis", "operasyon", "insan kaynaklari", 
-                "satinalma", "satin alma", "yetkili", "amir", "amiri", "memur", "memuru", "danismani"
+                "satinalma", "satin alma", "yetkili", "amir", "amiri", "memur", "memuru", "danismani",
+                "firma sahibi", "ortak", "genel mudur", "teknik mudur", "yonetim kurulu"
             ]
             for r_kw in role_keywords:
                 if r_kw in line_lower:
@@ -926,6 +955,9 @@ async def scan_card(
         def is_company_line(line_str: str, is_addr: bool) -> bool:
             if is_addr:
                 return False
+            # Eğer ticari faaliyet kelimesi içeriyorsa (örn: Kömür Ticareti, Hafriyat) kesinlikle şirket/faaliyet satırıdır
+            if contains_commercial_terms(line_str):
+                return True
             line_lower = clean_for_match(line_str)
             company_suffixes = [
                 "a.s.", "as.", "ltd", "sti", "sirketi", "holding", "grup", "grubu", "as"
@@ -933,36 +965,30 @@ async def scan_card(
             for suff in company_suffixes:
                 if re.search(r'\b' + re.escape(suff) + r'\b', line_lower) or line_lower.endswith(suff):
                     return True
-            
-            sector_keywords = [
-                "otomotiv", "lojistik", "nakliyat", "nakliye", "tasimacilik", "insaat", "yapi", 
-                "petrol", "akaryakit", "servis", "gida", "tarim", "metal", "demir", "celik", 
-                "cimento", "beton", "pazarlama", "tekstil", "turizm", "kimya", "maden", "enerji", 
-                "makine", "elektrik", "elektronik", "muhendislik", "mimarlik", "iletisim", "bilisim", 
-                "yazilim", "teknoloji", "hizmet", "hizmetleri", "ticaret", "sanayi", "san", "tic", 
-                "ithalat", "ihracat", "kargo", "kurye", "dagitim", "hafriyat", "tasima", "uretim", "imalat"
-            ]
-            for sk in sector_keywords:
-                if re.search(r'\b' + re.escape(sk) + r'\b', line_lower):
-                    if len(line_str.split()) >= 2:
-                        return True
             return False
 
         def is_contact_name_line(line_str: str, is_addr: bool, is_role: bool, is_comp: bool) -> bool:
             if is_addr or is_role or is_comp:
                 return False
+            # KRİTİK KONTROL: Ticari/sektörel kelime içeren hiçbir satır ŞAHIS ADI OLAMAZ!
+            # (Örn: 'Kömür Ticareti', 'Hafriyat Nakliyat', 'Sezer Ticaret' asla şahıs adı değildir!)
+            if contains_commercial_terms(line_str):
+                return False
+
             line_lower = clean_for_match(line_str)
-            if any(x in line_lower for x in ["@", "www.", ".com", "tel:", "gsm:", "fax:", "phone:", "web:"]):
+            if any(x in line_lower for x in ["@", "www.", ".com", "tel:", "gsm:", "fax:", "phone:", "web:", "no:", "kat:"]):
                 return False
             words = line_str.split()
             if not (2 <= len(words) <= 4):
                 return False
             
             for w in words:
-                w_clean = w.rstrip(".,;:").lstrip(".,;:")
+                w_clean = clean_for_match(w.rstrip(".,;:").lstrip(".,;:"))
                 if not w_clean:
                     continue
-                if not re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w_clean):
+                if w_clean in COMMERCIAL_TERMS or contains_commercial_terms(w_clean):
+                    return False
+                if not re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w.rstrip(".,;:")):
                     return False
             
             is_title_case = all(w[0].isupper() for w in words if w and w[0].isalpha())
@@ -971,6 +997,32 @@ async def scan_card(
                 return False
                 
             return True
+
+        def detect_sector(full_text: str) -> str:
+            t = clean_for_match(full_text)
+            if "komur" in t or "yakacak" in t or "odun" in t or "pelet" in t:
+                return "Kömür / Yakacak / Maden"
+            if "hafriyat" in t or "harfiyat" in t:
+                return "Hafriyat / İnşaat"
+            if "nakliyat" in t or "nakliye" in t or "lojistik" in t or "tasimacilik" in t:
+                return "Nakliyat / Lojistik"
+            if "insaat" in t or "yapi" in t or "cimento" in t or "beton" in t:
+                return "İnşaat / Malzeme"
+            if "akaryakit" in t or "petrol" in t:
+                return "Akaryakıt / Enerji"
+            if "gida" in t or "market" in t or "unlu mamul" in t:
+                return "Gıda / Toptan"
+            if "tarim" in t or "hayvancilik" in t or "yem" in t or "gubre" in t:
+                return "Tarım / Hayvancılık"
+            if "otomotiv" in t or "servis" in t or "yedek parca" in t:
+                return "Otomotiv / Servis"
+            if "demir" in t or "celik" in t or "metal" in t:
+                return "Demir Çelik / Metal"
+            if "mobilya" in t or "ahsap" in t or "kereste" in t:
+                return "Mobilya / Orman Ürünleri"
+            if "tekstil" in t or "giyim" in t:
+                return "Tekstil / Konfeksiyon"
+            return "Ticari Araç Adayı"
 
         processed_lines = []
         for line in lines:
@@ -994,27 +1046,10 @@ async def scan_card(
         name_lines = []
         unclassified_lines = []
 
-        company_candidates = []
-        for idx, line in enumerate(processed_lines):
-            is_addr = is_address_line(line)
-            is_comp = is_company_line(line, is_addr)
-            if is_comp:
-                if idx > 0:
-                    prev_line = processed_lines[idx - 1]
-                    prev_is_addr = is_address_line(prev_line)
-                    prev_is_role = is_role_line(prev_line)
-                    prev_is_comp = is_company_line(prev_line, prev_is_addr)
-                    prev_is_name = is_contact_name_line(prev_line, prev_is_addr, prev_is_role, prev_is_comp)
-                    
-                    if not (prev_is_addr or prev_is_role or prev_is_name or prev_is_comp):
-                        company_candidates.append(f"{prev_line} {line}")
-                        continue
-                company_candidates.append(line)
-
         for line in processed_lines:
             is_addr = is_address_line(line)
             is_role = is_role_line(line)
-            is_comp = is_company_line(line, is_addr) or any(line in cc for cc in company_candidates)
+            is_comp = is_company_line(line, is_addr)
             is_name = is_contact_name_line(line, is_addr, is_role, is_comp)
             
             if is_addr:
@@ -1028,24 +1063,32 @@ async def scan_card(
             else:
                 unclassified_lines.append(line)
 
-        # Resolve Contact Name
+        # ── AKILLI MARKA + TİCARİ FAALİYET BİRLEŞTİRME ──
+        # Örnek: Satır 1: "SEZER" (unclassified), Satır 2: "KÖMÜR TİCARETİ" (company_line)
+        # Bu iki satır birleşerek "SEZER KÖMÜR TİCARETİ" firma adını oluşturur!
+        for idx, line in enumerate(processed_lines):
+            if line in company_lines and idx > 0:
+                prev_line = processed_lines[idx - 1]
+                if prev_line not in address_lines and prev_line not in role_lines and prev_line not in name_lines:
+                    merged = f"{prev_line} {line}"
+                    if merged not in company_lines:
+                        company_lines.insert(0, merged)
+                    if prev_line in unclassified_lines:
+                        unclassified_lines.remove(prev_line)
+
+        # Resolve Contact Name strictly (Şahıs adında ticari kelime olamaz!)
+        contact_name = ""
         if name_lines:
             contact_name = name_lines[0]
         else:
-            candidate_name = None
+            # Unclassified satırlardan gerçek şahıs adı ara
             for u_line in unclassified_lines:
-                words = u_line.split()
-                if 2 <= len(words) <= 3 and all(re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w.rstrip(".,;:")) for w in words):
-                    candidate_name = u_line
-                    break
-            if candidate_name:
-                contact_name = candidate_name
-                if candidate_name in unclassified_lines:
-                    unclassified_lines.remove(candidate_name)
-            elif processed_lines:
-                first_line = processed_lines[0]
-                if first_line not in address_lines and first_line not in role_lines and first_line not in company_lines:
-                    contact_name = first_line
+                if not contains_commercial_terms(u_line) and not is_role_line(u_line) and not is_address_line(u_line):
+                    words = u_line.split()
+                    if 2 <= len(words) <= 3 and all(re.match(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\-]+$', w.rstrip(".,;:")) for w in words):
+                        contact_name = u_line
+                        unclassified_lines.remove(u_line)
+                        break
 
         # Resolve Email Domain for Company Check
         email_domain_name = None
@@ -1057,9 +1100,7 @@ async def scan_card(
                     email_domain_name = dom
 
         # Resolve Company Name
-        if company_candidates:
-            company_name = company_candidates[0]
-        elif company_lines:
+        if company_lines:
             company_name = company_lines[0]
         elif email_domain_name:
             dom_candidate = None
@@ -1081,11 +1122,13 @@ async def scan_card(
                 if email_domain_name:
                     company_name = email_domain_name.capitalize() + " Ltd. Şti."
                 else:
-                    company_name = "Yeni Firma Ltd. Şti."
+                    company_name = "Yeni Müşteri Adayı"
 
         # Resolve Role
         if role_lines:
             role = role_lines[0]
+        else:
+            role = "Yetkili" if contact_name else ""
 
         # Resolve Address
         if address_lines:
@@ -1103,14 +1146,19 @@ async def scan_card(
             else:
                 address = ""
 
+        # Sektörü akıllı analiz et
+        full_card_text = " ".join(processed_lines)
+        detected_sector = detect_sector(f"{company_name} {full_card_text}")
+
         lat, lon, det_city, det_dist = await geocode_address_smart(address)
 
         return CardScanResponse(
-            contact_name=contact_name or "Müşteri Yetkilisi",
-            role=role or "Yetkili",
+            contact_name=contact_name or "",
+            role=role or "",
             phone=phone or "",
             email=email or "",
-            company_name=company_name or "Yeni Firma Ltd. Şti.",
+            company_name=company_name or "Yeni Müşteri Adayı",
+            sector=detected_sector,
             address=address or "",
             website=website or "",
             city=det_city or "Samsun",

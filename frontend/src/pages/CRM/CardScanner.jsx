@@ -5,7 +5,7 @@ import {
   FiCamera, FiUpload, FiCheck, FiX, FiUser, FiBriefcase, 
   FiPhone, FiMail, FiLayers, FiMapPin, FiSend, FiFileText, 
   FiArrowRight, FiExternalLink, FiTruck, FiClock, FiCompass,
-  FiZap, FiRefreshCw, FiCheckCircle
+  FiZap, FiRefreshCw, FiCheckCircle, FiTag
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { duplicateDetection } from '../../services/duplicateDetection';
@@ -20,12 +20,12 @@ const PIPELINE_STAGES = [
 ];
 
 const COMMON_VEHICLES = [
-  'Daily 35S14 Panelvan',
-  'Daily 50C16 Kamyonet',
-  'Daily 70C18 Şasi',
-  'Eurocargo 150E25',
-  'Eurocargo 180E32',
-  'S-Way Çekici'
+  'Daily Şasi',
+  'Daily Panelvan',
+  'Daily 72C',
+  'Eurocargo',
+  'S-Way',
+  'T-Way'
 ];
 
 export default function CardScanner() {
@@ -38,6 +38,7 @@ export default function CardScanner() {
   const [companyName, setCompanyName] = useState('');
   const [contactName, setContactName] = useState('');
   const [role, setRole] = useState('');
+  const [sector, setSector] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [website, setWebsite] = useState('');
@@ -46,7 +47,7 @@ export default function CardScanner() {
   
   // Yönlendirme & Satış Tercihleri
   const [pipelineStage, setPipelineStage] = useState('contact');
-  const [selectedVehicle, setSelectedVehicle] = useState('Daily 35S14 Panelvan');
+  const [selectedVehicle, setSelectedVehicle] = useState('Daily Şasi');
   const [salesNote, setSalesNote] = useState('');
   const [routingInProgress, setRoutingInProgress] = useState(false);
   const [actionType, setActionType] = useState(null); // 'whatsapp', 'pipeline', 'proforma', 'customer'
@@ -88,10 +89,32 @@ export default function CardScanner() {
       const res = await scannerApi.scanCard(selectedFile);
       const data = res.data;
       
+      const COMMERCIAL_KEYWORDS = [
+        'ticaret', 'ticareti', 'sanayi', 'ltd', 'şti', 'aş', 'a.ş', 'holding',
+        'kömür', 'nakliyat', 'hafriyat', 'inşaat', 'insaat', 'otomotiv', 'petrol',
+        'lojistik', 'taşımacılık', 'gıda', 'tekstil', 'turizm', 'madencilik', 'tarım',
+        'pazarlama', 'ithalat', 'ihracat', 'şirketi', 'servis', 'hizmetleri'
+      ];
+
+      let finalCompany = data.company_name || '';
+      let finalContact = data.contact_name || '';
+
+      // Akıllı analiz kontrolü: Faaliyet/ticaret adı yetkili kişi olamaz!
+      if (finalContact) {
+        const isCommercial = COMMERCIAL_KEYWORDS.some(kw => finalContact.toLowerCase().includes(kw));
+        if (isCommercial) {
+          if (!finalCompany.toLowerCase().includes(finalContact.toLowerCase())) {
+            finalCompany = finalCompany ? `${finalCompany} ${finalContact}` : finalContact;
+          }
+          finalContact = '';
+        }
+      }
+
       setResult(data);
-      setCompanyName(data.company_name || '');
-      setContactName(data.contact_name || '');
+      setCompanyName(finalCompany);
+      setContactName(finalContact);
       setRole(data.role || '');
+      setSector(data.sector || '');
       setPhone(data.phone || '');
       setEmail(data.email || '');
       setWebsite(data.website || '');
@@ -196,7 +219,7 @@ export default function CardScanner() {
         address: address || null,
         city: resolvedCity || "Samsun",
         district: resolvedDistrict || "Tekkeköy",
-        sector: role ? `${role} / Ticari Araç` : "Ticari Araç Adayı",
+        sector: sector.trim() || (role ? `${role} / Ticari Araç` : "Ticari Araç Adayı"),
         current_fleet: selectedVehicle ? `İlgilenilen: ${selectedVehicle}` : '',
         segment: "B",
         potential_level: "high",
@@ -257,7 +280,11 @@ export default function CardScanner() {
 
       toast.success("Müşteri kaydedildi ve WhatsApp Bilgi Kartı açılıyor! 🎯", { id: 'route_load' });
 
-      const defaultMsg = `Sayın ${contactName || companyName}, tanıştığımıza çok memnun olduk. IVECO ${selectedVehicle || 'ticari araçlarımız'} hakkındaki görüşmemize istinaden iletişime geçiyorum.`;
+      const greeting = contactName.trim()
+        ? `Sayın ${contactName} (${companyName})`
+        : `Sayın ${companyName} Yetkilisi`;
+
+      const defaultMsg = `${greeting}, tanıştığımıza çok memnun olduk. IVECO ${selectedVehicle || 'ticari araçlarımız'} hakkındaki görüşmemize istinaden iletişime geçiyorum.`;
 
       // WhatsApp modali ve yönlendirmesini tetikle
       openWhatsApp(phone, defaultMsg, {
@@ -592,6 +619,19 @@ export default function CardScanner() {
                 value={role} 
                 onChange={e => setRole(e.target.value)} 
                 placeholder="Örn: Satın Alma Müdürü / Genel Müdür"
+                style={{ fontSize: '0.85rem' }}
+              />
+            </div>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiTag size={13} style={{ color: '#38bdf8' }} /> Sektör / Faaliyet Alanı
+              </label>
+              <input 
+                className="form-input" 
+                value={sector} 
+                onChange={e => setSector(e.target.value)} 
+                placeholder="Örn: Kömür / Yakacak / Maden"
                 style={{ fontSize: '0.85rem' }}
               />
             </div>

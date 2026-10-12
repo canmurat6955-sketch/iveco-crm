@@ -28,6 +28,15 @@ const STAGE_LABELS = {
   lost: '❌ Kaybedildi'
 };
 
+const IVECO_MODELS = [
+  'Daily Şasi',
+  'Daily Panelvan',
+  'Daily 72C',
+  'Eurocargo',
+  'S-Way',
+  'T-Way'
+];
+
 export default function WhatsAppActionModal({
   isOpen,
   onClose,
@@ -45,6 +54,7 @@ export default function WhatsAppActionModal({
 
   // Pipeline & Satış Aktivite State'leri
   const [pipelineStage, setPipelineStage] = useState('proposal');
+  const [selectedVehicle, setSelectedVehicle] = useState(vehicleTitle || 'Daily Şasi');
   const [status, setStatus] = useState(defaultStatus); // 'offer_given', 'sent', 'follow_up'
   const [message, setMessage] = useState('');
   const [internalNote, setInternalNote] = useState('');
@@ -79,6 +89,8 @@ export default function WhatsAppActionModal({
       setCreatedCustomerId(null);
       setShowCustomerAccordion(false);
 
+      setSelectedVehicle(vehicleTitle || 'Daily Şasi');
+
       // Default follow-up: 3 gün sonra
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate() + 3);
@@ -93,7 +105,8 @@ export default function WhatsAppActionModal({
       setStatus(defaultStatus);
 
       // WhatsApp Mesajı ve Dahili Not
-      const vText = vehicleTitle ? `IVECO ${vehicleTitle}` : 'IVECO ticari araç';
+      const curVeh = vehicleTitle || 'Daily Şasi';
+      const vText = `IVECO ${curVeh}`;
       if (defaultMessage) {
         setMessage(defaultMessage);
       } else {
@@ -103,9 +116,7 @@ export default function WhatsAppActionModal({
       }
 
       setInternalNote(
-        vehicleTitle 
-          ? `${vehicleTitle} aracı için WhatsApp üzerinden resmi teklif yönlendirildi.`
-          : 'Müşteriye WhatsApp üzerinden görüşme/teklif yönlendirildi.'
+        `${curVeh} aracı için WhatsApp üzerinden resmi teklif/görüşme yönlendirildi.`
       );
 
       // Müşteri form başlangıç verileri
@@ -118,7 +129,7 @@ export default function WhatsAppActionModal({
         sector: customer.sector || '',
         tax_number: customer.tax_number || '',
         vergi_dairesi: customer.vergi_dairesi || '',
-        current_fleet: customer.current_fleet || (vehicleTitle ? `İlgilenilen: ${vehicleTitle}` : ''),
+        current_fleet: customer.current_fleet || `İlgilenilen: ${curVeh}`,
         segment: customer.segment || '',
         sales_notes: customer.sales_notes || ''
       };
@@ -158,8 +169,24 @@ export default function WhatsAppActionModal({
 
   const activeCustomerId = createdCustomerId || customer.id || customer.customer_id;
 
+  const handleSelectModel = (model) => {
+    setSelectedVehicle(model);
+    setCustomerForm(prev => ({
+      ...prev,
+      current_fleet: `İlgilenilen: ${model}`
+    }));
+    setInternalNote(`${model} aracı için WhatsApp üzerinden görüşme/teklif yönlendirildi.`);
+    const compName = customerForm.company_name || customer.company_name || 'Yetkili';
+    if (pipelineStage === 'proposal') {
+      setMessage(`Sayın ${compName}, firmanız için ilgilendiğiniz IVECO ${model} modelimizle ilgili özel fiyat teklifimizi hazırladık. Detayları inceleyip değerlendirmenizi rica ederiz.`);
+    } else {
+      setMessage(`Sayın ${compName}, tanıştığımıza çok memnun olduk. IVECO ${model} modelimiz hakkındaki görüşmemize istinaden iletişime geçiyorum.`);
+    }
+  };
+
   const selectTemplate = (type) => {
-    const vText = vehicleTitle ? `IVECO ${vehicleTitle}` : 'IVECO ticari araç';
+    const curVeh = selectedVehicle || vehicleTitle || 'Daily Şasi';
+    const vText = `IVECO ${curVeh}`;
     if (type === 'teklif') {
       setStatus('offer_given');
       setPipelineStage('proposal');
@@ -168,12 +195,12 @@ export default function WhatsAppActionModal({
     } else if (type === 'katalog') {
       setStatus('sent');
       setPipelineStage('contact');
-      setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, IVECO ${vText} güncel ürün broşürünü, teknik özelliklerini ve avantajlı bayi finansman koşullarını bilginize sunuyoruz.`);
+      setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, ${vText} güncel ürün broşürünü, teknik özelliklerini ve avantajlı bayi finansman koşullarını bilginize sunuyoruz.`);
       setInternalNote(`${vText} ürün kataloğu ve teknik verileri gönderildi.`);
     } else if (type === 'kampanya') {
       setStatus('sent');
       setPipelineStage('contact');
-      setMessage(`Merhaba! IVECO ${vText} araçlarımızda bu aya özel düşük faiz ve takas destekli bayi kampanyamız başlamıştır. Stoktaki hemen teslim araçlarımız için detaylı bilgi alabilirsiniz.`);
+      setMessage(`Merhaba! ${vText} araçlarımızda bu aya özel düşük faiz ve takas destekli bayi kampanyamız başlamıştır. Stoktaki hemen teslim araçlarımız için detaylı bilgi alabilirsiniz.`);
       setInternalNote('Özel finansman ve takas kampanyası bilgisi paylaşıldı.');
     } else if (type === 'takip') {
       setStatus('follow_up');
@@ -219,7 +246,7 @@ export default function WhatsAppActionModal({
             sector: customerForm.sector || customer.sector || 'Ticari Araç Adayı',
             tax_number: customerForm.tax_number || customer.tax_number || '',
             vergi_dairesi: customerForm.vergi_dairesi || customer.vergi_dairesi || '',
-            current_fleet: customerForm.current_fleet || (vehicleTitle ? `İlgilenilen: ${vehicleTitle}` : ''),
+            current_fleet: customerForm.current_fleet || (selectedVehicle || vehicleTitle ? `İlgilenilen: ${selectedVehicle || vehicleTitle}` : ''),
             segment: customerForm.segment || null,
             sales_notes: pNote,
             pipeline_stage: pStage,
@@ -503,9 +530,9 @@ export default function WhatsAppActionModal({
                   {customerForm.city && <span>📍 {customerForm.city} {customerForm.district ? `/ ${customerForm.district}` : ''}</span>}
                 </div>
               </div>
-              {vehicleTitle && (
+              {(selectedVehicle || vehicleTitle) && (
                 <div className="badge badge-amber" style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <FiTruck size={13} /> {vehicleTitle}
+                  <FiTruck size={13} /> {selectedVehicle || vehicleTitle}
                 </div>
               )}
             </div>
@@ -548,6 +575,40 @@ export default function WhatsAppActionModal({
                   >
                     <span>{st.emoji}</span>
                     <span>{st.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* IVECO Model Seçimi (Hızlı Seçim) */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiTruck size={14} style={{ color: '#fbbf24' }} /> İlgilenilen IVECO Modeli:
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                {IVECO_MODELS.map(m => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => handleSelectModel(m)}
+                    style={{
+                      padding: '7px 8px',
+                      borderRadius: 8,
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      border: (selectedVehicle === m) ? '2px solid #fbbf24' : '1px solid var(--border-color)',
+                      background: (selectedVehicle === m) ? 'rgba(251, 191, 36, 0.2)' : 'var(--bg-card)',
+                      color: (selectedVehicle === m) ? '#fbbf24' : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <FiTruck size={12} />
+                    <span>{m}</span>
                   </button>
                 ))}
               </div>
