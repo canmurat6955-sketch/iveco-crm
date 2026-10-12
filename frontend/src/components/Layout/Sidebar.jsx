@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -60,6 +60,10 @@ export default function Sidebar() {
 
         <div className="nav-section">
           <div className="nav-section-title">Satış</div>
+          <NavLink to="/scan-card" className={`nav-item ${isActive('/scan-card') ? 'active' : ''}`}>
+            <span className="nav-icon" style={{ color: '#ec4899' }}><FiCamera size={18} /></span>
+            Kartvizit Tara & Yönlendir
+          </NavLink>
           <NavLink to="/sales" className={`nav-item ${isActive('/sales') ? 'active' : ''}`}>
             <span className="nav-icon"><FiActivity size={18} /></span>
             Satış Takip

@@ -6,7 +6,8 @@ import { openWhatsApp as triggerWhatsApp } from '../../utils/whatsapp';
 import PipelineOpportunityModal from '../../components/CRM/PipelineOpportunityModal';
 import { 
   FiPhone, FiMapPin, FiArrowRight, FiMessageSquare, 
-  FiChevronDown, FiChevronUp, FiSearch, FiRefreshCw, FiTruck, FiPlus 
+  FiChevronDown, FiChevronUp, FiSearch, FiRefreshCw, FiTruck, FiPlus,
+  FiCamera
 } from 'react-icons/fi';
 
 const TARGET_PROVINCES = [
@@ -117,6 +118,24 @@ export default function Pipeline() {
             title="Yenile"
           >
             <FiRefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Yenile
+          </button>
+          <button 
+            type="button" 
+            onClick={() => navigate('/scan-card')} 
+            className="btn btn-secondary btn-sm"
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 6, 
+              padding: '5px 12px', 
+              fontSize: '0.8rem', 
+              fontWeight: 700,
+              border: '1px solid rgba(236, 72, 153, 0.45)',
+              color: '#f472b6',
+              background: 'rgba(236, 72, 153, 0.1)'
+            }}
+          >
+            <FiCamera size={14} /> Kartvizit Tara & Fırsat Aç
           </button>
           <button 
             type="button" 

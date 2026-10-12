@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import useGeolocation from '../../hooks/useGeolocation';
 import { 
   FiZap, FiMapPin, FiSearch, FiNavigation, FiPlus, 
-  FiCompass, FiTruck, FiUsers, FiClock, FiAlertCircle 
+  FiCompass, FiTruck, FiUsers, FiClock, FiAlertCircle,
+  FiCamera
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -283,10 +284,43 @@ export default function FieldAssistantHero({
       <div 
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
           gap: 10
         }}
       >
+        <button
+          type="button"
+          onClick={() => navigate('/scan-card')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            padding: '12px 10px',
+            borderRadius: 12,
+            background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.16) 0%, rgba(219, 39, 119, 0.28) 100%)',
+            border: '1px solid rgba(236, 72, 153, 0.45)',
+            color: '#f8fafc',
+            cursor: 'pointer',
+            transition: 'transform 0.15s ease, background 0.15s ease'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(236, 72, 153, 0.28) 0%, rgba(219, 39, 119, 0.4) 100%)';
+            e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.7)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(236, 72, 153, 0.16) 0%, rgba(219, 39, 119, 0.28) 100%)';
+            e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.45)';
+          }}
+        >
+          <div style={{ color: '#f472b6' }}><FiCamera size={22} /></div>
+          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f472b6' }}>Kartvizit Tara</span>
+          <span style={{ fontSize: '0.68rem', color: '#fbcfe8' }}>Kamera & Yönlendir</span>
+        </button>
+
         <button
           type="button"
           onClick={() => navigate('/customers')}

@@ -53,6 +53,14 @@ export default function BottomNav({ onVisitStart }) {
               
               <button 
                 className="more-menu-item" 
+                onClick={() => { navigate('/scan-card'); setShowMoreMenu(false); }} 
+                style={{ fontWeight: 'bold', color: '#f472b6', background: 'rgba(236, 72, 153, 0.15)', border: '1px solid rgba(236, 72, 153, 0.3)' }}
+              >
+                🎴 Kartvizit Tara & Yönlendir (Kamera)
+              </button>
+
+              <button 
+                className="more-menu-item" 
                 onClick={() => { navigate('/workbench'); setShowMoreMenu(false); }} 
                 style={{ fontWeight: 'bold', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.12)' }}
               >

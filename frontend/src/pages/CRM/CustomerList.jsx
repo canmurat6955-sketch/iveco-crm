@@ -4,7 +4,8 @@ import { crmApi, vehiclesApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { 
   FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, 
-  FiUsers, FiZap, FiTruck, FiPhone, FiMessageSquare, FiNavigation, FiMapPin, FiChevronRight 
+  FiUsers, FiZap, FiTruck, FiPhone, FiMessageSquare, FiNavigation, FiMapPin, FiChevronRight,
+  FiCamera
 } from 'react-icons/fi';
 import { openWhatsApp } from '../../utils/whatsapp';
 import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
@@ -372,6 +373,22 @@ export default function CustomerList() {
             </>
           )}
           <button className="btn btn-secondary" onClick={() => navigate('/customers/import')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><FiDownload size={16} /> İçe Aktar</button>
+          <button 
+            type="button"
+            className="btn btn-secondary" 
+            onClick={() => navigate('/scan-card')} 
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 6,
+              border: '1px solid rgba(236, 72, 153, 0.45)',
+              color: '#f472b6',
+              background: 'rgba(236, 72, 153, 0.1)',
+              fontWeight: 700
+            }}
+          >
+            <FiCamera size={16} /> Kartvizit Tara
+          </button>
           <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><FiPlus size={16} /> Yeni Müşteri</button>
         </div>
       </div>

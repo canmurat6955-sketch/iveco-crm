@@ -1,20 +1,39 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { scannerApi, crmApi } from '../../api/client';
-import { FiCamera, FiUpload, FiCheck, FiX, FiUser, FiBriefcase, FiPhone, FiMail, FiLayers, FiMapPin } from 'react-icons/fi';
+import { 
+  FiCamera, FiUpload, FiCheck, FiX, FiUser, FiBriefcase, 
+  FiPhone, FiMail, FiLayers, FiMapPin, FiSend, FiFileText, 
+  FiArrowRight, FiExternalLink, FiTruck, FiClock, FiCompass,
+  FiZap, FiRefreshCw, FiCheckCircle
+} from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { duplicateDetection } from '../../services/duplicateDetection';
-import { useEffect } from 'react';
+import VoiceInputButton from '../../components/common/VoiceInputButton';
+import { openWhatsApp } from '../../utils/whatsapp';
 
+const PIPELINE_STAGES = [
+  { key: 'lead', label: 'Lead', emoji: '🎯', color: '#818cf8' },
+  { key: 'contact', label: 'İlk Görüşme', emoji: '📞', color: '#38bdf8' },
+  { key: 'proposal', label: 'Teklif', emoji: '📋', color: '#fbbf24' },
+  { key: 'negotiation', label: 'Pazarlık', emoji: '🤝', color: '#fb923c' },
+];
 
-
+const COMMON_VEHICLES = [
+  'Daily 35S14 Panelvan',
+  'Daily 50C16 Kamyonet',
+  'Daily 70C18 Şasi',
+  'Eurocargo 150E25',
+  'Eurocargo 180E32',
+  'S-Way Çekici'
+];
 
 export default function CardScanner() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [scanning, setScanning] = useState(false);
   
-  // OCR Sonuç Formu
+  // OCR Ayrıştırılmış Form State'leri
   const [result, setResult] = useState(null);
   const [companyName, setCompanyName] = useState('');
   const [contactName, setContactName] = useState('');
@@ -25,6 +44,13 @@ export default function CardScanner() {
   const [address, setAddress] = useState('');
   const [allCrmCustomers, setAllCrmCustomers] = useState([]);
   
+  // Yönlendirme & Satış Tercihleri
+  const [pipelineStage, setPipelineStage] = useState('contact');
+  const [selectedVehicle, setSelectedVehicle] = useState('Daily 35S14 Panelvan');
+  const [salesNote, setSalesNote] = useState('');
+  const [routingInProgress, setRoutingInProgress] = useState(false);
+  const [actionType, setActionType] = useState(null); // 'whatsapp', 'pipeline', 'proforma', 'customer'
+
   // Konum Ayrıştırma State'leri
   const [locationMode, setLocationMode] = useState('gps');
   const [latitude, setLatitude] = useState('');
@@ -42,14 +68,13 @@ export default function CardScanner() {
       .catch(() => {});
   }, []);
 
-
   const handleFileChange = (e, isCamera = false) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     setFile(selectedFile);
     setPreview(URL.createObjectURL(selectedFile));
-    setResult(null); // Eski sonuçları temizle
+    setResult(null);
 
     // Taramayı otomatik başlat
     startScan(selectedFile);
@@ -57,7 +82,7 @@ export default function CardScanner() {
 
   const startScan = async (selectedFile) => {
     setScanning(true);
-    toast.loading("AI OCR kartviziti analiz ediyor ve bilgileri ayrıştırıyor...", { id: 'ocr_load' });
+    toast.loading("Yapay zekâ kartviziti inceliyor ve bilgileri ayrıştırıyor...", { id: 'ocr_load' });
     
     try {
       const res = await scannerApi.scanCard(selectedFile);
@@ -72,7 +97,7 @@ export default function CardScanner() {
       setWebsite(data.website || '');
       setAddress(data.address || '');
 
-      // Backend'in akıllı çözdüğü konum ve koordinatları ata
+      // Konum ve koordinatları ata
       if (data.city) setResolvedCity(data.city);
       if (data.district) setResolvedDistrict(data.district);
       if (data.latitude && data.longitude) {
@@ -80,7 +105,7 @@ export default function CardScanner() {
         setLongitude(data.longitude.toString());
       }
       
-      toast.success("Kartvizit başarıyla tarandı! Lütfen bilgileri kontrol edin.", { id: 'ocr_load' });
+      toast.success("Kartvizit başarıyla tarandı! Lütfen bilgileri kontrol edip yönlendirme seçin. ✨", { id: 'ocr_load' });
     } catch (err) {
       toast.error(err.response?.data?.detail || "Tarama sırasında bir hata oluştu.", { id: 'ocr_load' });
     } finally {
@@ -101,7 +126,6 @@ export default function CardScanner() {
         setLongitude(lng.toString());
         toast.success("GPS Konumu alındı! 📍", { id: 'gps_load' });
 
-        // Şehir ve ilçeyi otomatik doldurmak için reverse geocoding yap
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
             headers: { 'Accept-Language': 'tr' }
@@ -132,156 +156,287 @@ export default function CardScanner() {
       return;
     }
     toast.loading("Adresten koordinat aranıyor...", { id: 'addr_load' });
-    await fetchLocationFromAddressDirect(address, true);
-  };
-
-  const fetchLocationFromAddressDirect = async (addrText, isManual = false) => {
-    const raw = addrText || address;
-    if (!raw || !raw.trim()) return;
-
-    const turkishCities = ['Samsun', 'Ordu', 'Çorum', 'Corum', 'Amasya', 'Sinop', 'Tokat', 'Giresun', 'Trabzon', 'İstanbul', 'Istanbul', 'Ankara', 'İzmir', 'Izmir', 'Bursa', 'Antalya'];
-    const turkishDistricts = ['İlkadım', 'Ilkadim', 'Atakum', 'Canik', 'Tekkeköy', 'Tekkekoy', 'Çarşamba', 'Carsamba', 'Bafra', 'Terme', 'Havza', 'Vezirköprü', 'Alaçam', '19 Mayıs', 'Kavak', 'Salıpazarı', 'Ayvacık', 'Asarcık', 'Ladik', 'Yakakent', 'Altınordu', 'Ünye', 'Fatsa', 'Merzifon', 'Suluova'];
-
-    let foundCity = 'Samsun';
-    for (const c of turkishCities) {
-      if (new RegExp(`\\b${c}\\b`, 'i').test(raw)) {
-        foundCity = c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
-        break;
-      }
-    }
-
-    let foundDistrict = null;
-    for (const d of turkishDistricts) {
-      if (new RegExp(`\\b${d}\\b`, 'i').test(raw)) {
-        foundDistrict = d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
-        break;
-      }
-    }
-
-    const cleaned = raw.replace(/^(?:Adres|Address)\s*[:\.-]?\s*/i, '').replace(/[/,]/g, ' ').trim();
-    const candidates = [cleaned];
-    if (foundDistrict && foundCity) candidates.push(`${foundDistrict}, ${foundCity}`);
-    else if (foundDistrict) candidates.push(`${foundDistrict}, Samsun`);
-    if (foundCity) candidates.push(foundCity);
-    candidates.push('Samsun, Türkiye');
-
+    
     try {
-      for (const q of candidates) {
-        try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`, {
-            headers: { 'Accept-Language': 'tr' }
-          });
-          const results = await response.json();
-          if (results && results.length > 0) {
-            const res = results[0];
-            setLatitude(res.lat);
-            setLongitude(res.lon);
-            const finalCity = foundCity || 'Samsun';
-            const finalDistrict = foundDistrict || 'Tekkeköy';
-            setResolvedCity(finalCity);
-            setResolvedDistrict(finalDistrict);
-            toast.success(`Konum çözümlendi: ${finalCity} / ${finalDistrict} 📍`, { id: 'addr_load' });
-            return;
-          }
-        } catch (e) {
-          // ignore candidate error
-        }
+      const q = `${address.trim()}, ${resolvedCity || 'Samsun'}, Türkiye`;
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`, {
+        headers: { 'Accept-Language': 'tr' }
+      });
+      const results = await response.json();
+      if (results && results.length > 0) {
+        setLatitude(results[0].lat);
+        setLongitude(results[0].lon);
+        toast.success(`Adres konumu haritada işaretlendi! 📍`, { id: 'addr_load' });
+      } else {
+        toast.success(`Varsayılan bölge (${resolvedCity}) konumu atandı. 📍`, { id: 'addr_load' });
       }
-
-      // Varsayılan koordinatlar
-      setLatitude('41.213498');
-      setLongitude('36.457804');
-      setResolvedCity(foundCity || 'Samsun');
-      setResolvedDistrict(foundDistrict || 'Tekkeköy');
-      if (isManual) {
-        toast.success(`Bölge konumu (${foundCity || 'Samsun'} / ${foundDistrict || 'Tekkeköy'}) atandı 📍`, { id: 'addr_load' });
-      }
-    } catch (err) {
-      console.warn("Direct address search failed:", err);
+    } catch {
+      toast.error("Adres arama servisine ulaşılamadı.", { id: 'addr_load' });
     }
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  // ── CRM Müşteri ve İrtibat Kaydını Oluştur ──
+  const saveCustomerRecord = async (targetStage) => {
     if (!companyName.trim()) {
-      toast.error("Firma adı gereklidir.");
-      return;
-    }
-    if (!contactName.trim()) {
-      toast.error("İrtibat kişisi adı gereklidir.");
-      return;
+      toast.error("Lütfen bir firma adı girin.");
+      return null;
     }
 
-    toast.loading("CRM'e aktarılıyor...", { id: 'save_load' });
+    const todayStr = new Date().toISOString().split('T')[0];
+    const pStage = targetStage || pipelineStage || 'contact';
+    const finalNote = salesNote.trim() || (selectedVehicle ? `${selectedVehicle} ilgisi için kartvizit görüşmesi sağlandı.` : 'Kartvizit taraması ile eklendi.');
 
     try {
-      // 1. Firmayı (Customer) CRM'e ekle
+      // 1. Müşteriyi CRM'e kaydet
       const customerRes = await crmApi.createCustomer({
-        company_name: companyName,
+        company_name: companyName.trim(),
         phone: phone || null,
         email: email || null,
         website: website || null,
         address: address || null,
         city: resolvedCity || "Samsun",
         district: resolvedDistrict || "Tekkeköy",
-        segment: "B", // Varsayılan segment
-        potential_level: "high", // Varsayılan potansiyel
-        potential_score: 65,
-        sales_notes: `Kartvizit tarayıcı ile otomatik eklendi. Konum Kaynağı: ${locationMode === 'gps' ? 'GPS Uydusu' : 'Adres Çözümleme'}`,
-        pipeline_stage: "lead",
+        sector: role ? `${role} / Ticari Araç` : "Ticari Araç Adayı",
+        current_fleet: selectedVehicle ? `İlgilenilen: ${selectedVehicle}` : '',
+        segment: "B",
+        potential_level: "high",
+        potential_score: 80,
+        sales_notes: finalNote,
+        pipeline_stage: pStage,
+        pipeline_note: finalNote,
+        last_contact_date: todayStr,
         latitude: latitude ? parseFloat(latitude) : null,
-        longitude: longitude ? parseFloat(longitude) : null
+        longitude: longitude ? parseFloat(longitude) : null,
+        source: "card_scanner"
       });
 
       const customerId = customerRes.data.id;
 
-      // 2. Kişiyi (Contact) ekle
-      await crmApi.addContact(customerId, {
-        contact_name: contactName,
-        role: role || null,
-        phone: phone || null,
-        email: email || null,
-        notes: "Kartvizit taramasından gelen kişi.",
-        is_primary: true
-      });
+      // 2. İrtibat Kişisini (Contact) CRM'e ekle
+      if (contactName.trim() && customerId) {
+        try {
+          await crmApi.addContact(customerId, {
+            contact_name: contactName.trim(),
+            role: role || null,
+            phone: phone || null,
+            email: email || null,
+            notes: "Kartvizit taramasından gelen yetkili kişi.",
+            is_primary: true
+          });
+        } catch (cErr) {
+          console.warn("Contact create warning:", cErr);
+        }
+      }
 
-      toast.success("Firma ve irtibat kişisi CRM'e başarıyla eklendi! 🎉", { id: 'save_load' });
-      
-      // Detaya yönlendir
-      navigate(`/customers/${customerId}`);
+      return { customerId, customerData: customerRes.data };
     } catch (err) {
-      toast.error("CRM'e ekleme başarısız oldu.", { id: 'save_load' });
+      console.error("Müşteri kayıt hatası:", err);
+      toast.error(err.response?.data?.detail || "CRM kaydı oluşturulurken hata meydana geldi.");
+      return null;
+    }
+  };
+
+  // ── YÖNLENDİRME 1: WhatsApp'a Yönlendir & Pipeline'a At (Önerilen) ──
+  const handleRouteWhatsApp = async () => {
+    if (!phone?.trim()) {
+      toast.error("WhatsApp yönlendirmesi için geçerli bir telefon numarası bulunmalıdır.");
+      return;
+    }
+
+    try {
+      setRoutingInProgress(true);
+      setActionType('whatsapp');
+      toast.loading("Müşteri kaydediliyor ve WhatsApp yönlendirmesi hazırlanıyor...", { id: 'route_load' });
+
+      const stage = pipelineStage === 'proposal' ? 'proposal' : 'contact';
+      const record = await saveCustomerRecord(stage);
+      if (!record) {
+        toast.dismiss('route_load');
+        return;
+      }
+
+      toast.success("Müşteri kaydedildi ve WhatsApp Bilgi Kartı açılıyor! 🎯", { id: 'route_load' });
+
+      const defaultMsg = `Sayın ${contactName || companyName}, tanıştığımıza çok memnun olduk. IVECO ${selectedVehicle || 'ticari araçlarımız'} hakkındaki görüşmemize istinaden iletişime geçiyorum.`;
+
+      // WhatsApp modali ve yönlendirmesini tetikle
+      openWhatsApp(phone, defaultMsg, {
+        customer: {
+          ...record.customerData,
+          id: record.customerId,
+          company_name: companyName,
+          contact_name: contactName,
+          phone: phone,
+          city: resolvedCity,
+          district: resolvedDistrict
+        },
+        vehicleTitle: selectedVehicle,
+        defaultStatus: stage === 'proposal' ? 'offer_given' : 'sent',
+        defaultMessage: defaultMsg
+      });
+    } finally {
+      setRoutingInProgress(false);
+      setActionType(null);
+    }
+  };
+
+  // ── YÖNLENDİRME 2: Doğrudan Satış Pipeline'ına Aktar (Kanban) ──
+  const handleRoutePipeline = async () => {
+    try {
+      setRoutingInProgress(true);
+      setActionType('pipeline');
+      toast.loading("Müşteri Satış Pipeline'ına aktarılıyor...", { id: 'route_load' });
+
+      const record = await saveCustomerRecord(pipelineStage);
+      if (!record) {
+        toast.dismiss('route_load');
+        return;
+      }
+
+      toast.success(`Firma Satış Pipeline'ına (${pipelineStage.toUpperCase()}) aktarıldı! 🎯`, { id: 'route_load' });
+      navigate('/pipeline');
+    } finally {
+      setRoutingInProgress(false);
+      setActionType(null);
+    }
+  };
+
+  // ── YÖNLENDİRME 3: Hızlı Proforma / Fiyat Teklifi Hazırla ──
+  const handleRouteProforma = async () => {
+    try {
+      setRoutingInProgress(true);
+      setActionType('proforma');
+      toast.loading("Müşteri kaydediliyor ve Proforma sihirbazına aktarılıyor...", { id: 'route_load' });
+
+      const record = await saveCustomerRecord('proposal');
+      if (!record) {
+        toast.dismiss('route_load');
+        return;
+      }
+
+      toast.success("Müşteri bilgileri Proforma ekranına yüklendi! 📄", { id: 'route_load' });
+      navigate('/proforma/quick', {
+        state: {
+          customer: {
+            id: record.customerId,
+            company_name: companyName,
+            contact_name: contactName,
+            phone: phone,
+            city: resolvedCity,
+            district: resolvedDistrict,
+            address: address,
+            email: email
+          },
+          vehicle_model: selectedVehicle
+        }
+      });
+    } finally {
+      setRoutingInProgress(false);
+      setActionType(null);
+    }
+  };
+
+  // ── YÖNLENDİRME 4: Müşteri Kartını Aç ──
+  const handleRouteCustomerDetail = async () => {
+    try {
+      setRoutingInProgress(true);
+      setActionType('customer');
+      toast.loading("Müşteri CRM'e kaydediliyor...", { id: 'route_load' });
+
+      const record = await saveCustomerRecord(pipelineStage);
+      if (!record) {
+        toast.dismiss('route_load');
+        return;
+      }
+
+      toast.success("Müşteri kartı açılıyor! 👤", { id: 'route_load' });
+      navigate(`/customers/${record.customerId}`);
+    } finally {
+      setRoutingInProgress(false);
+      setActionType(null);
     }
   };
 
   return (
-    <div className="mobile-page animate-in">
-      <h2 className="page-title">🎴 Kartvizit Tarayıcı</h2>
-      <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
-        Müşterinin kartvizitini kameradan çekin veya galeriye yükleyin. Yapay zeka bilgileri otomatik olarak CRM'e aktaracaktır.
-      </p>
+    <div className="mobile-page animate-in" style={{ maxWidth: 860, margin: '0 auto', padding: '16px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h2 className="page-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 10, fontSize: '1.45rem', fontWeight: 800 }}>
+            <span style={{ color: '#ec4899' }}>🎴</span> Kartvizit Tarayıcı & Akıllı Yönlendirme
+          </h2>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
+            Kartviziti kameranızla çekin; yapay zekâ bilgileri ayrıştırsın, tek tıkla WhatsApp veya Satış Pipeline'ına yönlendirin.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button 
+            type="button" 
+            onClick={() => navigate('/pipeline')} 
+            className="btn btn-secondary btn-sm"
+            style={{ fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          >
+            <span>📊 Pipeline'a Git</span>
+          </button>
+        </div>
+      </div>
 
-      {/* Upload Seçenekleri */}
-      <div className="card text-center" style={{ padding: '2rem 1.5rem', border: '2px dashed var(--border-color)', background: 'rgba(255,255,255,0.01)' }}>
+      {/* ── 1. KARTVİZİT ÇEKİM & YÜKLEME ALANI ── */}
+      <div 
+        className="card text-center" 
+        style={{ 
+          padding: '1.75rem 1.25rem', 
+          border: '2px dashed var(--border-color, rgba(236, 72, 153, 0.4))', 
+          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%)',
+          borderRadius: 14,
+          marginBottom: '1.25rem'
+        }}
+      >
         {preview ? (
-          <div style={{ marginBottom: 20, position: 'relative', display: 'inline-block' }}>
-            <img src={preview} alt="Kartvizit Önizleme" style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }} />
+          <div style={{ marginBottom: 16, position: 'relative', display: 'inline-block' }}>
+            <img 
+              src={preview} 
+              alt="Kartvizit Önizleme" 
+              style={{ maxWidth: '100%', maxHeight: 220, borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', border: '2px solid rgba(255,255,255,0.1)' }} 
+            />
             <button 
-              style={{ position: 'absolute', top: -10, right: -10, background: '#ef4444', border: 'none', color: '#fff', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              onClick={() => { setPreview(null); setResult(null); }}
+              type="button"
+              style={{ 
+                position: 'absolute', top: -10, right: -10, 
+                background: '#ef4444', border: 'none', color: '#fff', 
+                borderRadius: '50%', width: 28, height: 28, 
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              }}
+              onClick={() => { setPreview(null); setResult(null); setFile(null); }}
+              title="Görseli Kaldır"
             >
-              <FiX size={14} />
+              <FiX size={16} />
             </button>
           </div>
         ) : (
-          <div style={{ color: 'var(--text-muted)', marginBottom: 20 }}>
-            <FiCamera size={48} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.5 }} />
-            <span>Kamera çekimi veya Dosya yükleme</span>
+          <div style={{ color: 'var(--text-muted)', marginBottom: 18 }}>
+            <div 
+              style={{ 
+                width: 64, height: 64, borderRadius: '50%', 
+                background: 'rgba(236, 72, 153, 0.12)', color: '#f472b6', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                margin: '0 auto 12px' 
+              }}
+            >
+              <FiCamera size={32} />
+            </div>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
+              Kartvizit Fotoğrafını Çekin veya Galeriden Seçin
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+              Kamera çekiminde ışığın ve metinlerin net görünmesine özen gösterin
+            </div>
           </div>
         )}
 
-        <div className="flex gap-3 justify-center">
-          {/* Kamera Butonu (Mobil için capture tetikler) */}
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {/* Kamera Butonu (Mobilde doğrudan arka kamerayı açar) */}
           <input 
             type="file" 
             accept="image/*" 
@@ -290,11 +445,24 @@ export default function CardScanner() {
             onChange={(e) => handleFileChange(e, true)} 
             style={{ display: 'none' }} 
           />
-          <button className="btn btn-primary flex items-center gap-2" onClick={() => cameraInputRef.current.click()} disabled={scanning}>
-            <FiCamera size={16} /> Fotoğraf Çek
+          <button 
+            type="button"
+            className="btn btn-primary" 
+            onClick={() => cameraInputRef.current.click()} 
+            disabled={scanning}
+            style={{ 
+              display: 'inline-flex', alignItems: 'center', gap: 8, 
+              padding: '10px 18px', fontSize: '0.9rem', fontWeight: 700,
+              background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+              borderColor: '#ec4899',
+              boxShadow: '0 4px 14px rgba(236, 72, 153, 0.35)'
+            }}
+          >
+            <FiCamera size={18} /> 
+            <span>{preview ? 'Yeniden Çek' : '📸 Fotoğraf Çek (Kamera)'}</span>
           </button>
 
-          {/* Dosya Yükle Butonu */}
+          {/* Dosya / Galeri Yükle Butonu */}
           <input 
             type="file" 
             accept="image/*" 
@@ -302,165 +470,428 @@ export default function CardScanner() {
             onChange={handleFileChange} 
             style={{ display: 'none' }} 
           />
-          <button className="btn btn-secondary flex items-center gap-2" onClick={() => fileInputRef.current.click()} disabled={scanning}>
-            <FiUpload size={16} /> Galeri Seç
+          <button 
+            type="button"
+            className="btn btn-secondary" 
+            onClick={() => fileInputRef.current.click()} 
+            disabled={scanning}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 16px', fontSize: '0.9rem', fontWeight: 600 }}
+          >
+            <FiUpload size={18} /> 
+            <span>Dosya / Galeri Seç</span>
           </button>
         </div>
       </div>
 
-      {/* Tarama Yükleniyor Göstergesi */}
+      {/* ── 2. YÜKLENİYOR / OCR ANALİZ DURUMU ── */}
       {scanning && (
-        <div className="card mt-4 text-center">
-          <div className="loading-pulse" style={{ margin: '0 auto 10px' }} />
-          <span style={{ fontSize: 13, color: 'var(--accent-blue-light)', fontWeight: 600 }}>Yapay Zeka Analiz Ediyor...</span>
+        <div className="card text-center" style={{ padding: '2rem 1rem', marginBottom: '1.25rem', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+          <div className="loading-pulse" style={{ margin: '0 auto 12px', width: 36, height: 36 }} />
+          <div style={{ fontSize: '0.95rem', color: '#38bdf8', fontWeight: 700 }}>
+            Yapay Zekâ Kartviziti Analiz Ediyor...
+          </div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 4 }}>
+            Firma adı, yetkili, telefon ve adres bilgileri otomatik ayıklanıyor.
+          </div>
         </div>
       )}
 
-      {/* Sonuçları İnceleme Formu */}
+      {/* ── 3. AYRIŞTIRILMIŞ VERİ & AKILLI YÖNLENDİRME FORMU ── */}
       {result && !scanning && (
-        <form onSubmit={handleSave} className="card mt-4 animate-in">
-          <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            📝 Bilgileri Kontrol Edin
-          </h3>
-
+        <div className="card animate-in" style={{ padding: '1.25rem', marginBottom: '1.5rem', border: '1px solid var(--border-color)', borderRadius: 14 }}>
+          {/* Mükerrer Kontrol Uyarısı */}
           {allCrmCustomers.length > 0 && (() => {
             const matchObj = duplicateDetection.findMatch({ company_name: companyName, phone: phone }, allCrmCustomers);
             if (!matchObj) return null;
             const duplicate = matchObj.customer;
             return (
               <div style={{
-                background: 'rgba(245, 158, 11, 0.12)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: 8,
-                padding: 12,
-                marginBottom: 15,
+                background: 'rgba(245, 158, 11, 0.14)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: 10,
+                padding: '12px 14px',
+                marginBottom: 16,
                 color: '#fbbf24',
-                fontSize: 12,
+                fontSize: '0.84rem',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 8
               }}>
-                <span>⚠️ Bu firma zaten CRM'de kayıtlı olabilir: <strong>{duplicate.company_name}</strong></span>
+                <span>⚠️ Bu firma veya telefon CRM'de zaten mevcut olabilir: <strong>{duplicate.company_name}</strong></span>
                 <button 
                   type="button" 
                   className="btn btn-secondary btn-sm" 
                   onClick={() => navigate(`/customers/${duplicate.id}`)}
-                  style={{ padding: '4px 8px', fontSize: 11 }}
+                  style={{ padding: '4px 10px', fontSize: '0.78rem' }}
                 >
-                  Firmayı Aç
+                  Mevcut Kartı Aç
                 </button>
               </div>
             );
           })()}
 
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, borderBottom: '1px solid var(--border-color)', paddingBottom: 10 }}>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>📝</span> Kartvizit Bilgilerini Kontrol Edin
+            </h3>
+            <span className="badge badge-green" style={{ fontSize: '0.72rem' }}>
+              OCR Başarılı ✓
+            </span>
+          </div>
 
-          <div className="flex flex-col gap-4">
-
-
-            <div className="form-group">
-              <label className="form-label"><FiLayers size={12} /> Firma Adı *</label>
-              <input className="form-input" required value={companyName} onChange={e => setCompanyName(e.target.value)} />
+          {/* Form Alanları (2 Sütunlu Grid) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, marginBottom: 16 }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiLayers size={13} style={{ color: '#38bdf8' }} /> Firma Adı *
+              </label>
+              <input 
+                className="form-input" 
+                required 
+                value={companyName} 
+                onChange={e => setCompanyName(e.target.value)} 
+                placeholder="Örn: Karadeniz Lojistik A.Ş."
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
 
-            <div className="form-group">
-              <label className="form-label"><FiUser size={12} /> İrtibat Kişisi Adı *</label>
-              <input className="form-input" required value={contactName} onChange={e => setContactName(e.target.value)} />
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiUser size={13} style={{ color: '#10b981' }} /> İrtibat Kişisi Adı
+              </label>
+              <input 
+                className="form-input" 
+                value={contactName} 
+                onChange={e => setContactName(e.target.value)} 
+                placeholder="Örn: Hasan Yılmaz"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
 
-            <div className="form-group">
-              <label className="form-label"><FiBriefcase size={12} /> Görevi / Rolü</label>
-              <input className="form-input" value={role} onChange={e => setRole(e.target.value)} />
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiPhone size={13} style={{ color: '#25d366' }} /> Telefon Numarası *
+              </label>
+              <input 
+                className="form-input" 
+                value={phone} 
+                onChange={e => setPhone(e.target.value)} 
+                placeholder="05xx xxx xx xx"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
 
-            <div className="form-group">
-              <label className="form-label"><FiPhone size={12} /> Telefon Numarası</label>
-              <input className="form-input" value={phone} onChange={e => setPhone(e.target.value)} />
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiBriefcase size={13} style={{ color: '#f59e0b' }} /> Görevi / Rolü
+              </label>
+              <input 
+                className="form-input" 
+                value={role} 
+                onChange={e => setRole(e.target.value)} 
+                placeholder="Örn: Satın Alma Müdürü / Genel Müdür"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
 
-            <div className="form-group">
-              <label className="form-label"><FiMail size={12} /> E-posta Adresi</label>
-              <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <FiMail size={13} style={{ color: '#c084fc' }} /> E-posta
+              </label>
+              <input 
+                className="form-input" 
+                type="email" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                placeholder="info@firma.com"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
 
-            <div className="form-group">
-              <label className="form-label">🌐 Web Sitesi</label>
-              <input className="form-input" value={website} onChange={e => setWebsite(e.target.value)} placeholder="www.firma.com" />
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+                🌐 Web Sitesi
+              </label>
+              <input 
+                className="form-input" 
+                value={website} 
+                onChange={e => setWebsite(e.target.value)} 
+                placeholder="www.firma.com"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
+          </div>
 
-            <div className="form-group">
-              <label className="form-label"><FiMapPin size={12} /> Adres</label>
-              <textarea className="form-textarea" rows={2} value={address} onChange={e => setAddress(e.target.value)} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600 }}>Şehir</label>
+              <input 
+                className="form-input" 
+                value={resolvedCity} 
+                onChange={e => setResolvedCity(e.target.value)} 
+                placeholder="Şehir"
+                style={{ fontSize: '0.85rem' }}
+              />
             </div>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600 }}>İlçe</label>
+              <input 
+                className="form-input" 
+                value={resolvedDistrict} 
+                onChange={e => setResolvedDistrict(e.target.value)} 
+                placeholder="İlçe"
+                style={{ fontSize: '0.85rem' }}
+              />
+            </div>
+          </div>
 
-            {/* Konum Tipi Seçimi */}
-            <div style={{ background: 'rgba(99, 102, 241, 0.03)', padding: 12, borderRadius: 8, border: '1px solid var(--border-color)', margin: '5px 0 10px' }}>
-              <label className="form-label" style={{ fontWeight: '700', marginBottom: 8, display: 'block', fontSize: '0.85rem' }}>📍 Müşteri Konum Girişi</label>
-              <div className="flex gap-2 mb-3">
+          <div className="form-group" style={{ marginBottom: 14 }}>
+            <label className="form-label" style={{ fontSize: '0.78rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+              <FiMapPin size={13} style={{ color: '#ef4444' }} /> Kartvizitteki Adres
+            </label>
+            <textarea 
+              className="form-textarea" 
+              rows={2} 
+              value={address} 
+              onChange={e => setAddress(e.target.value)} 
+              placeholder="Adres metni..."
+              style={{ fontSize: '0.85rem', lineHeight: '1.4' }}
+            />
+          </div>
+
+          {/* Konum Tespiti (GPS / Adres) */}
+          <div style={{ background: 'rgba(99, 102, 241, 0.05)', padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(99, 102, 241, 0.2)', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)' }}>📍 Harita & Konum Belirleme:</span>
+              <div style={{ display: 'flex', gap: 6 }}>
                 <button 
-                  type="button" 
-                  className={`btn w-full btn-sm ${locationMode === 'gps' ? 'btn-primary' : 'btn-secondary'}`}
-                  onClick={() => setLocationMode('gps')}
-                  style={{ fontSize: '0.75rem', height: 32, padding: '0 6px', fontWeight: 'bold' }}
+                  type="button"
+                  onClick={fetchGpsCoordinates}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.72rem', padding: '3px 8px', color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                 >
-                  Şu An Müşterinin Yanındayım (GPS)
+                  <FiMapPin size={12} /> Canlı GPS Al
                 </button>
                 <button 
-                  type="button" 
-                  className={`btn w-full btn-sm ${locationMode === 'address' ? 'btn-primary' : 'btn-secondary'}`}
-                  onClick={() => setLocationMode('address')}
-                  style={{ fontSize: '0.75rem', height: 32, padding: '0 6px', fontWeight: 'bold' }}
+                  type="button"
+                  onClick={fetchLocationFromAddress}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.72rem', padding: '3px 8px', color: '#38bdf8', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                 >
-                  Ofisteyim (Adresten Konum Çek)
+                  Adresten Bul
                 </button>
               </div>
-              
-              {locationMode === 'gps' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <button 
-                    type="button"
-                    className="btn btn-secondary btn-sm flex items-center justify-center gap-1 w-full"
-                    onClick={fetchGpsCoordinates}
-                    style={{ background: 'rgba(52, 211, 153, 0.12)', color: '#34d399', borderColor: 'rgba(52, 211, 153, 0.25)', height: 32, fontSize: '0.8rem', fontWeight: 'bold' }}
-                  >
-                    📍 Şu Anki Konumumu GPS ile Al
-                  </button>
-                  {latitude && longitude && (
-                    <div style={{ fontSize: 10, color: '#34d399', textAlign: 'center', fontWeight: 'bold' }}>
-                      Enlem: {parseFloat(latitude).toFixed(6)} | Boylam: {parseFloat(longitude).toFixed(6)} ({resolvedCity} / {resolvedDistrict})
-                    </div>
-                  )}
-                </div>
-              )}
+            </div>
+            {latitude && longitude && (
+              <div style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 600 }}>
+                ✓ Koordinat: {parseFloat(latitude).toFixed(5)}, {parseFloat(longitude).toFixed(5)} ({resolvedCity} / {resolvedDistrict})
+              </div>
+            )}
+          </div>
 
-              {locationMode === 'address' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <button 
-                    type="button"
-                    className="btn btn-secondary btn-sm flex items-center justify-center gap-1 w-full"
-                    onClick={fetchLocationFromAddress}
-                    style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.25)', height: 32, fontSize: '0.8rem', fontWeight: 'bold' }}
-                  >
-                    🔍 Yazdığım Adresten Konum Bul
-                  </button>
-                  {latitude && longitude && (
-                    <div style={{ fontSize: 10, color: '#60a5fa', textAlign: 'center', fontWeight: 'bold' }}>
-                      Bulunan Koordinat: {parseFloat(latitude).toFixed(6)} | {parseFloat(longitude).toFixed(6)} ({resolvedCity} / {resolvedDistrict})
-                    </div>
-                  )}
-                </div>
-              )}
+          {/* ═══════════════════════════════════════════════════════════════════
+              4. AKILLI YÖNLENDİRME MERKEZİ (KULLANICI TALEBİ)
+             ═══════════════════════════════════════════════════════════════════ */}
+          <div 
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', 
+              border: '1.5px solid rgba(56, 189, 248, 0.35)', 
+              borderRadius: 12, 
+              padding: '14px', 
+              marginTop: 16,
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: 8 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#38bdf8', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FiZap size={16} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc' }}>
+                  🎯 Akıllı Satış Yönlendirme Merkezi
+                </h4>
+                <p style={{ margin: 0, fontSize: '0.74rem', color: '#94a3b8' }}>
+                  Kartviziti kaydederken doğrudan dilediğiniz satış sürecine aktarın:
+                </p>
+              </div>
             </div>
 
-            <div className="flex gap-2 mt-2">
-              <button type="button" className="btn btn-secondary w-full" onClick={() => setResult(null)}>
-                İptal Et
+            {/* A. Hedef Pipeline Aşaması Seçimi */}
+            <div style={{ marginBottom: 12 }}>
+              <label className="form-label" style={{ fontSize: '0.76rem', fontWeight: 700, color: '#cbd5e1', marginBottom: 6, display: 'block' }}>
+                📊 Eklenecek Pipeline Aşaması:
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                {PIPELINE_STAGES.map(st => (
+                  <button
+                    key={st.key}
+                    type="button"
+                    onClick={() => setPipelineStage(st.key)}
+                    style={{
+                      padding: '8px 4px',
+                      borderRadius: 8,
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      border: pipelineStage === st.key ? `2px solid ${st.color}` : '1px solid var(--border-color)',
+                      background: pipelineStage === st.key ? `${st.color}25` : 'rgba(255, 255, 255, 0.03)',
+                      color: pipelineStage === st.key ? st.color : 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 3,
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <span>{st.emoji}</span>
+                    <span>{st.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* B. İlgilenilen IVECO Modeli */}
+            <div style={{ marginBottom: 12 }}>
+              <label className="form-label" style={{ fontSize: '0.76rem', fontWeight: 700, color: '#cbd5e1', marginBottom: 6, display: 'block' }}>
+                🚛 İlgilenilen IVECO Modeli (Hızlı Seçim):
+              </label>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {COMMON_VEHICLES.map(v => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setSelectedVehicle(v)}
+                    className="btn btn-sm"
+                    style={{
+                      fontSize: '0.72rem',
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                      border: selectedVehicle === v ? '1.5px solid #fbbf24' : '1px solid var(--border-color)',
+                      background: selectedVehicle === v ? 'rgba(251, 191, 36, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                      color: selectedVehicle === v ? '#fbbf24' : 'var(--text-secondary)'
+                    }}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* C. Satış & Ziyaret Notu (Sesli Dikte Destekli) */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <label className="form-label" style={{ fontSize: '0.76rem', fontWeight: 700, color: '#cbd5e1', margin: 0 }}>
+                  📝 Satış / Ziyaret Görüşme Notu:
+                </label>
+                <VoiceInputButton 
+                  onTranscript={t => setSalesNote(prev => (prev ? prev + ' ' + t : t))}
+                  title="Görüşme Notunu Konuşarak Yazdır"
+                />
+              </div>
+              <input
+                type="text"
+                className="form-input"
+                value={salesNote}
+                onChange={e => setSalesNote(e.target.value)}
+                placeholder="Örn: 2 adet şasi için fiyat teklifi istediler, Salı günü dönüş yapılacak..."
+                style={{ fontSize: '0.82rem' }}
+              />
+            </div>
+
+            {/* D. HIZLI YÖNLENDİRME AKSİYON BUTONLARI */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+              {/* 1. WhatsApp ile Yönlendir (Önerilen) */}
+              <button
+                type="button"
+                onClick={handleRouteWhatsApp}
+                disabled={routingInProgress}
+                className="btn btn-success"
+                style={{
+                  padding: '11px 14px',
+                  fontSize: '0.88rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  background: '#25d366',
+                  borderColor: '#25d366',
+                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)'
+                }}
+              >
+                <FiSend size={16} />
+                <span>{routingInProgress && actionType === 'whatsapp' ? 'Açılıyor...' : "WhatsApp'a Yönlendir & Pipeline'a At 🚀"}</span>
               </button>
-              <button type="submit" className="btn btn-success w-full flex items-center justify-center gap-2">
-                <FiCheck size={16} /> CRM'e Aktar
+
+              {/* 2. Satış Pipeline'ında Gör */}
+              <button
+                type="button"
+                onClick={handleRoutePipeline}
+                disabled={routingInProgress}
+                className="btn btn-primary"
+                style={{
+                  padding: '11px 14px',
+                  fontSize: '0.86rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  background: 'linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%)',
+                  boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)'
+                }}
+              >
+                <span>🎯 Satış Pipeline'ına Aktar</span>
+                <FiArrowRight size={15} />
+              </button>
+
+              {/* 3. Hızlı Proforma Hazırla */}
+              <button
+                type="button"
+                onClick={handleRouteProforma}
+                disabled={routingInProgress}
+                className="btn btn-secondary"
+                style={{
+                  padding: '11px 14px',
+                  fontSize: '0.84rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 7,
+                  color: '#fbbf24',
+                  borderColor: 'rgba(251, 191, 36, 0.4)',
+                  background: 'rgba(251, 191, 36, 0.1)'
+                }}
+              >
+                <FiFileText size={15} />
+                <span>📄 Hızlı Proforma / Teklif Çıkar</span>
+              </button>
+
+              {/* 4. Müşteri Kartını Aç */}
+              <button
+                type="button"
+                onClick={handleRouteCustomerDetail}
+                disabled={routingInProgress}
+                className="btn btn-secondary"
+                style={{
+                  padding: '11px 14px',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 7
+                }}
+              >
+                <FiUser size={15} />
+                <span>👤 Müşteri Kartını Aç</span>
               </button>
             </div>
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { crmApi, scannerApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
@@ -78,6 +78,7 @@ function parseTurkishNumber(text) {
 
 export default function ProformaQuick() {
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef(null);
 
   // States
@@ -129,6 +130,27 @@ export default function ProformaQuick() {
   // Dictation States
   const [listeningField, setListeningField] = useState(null); // 'model' or 'price'
   const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    if (location.state?.customer) {
+      const c = location.state.customer;
+      setCustomer(prev => ({
+        ...prev,
+        company_name: c.company_name || prev.company_name,
+        tax_number: c.tax_number || prev.tax_number,
+        vergi_dairesi: c.vergi_dairesi || prev.vergi_dairesi,
+        address: c.address || prev.address,
+        city: c.city || prev.city,
+        district: c.district || prev.district
+      }));
+    }
+    if (location.state?.vehicle_model) {
+      setVehicle(prev => ({
+        ...prev,
+        vehicle_model: location.state.vehicle_model
+      }));
+    }
+  }, [location.state]);
 
   // Recalculate taxes reverse-calculated from net price (grand total)
   useEffect(() => {
