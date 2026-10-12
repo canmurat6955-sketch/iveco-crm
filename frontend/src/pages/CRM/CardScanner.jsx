@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { duplicateDetection } from '../../services/duplicateDetection';
 import VoiceInputButton from '../../components/common/VoiceInputButton';
 import { openWhatsApp } from '../../utils/whatsapp';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PIPELINE_STAGES = [
   { key: 'lead', label: 'Lead', emoji: '🎯', color: '#818cf8' },
@@ -29,6 +30,11 @@ const COMMON_VEHICLES = [
 ];
 
 export default function CardScanner() {
+  const { user } = useAuth();
+  const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
+    ? user.full_name
+    : 'Can Murat';
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [scanning, setScanning] = useState(false);
@@ -287,11 +293,11 @@ export default function CardScanner() {
 
       toast.success("Müşteri kaydedildi ve WhatsApp Bilgi Kartı açılıyor! 🎯", { id: 'route_load' });
 
-      const greeting = contactName.trim()
-        ? `Sayın ${contactName} (${companyName})`
+      const recipient = contactName.trim()
+        ? `Sayın ${contactName}`
         : `Sayın ${companyName} Yetkilisi`;
 
-      const defaultMsg = `${greeting}, tanıştığımıza çok memnun olduk. IVECO ${selectedVehicle || 'ticari araçlarımız'} hakkındaki görüşmemize istinaden iletişime geçiyorum.`;
+      const defaultMsg = `Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${companyName ? companyName + ' firmanız' : 'Firmanız'} için hazırladığımız avantajlı IVECO ${selectedVehicle || 'ticari araç'} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`;
 
       // WhatsApp modali ve yönlendirmesini tetikle
       openWhatsApp(phone, defaultMsg, {

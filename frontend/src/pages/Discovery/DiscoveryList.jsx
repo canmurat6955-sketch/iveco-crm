@@ -5,6 +5,7 @@ import useGeolocation from '../../hooks/useGeolocation';
 import { searchIntentParser } from '../../services/searchIntentParser';
 import { duplicateDetection } from '../../services/duplicateDetection';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../contexts/AuthContext';
 import { getWhatsAppUrl, openWhatsApp } from '../../utils/whatsapp';
 import { 
   FiZap, FiPlay, FiLoader, FiCheck, FiX, FiChevronLeft, 
@@ -112,6 +113,10 @@ const SECTOR_PRESETS = [
 export default function DiscoveryList() {
   const navigate = useNavigate();
   const { location, loading: gpsLoading, getLocation } = useGeolocation();
+  const { user } = useAuth();
+  const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
+    ? user.full_name
+    : 'Can Murat';
 
   // Ana Navigasyon Tabları
   const [activeTab, setActiveTab] = useState('osb_radar'); // osb_radar | tenders | bodybuilders | new_registrations | live_search | sources
@@ -692,7 +697,7 @@ export default function DiscoveryList() {
                           <button 
                             type="button"
                             className="btn btn-secondary btn-sm"
-                            onClick={() => openWhatsApp(biz.phone, `Sayın ${biz.company_name} yetkilisi, IVECO satış departmanından ulaşıyoruz. Firmanız için önerilen ${biz.recommended_iveco || 'Iveco ticari araç'} modelimiz hakkında özel filo teklifimizi iletmek isteriz.`, {
+                            onClick={() => openWhatsApp(biz.phone, `Sayın ${biz.company_name} yetkilisi, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için önerilen avantajlı IVECO ${biz.recommended_iveco || 'ticari araç'} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız ve fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`, {
                               customer: {
                                 id: biz.existing_customer_id,
                                 company_name: biz.company_name,
@@ -830,7 +835,7 @@ export default function DiscoveryList() {
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
-                            onClick={() => openWhatsApp(t.contractor_phone, `Sayın ${t.contractor_name || 'Yetkili'}, ${t.organization} tarafından ihalesi sonuçlanan "${t.title}" projeniz için tebrik ederiz. İhale şartnamesine uygun ${t.suggested_iveco_model || 'Iveco Şasi'} araçlarımız için özel filo teklifimizi görüşmek isteriz.`, {
+                            onClick={() => openWhatsApp(t.contractor_phone, `Sayın ${t.contractor_name || 'Yetkili'}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${t.organization} tarafından ihalesi sonuçlanan "${t.title}" projeniz için tebrik ederiz. İhale şartnamesine uygun avantajlı IVECO ${t.suggested_iveco_model || 'Şasi'} kampanyamızı ve özel filo teklifimizi sizinle paylaşmak istedim. Düşünürseniz detayları görüşmekten memnuniyet duyarım.`, {
                               customer: {
                                 id: t.matched_customer_id,
                                 company_name: t.contractor_name,
@@ -928,7 +933,7 @@ export default function DiscoveryList() {
                           {r.customer_phone && (
                             <button 
                               type="button"
-                              onClick={() => openWhatsApp(r.customer_phone, `Merhaba ${r.customer_name}, ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız ${r.requested_chassis || 'Iveco şasi'} için görüşebilir miyiz?`, {
+                              onClick={() => openWhatsApp(r.customer_phone, `Merhaba ${r.customer_name ? `Sayın ${r.customer_name}` : 'Yetkili'}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${r.bodybuilder_name} referansıyla iletişime geçiyorum. Aradığınız IVECO ${r.requested_chassis || 'şasi'} için hazırladığımız kampanyayı ve özel bayi teklifimizi paylaşmak isterim. Düşünürseniz detayları görüşebilir miyiz?`, {
                                 customer: {
                                   id: r.crm_customer_id,
                                   company_name: r.customer_name,
@@ -1067,7 +1072,7 @@ export default function DiscoveryList() {
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
-                            onClick={() => openWhatsApp(c.phone, `Sayın ${c.company_name} yetkilisi, yeni şirket kuruluşunuz hayırlı olsun. Şirketinizin lojistik ve saha operasyonları için IVECO Daily şasi ve panelvan araçlarımıza özel filo indirimlerimizi paylaşmak isteriz.`, {
+                            onClick={() => openWhatsApp(c.phone, `Sayın ${c.company_name} yetkilisi, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Yeni şirket kuruluşunuz hayırlı olsun. Şirketinizin lojistik ve saha operasyonları için hazırladığımız avantajlı IVECO Daily şasi ve panelvan filo kampanyamızı sizinle paylaşmak istedim. Düşünürseniz bayi fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`, {
                               customer: {
                                 id: c.matched_customer_id,
                                 company_name: c.company_name,
@@ -1368,7 +1373,7 @@ export default function DiscoveryList() {
                             </a>
                             <button
                               type="button"
-                              onClick={() => openWhatsApp(biz.phone, `Merhaba ${biz.name || 'Yetkili'}, IVECO ticari araçlarımız hakkında bilgi vermek için iletişime geçiyorum.`, {
+                              onClick={() => openWhatsApp(biz.phone, `Merhaba ${biz.name ? `Sayın ${biz.name}` : 'Yetkili'}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız avantajlı IVECO ticari araç kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız ve fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`, {
                                 customer: {
                                   company_name: biz.name || biz.company_name || 'İşletme',
                                   phone: biz.phone,

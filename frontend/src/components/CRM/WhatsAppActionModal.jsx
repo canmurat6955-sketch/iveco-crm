@@ -9,6 +9,7 @@ import {
 import VoiceInputButton from '../common/VoiceInputButton';
 import { salesApi, vehiclesApi, crmApi } from '../../api/client';
 import { launchNativeWhatsApp } from '../../utils/whatsapp';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const PIPELINE_STAGES = [
@@ -48,6 +49,10 @@ export default function WhatsAppActionModal({
   onSuccess
 }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
+    ? user.full_name
+    : 'Can Murat';
 
   // Adım kontrolü: 'compose' (WhatsApp Mesajı & Hazırlık) | 'post_action' (Bilgi Kartı & Pipeline Onayı)
   const [step, setStep] = useState('compose');
@@ -111,8 +116,11 @@ export default function WhatsAppActionModal({
       if (defaultMessage) {
         setMessage(defaultMessage);
       } else {
+        const recipient = customer.contact_name?.trim()
+          ? `Sayın ${customer.contact_name}`
+          : `Sayın ${customer.company_name || 'Yetkili'}`;
         setMessage(
-          `Sayın ${customer.company_name || 'Yetkili'}, firmanız için ilgilendiğiniz ${vText} modelimizle ilgili özel fiyat teklifimizi hazırladık. Detayları görüşmek ve sorularınızı yanıtlamak üzere incelemenize sunuyoruz.`
+          `Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${customer.company_name ? customer.company_name + ' firmanız' : 'Firmanız'} için hazırladığımız avantajlı ${vText} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız, düşük faiz ve takas destekli bayi fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`
         );
       }
 
@@ -179,35 +187,41 @@ export default function WhatsAppActionModal({
       current_fleet: `İlgilenilen: ${model}`
     }));
     setInternalNote(`${model} aracı için WhatsApp üzerinden görüşme/teklif yönlendirildi.`);
-    const compName = customerForm.company_name || customer.company_name || 'Yetkili';
+    const recipient = customerForm.contact_name?.trim()
+      ? `Sayın ${customerForm.contact_name}`
+      : `Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}`;
     if (pipelineStage === 'proposal') {
-      setMessage(`Sayın ${compName}, firmanız için ilgilendiğiniz IVECO ${model} modelimizle ilgili özel fiyat teklifimizi hazırladık. Detayları inceleyip değerlendirmenizi rica ederiz.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız avantajlı IVECO ${model} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız, düşük faiz ve takas destekli bayi fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`);
     } else {
-      setMessage(`Sayın ${compName}, tanıştığımıza çok memnun olduk. IVECO ${model} modelimiz hakkındaki görüşmemize istinaden iletişime geçiyorum.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Hazırladığımız avantajlı IVECO ${model} kampanyamızı ve özel teklifimizi sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`);
     }
   };
 
   const selectTemplate = (type) => {
     const curVeh = selectedVehicle || vehicleTitle || 'Daily Şasi';
     const vText = `IVECO ${curVeh}`;
+    const recipient = customerForm.contact_name?.trim()
+      ? `Sayın ${customerForm.contact_name}`
+      : `Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}`;
+
     if (type === 'teklif') {
       setStatus('offer_given');
       setPipelineStage('proposal');
-      setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, firmanız için ilgilendiğiniz ${vText} modelimizle ilgili özel fiyat teklifimizi hazırladık. İnceleyip değerlendirmenizi rica ederiz.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız avantajlı ${vText} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz teklif detaylarını ve ödeme seçeneklerini birlikte değerlendirmekten memnuniyet duyarım.`);
       setInternalNote(`${vText} için fiyat teklifi iletildi, karar bekleniyor.`);
     } else if (type === 'katalog') {
       setStatus('sent');
       setPipelineStage('contact');
-      setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, ${vText} güncel ürün broşürünü, teknik özelliklerini ve avantajlı bayi finansman koşullarını bilginize sunuyoruz.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${vText} güncel ürün broşürünü, teknik özelliklerini ve avantajlı bayi finansman koşullarımızı bilginize sunmak istedim. Düşünürseniz araç detaylarını ve uygun donanım alternatiflerini görüşmekten memnuniyet duyarım.`);
       setInternalNote(`${vText} ürün kataloğu ve teknik verileri gönderildi.`);
     } else if (type === 'kampanya') {
       setStatus('sent');
       setPipelineStage('contact');
-      setMessage(`Merhaba! ${vText} araçlarımızda bu aya özel düşük faiz ve takas destekli bayi kampanyamız başlamıştır. Stoktaki hemen teslim araçlarımız için detaylı bilgi alabilirsiniz.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${vText} araçlarımız için hazırladığımız düşük faiz ve takas destekli yeni dönem bayi kampanyamızı sizinle paylaşmak istedim. Düşünürseniz stoktaki hemen teslim araçlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`);
       setInternalNote('Özel finansman ve takas kampanyası bilgisi paylaşıldı.');
     } else if (type === 'takip') {
       setStatus('follow_up');
-      setMessage(`Sayın ${customerForm.company_name || customer.company_name || 'Yetkili'}, daha önce görüşmüş olduğumuz ${vText} aracımız hakkındaki değerlendirmenizi öğrenmek ve yardımcı olabileceğimiz noktaları netleştirmek isteriz.`);
+      setMessage(`Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Daha önce paylaşmış olduğumuz ${vText} kampanyamız ve teklifimiz hakkındaki değerlendirmenizi öğrenmek istedim. Düşünürseniz yardımcı olabileceğimiz noktaları netleştirmekten memnuniyet duyarım.`);
       setInternalNote('Önceki teklif sonrası takip mesajı gönderildi.');
     }
   };
