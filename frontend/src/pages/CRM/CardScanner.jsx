@@ -293,11 +293,7 @@ export default function CardScanner() {
 
       toast.success("Müşteri kaydedildi ve WhatsApp Bilgi Kartı açılıyor! 🎯", { id: 'route_load' });
 
-      const recipient = contactName.trim()
-        ? `Sayın ${contactName}`
-        : `Sayın ${companyName} Yetkilisi`;
-
-      const defaultMsg = `Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${companyName ? companyName + ' firmanız' : 'Firmanız'} için hazırladığımız avantajlı IVECO ${selectedVehicle || 'ticari araç'} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`;
+      const defaultMsg = `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız avantajlı IVECO ${selectedVehicle || 'Daily Şasi'} kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`;
 
       // WhatsApp modali ve yönlendirmesini tetikle
       openWhatsApp(phone, defaultMsg, {

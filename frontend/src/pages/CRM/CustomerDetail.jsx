@@ -200,14 +200,12 @@ export default function CustomerDetail() {
   };
 
   const selectWhatsAppTemplate = (tmplKey) => {
-    const recipient = customer?.contacts?.[0]?.contact_name || customer?.contact_name || customer?.company_name || 'Yetkili';
-    const recipientText = recipient ? `Sayın ${recipient}` : 'Yetkili';
     const templates = {
-      kampanya: `Merhaba ${recipientText}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız avantajlı IVECO ticari araç kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız, düşük faiz ve takas destekli bayi fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`,
-      teklif: `Merhaba ${recipientText}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için ilgilendiğiniz IVECO ticari araç modelimizle ilgili hazırladığımız özel fiyat teklifimizi ve ödeme planını paylaşmak istedim. Düşünürseniz detayları birlikte incelemekten memnuniyet duyarım.`,
-      tanisma: `Merhaba ${recipientText}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ERC Samsun Otomotiv IVECO Yetkili Satıcısı olarak ticari araç ve filo ihtiyaçlarınız konusunda avantajlı çözümlerimizi paylaşmak istedim. Düşünürseniz detaylı bilgi vermekten memnuniyet duyarım.`,
-      katalog: `Merhaba ${recipientText}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. IVECO Daily ve Ağır Vasıta modellerimizin güncel ürün kataloğunu ve avantajlı bayi finansman seçeneklerimizi bilginize sunmak istedim. Düşünürseniz detayları görüşmekten memnuniyet duyarım.`,
-      proforma: `Merhaba ${recipientText}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız resmi IVECO ticari araç teklif ve proforma detaylarını paylaşmak istedim. Düşünürseniz teslimat sürecini ve koşulları değerlendirmekten memnuniyet duyarım.`
+      kampanya: `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız avantajlı IVECO ticari araç kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`,
+      teklif: `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız avantajlı IVECO ticari araç kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`,
+      tanisma: `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Ticari araç ve filo ihtiyaçlarınıza yönelik avantajlı IVECO çözümlerimizi sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`,
+      katalog: `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. IVECO Daily ve Ağır Vasıta modellerimizin güncel ürün kataloğunu ve avantajlı bayi finansman koşullarımızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`,
+      proforma: `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız resmi IVECO proforma teklif detaylarını paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`
     };
     if (templates[tmplKey]) {
       setWhatsAppForm({ message: templates[tmplKey], template_name: tmplKey });
@@ -351,8 +349,7 @@ export default function CustomerDetail() {
       toast.error('Müşterinin telefon numarası kayıtlı değil');
       return;
     }
-    const recipient = customer?.contact_name ? `Sayın ${customer.contact_name}` : `Sayın ${customer?.company_name || 'Yetkili'}`;
-    const msg = `Merhaba ${recipient}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dilerim.`;
+    const msg = `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. ${rem.title}${rem.notes ? ' - ' + rem.notes : ''}. İyi çalışmalar dilerim.`;
     openWhatsApp(customer.phone, msg, { customer });
   };
 

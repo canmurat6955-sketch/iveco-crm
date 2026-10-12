@@ -697,7 +697,7 @@ export default function DiscoveryList() {
                           <button 
                             type="button"
                             className="btn btn-secondary btn-sm"
-                            onClick={() => openWhatsApp(biz.phone, `Sayın ${biz.company_name} yetkilisi, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için önerilen avantajlı IVECO ${biz.recommended_iveco || 'ticari araç'} kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız ve fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`, {
+                            onClick={() => openWhatsApp(biz.phone, `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız avantajlı IVECO ${biz.recommended_iveco || 'Daily Şasi'} kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`, {
                               customer: {
                                 id: biz.existing_customer_id,
                                 company_name: biz.company_name,
@@ -1373,7 +1373,7 @@ export default function DiscoveryList() {
                             </a>
                             <button
                               type="button"
-                              onClick={() => openWhatsApp(biz.phone, `Merhaba ${biz.name ? `Sayın ${biz.name}` : 'Yetkili'}, ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Firmanız için hazırladığımız avantajlı IVECO ticari araç kampanyamızı ve özel fiyat teklifimizi sizinle paylaşmak istedim. Düşünürseniz hemen teslim araçlarımız ve fırsatlarımız hakkında detaylı bilgi vermekten memnuniyet duyarım.`, {
+                              onClick={() => openWhatsApp(biz.phone, `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Sizin için hazırladığımız avantajlı IVECO ticari araç kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`, {
                                 customer: {
                                   company_name: biz.name || biz.company_name || 'İşletme',
                                   phone: biz.phone,
