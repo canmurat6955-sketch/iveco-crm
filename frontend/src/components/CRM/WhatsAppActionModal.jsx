@@ -4,10 +4,10 @@ import {
   FiMessageSquare, FiX, FiCheckCircle, FiCalendar, FiClock,
   FiSend, FiTag, FiTruck, FiPhone, FiCheck, FiUser, FiBriefcase,
   FiMapPin, FiChevronDown, FiChevronUp, FiSave, FiExternalLink,
-  FiFileText, FiArrowRight, FiRefreshCw
+  FiFileText, FiArrowRight, FiRefreshCw, FiDollarSign, FiPercent, FiCreditCard
 } from 'react-icons/fi';
 import VoiceInputButton from '../common/VoiceInputButton';
-import { salesApi, vehiclesApi, crmApi } from '../../api/client';
+import { salesApi, vehiclesApi, crmApi, campaignsApi } from '../../api/client';
 import { launchNativeWhatsApp } from '../../utils/whatsapp';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -87,6 +87,23 @@ export default function WhatsAppActionModal({
     segment: '',
     sales_notes: ''
   });
+
+  // Dinamik Finansman & Çatı Matrisi State'leri
+  const [financingMatrices, setFinancingMatrices] = useState([]);
+  const [showFinancing, setShowFinancing] = useState(false);
+  const [selectedMatrixId, setSelectedMatrixId] = useState(null);
+  const [selectedPrincipal, setSelectedPrincipal] = useState(null);
+  const [selectedTermMonths, setSelectedTermMonths] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      campaignsApi.getFinancingMatrices({ active_only: true })
+        .then(res => {
+          if (res.data) setFinancingMatrices(res.data);
+        })
+        .catch(() => {});
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && customer) {
@@ -216,6 +233,34 @@ export default function WhatsAppActionModal({
       setMessage(`Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Daha önce paylaşmış olduğumuz ${vText} kampanyamız hakkındaki değerlendirmenizi öğrenmek istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`);
       setInternalNote('Önceki teklif sonrası takip mesajı gönderildi.');
     }
+  };
+
+  // ── Finansman Matrisi Hesaplamaları (L&M vs HEAVY Filtresi) ──
+  const isHeavyVehicle = selectedVehicle.includes('S-Way') || selectedVehicle.includes('T-Way') || selectedVehicle.includes('X-Way');
+  const targetVehicleGroup = isHeavyVehicle ? 'heavy' : 'light_medium';
+  const availableMatrices = financingMatrices.filter(m => m.vehicle_group === targetVehicleGroup);
+
+  const activeMatrix = (selectedMatrixId ? availableMatrices.find(m => m.id === selectedMatrixId) : null) || availableMatrices[0];
+
+  let parsedTiers = [];
+  try {
+    parsedTiers = activeMatrix ? JSON.parse(activeMatrix.tiers_json || '[]') : [];
+  } catch {}
+
+  const activeTier = (selectedPrincipal ? parsedTiers.find(t => t.principal === selectedPrincipal) : null) || parsedTiers[0];
+  const termsList = activeTier?.terms || [];
+  const activeTerm = (selectedTermMonths ? termsList.find(t => t.months === selectedTermMonths) : null) || termsList[0];
+
+  const handleAppendFinancing = () => {
+    if (!activeMatrix || !activeTier || !activeTerm) {
+      toast.error('Lütfen geçerli bir finansman ve taksit seçeneği belirleyin.');
+      return;
+    }
+    const graceText = activeTerm.grace_months ? `ilk ${activeTerm.grace_months} ay ödemesiz, ` : '';
+    const rateText = activeTerm.rate ? ` (${activeTerm.rate} oran)` : '';
+    const financeSnippet = `\n\n📌 ${activeMatrix.bank_name} Çatı Kampanyası (${activeMatrix.campaign_name}):\n${activeTier.formatted_principal} kredi için ${graceText}${activeTerm.months} ay boyunca aylık ${Number(activeTerm.monthly_payment).toLocaleString('tr-TR')} TL taksit fırsatıyla hemen teslim.${rateText}`;
+    setMessage(prev => prev.trim() + financeSnippet);
+    toast.success(`${activeMatrix.bank_name} taksit teklifi mesaja eklendi! 🏦`);
   };
 
   const handleAddDays = (days) => {
@@ -664,6 +709,177 @@ export default function WhatsAppActionModal({
                   ⏳ Karar Takibi
                 </button>
               </div>
+            </div>
+
+            {/* Dinamik Banka Çatı Finansmanı & Kampanya Seçici */}
+            <div style={{
+              marginBottom: '1rem',
+              borderRadius: '8px',
+              border: showFinancing ? '1px solid #3b82f6' : '1px dashed var(--border-color)',
+              background: showFinancing ? 'rgba(59, 130, 246, 0.03)' : 'transparent',
+              overflow: 'hidden',
+              transition: 'all 0.2s ease'
+            }}>
+              <button
+                type="button"
+                onClick={() => setShowFinancing(!showFinancing)}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: showFinancing ? '#2563eb' : 'var(--text-color)',
+                  fontWeight: 600,
+                  fontSize: '0.82rem'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <FiCreditCard size={15} style={{ color: '#2563eb' }} />
+                  <span>🏦 Banka Çatı Kampanyası & Finansman Ekle</span>
+                  <span style={{
+                    fontSize: '0.7rem',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    background: isHeavyVehicle ? '#fef3c7' : '#e0f2fe',
+                    color: isHeavyVehicle ? '#92400e' : '#0369a1',
+                    fontWeight: 500
+                  }}>
+                    {isHeavyVehicle ? 'Ağır Vasıta (HEAVY)' : 'Hafif & Orta (L&M)'}
+                  </span>
+                </div>
+                {showFinancing ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+              </button>
+
+              {showFinancing && (
+                <div style={{ padding: '10px 14px 14px', borderTop: '1px solid rgba(59, 130, 246, 0.15)' }}>
+                  {availableMatrices.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Bu araç grubu için henüz kayıtlı aktif çatı kampanyası bulunmuyor.
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {/* Banka & Kampanya Seçimi */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                          Banka & Kampanya Anlaşması:
+                        </label>
+                        <select
+                          className="form-input"
+                          style={{ fontSize: '0.82rem', padding: '6px 8px' }}
+                          value={activeMatrix?.id || ''}
+                          onChange={e => {
+                            const mId = Number(e.target.value);
+                            setSelectedMatrixId(mId);
+                            setSelectedPrincipal(null);
+                            setSelectedTermMonths(null);
+                          }}
+                        >
+                          {availableMatrices.map(m => (
+                            <option key={m.id} value={m.id}>
+                              {m.bank_name} — {m.campaign_name} ({m.validity_period || 'Güncel'})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Kredi Tutarı (Anapara) Seçimi */}
+                      {parsedTiers.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                            Kredi Tutarı:
+                          </label>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {parsedTiers.map(t => {
+                              const isSel = (activeTier?.principal === t.principal);
+                              return (
+                                <button
+                                  key={t.principal}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedPrincipal(t.principal);
+                                    setSelectedTermMonths(null);
+                                  }}
+                                  className={`btn btn-sm ${isSel ? 'btn-primary' : 'btn-secondary'}`}
+                                  style={{
+                                    fontSize: '0.76rem',
+                                    padding: '3px 8px',
+                                    fontWeight: isSel ? 600 : 400
+                                  }}
+                                >
+                                  {t.formatted_principal}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Vade & Taksit Seçimi */}
+                      {termsList.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                            Vade & Taksit Tutarı:
+                          </label>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {termsList.map(term => {
+                              const isSel = (activeTerm?.months === term.months);
+                              return (
+                                <button
+                                  key={term.months}
+                                  type="button"
+                                  onClick={() => setSelectedTermMonths(term.months)}
+                                  className={`btn btn-sm ${isSel ? 'btn-primary' : 'btn-secondary'}`}
+                                  style={{
+                                    fontSize: '0.76rem',
+                                    padding: '4px 10px',
+                                    display: 'inline-flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-start',
+                                    lineHeight: 1.2
+                                  }}
+                                >
+                                  <span>
+                                    {term.grace_months ? `${term.grace_months} Ay Ödemesiz + ` : ''}<strong>{term.months} Ay Vade</strong>
+                                  </span>
+                                  <span style={{ fontSize: '0.7rem', opacity: 0.9 }}>
+                                    {Number(term.monthly_payment).toLocaleString('tr-TR')} TL / Ay {term.rate ? `(${term.rate})` : ''}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mesaja Ekle Butonu */}
+                      {activeTerm && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                          <button
+                            type="button"
+                            onClick={handleAppendFinancing}
+                            className="btn btn-primary btn-sm"
+                            style={{
+                              fontSize: '0.78rem',
+                              padding: '5px 12px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              background: '#2563eb'
+                            }}
+                          >
+                            <FiCheck size={13} />
+                            <span>Bu Finansman Teklifini Mesaja Ekle</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* WhatsApp Mesaj Metni + Sesli Dikte */}

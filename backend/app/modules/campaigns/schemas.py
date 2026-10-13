@@ -41,3 +41,41 @@ class CampaignResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     model_config = {"from_attributes": True}
+
+
+class FinancingMatrixCreate(BaseModel):
+    bank_name: str
+    vehicle_group: str  # "light_medium" | "heavy"
+    campaign_name: str
+    applicable_models: Optional[str] = None
+    validity_period: Optional[str] = None
+    notes: Optional[str] = None
+    tiers_json: str = "[]"
+    is_active: bool = True
+
+
+class FinancingMatrixUpdate(BaseModel):
+    bank_name: Optional[str] = None
+    vehicle_group: Optional[str] = None
+    campaign_name: Optional[str] = None
+    applicable_models: Optional[str] = None
+    validity_period: Optional[str] = None
+    notes: Optional[str] = None
+    tiers_json: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class FinancingMatrixResponse(BaseModel):
+    id: int
+    bank_name: str
+    vehicle_group: str
+    campaign_name: str
+    applicable_models: Optional[str] = None
+    validity_period: Optional[str] = None
+    is_active: bool
+    notes: Optional[str] = None
+    tiers_json: str
+    created_at: datetime
+    updated_at: datetime
+    model_config = {"from_attributes": True}
+

@@ -331,6 +331,16 @@ export const campaignsApi = {
   update: (id, data) => api.put(`/campaigns/${id}`, data),
   delete: (id) => api.delete(`/campaigns/${id}`),
   getCategories: () => api.get('/campaigns/categories'),
+
+  // Finansman & Banka Çatı Matrisleri
+  getFinancingMatrices: (params) => api.get('/campaigns/financing/matrices', { params }),
+  getFinancingMatrix: (id) => api.get(`/campaigns/financing/matrices/${id}`),
+  createFinancingMatrix: (data) => api.post('/campaigns/financing/matrices', data),
+  updateFinancingMatrix: (id, data) => api.put(`/campaigns/financing/matrices/${id}`, data),
+  deleteFinancingMatrix: (id) => api.delete(`/campaigns/financing/matrices/${id}`),
+  uploadCampaignExcel: (formData) => api.post('/campaigns/financing/upload-excel', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 };
 
 // ── Sales API ───────────────────────────────────────────────────

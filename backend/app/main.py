@@ -230,5 +230,217 @@ def _seed_initial_data():
         from app.modules.vehicles.service import VehicleService
         VehicleService(db).seed_master_data()
 
+        # Seed Banka Çatı Finansman Matrisleri (L&M ve HEAVY)
+        from app.modules.campaigns.models import FinancingMatrix
+        import json
+        if db.query(FinancingMatrix).count() == 0:
+            fm_seeds = [
+                FinancingMatrix(
+                    bank_name="Kuveyt Türk",
+                    vehicle_group="light_medium",
+                    campaign_name="6 Ay Ödemesiz - Bayi Katkılı",
+                    applicable_models="Daily 35 Şasi & Daily Van",
+                    validity_period="Eylül - Ekim 2026",
+                    is_active=True,
+                    notes="Daily 35 Şasi ve Van modelleri için ilk 6 ay ödemesiz taksitli kampanya.",
+                    tiers_json=json.dumps([
+                        {
+                            "principal": 1000000,
+                            "formatted_principal": "1.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 62390, "total_payment": 1497371, "rate": "%2.21"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 48808, "total_payment": 1757097, "rate": "%2.40"}
+                            ]
+                        },
+                        {
+                            "principal": 1500000,
+                            "formatted_principal": "1.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 98972, "total_payment": 2375326, "rate": "%2.55"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 77336, "total_payment": 2784087, "rate": "%2.67"}
+                            ]
+                        },
+                        {
+                            "principal": 2000000,
+                            "formatted_principal": "2.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 135609, "total_payment": 3254612, "rate": "%2.72"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 106012, "total_payment": 3816417, "rate": "%2.81"}
+                            ]
+                        },
+                        {
+                            "principal": 2500000,
+                            "formatted_principal": "2.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 171949, "total_payment": 4126777, "rate": "%2.81"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 134602, "total_payment": 4845677, "rate": "%2.89"}
+                            ]
+                        },
+                        {
+                            "principal": 3000000,
+                            "formatted_principal": "3.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 208629, "total_payment": 5007089, "rate": "%2.88"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 163089, "total_payment": 5871211, "rate": "%2.94"}
+                            ]
+                        }
+                    ], ensure_ascii=False)
+                ),
+                FinancingMatrix(
+                    bank_name="Kuveyt Türk",
+                    vehicle_group="light_medium",
+                    campaign_name="Daily 70C & Eurocargo - 6 Ay Ödemesiz",
+                    applicable_models="Daily 70C, Eurocargo",
+                    validity_period="Eylül - Ekim 2026",
+                    is_active=True,
+                    notes="Daily 70C ve Eurocargo modellerinde 6 ay ödemesiz bayi katkılı kampanya.",
+                    tiers_json=json.dumps([
+                        {
+                            "principal": 1000000,
+                            "formatted_principal": "1.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 58394, "total_payment": 1401459, "rate": "%1.33"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 45731, "total_payment": 1646317, "rate": "%1.78"}
+                            ]
+                        },
+                        {
+                            "principal": 1500000,
+                            "formatted_principal": "1.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 95315, "total_payment": 2287561, "rate": "%2.01"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 74579, "total_payment": 2684829, "rate": "%2.15"}
+                            ]
+                        },
+                        {
+                            "principal": 2000000,
+                            "formatted_principal": "2.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 132176, "total_payment": 3172216, "rate": "%2.20"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 103526, "total_payment": 3726932, "rate": "%2.32"}
+                            ]
+                        },
+                        {
+                            "principal": 2500000,
+                            "formatted_principal": "2.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 168972, "total_payment": 4055318, "rate": "%2.35"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 132254, "total_payment": 4761152, "rate": "%2.45"}
+                            ]
+                        }
+                    ], ensure_ascii=False)
+                ),
+                FinancingMatrix(
+                    bank_name="Denizbank",
+                    vehicle_group="light_medium",
+                    campaign_name="Çatı Anlaşması Standart Kampanya",
+                    applicable_models="Daily 35 Şasi & Panelvan",
+                    validity_period="Eylül - Ekim 2026",
+                    is_active=True,
+                    notes="Denizbank ticari taşıt kredisi bayi anlaşmalı avantajlı oranlar.",
+                    tiers_json=json.dumps([
+                        {
+                            "principal": 1000000,
+                            "formatted_principal": "1.000.000 TL",
+                            "terms": [
+                                {"months": 12, "grace_months": 0, "monthly_payment": 89000, "total_payment": 1068000, "rate": "%0.98"},
+                                {"months": 24, "grace_months": 0, "monthly_payment": 52300, "total_payment": 1255200, "rate": "%1.86"},
+                                {"months": 36, "grace_months": 0, "monthly_payment": 41100, "total_payment": 1479600, "rate": "%2.20"}
+                            ]
+                        },
+                        {
+                            "principal": 1500000,
+                            "formatted_principal": "1.500.000 TL",
+                            "terms": [
+                                {"months": 12, "grace_months": 0, "monthly_payment": 135000, "total_payment": 1620000, "rate": "%1.10"},
+                                {"months": 24, "grace_months": 0, "monthly_payment": 79500, "total_payment": 1908000, "rate": "%1.95"},
+                                {"months": 36, "grace_months": 0, "monthly_payment": 62800, "total_payment": 2260800, "rate": "%2.30"}
+                            ]
+                        },
+                        {
+                            "principal": 2000000,
+                            "formatted_principal": "2.000.000 TL",
+                            "terms": [
+                                {"months": 12, "grace_months": 0, "monthly_payment": 180000, "total_payment": 2160000, "rate": "%1.25"},
+                                {"months": 24, "grace_months": 0, "monthly_payment": 106000, "total_payment": 2544000, "rate": "%2.05"},
+                                {"months": 36, "grace_months": 0, "monthly_payment": 83500, "total_payment": 3006000, "rate": "%2.38"}
+                            ]
+                        }
+                    ], ensure_ascii=False)
+                ),
+                FinancingMatrix(
+                    bank_name="Kuveyt Türk",
+                    vehicle_group="heavy",
+                    campaign_name="S-Way & T-Way - 6 Ay Ödemesiz",
+                    applicable_models="S-Way Çekici, T-Way, X-Way",
+                    validity_period="Eylül - Ekim 2026",
+                    is_active=True,
+                    notes="Ağır vasıta S-Way ve T-Way için 6 ay ödemesiz filo ve bayi katkılı finansman.",
+                    tiers_json=json.dumps([
+                        {
+                            "principal": 2000000,
+                            "formatted_principal": "2.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 132000, "total_payment": 3168000, "rate": "%2.10"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 103000, "total_payment": 3708000, "rate": "%2.25"}
+                            ]
+                        },
+                        {
+                            "principal": 3000000,
+                            "formatted_principal": "3.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 198000, "total_payment": 4752000, "rate": "%2.20"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 154500, "total_payment": 5562000, "rate": "%2.35"}
+                            ]
+                        },
+                        {
+                            "principal": 4000000,
+                            "formatted_principal": "4.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 264000, "total_payment": 6336000, "rate": "%2.25"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 206000, "total_payment": 7416000, "rate": "%2.40"}
+                            ]
+                        },
+                        {
+                            "principal": 5000000,
+                            "formatted_principal": "5.000.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 6, "monthly_payment": 330000, "total_payment": 7920000, "rate": "%2.30"},
+                                {"months": 36, "grace_months": 6, "monthly_payment": 257500, "total_payment": 9270000, "rate": "%2.45"}
+                            ]
+                        }
+                    ], ensure_ascii=False)
+                ),
+                FinancingMatrix(
+                    bank_name="Garanti BBVA",
+                    vehicle_group="heavy",
+                    campaign_name="S-Way Çekici Avantajlı Finansman",
+                    applicable_models="IVECO S-Way 530 / 570",
+                    validity_period="Eylül - Ekim 2026",
+                    is_active=True,
+                    notes="S-Way uzun yol çekici alımlarında Garanti BBVA çatı finansman desteği.",
+                    tiers_json=json.dumps([
+                        {
+                            "principal": 2500000,
+                            "formatted_principal": "2.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 0, "monthly_payment": 142000, "total_payment": 3408000, "rate": "%2.15"},
+                                {"months": 36, "grace_months": 0, "monthly_payment": 112000, "total_payment": 4032000, "rate": "%2.35"}
+                            ]
+                        },
+                        {
+                            "principal": 3500000,
+                            "formatted_principal": "3.500.000 TL",
+                            "terms": [
+                                {"months": 24, "grace_months": 0, "monthly_payment": 198000, "total_payment": 4752000, "rate": "%2.20"},
+                                {"months": 36, "grace_months": 0, "monthly_payment": 156000, "total_payment": 5616000, "rate": "%2.40"}
+                            ]
+                        }
+                    ], ensure_ascii=False)
+                )
+            ]
+            db.add_all(fm_seeds)
+            db.commit()
+
     finally:
         db.close()
+

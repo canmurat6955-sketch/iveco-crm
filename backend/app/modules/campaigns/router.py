@@ -10,10 +10,75 @@ from datetime import date
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.modules.campaigns.service import CampaignService
-from app.modules.campaigns.schemas import CampaignUpdate, CampaignResponse
+from app.modules.campaigns.schemas import (
+    CampaignUpdate, CampaignResponse,
+    FinancingMatrixCreate, FinancingMatrixUpdate, FinancingMatrixResponse
+)
 
 router = APIRouter(prefix="/api/campaigns", tags=["Kampanyalar"])
 
+
+# ── Finansman & Banka Çatı Matrisleri Endpointleri ──────────────────
+
+@router.get("/financing/matrices", response_model=List[FinancingMatrixResponse])
+def list_financing_matrices(
+    vehicle_group: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    active_only: bool = Query(False),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return CampaignService(db).get_financing_matrices(vehicle_group, bank_name, active_only)
+
+
+@router.get("/financing/matrices/{matrix_id}", response_model=FinancingMatrixResponse)
+def get_financing_matrix(
+    matrix_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return CampaignService(db).get_financing_matrix(matrix_id)
+
+
+@router.post("/financing/matrices", response_model=FinancingMatrixResponse)
+def create_financing_matrix(
+    data: FinancingMatrixCreate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return CampaignService(db).create_financing_matrix(data)
+
+
+@router.put("/financing/matrices/{matrix_id}", response_model=FinancingMatrixResponse)
+def update_financing_matrix(
+    matrix_id: int,
+    data: FinancingMatrixUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return CampaignService(db).update_financing_matrix(matrix_id, data)
+
+
+@router.delete("/financing/matrices/{matrix_id}")
+def delete_financing_matrix(
+    matrix_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    CampaignService(db).delete_financing_matrix(matrix_id)
+    return {"message": "Finansman matrisi silindi"}
+
+
+@router.post("/financing/upload-excel")
+def upload_campaign_excel(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return CampaignService(db).import_excel_campaign(file)
+
+
+# ── Standart Kampanya & Katalog Endpointleri ───────────────────────
 
 @router.get("", response_model=List[CampaignResponse])
 def list_campaigns(
