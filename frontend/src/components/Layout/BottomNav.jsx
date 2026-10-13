@@ -2,11 +2,18 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { FiHome, FiUsers, FiMapPin, FiMap, FiMoreHorizontal, FiLogOut } from 'react-icons/fi';
 import { useState } from 'react';
 import NearbyRadarModal from '../CRM/NearbyRadarModal';
+import VoiceDebriefModal from '../VoiceDebrief/VoiceDebriefModal';
+import TCOCalculatorModal from '../TCO/TCOCalculatorModal';
+import BodybuilderMatcherModal from '../Bodybuilder/BodybuilderMatcherModal';
 
 export default function BottomNav({ onVisitStart }) {
   const navigate = useNavigate();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showRadar, setShowRadar] = useState(false);
+  const [showVoiceDebrief, setShowVoiceDebrief] = useState(false);
+  const [showTco, setShowTco] = useState(false);
+  const [showBodybuilder, setShowBodybuilder] = useState(false);
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -50,6 +57,30 @@ export default function BottomNav({ onVisitStart }) {
           <div className="more-menu-overlay" onClick={() => setShowMoreMenu(false)}>
             <div className="more-menu" onClick={e => e.stopPropagation()}>
               <div className="more-menu-header">Mobil Hızlı Menü</div>
+
+              <button 
+                className="more-menu-item" 
+                onClick={() => { setShowVoiceDebrief(true); setShowMoreMenu(false); }} 
+                style={{ fontWeight: 'bold', color: '#0284c7', background: 'rgba(2, 132, 199, 0.15)', border: '1px solid rgba(2, 132, 199, 0.3)' }}
+              >
+                🎙️ Araç İçi Sesli Satış Notu (AI Debrief)
+              </button>
+
+              <button 
+                className="more-menu-item" 
+                onClick={() => { setShowTco(true); setShowMoreMenu(false); }} 
+                style={{ fontWeight: 'bold', color: '#059669', background: 'rgba(5, 150, 105, 0.12)' }}
+              >
+                📊 TCO & Tasarruf Kıyaslama (50.000 km)
+              </button>
+
+              <button 
+                className="more-menu-item" 
+                onClick={() => { setShowBodybuilder(true); setShowMoreMenu(false); }} 
+                style={{ fontWeight: 'bold', color: '#d97706', background: 'rgba(217, 119, 6, 0.12)' }}
+              >
+                🏗️ Şasi - Üst Yapı & İstiap Motoru
+              </button>
               
               <button 
                 className="more-menu-item" 
@@ -58,6 +89,7 @@ export default function BottomNav({ onVisitStart }) {
               >
                 🎴 Kartvizit Tara & Yönlendir (Kamera)
               </button>
+
 
               <button 
                 className="more-menu-item" 
@@ -134,6 +166,22 @@ export default function BottomNav({ onVisitStart }) {
         isOpen={showRadar}
         onClose={() => setShowRadar(false)}
       />
+
+      <VoiceDebriefModal
+        isOpen={showVoiceDebrief}
+        onClose={() => setShowVoiceDebrief(false)}
+      />
+
+      <TCOCalculatorModal
+        isOpen={showTco}
+        onClose={() => setShowTco(false)}
+      />
+
+      <BodybuilderMatcherModal
+        isOpen={showBodybuilder}
+        onClose={() => setShowBodybuilder(false)}
+      />
     </>
   );
 }
+

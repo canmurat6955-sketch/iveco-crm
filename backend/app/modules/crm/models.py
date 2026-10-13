@@ -291,5 +291,44 @@ class CustomerAttachment(Base):
         return f"<CustomerAttachment {self.file_name} ({self.category}) for Customer#{self.customer_id}>"
 
 
+class ProposalTracking(Base):
+    """Müşteriye gönderilen akıllı teklif takip linkleri ve okundu bilgileri."""
+    __tablename__ = "proposal_trackings"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    proforma_id = Column(Integer, ForeignKey("proforma_invoices.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    token = Column(String(64), unique=True, nullable=False, index=True)
+    short_code = Column(String(20), unique=True, nullable=False, index=True)
+    view_count = Column(Integer, default=0)
+    last_viewed_at = Column(DateTime, nullable=True)
+    
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    proforma = relationship("ProformaInvoice")
+    customer = relationship("Customer")
+    creator = relationship("User")
+    view_events = relationship("ProposalViewEvent", back_populates="tracking", cascade="all, delete-orphan")
+
+
+class ProposalViewEvent(Base):
+    """Müşterinin teklifi açtığı anki okundu detayları."""
+    __tablename__ = "proposal_view_events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tracking_id = Column(Integer, ForeignKey("proposal_trackings.id", ondelete="CASCADE"), nullable=False, index=True)
+    viewed_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    ip_address = Column(String(100), nullable=True)
+    user_agent = Column(Text, nullable=True)
+    duration_seconds = Column(Integer, default=0)
+
+    tracking = relationship("ProposalTracking", back_populates="view_events")
+
+
+
 
 

@@ -79,11 +79,32 @@ export default function ProformaDetail() {
     }
   };
 
-  const handleWhatsAppShare = () => {
-    const origin = window.location.origin;
-    const wpMessage = `Sayın ${customer?.company_name?.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: ${origin}/proformas/${proforma.id}`;
-    const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
-    window.open(wpUrl, '_blank');
+  const handleWhatsAppShare = async () => {
+    try {
+      const origin = window.location.origin;
+      const trackRes = await crmApi.getProformaTrackingLink(id);
+      const trackingUrl = `${origin}/p/${trackRes.data.token}`;
+      const wpMessage = `Ben IVECO ERC Otomotiv Satış Sorumlusu Can Murat. Sizin için hazırladığımız ${proforma.vehicle_model} proforma teklifinizi incelemek için bağlantı:\n${trackingUrl}\n\nİnceledikten sonra detayları ve takas seçeneklerini görüşmekten memnuniyet duyarım.`;
+      const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
+      window.open(wpUrl, '_blank');
+    } catch (err) {
+      console.error(err);
+      toast.error('Akıllı takip bağlantısı oluşturulamadı.');
+    }
+  };
+
+  const handleCopySmartLink = async () => {
+    try {
+      toast.loading('Akıllı teklif linki oluşturuluyor...', { id: 'track' });
+      const origin = window.location.origin;
+      const trackRes = await crmApi.getProformaTrackingLink(id);
+      const trackingUrl = `${origin}/p/${trackRes.data.token}`;
+      await navigator.clipboard.writeText(trackingUrl);
+      toast.success('Akıllı takip linki kopyalandı! Müşteri açtığında anında bildirim alacaksınız.', { id: 'track', duration: 4000 });
+    } catch (err) {
+      console.error(err);
+      toast.error('Bağlantı kopyalanamadı.', { id: 'track' });
+    }
   };
 
   const handleDelete = async () => {
@@ -117,8 +138,11 @@ export default function ProformaDetail() {
           <button onClick={handleDelete} className="btn btn-danger btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <FiTrash2 size={16} /> Sil
           </button>
+          <button onClick={handleCopySmartLink} className="btn btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#6366f1', color: '#fff', border: 'none' }} title="Müşteri açtığında bildirim düşer">
+            🔗 Akıllı Takip Linki Kopyala
+          </button>
           <button onClick={handleWhatsAppShare} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#25D366', borderColor: '#25D366' }}>
-            <FiMessageCircle size={16} /> WhatsApp Paylaş
+            <FiMessageCircle size={16} /> WhatsApp Paylaş (Takip Linkli)
           </button>
           <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#1e40af', borderColor: '#1e40af' }}>
             <FiDownload size={16} /> PDF İndir
@@ -131,6 +155,7 @@ export default function ProformaDetail() {
           </button>
         </div>
       </div>
+
 
       {/* Printable Sheet A4 styled */}
       <div id="proforma-sheet" className="print-container" style={{

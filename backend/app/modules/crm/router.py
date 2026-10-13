@@ -5,7 +5,7 @@ import os
 import uuid
 import io
 from typing import List, Optional
-from fastapi import APIRouter, Depends, UploadFile, File, Form, Query, HTTPException, status
+from fastapi import APIRouter, Depends, UploadFile, File, Form, Query, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import openpyxl
@@ -299,6 +299,40 @@ def create_proforma(
 def get_proforma(proforma_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     """ID'ye göre proforma detayını getirir."""
     return CRMService(db).get_proforma(proforma_id)
+
+
+@router.post("/proformas/{proforma_id}/tracking-link")
+def create_proforma_tracking_link(
+    proforma_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Müşteriye gönderilecek akıllı takip linki ve token'ı üretir."""
+    return CRMService(db).get_or_create_proforma_tracking(proforma_id, current_user.id)
+
+
+@router.get("/proformas/public-view/{token}")
+def public_view_proforma(
+    token: str,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """Müşteri teklifi açtığında teklif sayfasını görüntüler ve satıcıya okundu anlık bildirimi gönderir."""
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("user-agent")
+    return CRMService(db).get_public_proforma_view(token, ip, ua)
+
+
+@router.get("/fleet-renewal-radar")
+def get_fleet_renewal_radar(
+    limit: int = Query(50),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Kritik yaş ve km eşiğindeki filoları ve otomatik filo yenileme tavsiyelerini listeler."""
+    return CRMService(db).get_fleet_renewal_radar(limit)
+
+
 
 
 @router.get("/proformas/{proforma_id}/export-excel")

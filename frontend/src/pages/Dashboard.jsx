@@ -13,6 +13,8 @@ import FieldAssistantHero from '../components/CRM/FieldAssistantHero';
 import TodayOpportunitiesCard from '../components/CRM/TodayOpportunitiesCard';
 import QuickVisitModal from '../components/CRM/QuickVisitModal';
 import NearbyRadarModal from '../components/CRM/NearbyRadarModal';
+import FleetRenewalRadarWidget from '../components/FleetRadar/FleetRenewalRadarWidget';
+
 
 const STAT_CARDS = [
   { key: 'total_customers', label: 'Toplam Müşteri', icon: FiUsers, gradient: 'linear-gradient(135deg, #1e3a5f, #2b7de9)' },
@@ -458,8 +460,12 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Filo Yaşam Döngüsü & Yenileme Radarı */}
+      <FleetRenewalRadarWidget onOpenWhatsApp={(item) => setWhatsAppModalData(item)} />
+
       {/* Pipeline + Trend Row */}
       <div className="dashboard-row-2 mt-6">
+
         <div className="card glass-card">
           <div className="card-header">
             <h3 className="card-title"><FiTrendingUp style={{ marginRight: 8 }} /> Satış Pipeline</h3>

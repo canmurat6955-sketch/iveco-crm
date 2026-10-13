@@ -17,8 +17,10 @@ from app.modules.sales_activity.schemas import (
     WhatsAppMessageCreate, WhatsAppSendRequest, WhatsAppMessageResponse,
     CommunicationsTimelineItem,
 )
-from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact
+from app.modules.crm.models import Customer, CustomerInteraction, CustomerContact, CustomerReminder, CustomerTradeIn
 from app.modules.auth.models import User
+from app.modules.sales_activity.voice_nlp import extract_entities_from_voice_text
+
 
 
 def normalize_phone(phone: Optional[str]) -> str:
@@ -909,5 +911,110 @@ class SalesActivityService:
         # Kronolojik olarak tersten sırala (en yeni en üstte)
         items.sort(key=lambda x: x.timestamp, reverse=True)
         return items[:limit]
+
+    def parse_voice_debrief(self, text: str) -> dict:
+        """Sözlü metni analiz eder ve ayıklanan CRM varlıklarını döndürür."""
+        return extract_entities_from_voice_text(text, self.db)
+
+    def commit_voice_debrief(self, data, user_id: int) -> dict:
+        """
+        Onaylanan sesli satış özetini CRM'e tam entegre olarak kaydeder:
+        1. SalesActivity kaydı oluşturur.
+        2. CustomerInteraction kaydı oluşturur.
+        3. Müşteri son iletişim tarihini ve ilgilenilen araç bilgisini günceller.
+        4. Varsa takas (TradeIn) kaydı oluşturur.
+        5. Varsa takip hatırlatıcısı (CustomerReminder) oluşturur.
+        6. Pipeline aşamasını günceller.
+        """
+        customer = self.db.query(Customer).filter(Customer.id == data.customer_id).first()
+        if not customer:
+            raise HTTPException(status_code=404, detail="Müşteri bulunamadı")
+
+        now = datetime.now(timezone.utc)
+
+        # 1. SalesActivity oluştur
+        activity = SalesActivity(
+            customer_id=customer.id,
+            user_id=user_id,
+            activity_type="voice_debrief",
+            message_content=data.raw_text or data.cleaned_summary,
+            notes=data.cleaned_summary,
+            status="replied" if data.pipeline_stage in ["proposal", "negotiation", "won"] else "sent",
+            next_follow_up=data.follow_up_date,
+            created_at=now,
+        )
+        self.db.add(activity)
+
+        # 2. CustomerInteraction oluştur
+        interaction = CustomerInteraction(
+            customer_id=customer.id,
+            user_id=user_id,
+            interaction_type="meeting",
+            notes=data.cleaned_summary,
+            next_action=data.follow_up_note or "Takip görüşmesi",
+            next_action_date=data.follow_up_date,
+            created_at=now,
+        )
+        self.db.add(interaction)
+
+        # 3. Müşteri güncellemesi (last_contact_date, pipeline_stage, vehicle)
+        customer.last_contact_date = date.today()
+        if data.pipeline_stage:
+            customer.pipeline_stage = data.pipeline_stage
+            customer.pipeline_note = data.cleaned_summary
+
+        if data.vehicle_model:
+            existing_note = customer.sales_notes or ""
+            veh_note = f"[Sesli Not - {date.today().strftime('%d.%m.%Y')}]: {data.vehicle_quantity} adet {data.vehicle_model}"
+            if data.body_type:
+                veh_note += f" ({data.body_type} Kasa)"
+            customer.sales_notes = f"{veh_note}\n{existing_note}".strip()
+
+        # 4. Takas Kaydı (Trade-In)
+        trade_in_id = None
+        if data.trade_in and data.trade_in.has_trade_in:
+            trade_in = CustomerTradeIn(
+                customer_id=customer.id,
+                user_id=user_id,
+                vehicle_brand=data.trade_in.vehicle_brand,
+                vehicle_model=data.trade_in.vehicle_model,
+                model_year=data.trade_in.model_year,
+                condition_notes=data.trade_in.notes or "Sesli not ile eklendi",
+                status="pending",
+                created_at=now,
+            )
+            self.db.add(trade_in)
+            self.db.flush()
+            trade_in_id = trade_in.id
+
+        # 5. Hatırlatıcı Kaydı (CustomerReminder)
+        reminder_id = None
+        if data.follow_up_date:
+            reminder = CustomerReminder(
+                customer_id=customer.id,
+                user_id=user_id,
+                reminder_date=data.follow_up_date,
+                reminder_type="takip",
+                title=f"Takip: {customer.company_name} ({data.vehicle_model or 'Görüşme'})",
+                notes=data.follow_up_note or data.cleaned_summary,
+                is_completed=False,
+                created_at=now,
+            )
+            self.db.add(reminder)
+            self.db.flush()
+            reminder_id = reminder.id
+
+        self.db.commit()
+
+        return {
+            "success": True,
+            "activity_id": activity.id,
+            "customer_id": customer.id,
+            "customer_name": customer.company_name,
+            "message": "Sesli satış özeti başarıyla CRM'e işlendi!",
+            "reminder_id": reminder_id,
+            "trade_in_id": trade_in_id,
+        }
+
 
 

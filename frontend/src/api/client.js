@@ -205,8 +205,12 @@ export const crmApi = {
   updateProforma: (proformaId, data) => api.put(`/crm/proformas/${proformaId}`, data),
   deleteProforma: (proformaId) => api.delete(`/crm/proformas/${proformaId}`),
   exportProformaExcel: (proformaId) => api.get(`/crm/proformas/${proformaId}/export-excel`, { responseType: 'blob' }),
+  getProformaTrackingLink: (proformaId) => api.post(`/crm/proformas/${proformaId}/tracking-link`),
+  getPublicProformaView: (token) => api.get(`/crm/proformas/public-view/${token}`),
+  getFleetRenewalRadar: (params) => api.get('/crm/fleet-renewal-radar', { params }),
   
   // Vehicle Catalog Endpoints
+
   searchVehicles: (query) => api.get('/crm/vehicles', { params: { query } }),
   importVehicles: (file) => {
     const formData = new FormData();
@@ -382,7 +386,12 @@ export const salesApi = {
 
   // ── Birleşik İletişim Zaman Tüneli ──
   getCommunicationsTimeline: (customerId, limit = 50) => api.get(`/sales/communications/timeline/${customerId}`, { params: { limit } }),
+
+  // ── Araç İçi Sesli Satış Özeti (Voice-to-CRM Debrief) ──
+  parseVoiceDebrief: (text) => api.post('/sales/voice/parse', { text }),
+  commitVoiceDebrief: (data) => api.post('/sales/voice/commit', data),
 };
+
 
 
 

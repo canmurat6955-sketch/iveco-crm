@@ -2,18 +2,24 @@
 CRM service: Customer CRUD, filtering, pagination, duplicate detection.
 """
 import math
+import re
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, desc, asc
 from fastapi import HTTPException, status
 from fuzzywuzzy import fuzz
+import secrets
+
 from datetime import datetime, timedelta, timezone, date
 from datetime import date as date_type
 
 from app.modules.crm.models import (
     Customer, CustomerInteraction, CustomerContact, ProformaInvoice,
-    Vehicle, CustomerFleetVehicle, CustomerReminder, CustomerTradeIn, CustomerAttachment
+    Vehicle, CustomerFleetVehicle, CustomerReminder, CustomerTradeIn, CustomerAttachment,
+    ProposalTracking, ProposalViewEvent
 )
+from app.modules.notifications.models import Notification
+
 from app.modules.crm.schemas import (
     CustomerCreate, CustomerUpdate, CustomerListResponse,
     CustomerResponse, InteractionCreate, CRMStats, DuplicateGroup,
@@ -1178,6 +1184,201 @@ class CRMService:
 
         results.sort(key=lambda x: x["distance_km"])
         return results[:limit]
+
+    # ── Akıllı Teklif Takip Zekâsı (Smart Proposal Link & Read Receipts) ──
+
+    def get_or_create_proforma_tracking(self, proforma_id: int, user_id: int) -> dict:
+        """Proforma için müşteriye özel takip edilebilir kısa bağlantı token'ı üretir."""
+        proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == proforma_id).first()
+        if not proforma:
+            raise HTTPException(status_code=404, detail="Proforma teklif bulunamadı")
+
+        tracking = self.db.query(ProposalTracking).filter(ProposalTracking.proforma_id == proforma_id).first()
+        if not tracking:
+            token = secrets.token_urlsafe(16)
+            short_code = f"p-{proforma.id}-{secrets.token_hex(3)}"
+            tracking = ProposalTracking(
+                proforma_id=proforma.id,
+                customer_id=proforma.customer_id,
+                created_by_id=user_id,
+                token=token,
+                short_code=short_code,
+                view_count=0,
+            )
+            self.db.add(tracking)
+            self.db.commit()
+            self.db.refresh(tracking)
+
+        return {
+            "tracking_id": tracking.id,
+            "proforma_id": proforma.id,
+            "token": tracking.token,
+            "short_code": tracking.short_code,
+            "view_count": tracking.view_count,
+            "last_viewed_at": tracking.last_viewed_at.isoformat() if tracking.last_viewed_at else None,
+            "tracking_url": f"/p/{tracking.token}",
+        }
+
+    def get_public_proforma_view(self, token: str, ip_address: Optional[str] = None, user_agent: Optional[str] = None) -> dict:
+        """
+        Müşteri teklif bağlantısını açtığında okundu kaydını tutar,
+        Can Murat'a anlık bildirim oluşturur ve teklif detayını döndürür.
+        """
+        tracking = self.db.query(ProposalTracking).filter(
+            (ProposalTracking.token == token) | (ProposalTracking.short_code == token)
+        ).first()
+
+        if not tracking:
+            raise HTTPException(status_code=404, detail="Teklif bağlantısı geçersiz veya süresi dolmuş")
+
+        proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == tracking.proforma_id).first()
+        if not proforma:
+            raise HTTPException(status_code=404, detail="Teklif bulunamadı")
+
+        customer = self.db.query(Customer).filter(Customer.id == proforma.customer_id).first()
+        creator = proforma.creator
+
+        now = datetime.now(timezone.utc)
+        tracking.view_count = (tracking.view_count or 0) + 1
+        tracking.last_viewed_at = now
+
+        # Okundu olayını kaydet
+        event = ProposalViewEvent(
+            tracking_id=tracking.id,
+            viewed_at=now,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        )
+        self.db.add(event)
+
+        # Satış temsilcisine anlık bildirim üret
+        company_label = customer.company_name if customer else "Müşteri"
+        city_label = f" ({customer.city})" if customer and customer.city else ""
+        notif = Notification(
+            user_id=tracking.created_by_id,
+            title="🔔 Teklifiniz Şu Anda İnceleniyor!",
+            message=f"{company_label}{city_label} için hazırladığınız {proforma.vehicle_model} teklifi müşteri tarafından görüntülendi! Sıcağı sıcağına aramak için harika bir an.",
+            notification_type="proposal_viewed",
+            related_entity_type="proforma",
+            related_entity_id=proforma.id,
+            is_read=False,
+            sent_at=now,
+        )
+        self.db.add(notif)
+        self.db.commit()
+
+        return {
+            "invoice_number": proforma.invoice_number,
+            "date": proforma.date.isoformat() if proforma.date else None,
+            "validity_date": proforma.validity_date.isoformat() if proforma.validity_date else None,
+            "vehicle_model": proforma.vehicle_model,
+            "model_year": proforma.model_year,
+            "motor_power": proforma.motor_power,
+            "color": proforma.color,
+            "max_weight": proforma.max_weight,
+            "grand_total": proforma.grand_total,
+            "payment_terms": proforma.payment_terms,
+            "notes": proforma.notes,
+            "delivery_place": proforma.delivery_place,
+            "company_name": customer.company_name if customer else "Sayın Müşterimiz",
+            "city": customer.city if customer else "",
+            "sales_rep_name": creator.full_name if creator else "Can Murat",
+            "sales_rep_email": creator.email if creator else "can.murat@ivecoerc.com",
+            "sales_rep_phone": "0530 000 00 00",
+            "dealer_title": "ERC SAMSUN OTOMOTİV SAN. VE TİC. A.Ş.",
+            "dealer_address": "Kirazlık Mah. 19 Mayıs San. Sit. No:1 Tekkeköy / SAMSUN",
+            "view_count": tracking.view_count,
+        }
+
+    # ── Filo Yaşam Döngüsü & Yenileme Radarı (Fleet Lifecycle Predictor) ──
+
+    def get_fleet_renewal_radar(self, limit: int = 50) -> List[dict]:
+        """
+        Müşterilerin mevcut filolarını tarayarak yaş (>=3 yıl) ve km (>160.000 km)
+        kritik eşiğine gelen filo yenileme fırsatlarını tespit eder.
+        """
+        current_year = date.today().year
+        radar_items = []
+
+        # 1. CustomerFleetVehicle tablosundan tarama
+        fleet_vehicles = self.db.query(CustomerFleetVehicle).join(Customer).filter(Customer.is_active == True).all()
+        for fv in fleet_vehicles:
+            cust = fv.customer
+            age = (current_year - fv.model_year) if fv.model_year else 0
+            mileage = fv.mileage or 0
+
+            is_urgent = age >= 4 or mileage >= 200000 or (fv.estimated_replacement_year and fv.estimated_replacement_year <= current_year)
+            is_upcoming = age >= 3 or mileage >= 150000
+
+            if is_urgent or is_upcoming:
+                brand_lower = (fv.brand or "").lower()
+                model_lower = (fv.model or "").lower()
+
+                # Tavsiye edilecek yeni IVECO modeli ve kampanya
+                if any(x in brand_lower or x in model_lower for x in ["transit", "master", "daily", "sprinter", "crafter", "ducato"]):
+                    suggested_iveco = "Yeni IVECO Daily 35C16 / 50C18 Şasi & Van"
+                    campaign_highlight = "Kuveyt Türk 6 Ay Ödemesiz Bayi Çatı Finansmanı & Yüksek Takas Desteği"
+                elif any(x in brand_lower or x in model_lower for x in ["atego", "cargo", "eurocargo", "npr", "nqr", "midlum"]):
+                    suggested_iveco = "Yeni IVECO Eurocargo 160E / 180E (12-18 Ton)"
+                    campaign_highlight = "Düşük Faizli Filo Kredisi & Yetkili Servis Bakım Paketi"
+                else:
+                    suggested_iveco = "Yeni IVECO S-Way 530 Çekici"
+                    campaign_highlight = "Heavy S-Way Çekici Avantajlı Finansman & Garanti Paketi"
+
+                radar_items.append({
+                    "id": f"fv-{fv.id}",
+                    "customer_id": cust.id,
+                    "customer_name": cust.company_name,
+                    "city": cust.city or "Samsun",
+                    "district": cust.district or "",
+                    "phone": cust.phone or "",
+                    "current_vehicle": f"{fv.brand} {fv.model} ({fv.model_year or 'Model Belirsiz'})",
+                    "plate_number": fv.plate_number or "",
+                    "age_years": age,
+                    "mileage": mileage,
+                    "urgency": "urgent" if is_urgent else "upcoming",
+                    "urgency_label": "🔴 Kritik Yenileme (Ağır Bakım Riski)" if is_urgent else "🟡 Yaklaşan Filo Yenileme Fırsatı",
+                    "reason": f"Araç {age} yaşında, tahmini {mileage:,} km'de. Garanti süresi dolmuş, bakım maliyetleri artmadan takas sunulmalı." if age >= 3 else "Planlanan filo yenileme periyodu geldi.",
+                    "suggested_iveco": suggested_iveco,
+                    "campaign_highlight": campaign_highlight,
+                })
+
+        # 2. Eğer kayıtlı fleet_vehicle azsa, Customer.current_fleet metnini analiz et
+        if len(radar_items) < 10:
+            customers_with_fleet = self.db.query(Customer).filter(
+                Customer.is_active == True,
+                Customer.current_fleet.isnot(None),
+                Customer.current_fleet != ""
+            ).limit(30).all()
+
+            for c in customers_with_fleet:
+                fleet_text = (c.current_fleet or "").lower()
+                year_match = re.search(r"\b(201\d|202[0-3])\b", fleet_text)
+                if year_match:
+                    model_year = int(year_match.group(1))
+                    age = current_year - model_year
+                    if age >= 3:
+                        radar_items.append({
+                            "id": f"cf-{c.id}",
+                            "customer_id": c.id,
+                            "customer_name": c.company_name,
+                            "city": c.city or "Samsun",
+                            "district": c.district or "",
+                            "phone": c.phone or "",
+                            "current_vehicle": f"Mevcut Filo ({c.current_fleet})",
+                            "plate_number": "",
+                            "age_years": age,
+                            "mileage": age * 45000,
+                            "urgency": "urgent" if age >= 4 else "upcoming",
+                            "urgency_label": "🔴 Kritik Yenileme" if age >= 4 else "🟡 Yaklaşan Filo Yenileme",
+                            "reason": f"Filodaki araçlar yaklaşık {age} yaşında ({model_year} model). Ağır bakım öncesi yeni IVECO filosu ile değiştirme fırsatı.",
+                            "suggested_iveco": "Yeni IVECO Daily 35C / Eurocargo",
+                            "campaign_highlight": "Kuveyt Türk 6 Ay Ödemesiz Bayi Çatı Kampanyası",
+                        })
+
+        radar_items.sort(key=lambda x: (0 if x["urgency"] == "urgent" else 1, -x["age_years"]))
+        return radar_items[:limit]
+
 
 
 

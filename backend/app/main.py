@@ -441,6 +441,68 @@ def _seed_initial_data():
             db.add_all(fm_seeds)
             db.commit()
 
+        # Seed Demo Filo Araçları (Filo Yaşam Döngüsü & Yenileme Radarı için)
+        from app.modules.crm.models import Customer, CustomerFleetVehicle
+        if db.query(CustomerFleetVehicle).count() == 0:
+            top_customers = db.query(Customer).order_by(Customer.id).limit(5).all()
+
+            if top_customers:
+                fleet_seeds = [
+                    CustomerFleetVehicle(
+                        customer_id=top_customers[0].id,
+                        brand="Ford",
+                        model="Transit 350L",
+                        model_year=2020,
+                        plate_number="55 ABC 421",
+                        body_type="Kapalı Kasa",
+                        mileage=215000,
+                        notes="Yüksek km, motor rektifiye ve ağır bakım periyodunda. Daily 35C teklif edilmeli."
+                    ),
+                    CustomerFleetVehicle(
+                        customer_id=top_customers[0].id,
+                        brand="Mercedes-Benz",
+                        model="Sprinter 316",
+                        model_year=2019,
+                        plate_number="55 AZ 882",
+                        body_type="Panelvan",
+                        mileage=260000,
+                        notes="Garanti bitti, servis maliyeti yüksek. Daily Panelvan veya 35C Şasi alternatifi."
+                    ),
+                    CustomerFleetVehicle(
+                        customer_id=top_customers[1].id if len(top_customers) > 1 else top_customers[0].id,
+                        brand="Ford",
+                        model="Cargo 1833",
+                        model_year=2021,
+                        plate_number="55 DF 109",
+                        body_type="Damper Kasa",
+                        mileage=185000,
+                        notes="Hafriyat ve şantiye aracı, aşınma yüksek. T-Way veya Eurocargo önerilecek."
+                    ),
+                    CustomerFleetVehicle(
+                        customer_id=top_customers[3].id if len(top_customers) > 3 else top_customers[0].id,
+                        brand="Isuzu",
+                        model="NPR 3D",
+                        model_year=2020,
+                        plate_number="55 KL 603",
+                        body_type="Açık Kasa",
+                        mileage=198000,
+                        notes="İnşaat malzemesi nakliyesi. Daily 72C (4100 mm) veya Eurocargo ML120E değişimi için ideal."
+                    ),
+                    CustomerFleetVehicle(
+                        customer_id=top_customers[4].id if len(top_customers) > 4 else top_customers[0].id,
+                        brand="Iveco",
+                        model="Daily 35C15",
+                        model_year=2022,
+                        plate_number="55 FR 310",
+                        body_type="Frigorifik Kasa",
+                        mileage=168000,
+                        notes="3. yıl dolumu, soğuk zincir lojistiği. Yeni Daily 70C / 72C Frigo büyüme teklifi."
+                    ),
+                ]
+                db.add_all(fleet_seeds)
+                db.commit()
+
     finally:
         db.close()
+
 

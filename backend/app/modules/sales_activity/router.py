@@ -16,7 +16,9 @@ from app.modules.sales_activity.schemas import (
     CallLogCreate, CallLogSyncRequest, CallLogResponse, CallStatsResponse, ConvertToLeadRequest,
     WhatsAppMessageCreate, WhatsAppSendRequest, WhatsAppMessageResponse,
     CommunicationsTimelineItem,
+    VoiceDebriefParseRequest, VoiceDebriefCommitRequest, VoiceDebriefCommitResponse,
 )
+
 
 
 router = APIRouter(prefix="/api/sales", tags=["Satış Aktiviteleri"])
@@ -277,5 +279,28 @@ def get_communications_timeline(
 ):
     """Müşterinin aramalar, WhatsApp ve ziyaretlerden oluşan birleşik iletişim zaman tüneli."""
     return SalesActivityService(db).get_communications_timeline(customer_id, limit)
+
+
+# ── Araç İçi Sesli Satış Özeti (Voice-to-CRM Debrief) ──
+
+@router.post("/voice/parse")
+def parse_voice_debrief(
+    data: VoiceDebriefParseRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """Sözlü metni NLP ile analiz eder; müşteri, araç, adet, takas, takip tarihi ve pipeline aşamasını ayıklar."""
+    return SalesActivityService(db).parse_voice_debrief(data.text)
+
+
+@router.post("/voice/commit", response_model=VoiceDebriefCommitResponse)
+def commit_voice_debrief(
+    data: VoiceDebriefCommitRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """Onaylanan sesli satış özetini CRM aktivitesi, hatırlatıcı, takas kaydı ve pipeline olarak kaydeder."""
+    return SalesActivityService(db).commit_voice_debrief(data, current_user.id)
+
 
 

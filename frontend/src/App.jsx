@@ -26,6 +26,7 @@ const ProformaQuick = lazy(() => import('./pages/CRM/ProformaQuick'));
 const VehicleManagement = lazy(() => import('./pages/Vehicles/VehicleManagement'));
 const PersonalContacts = lazy(() => import('./pages/Contacts/PersonalContacts'));
 const Workbench = lazy(() => import('./pages/Workbench/Workbench'));
+const PublicProposalView = lazy(() => import('./pages/Public/PublicProposalView'));
 
 const PageLoader = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>
@@ -58,7 +59,10 @@ export default function App() {
           <CallProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/p/:token" element={page(PublicProposalView)} />
+              <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
               <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+
                 <Route index element={page(Dashboard)} />
                 <Route path="workbench" element={page(Workbench)} />
                 <Route path="customers" element={page(CustomerList)} />

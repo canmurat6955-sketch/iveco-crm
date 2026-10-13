@@ -279,4 +279,40 @@ class CommunicationsTimelineItem(BaseModel):
     actor_name: Optional[str] = None
 
 
+class VoiceDebriefParseRequest(BaseModel):
+    text: str = Field(..., min_length=2)
+
+
+class TradeInInfo(BaseModel):
+    has_trade_in: bool = True
+    vehicle_brand: str
+    vehicle_model: str
+    model_year: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class VoiceDebriefCommitRequest(BaseModel):
+    customer_id: int
+    cleaned_summary: str
+    raw_text: Optional[str] = None
+    vehicle_model: Optional[str] = None
+    vehicle_quantity: int = 1
+    body_type: Optional[str] = None
+    trade_in: Optional[TradeInInfo] = None
+    follow_up_date: Optional[date] = None
+    follow_up_note: Optional[str] = None
+    pipeline_stage: Optional[str] = None  # lead, proposal, negotiation, won, lost
+
+
+class VoiceDebriefCommitResponse(BaseModel):
+    success: bool
+    activity_id: int
+    customer_id: int
+    customer_name: str
+    message: str
+    reminder_id: Optional[int] = None
+    trade_in_id: Optional[int] = None
+
+
+
 
