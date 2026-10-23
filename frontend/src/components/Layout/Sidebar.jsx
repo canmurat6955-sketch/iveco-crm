@@ -27,7 +27,7 @@ export default function Sidebar() {
   if (userName.startsWith('Satış') || userName.startsWith('Satis')) {
     userName = 'King';
   }
-  const userRole = user?.role === 'admin' ? 'Yönetici' : 'Satış Temsilcisi';
+  const userRole = (user?.role === 'admin' && !userName.includes('Can') && !userName.includes('King')) ? 'Yönetici' : 'Sales Priest';
   const userAvatar = userName.charAt(0);
 
   return (
