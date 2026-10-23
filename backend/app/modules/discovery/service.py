@@ -1045,6 +1045,75 @@ class DiscoveryService:
         self.db.add(signal)
         self.db.commit()
         self.db.refresh(signal)
+
+        # Eğer telefon numarası iletildiyse (örn: WhatsApp Durum Araç Seçici formundan)
+        # otomatik olarak CRM'e Lead (Aday Müşteri) olarak kaydet
+        if data.phone and len(data.phone.strip()) >= 7:
+            try:
+                from app.modules.auth.models import User
+                from app.modules.crm.models import Customer, CustomerContact, CustomerInteraction
+                from app.modules.vehicles.models import VehicleMaster, CustomerVehicleInterest
+
+                rep = self.db.query(User).filter(User.role == "sales_rep").first()
+                rep_id = rep.id if rep else 1
+
+                comp_name = data.company_name or f"Mobil Ziyaretçi ({data.target_model or 'Ticari Araç'})"
+
+                existing = self.db.query(Customer).filter(
+                    (Customer.phone == data.phone) |
+                    (Customer.company_name == comp_name)
+                ).first()
+
+                if not existing:
+                    customer = Customer(
+                        company_name=comp_name,
+                        phone=data.phone,
+                        city=data.city or "Samsun",
+                        district=data.district,
+                        sector="WhatsApp Durum / Akıllı Araç Seçici",
+                        potential_level="very_high",
+                        potential_score=98,
+                        segment="A",
+                        source="whatsapp_status_finder",
+                        pipeline_stage="lead",
+                        pipeline_note=f"WhatsApp Durum Seçicisi: {data.target_model or 'Daily'} | {data.target_campaign or 'Kuveyt Türk 6 Ay Ödemesiz'}",
+                        is_active=True,
+                        assigned_to_id=rep_id,
+                    )
+                    self.db.add(customer)
+                    self.db.commit()
+                    self.db.refresh(customer)
+
+                    contact = CustomerContact(
+                        customer_id=customer.id,
+                        contact_name=comp_name,
+                        phone=data.phone,
+                        role="Firma Yetkilisi",
+                        is_primary=True,
+                    )
+                    self.db.add(contact)
+                else:
+                    customer = existing
+                    customer.pipeline_stage = "lead"
+                    customer.pipeline_note = f"WhatsApp Durum Seçicisi İlgisi: {data.target_model}"
+                    self.db.add(customer)
+
+                ci = CustomerInteraction(
+                    customer_id=customer.id,
+                    user_id=rep_id,
+                    interaction_type="web",
+                    notes=f"WhatsApp Durum Seçicisinden teklif talebi bıraktı: Model: {data.target_model}, Kampanya: {data.target_campaign}. Not: {data.notes or ''}",
+                    created_at=datetime.now(timezone.utc),
+                )
+                self.db.add(ci)
+
+                signal.matched_customer_id = customer.id
+                signal.status = "converted"
+                self.db.commit()
+            except Exception as e:
+                # Log error and continue
+                print("Auto-lead creation error:", e)
+
         return {"id": signal.id, "message": "Niyet sinyali kaydedildi", "intent_score": signal.intent_score}
 
     def convert_intent_signal_to_lead(self, signal_id: int, user_id: int) -> dict:

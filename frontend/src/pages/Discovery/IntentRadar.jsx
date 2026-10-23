@@ -44,6 +44,8 @@ export default function IntentRadar() {
 
   // Smart Link Generator Modal State
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [copiedStatusText, setCopiedStatusText] = useState(false);
   const [generatorModel, setGeneratorModel] = useState('Daily 35C16 Şasi');
   const [generatorCampaign, setGeneratorCampaign] = useState('kuveyt-turk-6-ay');
   const [generatorCompany, setGeneratorCompany] = useState('');
@@ -250,6 +252,27 @@ export default function IntentRadar() {
           >
             <FiZap size={16} />
             Akıllı Kampanya Linki Üret
+          </button>
+
+          <button
+            onClick={() => setIsStatusModalOpen(true)}
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '10px 16px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)'
+            }}
+          >
+            <FiMessageSquare size={16} />
+            📲 WhatsApp Durumunda Paylaş
           </button>
 
           <button
@@ -1095,6 +1118,153 @@ export default function IntentRadar() {
                 }}
               >
                 Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── WHATSAPP STATUS SHARING MODAL ────────────────────── */}
+      {isStatusModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid rgba(34, 197, 94, 0.4)',
+            borderRadius: '16px',
+            maxWidth: '560px',
+            width: '100%',
+            padding: '28px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setIsStatusModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer'
+              }}
+            >
+              <FiX size={20} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <div style={{
+                background: '#22c55e',
+                color: '#fff',
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 12px rgba(34, 197, 94, 0.4)'
+              }}>
+                <FiMessageSquare size={20} />
+              </div>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+                  WhatsApp Durum Paylaşım Kartı
+                </h2>
+                <span style={{ fontSize: '0.78rem', color: '#4ade80' }}>
+                  Akıllı Araç & Kredi Seçici Linki
+                </span>
+              </div>
+            </div>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: 1.5 }}>
+              Aşağıdaki hazır şablonu WhatsApp Durumunuzda paylaşın. Müşterileriniz durumunuzdaki linke tıkladığında istedikleri tonaj ve kasayı seçip anında taksit hesaplayabilir; teklif istediklerinde doğrudan bu radara <strong>🔥 Çok Sıcak</strong> olarak düşerler!
+            </p>
+
+            {/* Metin Kutusu */}
+            <div style={{
+              background: 'var(--bg-primary)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '10px',
+              padding: '16px',
+              marginBottom: '16px',
+              fontSize: '0.84rem',
+              lineHeight: 1.6,
+              color: '#e2e8f0',
+              whiteSpace: 'pre-wrap'
+            }}>
+{`🚛 İŞİNİZE EN UYGUN IVECO'YU VE 6 AY ÖDEMESİZ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲
+
+Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli aracı ve Kuveyt Türk 6 ay ertelemeli taksit tablonuzu anında özetlesin.
+
+👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
+👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum
+
+IVECO ERC Otomotiv • Can Murat`}
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE 6 AY ÖDEMESİZ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli aracı ve Kuveyt Türk 6 ay ertelemeli taksit tablonuzu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum\n\nIVECO ERC Otomotiv • Can Murat`;
+                  navigator.clipboard.writeText(text);
+                  setCopiedStatusText(true);
+                  toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');
+                  setTimeout(() => setCopiedStatusText(false), 3000);
+                }}
+                style={{
+                  flex: 1,
+                  background: copiedStatusText ? '#10b981' : '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  fontWeight: 700,
+                  fontSize: '0.88rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
+                }}
+              >
+                {copiedStatusText ? (
+                  <>
+                    <FiCheck size={18} /> Metin Kopyalandı!
+                  </>
+                ) : (
+                  <>
+                    <FiCopy size={18} /> Durum Metnini & Linki Kopyala
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => window.open('https://web.whatsapp.com', '_blank')}
+                style={{
+                  background: 'rgba(34, 197, 94, 0.15)',
+                  color: '#4ade80',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  fontWeight: 600,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer'
+                }}
+              >
+                WhatsApp Web'i Aç
               </button>
             </div>
           </div>
