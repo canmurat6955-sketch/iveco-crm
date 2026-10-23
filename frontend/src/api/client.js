@@ -345,6 +345,7 @@ export const campaignsApi = {
   uploadCampaignExcel: (formData) => api.post('/campaigns/financing/upload-excel', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+  getOutreachRecipients: () => api.get('/campaigns/outreach/recipients'),
 };
 
 // ── Sales API ───────────────────────────────────────────────────

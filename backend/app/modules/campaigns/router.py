@@ -144,3 +144,48 @@ def download_file(campaign_id: int, db: Session = Depends(get_db), current_user=
     path = CampaignService(db).get_file_path(campaign_id)
     campaign = CampaignService(db).get_campaign(campaign_id)
     return FileResponse(path, filename=campaign.file_name, media_type=campaign.file_type)
+
+
+@router.get("/outreach/recipients")
+def get_campaign_recipients(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """WhatsApp üzerinden kampanya iletilen ve okunan firmaları listeler."""
+    from app.modules.sales_activity.models import WhatsAppMessage
+    from app.modules.crm.models import Customer
+    
+    messages = (
+        db.query(WhatsAppMessage)
+        .filter(
+            WhatsAppMessage.media_url.ilike("%kuveyt_turk_daily_6ay%") |
+            WhatsAppMessage.content.ilike("%Daily Şasi kampanyamızı%")
+        )
+        .order_by(WhatsAppMessage.created_at.desc())
+        .all()
+    )
+    
+    result = []
+    for m in messages:
+        c = m.customer
+        if not c:
+            continue
+        result.append({
+            "id": m.id,
+            "customer_id": c.id,
+            "company_name": c.company_name,
+            "phone": m.phone_number,
+            "district": c.district,
+            "city": c.city,
+            "sector": c.sector,
+            "status": m.status,
+            "read_time": m.created_at.strftime("%H:%M") if m.created_at else None,
+            "created_at": m.created_at.isoformat() if m.created_at else None,
+            "sender_name": m.sender_name or "Can Murat",
+            "content": m.content,
+            "media_url": m.media_url,
+            "pipeline_stage": c.pipeline_stage,
+            "potential_score": c.potential_score,
+            "segment": c.segment,
+        })
+    return result

@@ -440,8 +440,20 @@ export default function CustomerList() {
                       )}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-heading)' }}>
-                        {c.company_name}
+                      <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span>{c.company_name}</span>
+                        {c.pipeline_note && c.pipeline_note.includes('Okundu') && (
+                          <span style={{
+                            background: '#dcfce7',
+                            color: '#166534',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            padding: '1px 5px',
+                            borderRadius: 4
+                          }}>
+                            ✓✓ Kampanya Okundu
+                          </span>
+                        )}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         <FiMapPin size={12} />
@@ -594,7 +606,24 @@ export default function CustomerList() {
                 <td style={{ textAlign: 'center' }} onClick={e => toggleSelect(c.id, e)}>
                   {selected.has(c.id) ? <FiCheckSquare size={16} style={{ color: 'var(--accent-blue-light)' }} /> : <FiSquare size={16} style={{ color: 'var(--text-muted)' }} />}
                 </td>
-                <td className="font-semibold">{c.company_name}</td>
+                <td className="font-semibold">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <span>{c.company_name}</span>
+                    {c.pipeline_note && c.pipeline_note.includes('Okundu') && (
+                      <span style={{
+                        background: '#dcfce7',
+                        color: '#166534',
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        padding: '1px 6px',
+                        borderRadius: 4,
+                        whiteSpace: 'nowrap'
+                      }} title={c.pipeline_note}>
+                        ✓✓ Kampanya Okundu
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td>{c.city || '—'} {c.district ? `/ ${c.district}` : ''}</td>
                 <td className="text-muted">{c.sector || '—'}</td>
                 <td className="hide-on-mobile">{c.phone || '—'}</td>

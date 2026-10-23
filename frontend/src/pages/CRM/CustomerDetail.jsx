@@ -693,6 +693,58 @@ export default function CustomerDetail() {
             })}
           </div>
 
+          {/* WhatsApp Kampanya İletim & Okunma Rozeti */}
+          {customer.pipeline_note && customer.pipeline_note.includes('Okundu') && (
+            <div style={{
+              margin: '0 0 20px 0',
+              padding: '12px 16px',
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 78, 59, 0.2))',
+              border: '1.5px solid rgba(16, 185, 129, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 10
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{
+                  background: '#10b981',
+                  color: '#fff',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  padding: '3px 8px',
+                  borderRadius: 6,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  ✓✓ KAMPANYA OKUNDU
+                </span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#10b981' }}>
+                    {customer.pipeline_note}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                    Can Murat tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <a
+                  href="/campaigns/kuveyt_turk_daily_6ay.png"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-xs btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#10b981', borderColor: '#10b981' }}
+                >
+                  <FiEye size={12} /> İletilen Tabloyu Gör
+                </a>
+              </div>
+            </div>
+          )}
+
           <div className="form-row" style={{ gap: '2rem' }}>
             <div>
               <div className="text-xs text-muted mb-4" style={{ textTransform: 'uppercase', letterSpacing: 1 }}>İletişim</div>
@@ -1134,9 +1186,16 @@ export default function CustomerDetail() {
                             </span>
                           )}
                           {isWA && (
-                            <span className="badge" style={{ fontSize: '0.7rem', background: item.direction === 'outbound' ? '#10b98125' : '#3b82f625', color: item.direction === 'outbound' ? '#10b981' : '#60a5fa' }}>
-                              {item.direction === 'outbound' ? '↗️ Giden İleti' : '↙️ Gelen Yanıt'}
-                            </span>
+                            <>
+                              <span className="badge" style={{ fontSize: '0.7rem', background: item.direction === 'outbound' ? '#10b98125' : '#3b82f625', color: item.direction === 'outbound' ? '#10b981' : '#60a5fa' }}>
+                                {item.direction === 'outbound' ? '↗️ Giden İleti' : '↙️ Gelen Yanıt'}
+                              </span>
+                              {item.status === 'read' && (
+                                <span className="badge" style={{ fontSize: '0.7rem', background: '#dcfce7', color: '#166534', fontWeight: 800 }}>
+                                  ✓✓ Okundu
+                                </span>
+                              )}
+                            </>
                           )}
                         </div>
 
@@ -1156,6 +1215,14 @@ export default function CustomerDetail() {
                         <p className="text-sm" style={{ margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
                           {item.summary}
                         </p>
+                      )}
+
+                      {item.media_url && (
+                        <div style={{ marginTop: 8 }}>
+                          <a href={item.media_url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', color: '#10b981', textDecoration: 'none', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 8px', borderRadius: 4, border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                            🖼️ Eklenen Kampanya Görselini Görüntüle ↗
+                          </a>
+                        </div>
                       )}
                     </div>
                   </div>

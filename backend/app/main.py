@@ -502,6 +502,329 @@ def _seed_initial_data():
                 db.add_all(fleet_seeds)
                 db.commit()
 
+        # Seed WhatsApp Kampanya Gönderilen & Okunan 14 Samsun Nakliyat/Ambar Firması
+        from datetime import datetime, timezone, date, timedelta
+        import re
+        from app.modules.crm.models import Customer, CustomerContact, CustomerInteraction
+        from app.modules.vehicles.models import VehicleMaster, CustomerVehicleInterest
+        from app.modules.sales_activity.models import SalesActivity, WhatsAppMessage
+        from app.modules.campaigns.models import Campaign
+        from app.modules.contacts.models import PersonalContact
+
+        # Ensure sales_rep name is Can Murat
+        sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
+        if sales_rep and sales_rep.full_name != "Can Murat":
+            sales_rep.full_name = "Can Murat"
+            db.add(sales_rep)
+            db.commit()
+
+        # 1. Kuveyt Türk Daily 6 Ay Ödemesiz Kampanyası (Campaign tablosu)
+        daily_campaign = db.query(Campaign).filter(
+            Campaign.title.ilike("%Kuveyt Türk 6 Ay Ödemesiz%Daily%")
+        ).first()
+        if not daily_campaign:
+            daily_campaign = Campaign(
+                title="Kuveyt Türk 6 Ay Ödemesiz - Daily Şasi Kampanyası",
+                category="finance_campaign",
+                description="Daily 35 Şasi ve Van modelleri için ilk 6 ay ödemesiz Kuveyt Türk bayi katkılı finansman kampanyası (1M-3M TL, 24 ve 36 ay vadeli).",
+                file_path=os.path.join(settings.FILE_STORAGE_PATH, "campaigns", "kuveyt_turk_daily_6ay.png") if os.path.exists(os.path.join(settings.FILE_STORAGE_PATH, "campaigns", "kuveyt_turk_daily_6ay.png")) else None,
+                file_name="kuveyt_turk_daily_6ay.png",
+                file_type="image/png",
+                validity_start=date(2026, 9, 1),
+                validity_end=date(2026, 11, 30),
+                version="2026-Q4",
+                is_active=True,
+                uploaded_by_id=sales_rep.id if sales_rep else 1,
+            )
+            db.add(daily_campaign)
+            db.commit()
+            db.refresh(daily_campaign)
+
+        # 2. Daily 35C16 Şasi Kamyonet Master Vehicle
+        daily_master_vehicle = db.query(VehicleMaster).filter(
+            VehicleMaster.vehicle_group == "Daily",
+            VehicleMaster.model_code == "35C16",
+            VehicleMaster.vehicle_sub_group.ilike("%Şasi%")
+        ).first()
+
+        campaign_companies = [
+            {
+                "company_name": "Temel Nakliyat Samsun Ambarı",
+                "contact_name": "Temel Bey",
+                "phone": "0532 555 10 14",
+                "district": "İlkadım (Ambarlar)",
+                "address": "Ambarlar Sitesi No: 14, İlkadım / Samsun",
+                "sector": "Ambar & Taşımacılık",
+                "hour": 10, "minute": 14,
+            },
+            {
+                "company_name": "SHL Sahil Lojistik (Samsun Şubesi)",
+                "contact_name": "Şahin Bey",
+                "phone": "0533 555 10 13",
+                "district": "Tekkeköy (Lojistik Köy)",
+                "address": "Samsun Lojistik Köyü B Blok No: 12, Tekkeköy / Samsun",
+                "sector": "Ulusal & Bölgesel Lojistik",
+                "hour": 10, "minute": 13,
+            },
+            {
+                "company_name": "Anadolu Ambarı Samsun Hattı",
+                "contact_name": "Kemal Bey",
+                "phone": "0535 555 10 13",
+                "district": "İlkadım",
+                "address": "Kıran Mah. Ambarlar Cad. No: 8, İlkadım / Samsun",
+                "sector": "Ambar & Parça Yük Taşımacılığı",
+                "hour": 10, "minute": 13,
+            },
+            {
+                "company_name": "Samsun Lojistik Center",
+                "contact_name": "Filo Müdürü",
+                "phone": "0542 555 10 12",
+                "district": "Tekkeköy",
+                "address": "Lojistik Center Tesisleri, Tekkeköy / Samsun",
+                "sector": "Depolama & Dağıtım Lojistiği",
+                "hour": 10, "minute": 12,
+            },
+            {
+                "company_name": "Öncü Nakliyat & Ambar Hizmetleri",
+                "contact_name": "Murat Bey",
+                "phone": "0530 555 10 12",
+                "district": "Canik",
+                "address": "Eski Sanayi Sitesi 24. Sok. No: 5, Canik / Samsun",
+                "sector": "Şehirlerarası Nakliyat & Ambar",
+                "hour": 10, "minute": 12,
+            },
+            {
+                "company_name": "Körfez Parça Eşya Taşım",
+                "contact_name": "Hüseyin Bey",
+                "phone": "0544 555 10 06",
+                "district": "Atakum / Körfez",
+                "address": "Körfez Mah. Atatürk Bulvarı No: 142, Atakum / Samsun",
+                "sector": "Parça Eşya & Şehir İçi Dağıtım",
+                "hour": 10, "minute": 6,
+            },
+            {
+                "company_name": "Terme Can Nakliyat",
+                "contact_name": "Can Bey",
+                "phone": "0536 555 10 05",
+                "district": "Terme",
+                "address": "Sanayi Mah. Çarşamba Yolu Üzeri No: 45, Terme / Samsun",
+                "sector": "Tarım Ürünleri & Ağır Nakliyat",
+                "hour": 10, "minute": 5,
+            },
+            {
+                "company_name": "Atakum Nakliyat",
+                "contact_name": "Erkan Bey",
+                "phone": "0546 555 10 04",
+                "district": "Atakum",
+                "address": "Mimar Sinan Mah. İsmet İnönü Bulv. No: 88, Atakum / Samsun",
+                "sector": "Evden Eve & Ofis Taşımacılığı",
+                "hour": 10, "minute": 4,
+            },
+            {
+                "company_name": "Gümüşay Nakliyat Samsun",
+                "contact_name": "Gümüşay Yetkilisi",
+                "phone": "0537 555 10 04",
+                "district": "İlkadım",
+                "address": "Zafer Mah. Şevket Dingil Sok. No: 11, İlkadım / Samsun",
+                "sector": "Şehirlerarası Parça & Komple Taşımacılık",
+                "hour": 10, "minute": 4,
+            },
+            {
+                "company_name": "Samsun Özgüray Nakliyat",
+                "contact_name": "Özgür Bey",
+                "phone": "0538 555 10 03",
+                "district": "Canik",
+                "address": "Kuzey Sanayi Sitesi 32. Blok No: 7, Canik / Samsun",
+                "sector": "Ambar & Lojistik Dağıtım",
+                "hour": 10, "minute": 3,
+            },
+            {
+                "company_name": "Kılıç Ege Nakliyat",
+                "contact_name": "Kılıç Bey",
+                "phone": "0541 445 95 85",
+                "district": "Tekkeköy",
+                "address": "Organize Sanayi Bölgesi 12. Cad. No: 19, Tekkeköy / Samsun",
+                "sector": "Ege & Akdeniz Hattı Taşımacılık",
+                "hour": 10, "minute": 1,
+            },
+            {
+                "company_name": "Kılıç Ege Nakliyat & Lojistik",
+                "contact_name": "Kılıçlar Filo Sorumlusu",
+                "phone": "0538 280 40 87",
+                "district": "Tekkeköy",
+                "address": "Samsun Lojistik Köyü D Blok No: 4, Tekkeköy / Samsun",
+                "sector": "Filo Lojistik & Parsiyel Taşıma",
+                "hour": 10, "minute": 1,
+            },
+            {
+                "company_name": "Kenan Aydın Sinan Aydın Samtaş Nakliye Rehberim",
+                "contact_name": "Kenan Aydın / Sinan Aydın",
+                "phone": "0532 334 08 73",
+                "district": "Canik",
+                "address": "Güdül Sanayi Sitesi Nakliyeciler Sitesi No: 23, Canik / Samsun",
+                "sector": "Samsun - Marmara Düzenli Sefer & Ağır Nakliyat",
+                "hour": 10, "minute": 1,
+            },
+            {
+                "company_name": "Samsun Öz Samtaş Ambarı",
+                "contact_name": "Samtaş Ambar Müdürü",
+                "phone": "0362 266 55 01",
+                "district": "Canik (Doğu Sanayi)",
+                "address": "Doğu Sanayi Sitesi 15. Sok. No: 18, Canik / Samsun",
+                "sector": "Ambar Kargo & Parsiyel Nakliyat",
+                "hour": 10, "minute": 1,
+            },
+        ]
+
+        outreach_msg = (
+            "Ben IVECO ERC Otomotiv Satış Sorumlusu Can Murat. "
+            "Sizin için hazırladığımız avantajlı IVECO Daily Şasi kampanyamızı sizinle paylaşmak istedim. "
+            "Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım."
+        )
+
+        rep_id = sales_rep.id if sales_rep else 1
+
+        for c_data in campaign_companies:
+            cust = db.query(Customer).filter(Customer.company_name == c_data["company_name"]).first()
+            if not cust:
+                cust = Customer(
+                    company_name=c_data["company_name"],
+                    phone=c_data["phone"],
+                    city="Samsun",
+                    district=c_data["district"],
+                    address=c_data["address"],
+                    sector=c_data["sector"],
+                    pipeline_stage="proposal",
+                    pipeline_note="Kuveyt Türk 6 Ay Ödemesiz Daily Şasi Kampanyası Gönderildi (Okundu)",
+                    segment="B",
+                    potential_score=80,
+                    potential_level="high",
+                    last_contact_date=date(2026, 10, 20),
+                    source="whatsapp_campaign",
+                    is_active=True,
+                    assigned_to_id=rep_id,
+                )
+                db.add(cust)
+                db.commit()
+                db.refresh(cust)
+            else:
+                cust.pipeline_stage = "proposal"
+                cust.pipeline_note = "Kuveyt Türk 6 Ay Ödemesiz Daily Şasi Kampanyası Gönderildi (Okundu)"
+                cust.segment = cust.segment or "B"
+                cust.potential_score = max(cust.potential_score or 0, 80)
+                cust.last_contact_date = date(2026, 10, 20)
+                db.add(cust)
+                db.commit()
+
+            # Contact
+            contact = db.query(CustomerContact).filter(CustomerContact.customer_id == cust.id).first()
+            if not contact:
+                contact = CustomerContact(
+                    customer_id=cust.id,
+                    contact_name=c_data["contact_name"],
+                    role="Firma Yetkilisi",
+                    phone=c_data["phone"],
+                    is_primary=True,
+                )
+                db.add(contact)
+                db.commit()
+
+            # Personal Contact sync (if existing)
+            pc = db.query(PersonalContact).filter(
+                (PersonalContact.full_name.ilike(f"%{c_data['company_name'][:12]}%")) |
+                (PersonalContact.phone == c_data["phone"])
+            ).first()
+            if pc and not pc.converted_customer_id:
+                pc.converted_customer_id = cust.id
+                db.add(pc)
+                db.commit()
+
+            # Vehicle Interest
+            if daily_master_vehicle:
+                vi = db.query(CustomerVehicleInterest).filter(CustomerVehicleInterest.customer_id == cust.id).first()
+                if not vi:
+                    vi = CustomerVehicleInterest(
+                        customer_id=cust.id,
+                        vehicle_id=daily_master_vehicle.id,
+                        interest_level="high",
+                        purchase_timeframe="0_30_days",
+                        estimated_quantity=1,
+                        customer_note="Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı Kampanyası iletildi. Daily 35C16 Şasi Kamyonet ilgisi.",
+                        opportunity_status="open",
+                        created_by=rep_id,
+                    )
+                    db.add(vi)
+                    db.commit()
+
+            # Specific timestamp from screenshot (2026-10-20 HH:MM)
+            msg_dt = datetime(2026, 10, 20, c_data["hour"], c_data["minute"], 0, tzinfo=timezone.utc)
+
+            # SalesActivity
+            sa = db.query(SalesActivity).filter(
+                SalesActivity.customer_id == cust.id,
+                SalesActivity.activity_type == "whatsapp",
+                SalesActivity.template_used == "Daily Şasi 6 Ay Ödemesiz Bayi Katkılı Kampanyası"
+            ).first()
+            if not sa:
+                sa = SalesActivity(
+                    customer_id=cust.id,
+                    user_id=rep_id,
+                    activity_type="whatsapp",
+                    template_used="Daily Şasi 6 Ay Ödemesiz Bayi Katkılı Kampanyası",
+                    campaign_id=daily_campaign.id if daily_campaign else None,
+                    message_content=outreach_msg,
+                    status="replied",
+                    notes=f"Kuveyt Türk 6 Ay Ödemesiz Kampanya Tablosu iletildi. Müşteri tarafından okundu (Mavi Çift Tık - Saat {c_data['hour']:02d}:{c_data['minute']:02d}).",
+                    created_at=msg_dt,
+                    updated_at=msg_dt,
+                )
+                db.add(sa)
+                db.commit()
+
+            # WhatsAppMessage
+            norm_phone = re.sub(r"\D", "", c_data["phone"])
+            wm = db.query(WhatsAppMessage).filter(
+                WhatsAppMessage.customer_id == cust.id,
+                WhatsAppMessage.phone_number == c_data["phone"]
+            ).first()
+            if not wm:
+                wm = WhatsAppMessage(
+                    customer_id=cust.id,
+                    contact_id=contact.id if contact else None,
+                    user_id=rep_id,
+                    phone_number=c_data["phone"],
+                    normalized_phone=norm_phone,
+                    direction="outbound",
+                    sender_name="Can Murat",
+                    message_type="image",
+                    content=outreach_msg,
+                    media_url="/campaigns/kuveyt_turk_daily_6ay.png",
+                    status="read",
+                    source="web_companion",
+                    created_at=msg_dt,
+                )
+                db.add(wm)
+                db.commit()
+
+            # CustomerInteraction
+            ci = db.query(CustomerInteraction).filter(
+                CustomerInteraction.customer_id == cust.id,
+                CustomerInteraction.interaction_type == "whatsapp",
+                CustomerInteraction.notes.ilike("%Kuveyt Türk 6 Ay Ödemesiz%")
+            ).first()
+            if not ci:
+                ci = CustomerInteraction(
+                    customer_id=cust.id,
+                    user_id=rep_id,
+                    interaction_type="whatsapp",
+                    notes=f"Daily Şasi Kuveyt Türk 6 Ay Ödemesiz Kampanyası iletildi ve okundu (Saat {c_data['hour']:02d}:{c_data['minute']:02d}).",
+                    next_action="Kuveyt Türk 24/36 ay ödemesiz taksit tercihi ve kasa detayları için takip araması yapılacak.",
+                    next_action_date=date.today() + timedelta(days=2),
+                    created_at=msg_dt,
+                )
+                db.add(ci)
+                db.commit()
+
     finally:
         db.close()
 

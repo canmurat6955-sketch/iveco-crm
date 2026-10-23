@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { campaignsApi, getBaseUrl } from '../../api/client';
 import toast from 'react-hot-toast';
 import { 
   FiFileText, FiCreditCard, FiUploadCloud, FiPlus, FiTrash2, 
-  FiCheck, FiX, FiRefreshCw, FiDollarSign, FiClock, FiChevronDown, FiChevronUp 
+  FiCheck, FiX, FiRefreshCw, FiDollarSign, FiClock, FiChevronDown, FiChevronUp,
+  FiEye, FiExternalLink, FiMessageSquare
 } from 'react-icons/fi';
 
 const CATEGORY_LABELS = {
@@ -14,6 +16,7 @@ const CATEGORY_LABELS = {
 };
 
 export default function CampaignList() {
+  const navigate = useNavigate();
   const [mainTab, setMainTab] = useState('financing'); // 'financing' | 'catalogs'
 
   // ── 1. Standart Kampanyalar / Kataloglar State'leri ──
@@ -29,6 +32,12 @@ export default function CampaignList() {
   const [loadingMatrices, setLoadingMatrices] = useState(false);
   const [uploadingExcel, setUploadingExcel] = useState(false);
   const excelInputRef = useRef(null);
+
+  // ── 3. WhatsApp Kampanya İletilen Firmalar State'leri ──
+  const [recipients, setRecipients] = useState([]);
+  const [loadingRecipients, setLoadingRecipients] = useState(false);
+  const [showRecipients, setShowRecipients] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Yeni Manuel Matris Modal
   const [showAddMatrix, setShowAddMatrix] = useState(false);
@@ -62,6 +71,11 @@ export default function CampaignList() {
       .then(r => setFinancingMatrices(r.data || []))
       .catch(() => {})
       .finally(() => setLoadingMatrices(false));
+
+    // WhatsApp ile iletilen ve okunan firmaları yükle
+    campaignsApi.getOutreachRecipients()
+      .then(r => setRecipients(r.data || []))
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -269,6 +283,193 @@ export default function CampaignList() {
               Toplam {financingMatrices.length} aktif çatı anlaşması tanımlı
             </div>
           </div>
+
+          {/* WhatsApp Kampanya Gönderilen & Okunan 14 Samsun Nakliyat/Ambar Firması */}
+          {recipients.length > 0 && (
+            <div className="card mb-6" style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 78, 59, 0.15))',
+              border: '1.5px solid rgba(16, 185, 129, 0.4)',
+              borderRadius: 12,
+              padding: '1.25rem',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                    <span style={{
+                      background: '#10b981',
+                      color: '#fff',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}>
+                      ✓✓ %100 OKUNDU
+                    </span>
+                    <span style={{
+                      background: 'rgba(59, 130, 246, 0.15)',
+                      color: '#60a5fa',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '3px 8px',
+                      borderRadius: 6
+                    }}>
+                      IVECO Daily Şasi (35C16 / 70C)
+                    </span>
+                    <span style={{
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      color: '#fbbf24',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      padding: '3px 8px',
+                      borderRadius: 6
+                    }}>
+                      Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı
+                    </span>
+                  </div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '6px 0 2px 0', color: 'var(--text-heading)' }}>
+                    📬 Kampanya İletilen ve Okunan Firmalar ({recipients.length} Firma)
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Samsun bölgesi ambar, kargo ve lojistik firmalarına WhatsApp üzerinden görsel ve resmi kampanya mesajı iletildi. Tüm firmalar tarafından çift tık ile okundu.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    className="btn btn-xs btn-secondary"
+                    onClick={() => setPreviewImage('/campaigns/kuveyt_turk_daily_6ay.png')}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.75rem', borderColor: '#10b981', color: '#10b981' }}
+                  >
+                    <FiEye size={13} />
+                    <span>Kampanya Görselini Gör</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-xs btn-secondary"
+                    onClick={() => setShowRecipients(!showRecipients)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.75rem' }}
+                  >
+                    {showRecipients ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+                    <span>{showRecipients ? 'Listeyi Gizle' : `Firmaları Göster (${recipients.length})`}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Mesaj Önizleme Kutusu */}
+              <div style={{
+                marginTop: 12,
+                padding: '8px 12px',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px dashed rgba(16, 185, 129, 0.3)',
+                borderRadius: 8,
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 8
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: '1.1rem' }}>💬</span>
+                  <span>
+                    <strong>İletilen Resmi Mesaj:</strong> "Ben IVECO ERC Otomotiv Satış Sorumlusu Can Murat. Sizin için hazırladığımız avantajlı IVECO Daily Şasi kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım."
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>Temsilci: Can Murat</span> • <span>Eki: Kuveyt Türk Taksit Tablosu</span>
+                </div>
+              </div>
+
+              {/* Firma Listesi Kartları / Tablosu */}
+              {showRecipients && (
+                <div style={{
+                  marginTop: 14,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                  gap: '0.75rem'
+                }}>
+                  {recipients.map(r => (
+                    <div
+                      key={r.id}
+                      onClick={() => navigate(`/customers/${r.customer_id}`)}
+                      style={{
+                        background: 'var(--bg-card, #1e293b)',
+                        border: '1px solid rgba(16, 185, 129, 0.25)',
+                        borderRadius: 8,
+                        padding: '10px 12px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = '#10b981';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.15)';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.25)';
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-heading)' }}>
+                            {r.company_name}
+                          </div>
+                          <span style={{
+                            background: '#dcfce7',
+                            color: '#166534',
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            padding: '2px 6px',
+                            borderRadius: 4,
+                            whiteSpace: 'nowrap',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 3
+                          }}>
+                            ✓✓ {r.read_time || 'Okundu'}
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>📍 {r.district || 'Samsun'}</span>
+                          <span>•</span>
+                          <span>{r.phone}</span>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        marginTop: 8,
+                        paddingTop: 6,
+                        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        fontSize: '0.72rem'
+                      }}>
+                        <span style={{ color: '#10b981', fontWeight: 600 }}>
+                          📋 Teklif Aşaması (%{r.potential_score || 80})
+                        </span>
+                        <span style={{ color: '#38bdf8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          Müşteri Kartı <FiExternalLink size={11} />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Matris Kartları Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
@@ -586,6 +787,57 @@ export default function CampaignList() {
                 <button type="submit" className="btn btn-primary">Kaydet</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Kampanya Görseli Önizleme Modalı */}
+      {previewImage && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }} onClick={() => setPreviewImage(null)}>
+          <div style={{
+            position: 'relative',
+            maxWidth: '900px',
+            maxHeight: '90vh',
+            background: 'var(--bg-card, #1e293b)',
+            borderRadius: 12,
+            padding: '1.25rem',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            display: 'flex',
+            flexDirection: 'column'
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)' }}>
+                📊 Kuveyt Türk 6 Ay Ödemesiz - Bayi Katkılı Kampanya Tablosu
+              </div>
+              <button
+                type="button"
+                className="btn btn-sm btn-secondary"
+                onClick={() => setPreviewImage(null)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <FiX size={16} /> Kapat
+              </button>
+            </div>
+            <div style={{ overflow: 'auto', textAlign: 'center', background: '#000', borderRadius: 8, padding: 8 }}>
+              <img
+                src={previewImage}
+                alt="Kampanya Tablosu"
+                style={{ maxWidth: '100%', maxHeight: '72vh', objectFit: 'contain', borderRadius: 4 }}
+              />
+            </div>
+            <div style={{ marginTop: 10, textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Bu kampanya tablosu WhatsApp üzerinden 14 Samsun lojistik ve nakliyat firmasına resmi teklif olarak iletilmiştir.
+            </div>
           </div>
         </div>
       )}
