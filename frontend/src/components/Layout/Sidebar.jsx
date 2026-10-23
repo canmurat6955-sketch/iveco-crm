@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -75,6 +75,10 @@ export default function Sidebar() {
           <NavLink to="/discovery" className={`nav-item ${isActive('/discovery') ? 'active' : ''}`}>
             <span className="nav-icon"><FiCompass size={18} /></span>
             Firma Keşfi
+          </NavLink>
+          <NavLink to="/intent-radar" className={`nav-item ${isActive('/intent-radar') ? 'active' : ''}`}>
+            <span className="nav-icon" style={{ color: '#f59e0b' }}><FiTarget size={18} /></span>
+            Arama & Niyet Radarı
           </NavLink>
           <NavLink to="/campaigns" className={`nav-item ${isActive('/campaigns') ? 'active' : ''}`}>
             <span className="nav-icon"><FiFolder size={18} /></span>

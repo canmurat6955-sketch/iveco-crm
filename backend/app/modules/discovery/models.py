@@ -132,7 +132,37 @@ class NewCompanyRegistration(Base):
     address = Column(Text, nullable=True)
     status = Column(String(50), default="new")  # new, contacted, converted, ignored
     matched_customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    customer = relationship("Customer", foreign_keys=[matched_customer_id], lazy="joined")
+
+
+class WebIntentSignal(Base):
+    """
+    Google Arama Niyeti, Web Sitesi Ziyaretçisi ve Akıllı Kampanya Takip Sinyalleri.
+    Müşterinin Google'da kamyon/araç arattığını ve kampanya sayfalarını incelediğini tespit eder.
+    """
+    __tablename__ = "web_intent_signals"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    source = Column(String(50), nullable=False, default="google_search")  # google_search, google_ads, whatsapp_link, direct_web
+    search_query = Column(String(500), nullable=True)  # "iveco daily 35c16 şasi", "satılık frigorifik kamyon", vb.
+    target_model = Column(String(100), nullable=True)  # Daily 35C16, Daily 70C, Eurocargo, S-Way 530
+    target_campaign = Column(String(200), nullable=True)  # Kuveyt Türk 6 Ay Ödemesiz, vb.
+    company_name = Column(String(500), nullable=True)  # Tespit edilen kurumsal IP / firma adı
+    city = Column(String(100), nullable=True, default="Samsun")
+    district = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    ip_address = Column(String(100), nullable=True)
+    page_url = Column(String(500), nullable=True)
+    referrer = Column(String(500), nullable=True)
+    duration_seconds = Column(Integer, default=45)  # Sayfada geçirilen süre
+    scroll_depth = Column(Integer, default=70)  # Sayfa inceleme derinliği %
+    intent_score = Column(Integer, default=85)  # 1-100 Niyet skoru
+    intent_level = Column(String(30), default="high")  # very_high (🔥 Çok Sıcak), high (Sıcak), medium (Orta), low
+    matched_customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True)
+    status = Column(String(50), default="new")  # new, contacted, converted, archived
+    notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     customer = relationship("Customer", foreign_keys=[matched_customer_id], lazy="joined")
+
 

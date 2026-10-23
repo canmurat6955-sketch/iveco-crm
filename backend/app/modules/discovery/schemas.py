@@ -258,3 +258,68 @@ class NewCompanyResponse(BaseModel):
     created_at: datetime
     model_config = {"from_attributes": True}
 
+
+# ── Google Arama & Dijital Niyet Radarı (Web Intent Signals) Schemas ─────
+
+class WebIntentSignalCreate(BaseModel):
+    source: str = "google_search"
+    search_query: Optional[str] = None
+    target_model: Optional[str] = None
+    target_campaign: Optional[str] = None
+    company_name: Optional[str] = None
+    city: Optional[str] = "Samsun"
+    district: Optional[str] = None
+    phone: Optional[str] = None
+    ip_address: Optional[str] = None
+    page_url: Optional[str] = None
+    referrer: Optional[str] = None
+    duration_seconds: int = 45
+    scroll_depth: int = 70
+    intent_score: int = 85
+    intent_level: str = "high"
+    matched_customer_id: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class WebIntentSignalUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+    matched_customer_id: Optional[int] = None
+
+
+class WebIntentSignalResponse(BaseModel):
+    id: int
+    source: str
+    search_query: Optional[str] = None
+    target_model: Optional[str] = None
+    target_campaign: Optional[str] = None
+    company_name: Optional[str] = None
+    city: Optional[str] = None
+    district: Optional[str] = None
+    phone: Optional[str] = None
+    ip_address: Optional[str] = None
+    page_url: Optional[str] = None
+    referrer: Optional[str] = None
+    duration_seconds: int
+    scroll_depth: int
+    intent_score: int
+    intent_level: str
+    matched_customer_id: Optional[int] = None
+    matched_customer_name: Optional[str] = None
+    status: str
+    notes: Optional[str] = None
+    created_at: datetime
+    model_config = {"from_attributes": True}
+
+
+class IntentStatsResponse(BaseModel):
+    total_signals: int
+    hot_leads_count: int
+    google_search_count: int
+    whatsapp_campaign_count: int
+    avg_intent_score: int
+    top_search_queries: List[dict]
+    top_target_models: List[dict]
+    top_locations: List[dict]
+
+

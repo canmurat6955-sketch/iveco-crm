@@ -307,6 +307,12 @@ export const discoveryApi = {
   // Yeni Kurulan Şirketler (Ticaret Sicil / NACE)
   getNewRegistrations: (city) => api.get('/discovery/new-registrations', { params: typeof city === 'object' ? city : { city } }),
   convertNewCompanyToLead: (id) => api.post(`/discovery/new-registrations/${id}/convert-to-lead`),
+
+  // Google Arama Niyeti & Dijital İstihbarat Radarı
+  getIntentSignals: (params) => api.get('/discovery/intent-signals', { params }),
+  recordIntentSignal: (data) => api.post('/discovery/intent-signals', data),
+  convertIntentToLead: (signalId) => api.post(`/discovery/intent-signals/${signalId}/convert-to-lead`),
+  getIntentStats: () => api.get('/discovery/intent-stats'),
 };
 
 // ── Enrichment API ──────────────────────────────────────────────

@@ -12,7 +12,8 @@ import httpx
 from app.core.config import settings
 from app.modules.discovery.models import (
     DiscoverySource, DiscoveredCompany,
-    Tender, BodybuilderPartner, BodybuilderReferral, NewCompanyRegistration
+    Tender, BodybuilderPartner, BodybuilderReferral, NewCompanyRegistration,
+    WebIntentSignal
 )
 from app.modules.discovery.schemas import (
     SourceCreate, SourceUpdate, DiscoveredCompanyList,
@@ -22,6 +23,8 @@ from app.modules.discovery.schemas import (
     BodybuilderCreate, BodybuilderUpdate, BodybuilderResponse,
     ReferralCreate, ReferralUpdate, ReferralResponse,
     NewCompanyResponse,
+    WebIntentSignalCreate, WebIntentSignalUpdate, WebIntentSignalResponse,
+    IntentStatsResponse,
 )
 from app.modules.discovery.sources.demo_source import OrtaKaradenizDemoScraper
 from app.modules.crm.models import Customer
@@ -963,4 +966,208 @@ class DiscoveryService:
         comp.status = "converted"
         self.db.commit()
         return {"message": "Yeni şirket CRM'e Aday Müşteri olarak aktarıldı!", "customer_id": customer.id}
+
+    # ── Google Arama & Dijital Niyet Radarı (Web Intent Signals) ──────────────
+
+    def get_intent_signals(
+        self,
+        source: Optional[str] = None,
+        intent_level: Optional[str] = None,
+        city: Optional[str] = None,
+        search: Optional[str] = None,
+        limit: int = 50,
+    ) -> List[dict]:
+        """Tüm dijital arama ve kampanya niyet sinyallerini listeler."""
+        query = self.db.query(WebIntentSignal).order_by(desc(WebIntentSignal.created_at))
+        if source:
+            query = query.filter(WebIntentSignal.source == source)
+        if intent_level:
+            query = query.filter(WebIntentSignal.intent_level == intent_level)
+        if city:
+            query = query.filter(WebIntentSignal.city.ilike(f"%{city}%"))
+        if search:
+            query = query.filter(
+                (WebIntentSignal.search_query.ilike(f"%{search}%")) |
+                (WebIntentSignal.company_name.ilike(f"%{search}%")) |
+                (WebIntentSignal.target_model.ilike(f"%{search}%"))
+            )
+        signals = query.limit(limit).all()
+
+        results = []
+        for s in signals:
+            cust_name = s.customer.company_name if s.customer else None
+            results.append({
+                "id": s.id,
+                "source": s.source,
+                "search_query": s.search_query,
+                "target_model": s.target_model,
+                "target_campaign": s.target_campaign,
+                "company_name": s.company_name,
+                "city": s.city,
+                "district": s.district,
+                "phone": s.phone,
+                "ip_address": s.ip_address,
+                "page_url": s.page_url,
+                "referrer": s.referrer,
+                "duration_seconds": s.duration_seconds,
+                "scroll_depth": s.scroll_depth,
+                "intent_score": s.intent_score,
+                "intent_level": s.intent_level,
+                "matched_customer_id": s.matched_customer_id,
+                "matched_customer_name": cust_name,
+                "status": s.status,
+                "notes": s.notes,
+                "created_at": s.created_at,
+            })
+        return results
+
+    def create_intent_signal(self, data: WebIntentSignalCreate) -> dict:
+        """Yeni bir web arama niyeti / kampanya tıklama sinyali kaydeder."""
+        signal = WebIntentSignal(
+            source=data.source,
+            search_query=data.search_query,
+            target_model=data.target_model,
+            target_campaign=data.target_campaign,
+            company_name=data.company_name,
+            city=data.city,
+            district=data.district,
+            phone=data.phone,
+            ip_address=data.ip_address,
+            page_url=data.page_url,
+            referrer=data.referrer,
+            duration_seconds=data.duration_seconds,
+            scroll_depth=data.scroll_depth,
+            intent_score=data.intent_score,
+            intent_level=data.intent_level,
+            matched_customer_id=data.matched_customer_id,
+            notes=data.notes,
+        )
+        self.db.add(signal)
+        self.db.commit()
+        self.db.refresh(signal)
+        return {"id": signal.id, "message": "Niyet sinyali kaydedildi", "intent_score": signal.intent_score}
+
+    def convert_intent_signal_to_lead(self, signal_id: int, user_id: int) -> dict:
+        """Tespit edilen arama niyeti sinyalini CRM'e Lead (Aday Müşteri) olarak aktarır."""
+        from app.modules.vehicles.models import VehicleMaster, CustomerVehicleInterest
+
+        signal = self.db.query(WebIntentSignal).filter(WebIntentSignal.id == signal_id).first()
+        if not signal:
+            raise HTTPException(status_code=404, detail="Niyet sinyali bulunamadı")
+
+        comp_name = signal.company_name or f"Google Ziyaretçisi ({signal.search_query or signal.target_model or 'Ticari Araç'})"
+        
+        # Müşteri zaten varsa eşleştir
+        existing = None
+        if signal.company_name:
+            existing = self.db.query(Customer).filter(Customer.company_name.ilike(f"%{signal.company_name}%")).first()
+
+        if existing:
+            customer = existing
+            customer.potential_score = max(customer.potential_score or 0, signal.intent_score)
+            customer.pipeline_note = f"Google/Web Ziyareti: '{signal.search_query or signal.target_model}' incelendi ({signal.duration_seconds} sn)"
+            self.db.add(customer)
+        else:
+            customer = Customer(
+                company_name=comp_name,
+                phone=signal.phone,
+                city=signal.city or "Samsun",
+                district=signal.district,
+                sector="Lojistik / Ticari Taşımacılık (Web Ziyaretçisi)",
+                sales_notes=f"Google Arama Terimi: '{signal.search_query}'. İncelediği Model: {signal.target_model}. Süre: {signal.duration_seconds} sn. Derinlik: %{signal.scroll_depth}.",
+                potential_level=signal.intent_level,
+                potential_score=signal.intent_score,
+                segment="A" if signal.intent_score >= 90 else "B",
+                source="google_search_intent",
+                pipeline_stage="lead",
+                pipeline_note=f"Google Aramasından Yakalandı: '{signal.search_query or signal.target_model}'",
+                is_active=True,
+                assigned_to_id=user_id,
+            )
+            self.db.add(customer)
+            self.db.commit()
+            self.db.refresh(customer)
+
+            # Araç ilgisi ekle
+            if signal.target_model:
+                vm = self.db.query(VehicleMaster).filter(
+                    (VehicleMaster.model_code.ilike(f"%{signal.target_model}%")) |
+                    (VehicleMaster.vehicle_group.ilike(f"%{signal.target_model}%"))
+                ).first()
+                if vm:
+                    vi = CustomerVehicleInterest(
+                        customer_id=customer.id,
+                        vehicle_id=vm.id,
+                        interest_level="purchase_ready" if signal.intent_score >= 90 else "high",
+                        purchase_timeframe="0_30_days",
+                        estimated_quantity=1,
+                        customer_note=f"Google araması '{signal.search_query}' üzerinden web sayfasında {signal.duration_seconds} sn inceleme yaptı.",
+                        opportunity_status="open",
+                        created_by=user_id,
+                    )
+                    self.db.add(vi)
+
+        signal.matched_customer_id = customer.id
+        signal.status = "converted"
+        self.db.commit()
+
+        return {
+            "message": f"'{customer.company_name}' CRM Lead Havuzuna başarıyla aktarıldı!",
+            "customer_id": customer.id,
+            "pipeline_stage": customer.pipeline_stage,
+        }
+
+    def get_intent_stats(self) -> dict:
+        """Dijital niyet ve arama istatistiklerini hesaplar."""
+        total = self.db.query(WebIntentSignal).count()
+        hot = self.db.query(WebIntentSignal).filter(WebIntentSignal.intent_level == "very_high").count()
+        google = self.db.query(WebIntentSignal).filter(WebIntentSignal.source.in_(["google_search", "google_ads"])).count()
+        whatsapp = self.db.query(WebIntentSignal).filter(WebIntentSignal.source == "whatsapp_link").count()
+        
+        avg_score_raw = self.db.query(func.avg(WebIntentSignal.intent_score)).scalar()
+        avg_score = int(avg_score_raw) if avg_score_raw else 85
+
+        # En çok aranan 5 terim
+        queries_raw = (
+            self.db.query(WebIntentSignal.search_query, func.count(WebIntentSignal.id))
+            .filter(WebIntentSignal.search_query.isnot(None))
+            .group_by(WebIntentSignal.search_query)
+            .order_by(desc(func.count(WebIntentSignal.id)))
+            .limit(5)
+            .all()
+        )
+        top_queries = [{"query": q, "count": cnt} for q, cnt in queries_raw if q]
+
+        # En çok incelenen modeller
+        models_raw = (
+            self.db.query(WebIntentSignal.target_model, func.count(WebIntentSignal.id))
+            .filter(WebIntentSignal.target_model.isnot(None))
+            .group_by(WebIntentSignal.target_model)
+            .order_by(desc(func.count(WebIntentSignal.id)))
+            .limit(5)
+            .all()
+        )
+        top_models = [{"model": m, "count": cnt} for m, cnt in models_raw if m]
+
+        # Lokasyon dağılımı
+        loc_raw = (
+            self.db.query(WebIntentSignal.city, WebIntentSignal.district, func.count(WebIntentSignal.id))
+            .group_by(WebIntentSignal.city, WebIntentSignal.district)
+            .order_by(desc(func.count(WebIntentSignal.id)))
+            .limit(5)
+            .all()
+        )
+        top_locations = [{"location": f"{d} / {c}" if d else c, "count": cnt} for c, d, cnt in loc_raw if c]
+
+        return {
+            "total_signals": total,
+            "hot_leads_count": hot,
+            "google_search_count": google,
+            "whatsapp_campaign_count": whatsapp,
+            "avg_intent_score": avg_score,
+            "top_search_queries": top_queries,
+            "top_target_models": top_models,
+            "top_locations": top_locations,
+        }
+
 

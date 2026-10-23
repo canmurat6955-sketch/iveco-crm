@@ -16,6 +16,7 @@ from app.modules.discovery.schemas import (
     BodybuilderCreate, BodybuilderUpdate, BodybuilderResponse,
     ReferralCreate, ReferralUpdate, ReferralResponse,
     NewCompanyResponse,
+    WebIntentSignalCreate, WebIntentSignalResponse, IntentStatsResponse,
 )
 
 router = APIRouter(prefix="/api/discovery", tags=["Firma Keşfi & Lead Radarı"])
@@ -227,4 +228,49 @@ def reject_company(company_id: int, db: Session = Depends(get_db), current_user=
 @router.get("/stats", response_model=DiscoveryStats)
 def get_stats(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return DiscoveryService(db).get_stats()
+
+
+# ── Google Arama & Dijital Niyet Radarı Endpoints ─────────────────────────
+
+@router.get("/intent-signals", response_model=List[WebIntentSignalResponse])
+def list_intent_signals(
+    source: Optional[str] = Query(None),
+    intent_level: Optional[str] = Query(None),
+    city: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Google Arama ve dijital kampanya niyet sinyallerini listeler."""
+    return DiscoveryService(db).get_intent_signals(source, intent_level, city, search, limit)
+
+
+@router.post("/intent-signals")
+def record_intent_signal(
+    data: WebIntentSignalCreate,
+    db: Session = Depends(get_db)
+):
+    """Web sitesi, kampanya linki veya Google üzerinden gelen niyet sinyalini kaydeder."""
+    return DiscoveryService(db).create_intent_signal(data)
+
+
+@router.post("/intent-signals/{signal_id}/convert-to-lead")
+def convert_intent_to_lead(
+    signal_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Tespit edilen arama niyeti sinyalini CRM'e Lead (Aday Müşteri) olarak aktarır."""
+    return DiscoveryService(db).convert_intent_signal_to_lead(signal_id, current_user.id)
+
+
+@router.get("/intent-stats", response_model=IntentStatsResponse)
+def get_intent_stats(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Dijital arama ve niyet radarı özet istatistiklerini getirir."""
+    return DiscoveryService(db).get_intent_stats()
+
 

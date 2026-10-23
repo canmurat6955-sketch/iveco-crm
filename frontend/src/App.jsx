@@ -17,6 +17,7 @@ const SalesActivity = lazy(() => import('./pages/Sales/SalesActivity'));
 const Pipeline = lazy(() => import('./pages/Sales/Pipeline'));
 const NotificationCenter = lazy(() => import('./pages/Notifications/NotificationCenter'));
 const DiscoveryList = lazy(() => import('./pages/Discovery/DiscoveryList'));
+const IntentRadar = lazy(() => import('./pages/Discovery/IntentRadar'));
 const RoutePlanner = lazy(() => import('./pages/Sales/RoutePlanner'));
 const CardScanner = lazy(() => import('./pages/CRM/CardScanner'));
 const MapPage = lazy(() => import('./pages/CRM/Map'));
@@ -74,6 +75,7 @@ export default function App() {
                 <Route path="pipeline" element={page(Pipeline)} />
                 <Route path="notifications" element={page(NotificationCenter)} />
                 <Route path="discovery" element={page(DiscoveryList)} />
+                <Route path="intent-radar" element={page(IntentRadar)} />
                 <Route path="routes" element={page(RoutePlanner)} />
                 <Route path="scan-card" element={page(CardScanner)} />
                 <Route path="map" element={page(MapPage)} />

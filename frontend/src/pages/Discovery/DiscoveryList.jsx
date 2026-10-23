@@ -505,6 +505,13 @@ export default function DiscoveryList() {
         >
           <FiSearch size={15} /> 🔎 Serbest Canlı Arama
         </button>
+        <button 
+          className="btn btn-sm btn-secondary"
+          onClick={() => navigate('/intent-radar')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', flexShrink: 0, borderColor: 'rgba(245, 158, 11, 0.5)', color: '#f59e0b' }}
+        >
+          <FiZap size={15} /> 🛰️ Google Arama & Niyet Radarı
+        </button>
       </div>
 
       {/* ── 9 HEDEF İL HIZLI FİLTRE BARI ───────────────────────────────── */}
