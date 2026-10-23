@@ -317,8 +317,8 @@ export default function FieldAssistantHero({
           }}
         >
           <div style={{ color: '#f472b6' }}><FiCamera size={22} /></div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f472b6' }}>Kartvizit Tara</span>
-          <span style={{ fontSize: '0.68rem', color: '#fbcfe8' }}>Kamera & Yönlendir</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f472b6', letterSpacing: '-0.01em' }}>Kartvizit Tara</span>
+          <span style={{ fontSize: '0.72rem', color: '#fbcfe8' }}>Kamera & Yönlendir</span>
         </button>
 
         <button
@@ -330,7 +330,7 @@ export default function FieldAssistantHero({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            padding: '12px 10px',
+            padding: '14px 10px',
             borderRadius: 12,
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -350,8 +350,8 @@ export default function FieldAssistantHero({
           }}
         >
           <div style={{ color: '#60a5fa' }}><FiUsers size={22} /></div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>Firma Ara</span>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>CRM Portföyü</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>Firma Ara</span>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>CRM Portföyü</span>
         </button>
 
         <button
@@ -363,26 +363,26 @@ export default function FieldAssistantHero({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            padding: '12px 10px',
+            padding: '14px 10px',
             borderRadius: 12,
-            background: 'rgba(2, 132, 199, 0.1)',
-            border: '1px solid rgba(2, 132, 199, 0.3)',
+            background: 'rgba(2, 132, 199, 0.14)',
+            border: '1px solid rgba(2, 132, 199, 0.35)',
             color: '#f8fafc',
             cursor: 'pointer',
             transition: 'transform 0.15s ease, background 0.15s ease'
           }}
           onMouseEnter={e => {
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.22)';
+            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.25)';
           }}
           onMouseLeave={e => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.1)';
+            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.14)';
           }}
         >
           <div style={{ color: '#38bdf8' }}><FiNavigation size={22} /></div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>Yakınımdakiler</span>
-          <span style={{ fontSize: '0.68rem', color: '#38bdf8' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em', color: '#f8fafc' }}>Yakınımdakiler</span>
+          <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>
             {stats.nearby_5km ? `${stats.nearby_5km} Müşteri (5 km)` : 'GPS Radarı'}
           </span>
         </button>
@@ -396,7 +396,7 @@ export default function FieldAssistantHero({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            padding: '12px 10px',
+            padding: '14px 10px',
             borderRadius: 12,
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -416,8 +416,8 @@ export default function FieldAssistantHero({
           }}
         >
           <div style={{ color: '#f59e0b' }}><FiCompass size={22} /></div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 700 }}>Bugünün Rotası</span>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Güzergah & Sıralama</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>Bugünün Rotası</span>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Güzergah & Sıralama</span>
         </button>
 
         <button
@@ -429,27 +429,27 @@ export default function FieldAssistantHero({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            padding: '12px 10px',
+            padding: '14px 10px',
             borderRadius: 12,
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3))',
-            border: '1px solid rgba(16, 185, 129, 0.45)',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.38))',
+            border: '1px solid rgba(16, 185, 129, 0.5)',
             color: '#f8fafc',
             cursor: 'pointer',
-            boxShadow: '0 4px 15px rgba(16, 185, 129, 0.2)',
+            boxShadow: '0 4px 15px rgba(16, 185, 129, 0.25)',
             transition: 'transform 0.15s ease, background 0.15s ease'
           }}
           onMouseEnter={e => {
             e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.45))';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.5))';
           }}
           onMouseLeave={e => {
             e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.3))';
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.38))';
           }}
         >
           <div style={{ color: '#34d399' }}><FiPlus size={22} /></div>
-          <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#34d399' }}>+ Ziyaret Başlat</span>
-          <span style={{ fontSize: '0.68rem', color: '#a7f3d0' }}>GPS Konumlu</span>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#34d399', letterSpacing: '-0.01em' }}>+ Ziyaret Başlat</span>
+          <span style={{ fontSize: '0.72rem', color: '#a7f3d0' }}>GPS Konumlu</span>
         </button>
       </div>
     </div>

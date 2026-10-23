@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  FiX, FiNavigation, FiMapPin, FiPhone, FiMessageSquare, FiExternalLink, 
-  FiCompass, FiRadio, FiRefreshCw, FiAlertCircle, FiChevronRight, FiTruck, FiCheck, FiLoader 
+  FiX, FiNavigation, FiMapPin, FiPhone, FiMessageSquare, 
+  FiRadio, FiRefreshCw, FiAlertCircle, FiChevronRight, FiTruck, FiPlay
 } from 'react-icons/fi';
 import { crmApi } from '../../api/client';
 import { openWhatsApp } from '../../utils/whatsapp';
@@ -15,7 +15,7 @@ const RADIUS_OPTIONS = [
   { label: '50 km', value: 50 },
 ];
 
-export default function NearbyRadarModal({ isOpen, onClose }) {
+export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
   const navigate = useNavigate();
   const [coords, setCoords] = useState(null);
   const [radius, setRadius] = useState(25);
@@ -23,7 +23,7 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState(null);
-  const [fallbackCity, setFallbackCity] = useState(null);
+  const [fallbackCity, setFallbackCity] = useState('Samsun');
 
   useEffect(() => {
     if (isOpen) {
@@ -36,7 +36,7 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
     setError(null);
 
     if (!navigator.geolocation) {
-      setError('Cihazınızda GPS / Konum servisi desteklenmiyor.');
+      setError('Cihazınızda GPS desteği bulunamadı. Varsayılan Samsun bayisi konumu kullanılıyor.');
       useDefaultLocation(41.2867, 36.33, 'Samsun');
       return;
     }
@@ -54,10 +54,10 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
       (err) => {
         console.warn('Geolocation error:', err);
         setLocating(false);
-        setError('GPS konumu alınamadı (izin verilmemiş olabilir). Varsayılan Samsun bayisi konumu kullanılıyor.');
+        setError('GPS konumu alınamadı. Samsun bayisi merkezli radar çalıştırılıyor.');
         useDefaultLocation(41.2867, 36.33, 'Samsun');
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
     );
   };
 
@@ -83,229 +83,422 @@ export default function NearbyRadarModal({ isOpen, onClose }) {
 
   const handleRadiusChange = (newRadius) => {
     setRadius(newRadius);
-    if (coords) {
-      fetchNearby(coords.lat, coords.lng, newRadius);
-    }
+    const targetLat = coords?.lat || 41.2867;
+    const targetLng = coords?.lng || 36.33;
+    fetchNearby(targetLat, targetLng, newRadius);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[120] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[88dvh] my-auto">
-        {/* Header with Radar Animation */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-blue-900 to-indigo-950 text-white relative overflow-hidden">
-          {/* Subtle radar pulse effect */}
-          <div className="absolute right-12 -top-10 w-40 h-40 bg-blue-500/10 rounded-full animate-ping pointer-events-none" />
-          
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/60 border border-blue-400/30 flex items-center justify-center shadow-lg">
-              <FiRadio className="w-5 h-5 text-blue-300 animate-pulse" />
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.78)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px'
+      }}
+      onClick={onClose}
+    >
+      <div 
+        style={{
+          background: 'var(--bg-card, #111833)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: 16,
+          width: '100%',
+          maxWidth: 680,
+          maxHeight: '88vh',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{
+          background: 'linear-gradient(135deg, #0f274a 0%, #0a1128 100%)',
+          padding: '16px 20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          position: 'relative'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              background: 'linear-gradient(135deg, #0284c7, #2563eb)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 16px rgba(2, 132, 199, 0.5)'
+            }}>
+              <FiRadio size={22} className="animate-pulse" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold flex items-center gap-2">
-                Yakınımdaki Müşteriler
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-200 font-mono">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc' }}>
+                  Yakınımdaki Müşteriler
+                </h2>
+                <span style={{
+                  background: 'rgba(56, 189, 248, 0.2)',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  fontSize: '0.7rem',
+                  fontWeight: 700
+                }}>
                   GPS RADAR
                 </span>
-              </h2>
-              <p className="text-xs text-blue-200/80">
+              </div>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8', marginTop: 2 }}>
                 {locating 
-                  ? 'Mevcut konum tespit ediliyor...' 
+                  ? 'Konum tespit ediliyor...' 
                   : coords 
-                  ? `${radius} km yarıçapındaki müşteriler listeleniyor` 
-                  : 'Konum bekleniyor'}
+                  ? `${radius} km yarıçapındaki müşteriler (Mesafe sıralı)` 
+                  : `${fallbackCity} bayisi çevresi`}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 relative z-10">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               onClick={locateUserAndFetch}
               disabled={locating || loading}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all disabled:opacity-50"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                borderRadius: 8,
+                padding: '7px 10px',
+                cursor: (locating || loading) ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: '0.78rem',
+                fontWeight: 600
+              }}
               title="Konumu Yenile"
             >
-              <FiRefreshCw className={`w-4 h-4 ${locating || loading ? 'animate-spin' : ''}`} />
+              <FiRefreshCw size={14} className={locating || loading ? 'loading-pulse' : ''} />
+              Yenile
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: 4
+              }}
             >
-              <FiX className="w-5 h-5" />
+              <FiX size={22} />
             </button>
           </div>
         </div>
 
-        {/* Radius Filter Chips - Mobil Uyumlu */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 shrink-0">
-            <FiCompass className="w-3.5 h-3.5" /> Arama Yarıçapı:
+        {/* Yarıçap Filtresi */}
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.8)',
+          padding: '10px 18px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 10
+        }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <FiNavigation size={14} style={{ color: '#38bdf8' }} /> ARAMA YARIÇAPI:
           </span>
-          <div className="flex items-center flex-wrap gap-1.5">
-            {RADIUS_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => handleRadiusChange(opt.value)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                  radius === opt.value
-                    ? 'bg-blue-600 text-white shadow-sm ring-2 ring-blue-500/20'
-                    : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {RADIUS_OPTIONS.map(opt => {
+              const active = radius === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => handleRadiusChange(opt.value)}
+                  style={{
+                    background: active ? '#0284c7' : 'rgba(255, 255, 255, 0.06)',
+                    color: active ? '#fff' : '#94a3b8',
+                    border: '1px solid',
+                    borderColor: active ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 20,
+                    padding: '4px 12px',
+                    fontSize: '0.76rem',
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Content List */}
-        <div className="p-4 sm:p-5 overflow-y-auto flex-1">
+        {/* Müşteri Listesi */}
+        <div style={{ padding: '16px 20px', overflowY: 'auto', flex: 1, maxHeight: 'calc(88vh - 150px)' }}>
           {error && (
-            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
-              <FiAlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+            <div style={{
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              borderRadius: 10,
+              padding: '10px 14px',
+              fontSize: '0.78rem',
+              color: '#fbbf24',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 12
+            }}>
+              <FiAlertCircle size={16} />
               <span>{error}</span>
             </div>
           )}
 
           {loading || locating ? (
-            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-              <div className="relative mb-4">
-                <div className="w-14 h-14 rounded-full border-4 border-blue-500/20 border-t-blue-600 animate-spin" />
-                <FiRadio className="w-6 h-6 text-blue-600 absolute inset-0 m-auto animate-pulse" />
-              </div>
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                {locating ? 'GPS uyduları ile konum eşleniyor...' : 'Yakındaki müşteriler taranıyor...'}
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
+              <div className="loading-pulse" style={{ margin: '0 auto 16px' }}></div>
+              <p style={{ fontWeight: 600, fontSize: '0.9rem', color: '#f8fafc', margin: '0 0 4px' }}>
+                {locating ? 'GPS konumu eşleniyor...' : 'Yakındaki müşteriler taranıyor...'}
               </p>
-              <p className="text-xs text-slate-400 mt-1">Lütfen bekleyin...</p>
+              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Lütfen bekleyin...</span>
             </div>
           ) : customers.length === 0 ? (
-            <div className="text-center py-14 px-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center mx-auto mb-3 text-xl">
-                📍
-              </div>
-              <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
-                Bu yarıçapta ({radius} km) müşteri bulunamadı
-              </h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto mb-4">
-                Daha geniş bir alanı taramak için arama yarıçapını 25 km veya 50 km olarak deneyebilirsiniz.
+            <div style={{
+              textAlign: 'center',
+              padding: '48px 20px',
+              border: '1px dashed rgba(255, 255, 255, 0.12)',
+              borderRadius: 12
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: 10 }}>📍</div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>
+                Bu yarıçapta ({radius} km) kayıtlı müşteri bulunamadı
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '0 0 16px' }}>
+                Arama yarıçapını genişleterek bölgedeki diğer firmaları görüntüleyebilirsiniz.
               </p>
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={() => handleRadiusChange(50)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-md transition-all"
-                >
-                  50 km Olarak Genişlet
-                </button>
-              </div>
+              <button
+                onClick={() => handleRadiusChange(50)}
+                style={{
+                  background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '8px 18px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                50 km Olarak Genişlet
+              </button>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pb-1">
-                <span>Bulunan: <strong>{customers.length} müşteri</strong></span>
-                <span>Mesafeye göre sıralı</span>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, fontSize: '0.78rem', color: '#94a3b8' }}>
+                <span>Bulunan: <strong style={{ color: '#38bdf8' }}>{customers.length} müşteri</strong></span>
+                <span>En yakından uzağa sıralı</span>
               </div>
 
-              {customers.map((c) => (
-                <div
-                  key={c.id}
-                  className="p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 hover:border-blue-300 dark:hover:border-blue-700/60 transition-all shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                        {c.company_name}
-                      </span>
-                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                        {c.distance_km < 1 ? `${Math.round(c.distance_km * 1000)} m` : `${c.distance_km} km`}
-                      </span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                        c.segment === 'A' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' :
-                        c.segment === 'B' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' :
-                        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                      }`}>
-                        Segment {c.segment}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-                      <FiMapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                      <span className="truncate">
-                        {[c.district, c.city].filter(Boolean).join(', ') || 'Konum belirtilmedi'}
-                      </span>
-                      {c.interested_vehicle && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md font-medium truncate">
-                          <FiTruck className="w-3 h-3" />
-                          {c.interested_vehicle}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {customers.map((c) => (
+                  <div
+                    key={c.id}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.65)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: 12,
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 12,
+                      transition: 'border-color 0.2s ease'
+                    }}
+                  >
+                    {/* Sol Bilgiler */}
+                    <div style={{ flex: '1 1 280px', minWidth: 240 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                        <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#f8fafc' }}>
+                          {c.company_name}
                         </span>
-                      )}
+                        <span style={{
+                          background: 'rgba(2, 132, 199, 0.2)',
+                          color: '#38bdf8',
+                          border: '1px solid rgba(2, 132, 199, 0.4)',
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          fontSize: '0.72rem',
+                          fontWeight: 800
+                        }}>
+                          {c.distance_km < 1 ? `${Math.round(c.distance_km * 1000)} m` : `${c.distance_km} km`}
+                        </span>
+                        {c.segment && (
+                          <span style={{
+                            background: c.segment === 'A' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                            color: c.segment === 'A' ? '#fbbf24' : '#60a5fa',
+                            padding: '2px 6px',
+                            borderRadius: 4,
+                            fontSize: '0.68rem',
+                            fontWeight: 700
+                          }}>
+                            Segment {c.segment}
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.76rem', color: '#94a3b8' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <FiMapPin size={12} style={{ color: '#64748b' }} />
+                          {[c.district, c.city].filter(Boolean).join(', ') || 'Samsun'}
+                        </span>
+                        {c.interested_vehicle && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#38bdf8', fontWeight: 600 }}>
+                            <FiTruck size={12} />
+                            {c.interested_vehicle}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Action Buttons for Field Reps */}
-                  <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
-                    {/* Call Directly */}
-                    {c.phone && (
-                      <a
-                        href={`tel:${c.phone}`}
-                        className="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95"
-                        title="Telefonla Ara"
-                      >
-                        <FiPhone className="w-4 h-4" />
-                        <span className="hidden sm:inline">Ara</span>
-                      </a>
-                    )}
-
-                    {/* WhatsApp with Customer Info Modal */}
-                    {c.phone && (
+                    {/* Sağ Aksiyon Butonları */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      {/* Ziyaret Başlat Butonu */}
                       <button
                         type="button"
-                        onClick={() => openWhatsApp(c.phone, '', { customer: c, defaultStatus: 'offer_given' })}
-                        className="p-2 sm:px-3 sm:py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95"
-                        title="WhatsApp & Bilgi Girişi"
+                        onClick={() => {
+                          if (onStartVisit) {
+                            onStartVisit(c);
+                          } else {
+                            onClose();
+                            navigate(`/customers/${c.id}`);
+                          }
+                        }}
+                        style={{
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 8,
+                          padding: '7px 12px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                        }}
+                        title="Bu firmaya ziyaret kaydı başlat"
                       >
-                        <FiMessageSquare className="w-4 h-4 text-[#25d366]" />
-                        <span className="hidden sm:inline">WhatsApp</span>
+                        <FiPlay size={12} /> Ziyaret Başlat
                       </button>
-                    )}
 
-                    {/* Apple Maps 1-Tap Directions */}
-                    <a
-                      href={c.apple_maps_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 flex items-center gap-1 text-xs font-semibold shadow-sm transition-all active:scale-95"
-                      title="Apple Haritalar ile Yol Tarifi"
-                    >
-                      <FiNavigation className="w-4 h-4 text-blue-400" />
-                      <span className="hidden sm:inline">Yol Tarifi</span>
-                    </a>
+                      {/* Telefonla Ara */}
+                      {c.phone && (
+                        <a
+                          href={`tel:${c.phone}`}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            color: '#10b981',
+                            border: '1px solid rgba(16, 185, 129, 0.3)',
+                            borderRadius: 8,
+                            padding: '7px 10px',
+                            fontSize: '0.78rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            textDecoration: 'none'
+                          }}
+                          title="Telefonla Ara"
+                        >
+                          <FiPhone size={14} />
+                        </a>
+                      )}
 
-                    {/* Google Maps Fallback */}
-                    <a
-                      href={c.google_maps_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 transition-all"
-                      title="Google Haritalar"
-                    >
-                      <FiMapPin className="w-4 h-4 text-red-500" />
-                    </a>
+                      {/* WhatsApp */}
+                      {c.phone && (
+                        <button
+                          type="button"
+                          onClick={() => openWhatsApp(c.phone, '', { customer: c, defaultStatus: 'offer_given' })}
+                          style={{
+                            background: 'rgba(37, 211, 102, 0.15)',
+                            color: '#25d366',
+                            border: '1px solid rgba(37, 211, 102, 0.3)',
+                            borderRadius: 8,
+                            padding: '7px 10px',
+                            fontSize: '0.78rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}
+                          title="WhatsApp Aç"
+                        >
+                          <FiMessageSquare size={14} />
+                        </button>
+                      )}
 
-                    {/* View Customer Detail */}
-                    <button
-                      onClick={() => {
-                        onClose();
-                        navigate(`/customers/${c.id}`);
-                      }}
-                      className="p-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 transition-all"
-                      title="Müşteri Detayına Git"
-                    >
-                      <FiChevronRight className="w-4 h-4" />
-                    </button>
+                      {/* Apple / Google Haritalar Yol Tarifi */}
+                      <a
+                        href={c.apple_maps_url || c.google_maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.company_name + ' ' + (c.city || 'Samsun'))}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: 'rgba(56, 189, 248, 0.12)',
+                          color: '#38bdf8',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          borderRadius: 8,
+                          padding: '7px 10px',
+                          fontSize: '0.78rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          textDecoration: 'none'
+                        }}
+                        title="Haritada Yol Tarifi Al"
+                      >
+                        <FiNavigation size={14} />
+                      </a>
+
+                      {/* Müşteri Detayı */}
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate(`/customers/${c.id}`);
+                        }}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          color: '#cbd5e1',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: 8,
+                          padding: '7px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title="Müşteri Kartına Git"
+                      >
+                        <FiChevronRight size={16} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>

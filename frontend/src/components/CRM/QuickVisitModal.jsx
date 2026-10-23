@@ -22,10 +22,26 @@ export default function QuickVisitModal({ isOpen, onClose, initialCustomerId, in
     return d.toISOString().split('T')[0];
   });
   const [saving, setSaving] = useState(false);
+  const [nearbyCustomers, setNearbyCustomers] = useState([]);
+  const [loadingNearby, setLoadingNearby] = useState(false);
+  const [showNearbyPick, setShowNearbyPick] = useState(true);
+
+  const fetchNearby = () => {
+    setLoadingNearby(true);
+    const lat = location?.latitude || 41.2867;
+    const lng = location?.longitude || 36.33;
+    crmApi.getNearbyCustomers(lat, lng, 35, 10)
+      .then(res => {
+        setNearbyCustomers(res.data || []);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingNearby(false));
+  };
 
   useEffect(() => {
     if (isOpen) {
       getLocation();
+      fetchNearby();
       if (initialCustomerId) {
         setSelectedCustomer({ id: initialCustomerId, company_name: initialCompanyName || 'Müşteri' });
       } else if (activeVisit) {
@@ -173,9 +189,75 @@ export default function QuickVisitModal({ isOpen, onClose, initialCustomerId, in
         <form onSubmit={handleSubmit} style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* 1. Müşteri Seçimi */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: 6 }}>
-              1. Ziyaret Edilen Müşteri *
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1' }}>
+                1. Ziyaret Edilen Müşteri *
+              </label>
+              {nearbyCustomers.length > 0 && !selectedCustomer && (
+                <button
+                  type="button"
+                  onClick={() => setShowNearbyPick(!showNearbyPick)}
+                  style={{
+                    background: showNearbyPick ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+                    color: showNearbyPick ? '#38bdf8' : '#94a3b8',
+                    border: '1px solid',
+                    borderColor: showNearbyPick ? 'rgba(56, 189, 248, 0.4)' : 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 12,
+                    padding: '2px 8px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                >
+                  <FiMapPin size={12} /> 📍 Yakınımdakiler ({nearbyCustomers.length})
+                </button>
+              )}
+            </div>
+
+            {/* Yakındaki Firmalar Hızlı Seçim Barı */}
+            {showNearbyPick && !selectedCustomer && nearbyCustomers.length > 0 && (
+              <div style={{ marginBottom: 10, background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.25)', borderRadius: 10, padding: '8px 10px' }}>
+                <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700, display: 'block', marginBottom: 6 }}>
+                  📍 Yakınınızdaki Müşteriler (Tek Tıkla Seçin):
+                </span>
+                <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
+                  {nearbyCustomers.slice(0, 8).map(nc => (
+                    <button
+                      key={nc.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCustomer(nc);
+                        setShowNearbyPick(false);
+                      }}
+                      style={{
+                        background: 'rgba(15, 23, 42, 0.8)',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: 8,
+                        padding: '6px 10px',
+                        color: '#f8fafc',
+                        fontSize: '0.74rem',
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6
+                      }}
+                      title={`${nc.company_name} (${nc.distance_km} km)`}
+                    >
+                      <span style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nc.company_name}</span>
+                      <span style={{ color: '#38bdf8', fontSize: '0.68rem', fontWeight: 800 }}>
+                        {nc.distance_km < 1 ? `${Math.round(nc.distance_km * 1000)}m` : `${nc.distance_km}km`}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {selectedCustomer ? (
               <div 
                 style={{
