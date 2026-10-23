@@ -337,6 +337,11 @@ export default function Dashboard() {
         <NearbyRadarModal
           isOpen={radarOpen}
           onClose={() => setRadarOpen(false)}
+          onStartVisit={(cust) => {
+            setRadarOpen(false);
+            setQuickVisitCustomer(cust);
+            setQuickVisitModalOpen(true);
+          }}
         />
       </div>
     );
