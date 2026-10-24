@@ -472,6 +472,10 @@ export const vehiclesApi = {
   getTodayOpportunities: () => api.get('/vehicles/opportunities/today'),
   getVehiclePipeline: () => api.get('/vehicles/pipeline'),
   getDemandReports: (params) => api.get('/vehicles/reports/demand', { params }),
+
+  // Akıllı Şasi & Kasa Önerici (Kantar & m³ Motoru)
+  getChassisConfigurations: () => api.get('/vehicles/chassis-configurations'),
+  matchChassis: (data) => api.post('/vehicles/match-chassis', data),
 };
 
 

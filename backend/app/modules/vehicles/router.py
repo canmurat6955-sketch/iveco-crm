@@ -260,3 +260,42 @@ def get_demand_reports(
 ):
     """Generates demand intelligence reports across groups, models, engines, and cities."""
     return VehicleService(db).get_demand_reports(date_from=date_from, date_to=date_to)
+
+
+# ── 8. Akıllı Şasi & Kasa Önerici (Kantar & m³ Motoru) ────────────
+from pydantic import BaseModel, Field
+from app.modules.vehicles.chassis_engine import CHASSIS_CONFIGURATIONS, ChassisMatchingEngine
+
+
+class MatchChassisRequest(BaseModel):
+    payload_kg: float = Field(..., description="Taşınacak net yük ağırlığı (kg)")
+    volume_m3: Optional[float] = Field(None, description="Talep edilen kasa hacmi (m³)")
+    body_length_cm: Optional[float] = Field(None, description="Talep edilen kasa dıştan dışa boyu (cm)")
+    body_width_cm: Optional[float] = Field(None, description="Talep edilen kasa dıştan dışa genişliği (cm)")
+    body_height_cm: Optional[float] = Field(None, description="Talep edilen kasa dıştan dışa yüksekliği (cm)")
+    body_type: str = Field("kapali_kutu", description="Kasa tipi (frigo, kapali_kutu, acik_sac, kayar_perde, damper, oto_kurtarma)")
+    license_preference: Optional[str] = Field(None, description="Ehliyet tercihi (B, C, ANY)")
+
+
+@router.get("/chassis-configurations")
+def get_chassis_configurations():
+    """Tüm IVECO şasi modelleri, boş ağırlıkları, kantar sınırları ve teknik föy PDF bağlantılarını listeler."""
+    return {"total": len(CHASSIS_CONFIGURATIONS), "items": CHASSIS_CONFIGURATIONS}
+
+
+@router.post("/match-chassis")
+def match_chassis_by_specs(req: MatchChassisRequest):
+    """
+    Kullanıcının talep ettiği yük ağırlığı (kg), kasa hacmi (m³) veya boyutlarına göre
+    en ideal IVECO modelini, şasisini, kantar değerlendirmesini ve teknik föyünü döner.
+    """
+    return ChassisMatchingEngine.match(
+        payload_kg=req.payload_kg,
+        volume_m3=req.volume_m3,
+        body_length_cm=req.body_length_cm,
+        body_width_cm=req.body_width_cm,
+        body_height_cm=req.body_height_cm,
+        body_type=req.body_type,
+        license_preference=req.license_preference
+    )
+

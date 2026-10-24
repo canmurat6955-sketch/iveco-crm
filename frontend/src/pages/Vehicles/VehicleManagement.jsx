@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { vehiclesApi } from '../../api/client';
 import { FiTruck, FiPlus, FiEdit2, FiTrash2, FiSearch, FiCheck, FiX, FiBarChart2, FiLayers, FiPackage, FiUsers } from 'react-icons/fi';
 import StockMatchModal from './StockMatchModal';
+import SmartChassisMatcherModal from '../../components/Vehicles/SmartChassisMatcherModal';
 import toast from 'react-hot-toast';
 
 export default function VehicleManagement() {
   const [activeTab, setActiveTab] = useState('master'); // 'master', 'stock', 'reports'
+  const [showChassisMatcher, setShowChassisMatcher] = useState(false);
 
   // Master Vehicles State
   const [masterVehicles, setMasterVehicles] = useState([]);
@@ -231,6 +233,19 @@ export default function VehicleManagement() {
             }}
           >
             📊 Talep Zekâsı Raporları
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowChassisMatcher(true)}
+            style={{
+              padding: '8px 16px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 800,
+              border: '1px solid rgba(56, 189, 248, 0.4)', cursor: 'pointer',
+              background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+              color: '#fff', display: 'flex', alignItems: 'center', gap: 6,
+              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)'
+            }}
+          >
+            🎯 Akıllı Şasi & Kasa Hesaplayıcı
           </button>
         </div>
       </div>
@@ -750,6 +765,12 @@ export default function VehicleManagement() {
           </div>
         </div>
       )}
+
+      {/* Akıllı Şasi, Kasa ve Kantar Hesaplayıcı Modalı */}
+      <SmartChassisMatcherModal
+        isOpen={showChassisMatcher}
+        onClose={() => setShowChassisMatcher(false)}
+      />
     </div>
   );
 }
