@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget, FiEye } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -92,6 +92,23 @@ export default function Sidebar() {
             <span className="nav-icon"><FiTruck size={18} /></span>
             Araç Yönetimi
           </NavLink>
+          <a
+            href="/arac-secici?preview=true&company=%C3%96rnek%20Lojistik&name=Can%20Murat&phone=05325551014"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nav-item"
+            style={{
+              background: 'rgba(217, 119, 6, 0.12)',
+              color: '#f59e0b',
+              border: '1px dashed rgba(245, 158, 11, 0.4)',
+              fontWeight: 700,
+              marginTop: '4px'
+            }}
+            title="Müşterinin göreceği akıllı şasi ve kredi ekranını test et"
+          >
+            <span className="nav-icon" style={{ color: '#f59e0b' }}><FiEye size={18} /></span>
+            Müşteri Ekranı Test & Önizle
+          </a>
         </div>
 
 

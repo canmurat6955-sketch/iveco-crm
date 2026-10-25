@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   FiX, FiTruck, FiCheckCircle, FiAlertCircle, FiDownload, 
-  FiMessageSquare, FiFileText, FiRefreshCw, FiLayers, FiMaximize2, FiMinimize2, FiCopy
+  FiMessageSquare, FiFileText, FiRefreshCw, FiLayers, FiMaximize2, FiMinimize2, FiCopy, FiEye
 } from 'react-icons/fi';
 import { vehiclesApi } from '../../api/client';
 import { openWhatsApp } from '../../utils/whatsapp';
@@ -684,6 +684,30 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                     >
                       <FiCopy size={15} />
                       <span>Linki Kopyala</span>
+                    </button>
+
+                    {/* Müşteri Gözünden Önizle */}
+                    <button
+                      type="button"
+                      onClick={() => window.open(getCustomerShareUrl() + '&preview=true', '_blank')}
+                      style={{
+                        background: 'rgba(217, 119, 6, 0.15)',
+                        border: '1px solid rgba(245, 158, 11, 0.45)',
+                        borderRadius: 10,
+                        padding: '10px 14px',
+                        color: '#fbbf24',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        cursor: 'pointer'
+                      }}
+                      title="Müşteriye göndermeden önce bu ekranı yeni sekmede canlı test et"
+                    >
+                      <FiEye size={15} />
+                      <span>Müşteri Gözünden Önizle</span>
                     </button>
                   </div>
                 </div>

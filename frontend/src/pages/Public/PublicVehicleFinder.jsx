@@ -68,6 +68,7 @@ export default function PublicVehicleFinder() {
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
 
+  const isPreviewMode = searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const [step, setStep] = useState(1);
@@ -107,7 +108,7 @@ export default function PublicVehicleFinder() {
 
   // Kişisel VIP Link tıklandığında CRM'e sessizce dijital niyet / ziyaret sinyali kaydet
   useEffect(() => {
-    if (customerIdParam || phoneParam || companyParam) {
+    if (!isPreviewMode && (customerIdParam || phoneParam || companyParam)) {
       const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
       discoveryApi.recordIntentSignal({
         source: 'whatsapp_personalized_link',
@@ -126,7 +127,7 @@ export default function PublicVehicleFinder() {
         notes: `Müşteri WhatsApp üzerinden iletilen kişiselleştirilmiş şasi & kantar seçici bağlantısını tıkladı.`
       }).catch(err => console.debug('Intent signal log error:', err));
     }
-  }, [customerIdParam, phoneParam, companyParam]);
+  }, [customerIdParam, phoneParam, companyParam, isPreviewMode]);
 
   // ── KESİN ŞASİ, KASA BOYUTLARI VE KANTAR EŞLEŞTİRME MOTORU ──────
   const matched = useMemo(() => {
@@ -486,6 +487,13 @@ export default function PublicVehicleFinder() {
       notes: `Müşteri Akıllı Şasi Seçiciyi kullandı.\nModel: ${matched.modelTitle}\nŞasi: ${matched.wheelbase}\nYük: ${payloadKg} kg, Hacim: ${matched.dims.volume}\nKasa: ${matched.dims.length} x ${matched.dims.width} x ${matched.dims.height}\nKantar Sınırı: ${matched.kantarLimit} kg, Boş Ağırlık: ${matched.unladenWeight} kg\nMüşteri Notu: ${customerNotes}`
     };
 
+    if (isPreviewMode) {
+      setSubmitted(true);
+      setSubmitting(false);
+      toast.success('🛠️ TEST MODU: Simülasyon başarılı! Gerçek müşteride bu veriler anında Satış Pipeline\'ına düşer.', { duration: 5000 });
+      return;
+    }
+
     try {
       await discoveryApi.recordIntentSignal(leadPayload);
       setSubmitted(true);
@@ -554,6 +562,46 @@ export default function PublicVehicleFinder() {
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
         
+        {/* Test & Önizleme Modu Rozeti (Can Murat Kontrol Paneli) */}
+        {isPreviewMode && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.35) 0%, rgba(180, 83, 9, 0.45) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.65)',
+            borderRadius: '14px',
+            padding: '12px 16px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            textAlign: 'left',
+            boxShadow: '0 4px 15px rgba(217, 119, 6, 0.25)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1.4rem' }}>🛠️</span>
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fbbf24' }}>
+                  CANLI TEST & ÖNİZLEME MODU (Sales Priest: Can Murat)
+                </div>
+                <div style={{ fontSize: '0.74rem', color: '#fef3c7' }}>
+                  Bu ekranı şu anda sadece siz test ediyorsunuz. Müşteriye göndermeden önce tüm kasa ölçülerini, kantar sınırlarını ve WhatsApp butonunu deneyebilirsiniz.
+                </div>
+              </div>
+            </div>
+            <span style={{
+              background: '#b45309',
+              color: '#fff',
+              padding: '4px 10px',
+              borderRadius: '8px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              flexShrink: 0
+            }}>
+              GİZLİ TEST
+            </span>
+          </div>
+        )}
+
         {/* VIP Karşılama Kartı (Linkten Müşteri / Firma Bilgisi Gelmişse) */}
         {isVipCustomer && (
           <div style={{
