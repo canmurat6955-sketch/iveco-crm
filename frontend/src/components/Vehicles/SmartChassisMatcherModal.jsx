@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   FiX, FiTruck, FiCheckCircle, FiAlertCircle, FiDownload, 
-  FiMessageSquare, FiFileText, FiRefreshCw, FiLayers, FiMaximize2, FiMinimize2
+  FiMessageSquare, FiFileText, FiRefreshCw, FiLayers, FiMaximize2, FiMinimize2, FiCopy
 } from 'react-icons/fi';
 import { vehiclesApi } from '../../api/client';
 import { openWhatsApp } from '../../utils/whatsapp';
@@ -91,10 +91,43 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
   const dims = rec?.dimensions;
   const scale = rec?.scale_analysis;
 
+  const getCustomerShareUrl = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
+    const compName = customer?.company_name || '';
+    const cid = customer?.id || '';
+    const params = new URLSearchParams();
+    if (cid) params.set('cid', cid);
+    if (compName) params.set('company', compName);
+    if (cleanPhone) params.set('phone', cleanPhone);
+    params.set('payload', payloadKg);
+    params.set('body', bodyType);
+    params.set('ref', 'canmurat_crm_matcher');
+    return `${origin}/arac-secici?${params.toString()}`;
+  };
+
   const handleSendWhatsApp = () => {
     const phone = customer?.phone || '';
-    const text = rec?.whatsapp_proposal || '';
+    let text = rec?.whatsapp_proposal || '';
+    const shareUrl = getCustomerShareUrl();
+    if (text) {
+      text += `\n\n🔗 *Özel Konfigüratörünüzü Buradan İnceleyebilirsiniz:*\n${shareUrl}`;
+    }
     openWhatsApp(phone, text, { customer });
+  };
+
+  const handleCopyCustomerLink = async () => {
+    const shareUrl = getCustomerShareUrl();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success(
+        customer?.company_name 
+          ? `${customer.company_name} için özel bağlantı kopyalandı! 📋`
+          : 'Konfigürasyon bağlantısı kopyalandı! 📋'
+      );
+    } catch {
+      toast.error('Bağlantı kopyalanamadı.');
+    }
   };
 
   const modalContent = (
@@ -623,10 +656,34 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                         cursor: 'pointer',
                         boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)'
                       }}
-                      title="Müşteriye WhatsApp teklif taslağı gönder"
+                      title="Müşteriye WhatsApp teklif taslağı ve özel konfigürasyon linkini gönder"
                     >
                       <FiMessageSquare size={15} />
                       <span>WhatsApp'tan Paylaş</span>
+                    </button>
+
+                    {/* Müşteriye Özel Link Kopyala */}
+                    <button
+                      type="button"
+                      onClick={handleCopyCustomerLink}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.12)',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: 10,
+                        padding: '10px 14px',
+                        color: '#38bdf8',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        cursor: 'pointer'
+                      }}
+                      title="Müşteriye özel hesaplayıcı linkini panoya kopyala"
+                    >
+                      <FiCopy size={15} />
+                      <span>Linki Kopyala</span>
                     </button>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import { useVisit } from '../../contexts/VisitContext';
 import { useAuth } from '../../contexts/AuthContext';
 import VehicleInterestModal from './VehicleInterestModal';
 import StockMatchModal from '../Vehicles/StockMatchModal';
+import SmartChassisMatcherModal from '../../components/Vehicles/SmartChassisMatcherModal';
 import CustomerAttachmentModal from '../../components/CRM/CustomerAttachmentModal';
 import TradeInModal from '../../components/CRM/TradeInModal';
 import WhatsAppActionModal from '../../components/CRM/WhatsAppActionModal';
@@ -16,7 +17,7 @@ import {
   FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, 
   FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, 
   FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw,
-  FiCamera, FiNavigation, FiRepeat
+  FiCamera, FiNavigation, FiRepeat, FiShare2, FiCopy
 } from 'react-icons/fi';
 
 
@@ -123,6 +124,41 @@ export default function CustomerDetail() {
   // ── Takas / 2. El Değerlendirme State'leri ──
   const [tradeIns, setTradeIns] = useState([]);
   const [showTradeIn, setShowTradeIn] = useState(false);
+
+  // ── Akıllı Şasi & Kasa Seçici Modal State'i ──
+  const [showChassisMatcher, setShowChassisMatcher] = useState(false);
+
+  const handleCopyPersonalizedLink = () => {
+    if (!customer) return;
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
+    const link = `${origin}/arac-secici?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_crm`;
+    navigator.clipboard.writeText(link).then(() => {
+      toast.success(`${customer.company_name} için özel konfigüratör bağlantısı kopyalandı! 📋`);
+    }).catch(() => toast.error('Link kopyalanamadı'));
+  };
+
+  const handleSharePersonalizedWhatsApp = () => {
+    if (!customer?.phone) {
+      toast.error('Müşterinin telefon numarası kayıtlı değil.');
+      return;
+    }
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const cleanPhone = customer.phone.replace(/\D/g, '');
+    const link = `${origin}/arac-secici?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_crm`;
+    const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;
+
+    const msg = (
+      `Sayın ${contactName},\n\n` +
+      `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
+      `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve Kuveyt Türk 6 ay ödemesiz kredi planınızı saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
+      `Aşağıdaki firmanıza özel bağlantıdan dilediğiniz tonaj ve hacme göre anında simülasyon yapabilirsiniz:\n` +
+      `🔗 ${link}\n\n` +
+      `Beğendiğiniz kombinasyonun hazır şasi stok durumu ve resmi teklifi için bu mesajı yanıtlamanız yeterlidir.`
+    );
+
+    openWhatsApp(customer.phone, msg, { customer });
+  };
 
   const loadAttachments = () => {
     crmApi.getAttachments(id).then(r => setAttachments(r.data || [])).catch(() => {});
@@ -572,6 +608,58 @@ export default function CustomerDetail() {
 
               <button className="btn btn-success btn-sm" onClick={() => setShowWhatsAppModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}>
                 <FiMessageSquare size={15} /> WhatsApp
+              </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={() => setShowChassisMatcher(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)'
+                }}
+                title="Şasi, kasa boyutları ve kantar hesaplayıcısını bu müşteri için aç"
+              >
+                <FiTruck size={15} /> 🎯 Şasi & Kasa Seçici
+              </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={handleSharePersonalizedWhatsApp}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
+                }}
+                title="Müşteriye özel hesaplayıcı linkini WhatsApp mesajı olarak gönder"
+              >
+                <FiShare2 size={14} /> 📲 VIP Link Paylaş
+              </button>
+
+              <button
+                className="btn btn-sm"
+                onClick={handleCopyPersonalizedLink}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255, 255, 255, 0.15)'
+                }}
+                title="Müşteriye özel bağlantıyı panoya kopyala"
+              >
+                <FiCopy size={13} /> Linki Kopyala
               </button>
 
               <button
@@ -2626,6 +2714,17 @@ export default function CustomerDetail() {
             crmApi.getInteractions(id).then(r => setInteractions(r.data));
             loadVehicleInterests();
           }}
+        />
+      )}
+
+      {/* ── AKILLI ŞASİ, KASA & KANTAR SEÇİCİ MODALI ── */}
+      {showChassisMatcher && customer && (
+        <SmartChassisMatcherModal
+          isOpen={showChassisMatcher}
+          onClose={() => setShowChassisMatcher(false)}
+          customer={customer}
+          initialPayload={4800}
+          initialVolume={28}
         />
       )}
     </div>

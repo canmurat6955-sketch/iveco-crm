@@ -19,7 +19,9 @@ import {
   FiDownload,
   FiFileText,
   FiAlertCircle,
-  FiMaximize2
+  FiMaximize2,
+  FiShare2,
+  FiCopy
 } from 'react-icons/fi';
 
 // Sektör Seçenekleri
@@ -57,33 +59,74 @@ const BODY_TYPES = [
 export default function PublicVehicleFinder() {
   const [searchParams] = useSearchParams();
   const refCode = searchParams.get('ref') || 'whatsapp_durum';
+  const customerIdParam = searchParams.get('cid') || searchParams.get('customer_id');
+  const companyParam = searchParams.get('company') || searchParams.get('firma') || searchParams.get('comp') || '';
+  const nameParam = searchParams.get('name') || searchParams.get('yetkili') || '';
+  const phoneParam = searchParams.get('phone') || searchParams.get('tel') || '';
+  const sectorParam = searchParams.get('sector') || '';
+  const payloadParam = searchParams.get('payload') || searchParams.get('tonaj') || '';
+  const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
+  const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
+
+  const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const [step, setStep] = useState(1);
-  const [selectedSector, setSelectedSector] = useState('gida_frigo');
+  const [selectedSector, setSelectedSector] = useState(
+    SECTORS.some(s => s.id === sectorParam) ? sectorParam : 'gida_frigo'
+  );
   
   // Tonaj & Hacim State'leri
-  const [payloadKg, setPayloadKg] = useState(4800);
-  const [volumeM3, setVolumeM3] = useState(28);
+  const [payloadKg, setPayloadKg] = useState(
+    payloadParam && !isNaN(Number(payloadParam)) ? Number(payloadParam) : 4800
+  );
+  const [volumeM3, setVolumeM3] = useState(
+    volumeParam && !isNaN(Number(volumeParam)) ? Number(volumeParam) : 28
+  );
   const [customDims, setCustomDims] = useState(false);
   const [bodyLengthCm, setBodyLengthCm] = useState(580);
   const [bodyWidthCm, setBodyWidthCm] = useState(225);
   const [bodyHeightCm, setBodyHeightCm] = useState(220);
-  const [selectedBody, setSelectedBody] = useState('frigo');
+  const [selectedBody, setSelectedBody] = useState(
+    BODY_TYPES.some(b => b.id === bodyParam) ? bodyParam : 'frigo'
+  );
 
   // Kredi Parametreleri
   const [loanPrincipal, setLoanPrincipal] = useState(1500000);
   const [loanTerm, setLoanTerm] = useState(36);
 
-  // Müşteri İletişim Formu
-  const [customerName, setCustomerName] = useState('');
-  const [customerCompany, setCustomerCompany] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+  // Müşteri İletişim Formu (Mevcut Müşteri Linkinden Otomatik Doldurma)
+  const [customerName, setCustomerName] = useState(nameParam);
+  const [customerCompany, setCustomerCompany] = useState(companyParam);
+  const [customerPhone, setCustomerPhone] = useState(phoneParam);
   const [customerCity, setCustomerCity] = useState('Samsun');
   const [customerNotes, setCustomerNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const [startTime] = useState(Date.now());
+
+  // Kişisel VIP Link tıklandığında CRM'e sessizce dijital niyet / ziyaret sinyali kaydet
+  useEffect(() => {
+    if (customerIdParam || phoneParam || companyParam) {
+      const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
+      discoveryApi.recordIntentSignal({
+        source: 'whatsapp_personalized_link',
+        search_query: `[Kişisel Link Ziyareti]: ${companyParam || nameParam || 'VIP Müşteri'} Araç Seçiciyi Açtı`,
+        target_model: 'IVECO Şasi & Kasa Seçici',
+        company_name: companyParam || nameParam || 'Kayıtlı Müşteri',
+        phone: phoneParam || undefined,
+        city: 'Samsun',
+        page_url: window.location.href,
+        referrer: document.referrer || 'whatsapp_chat',
+        duration_seconds: 3,
+        scroll_depth: 30,
+        intent_score: 92,
+        intent_level: 'high',
+        matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
+        notes: `Müşteri WhatsApp üzerinden iletilen kişiselleştirilmiş şasi & kantar seçici bağlantısını tıkladı.`
+      }).catch(err => console.debug('Intent signal log error:', err));
+    }
+  }, [customerIdParam, phoneParam, companyParam]);
 
   // ── KESİN ŞASİ, KASA BOYUTLARI VE KANTAR EŞLEŞTİRME MOTORU ──────
   const matched = useMemo(() => {
@@ -413,7 +456,7 @@ export default function PublicVehicleFinder() {
     return { monthly, total, rate };
   }, [loanPrincipal, loanTerm]);
 
-  // Form Gönderimi (Teklif İste & CRM'e Lead Olarak Yaz)
+  // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {
     e.preventDefault();
     if (!customerPhone.trim() || customerPhone.replace(/\D/g, '').length < 10) {
@@ -423,21 +466,23 @@ export default function PublicVehicleFinder() {
 
     setSubmitting(true);
     const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+    const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
 
     const leadPayload = {
-      source: 'whatsapp_link',
+      source: customerIdParam ? 'crm_existing_customer' : (refCode || 'whatsapp_link'),
       search_query: `[Şasi & Kasa Seçici]: ${selectedSector} | ${payloadKg} kg | ${volumeM3} m3 | ${selectedBody}`,
       target_model: matched.modelTitle,
       target_campaign: `Kuveyt Türk 6 Ay Ödemesiz (${loanPrincipal.toLocaleString('tr-TR')} TL / ${loanTerm} Ay)`,
-      company_name: customerCompany.trim() || customerName.trim() || 'WhatsApp Durum Ziyaretçisi',
+      company_name: customerCompany.trim() || customerName.trim() || 'WhatsApp Ziyaretçisi',
       city: customerCity,
       phone: customerPhone.trim(),
       page_url: window.location.href,
-      referrer: document.referrer || 'whatsapp_status',
+      referrer: document.referrer || 'whatsapp_chat',
       duration_seconds: durationSeconds,
       scroll_depth: 100,
       intent_score: 99,
       intent_level: 'very_high',
+      matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
       notes: `Müşteri Akıllı Şasi Seçiciyi kullandı.\nModel: ${matched.modelTitle}\nŞasi: ${matched.wheelbase}\nYük: ${payloadKg} kg, Hacim: ${matched.dims.volume}\nKasa: ${matched.dims.length} x ${matched.dims.width} x ${matched.dims.height}\nKantar Sınırı: ${matched.kantarLimit} kg, Boş Ağırlık: ${matched.unladenWeight} kg\nMüşteri Notu: ${customerNotes}`
     };
 
@@ -456,15 +501,44 @@ export default function PublicVehicleFinder() {
   // Doğrudan WhatsApp Aç (Can Murat)
   const handleDirectWhatsApp = () => {
     const cleanPhone = '905325551014';
+    const clientGreeting = (customerCompany || customerName)
+      ? `Merhaba Can Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
+      : `Merhaba Can Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
+
     const msg = (
-      `Merhaba Can Bey, WhatsApp durumunuzdaki IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceledim.\n\n` +
+      clientGreeting +
       `🚛 *Tavsiye Edilen Model:* ${matched.modelTitle}\n` +
       `📐 *Önerilen Kasa Boyutları:* ${matched.dims.length} × ${matched.dims.width} × ${matched.dims.height} (${matched.dims.volume})\n` +
       `⚖️ *Yük İhtiyacım:* ${payloadKg} kg Net Yük | Kantar Durumu: ${matched.kantarTitle}\n` +
       `💳 *İlgilendiğim Kredi:* Kuveyt Türk 6 Ay Ödemesiz (${loanPrincipal.toLocaleString('tr-TR')} TL / ${loanTerm} Ay)\n\n` +
-      `Bu aracın güncel şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
+      `Bu aracın hazır şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  // Sayfayı Paylaş / Linki Kopyala
+  const handleShareLink = async () => {
+    const shareUrl = window.location.href;
+    const shareTitle = 'IVECO Akıllı Şasi, Kasa & Finansman Seçici';
+    const shareText = `İşinize en uygun IVECO şasisini, kasa ölçülerini ve 6 ay ödemesiz kredi planını buradan hesaplayabilirsiniz:\n${shareUrl}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl
+        });
+        return;
+      } catch (err) {}
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Konfigürasyon bağlantısı kopyalandı! 📋');
+    } catch {
+      toast.error('Bağlantı kopyalanamadı.');
+    }
   };
 
   return (
@@ -479,6 +553,72 @@ export default function PublicVehicleFinder() {
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
+        
+        {/* VIP Karşılama Kartı (Linkten Müşteri / Firma Bilgisi Gelmişse) */}
+        {isVipCustomer && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.45) 0%, rgba(15, 23, 42, 0.85) 100%)',
+            border: '1px solid rgba(59, 130, 246, 0.45)',
+            borderRadius: '16px',
+            padding: '14px 18px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            boxShadow: '0 8px 24px rgba(0, 75, 147, 0.25)',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem',
+                flexShrink: 0,
+                boxShadow: '0 0 14px rgba(2, 132, 199, 0.5)'
+              }}>
+                ✨
+              </div>
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  FİRMANIZA ÖZEL HAZIRLANDI
+                </div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.25 }}>
+                  Sayın {customerCompany || customerName || 'Değerli Müşterimiz'}, Hoş Geldiniz!
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
+                  Satış Sorumlunuz <strong style={{ color: '#e2e8f0' }}>Can Murat (Sales Priest)</strong> operasyonunuza özel teknik şasi ve kantar simülasyonunu hazırladı.
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={handleShareLink}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#f8fafc',
+                borderRadius: '10px',
+                padding: '7px 12px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                flexShrink: 0
+              }}
+              title="Bu bağlantıyı kopyala veya paylaş"
+            >
+              <FiShare2 size={13} /> Paylaş
+            </button>
+          </div>
+        )}
+
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 75, 147, 0.25)', border: '1px solid rgba(43, 125, 233, 0.4)', padding: '6px 14px', borderRadius: '30px', marginBottom: '10px' }}>
           <span style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '1px' }}>IVECO ERC OTOMOTİV</span>
           <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>• Samsun Yetkili Bayi</span>
@@ -491,7 +631,7 @@ export default function PublicVehicleFinder() {
           Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>Kuveyt Türk 6 Ay Ödemesiz</strong> taksit tutarını anında hesaplasın.
         </p>
 
-        {/* Can Murat Temsilci Rozeti (Sales Priest) */}
+        {/* Can Murat Temsilci Rozeti (Sales Priest) & Paylaş Butonu */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -500,7 +640,9 @@ export default function PublicVehicleFinder() {
           border: '1px solid rgba(99, 179, 237, 0.25)',
           borderRadius: '25px',
           padding: '6px 16px',
-          marginTop: '12px'
+          marginTop: '12px',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
         }}>
           <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#004B93', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px' }}>
             CM
@@ -527,6 +669,25 @@ export default function PublicVehicleFinder() {
             }}
           >
             <FiMessageSquare size={12} /> WhatsApp
+          </button>
+          <button
+            onClick={handleShareLink}
+            style={{
+              background: 'rgba(56, 189, 248, 0.15)',
+              color: '#38bdf8',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '20px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer'
+            }}
+            title="Sistemin linkini kopyala"
+          >
+            <FiCopy size={12} /> Linki Kopyala
           </button>
         </div>
       </div>

@@ -1046,9 +1046,9 @@ class DiscoveryService:
         self.db.commit()
         self.db.refresh(signal)
 
-        # Eğer telefon numarası iletildiyse (örn: WhatsApp Durum Araç Seçici formundan)
-        # otomatik olarak CRM'e Lead (Aday Müşteri) olarak kaydet
-        if data.phone and len(data.phone.strip()) >= 7:
+        # Eğer müşteri ID veya telefon numarası iletildiyse
+        # CRM müşterisiyle eşleştir veya otomatik olarak Lead (Aday Müşteri) olarak kaydet
+        if data.matched_customer_id or (data.phone and len(data.phone.strip()) >= 7):
             try:
                 from app.modules.auth.models import User
                 from app.modules.crm.models import Customer, CustomerContact, CustomerInteraction
@@ -1059,10 +1059,15 @@ class DiscoveryService:
 
                 comp_name = data.company_name or f"Mobil Ziyaretçi ({data.target_model or 'Ticari Araç'})"
 
-                existing = self.db.query(Customer).filter(
-                    (Customer.phone == data.phone) |
-                    (Customer.company_name == comp_name)
-                ).first()
+                existing = None
+                if data.matched_customer_id:
+                    existing = self.db.query(Customer).filter(Customer.id == data.matched_customer_id).first()
+
+                if not existing and (data.phone or comp_name):
+                    existing = self.db.query(Customer).filter(
+                        (Customer.phone == data.phone) |
+                        (Customer.company_name == comp_name)
+                    ).first()
 
                 if not existing:
                     customer = Customer(
@@ -1094,8 +1099,9 @@ class DiscoveryService:
                     self.db.add(contact)
                 else:
                     customer = existing
-                    customer.pipeline_stage = "lead"
-                    customer.pipeline_note = f"WhatsApp Durum Seçicisi İlgisi: {data.target_model}"
+                    if not customer.pipeline_stage:
+                        customer.pipeline_stage = "lead"
+                    customer.pipeline_note = f"Araç Seçici İlgisi: {data.target_model}"
                     self.db.add(customer)
 
                 ci = CustomerInteraction(

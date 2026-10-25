@@ -232,6 +232,23 @@ export default function WhatsAppActionModal({
       setStatus('follow_up');
       setMessage(`Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Daha önce paylaşmış olduğumuz ${vText} kampanyamız hakkındaki değerlendirmenizi öğrenmek istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`);
       setInternalNote('Önceki teklif sonrası takip mesajı gönderildi.');
+    } else if (type === 'arac_secici') {
+      setStatus('sent');
+      setPipelineStage('proposal');
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+      const cleanPhone = (customerForm.phone || customer.phone || '').replace(/\D/g, '');
+      const comp = customerForm.company_name || customer.company_name || '';
+      const cid = customer?.id || '';
+      const link = `${origin}/arac-secici?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=canmurat_crm`;
+      const greeting = comp ? `Sayın ${comp} Yetkilisi,\n\n` : '';
+      setMessage(
+        `${greeting}Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
+        `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve Kuveyt Türk 6 ay ödemesiz kredi planınızı saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
+        `Aşağıdaki firmanıza özel bağlantıdan dilediğiniz tonaj ve hacme göre anında simülasyon yapabilirsiniz:\n` +
+        `🔗 ${link}\n\n` +
+        `Beğendiğiniz kombinasyonun hazır şasi stok durumu ve resmi teklifi için bu mesajı yanıtlamanız yeterlidir.`
+      );
+      setInternalNote('Müşteriye özel Akıllı Şasi, Kasa ve Kredi Seçici bağlantısı iletildi.');
     }
   };
 
@@ -707,6 +724,22 @@ export default function WhatsAppActionModal({
                   style={{ fontSize: '0.74rem', padding: '4px 10px' }}
                 >
                   ⏳ Karar Takibi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectTemplate('arac_secici')}
+                  className="btn btn-sm"
+                  style={{
+                    fontSize: '0.74rem',
+                    padding: '4px 10px',
+                    background: 'rgba(2, 132, 199, 0.2)',
+                    color: '#38bdf8',
+                    border: '1px solid rgba(56, 189, 248, 0.45)',
+                    fontWeight: 700
+                  }}
+                  title="Müşteriye özel şasi, kasa ve kantar hesaplayıcı linkini mesaja ekler"
+                >
+                  🎯 Akıllı Şasi Seçici (Kişisel Link)
                 </button>
               </div>
             </div>
