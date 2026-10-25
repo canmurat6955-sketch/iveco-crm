@@ -740,44 +740,42 @@ export default function PublicVehicleFinder() {
         </div>
       </div>
 
-      {/* ── STEPPER BAR ─────────────────────────────────────────── */}
-      <div style={{ maxWidth: '680px', margin: '0 auto 20px', display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+      {/* ── STEPPER BAR (2 ADIM: TONAJ & METREKÜP ➔ KREDİ & TEKLİF PLANI) ── */}
+      <div style={{ maxWidth: '680px', margin: '0 auto 20px', display: 'flex', justifyContent: 'center', gap: '14px', position: 'relative' }}>
         {[
-          { num: 1, label: 'Sektör' },
-          { num: 2, label: 'Tonaj & Hacim' },
-          { num: 3, label: 'Kasa Tipi' },
-          { num: 4, label: 'Şasi & Teklif' }
+          { num: 1, label: '1. Tonaj & Metreküp' },
+          { num: 2, label: '2. Kredi & Teklif Planı' }
         ].map((s) => (
           <div
             key={s.num}
             onClick={() => s.num < step && setStep(s.num)}
             style={{
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              flex: 1,
+              gap: '10px',
               cursor: s.num < step ? 'pointer' : 'default',
-              position: 'relative',
-              zIndex: 2
+              padding: '8px 18px',
+              borderRadius: '24px',
+              background: step === s.num ? 'rgba(0, 75, 147, 0.45)' : 'rgba(15, 23, 42, 0.6)',
+              border: step === s.num ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+              transition: 'all 0.2s ease'
             }}
           >
             <div style={{
-              width: '32px',
-              height: '32px',
+              width: '26px',
+              height: '26px',
               borderRadius: '50%',
-              background: step === s.num ? '#004B93' : step > s.num ? '#10b981' : '#1e293b',
+              background: step === s.num ? '#0284c7' : step > s.num ? '#10b981' : '#1e293b',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              marginBottom: '4px',
-              border: step === s.num ? '2px solid #38bdf8' : 'none'
+              fontWeight: 800,
+              fontSize: '0.82rem'
             }}>
-              {step > s.num ? <FiCheck size={16} /> : s.num}
+              {step > s.num ? <FiCheck size={14} /> : s.num}
             </div>
-            <span style={{ fontSize: '0.75rem', color: step === s.num ? '#38bdf8' : '#94a3b8', fontWeight: step === s.num ? 700 : 500 }}>
+            <span style={{ fontSize: '0.84rem', color: step === s.num ? '#38bdf8' : '#94a3b8', fontWeight: step === s.num ? 800 : 500 }}>
               {s.label}
             </span>
           </div>
@@ -796,81 +794,14 @@ export default function PublicVehicleFinder() {
         backdropFilter: 'blur(8px)'
       }}>
 
-        {/* ── ADIM 1: SEKTÖR SEÇİMİ ─────────────────────────────── */}
+        {/* ── ADIM 1: TONAJ & METREKÜP SEÇİMİ ─────────────────────── */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '6px', color: '#f8fafc' }}>
-              1. Hangi alanda taşıma yapıyorsunuz?
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '6px', color: '#f8fafc' }}>
+              1. Taşıyacağınız Net Yük (Tonaj) ve Kasa Hacmi (Metreküp)
             </h2>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '16px' }}>
-              İş kolunuza en uygun motor gücünü ve şasi mukavemetini belirlemek için seçin:
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px', marginBottom: '20px' }}>
-              {SECTORS.map(sec => {
-                const isSelected = selectedSector === sec.id;
-                return (
-                  <div
-                    key={sec.id}
-                    onClick={() => setSelectedSector(sec.id)}
-                    style={{
-                      background: isSelected ? 'rgba(0, 75, 147, 0.35)' : 'rgba(15, 23, 42, 0.6)',
-                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '12px',
-                      padding: '14px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <span style={{ fontSize: '24px' }}>{sec.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#38bdf8' : '#f8fafc' }}>
-                        {sec.label}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>
-                        {sec.desc}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '14px',
-                fontWeight: 700,
-                fontSize: '0.92rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
-              }}
-            >
-              Devam Et (Tonaj & Hacim Belirle) <FiArrowRight size={18} />
-            </button>
-          </div>
-        )}
-
-        {/* ── ADIM 2: HASSAS TONAJ, KASA HACMİ & BOYUT SEÇİMİ ───── */}
-        {step === 2 && (
-          <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '6px', color: '#f8fafc' }}>
-              2. Taşıyacağınız Net Yük Ağırlığı ve Kasa Hacmi?
-            </h2>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '16px' }}>
-              Sistem kantar sınırını ve şasi uzunluğunu bu değerlere göre otomatik atayacaktır:
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '18px' }}>
+              İşinize uygun net tonajı ve metreküpü belirleyin; sistemimiz kantar sınırına en uygun şasiyi ve Kuveyt Türk 6 ay ödemesiz kredi planınızı anında hazırlasın:
             </p>
 
             {/* Net Yük Ağırlığı Sürgüsü */}
@@ -878,14 +809,14 @@ export default function PublicVehicleFinder() {
               background: 'rgba(15, 23, 42, 0.65)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '12px',
-              padding: '14px 16px',
-              marginBottom: '14px'
+              padding: '16px',
+              marginBottom: '16px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
                   TAŞINACAK NET YÜK AĞIRLIĞI:
                 </span>
-                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#38bdf8' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8' }}>
                   {(payloadKg / 1000).toFixed(1)} Ton ({payloadKg.toLocaleString('tr-TR')} kg)
                 </span>
               </div>
@@ -897,7 +828,7 @@ export default function PublicVehicleFinder() {
                 step="250"
                 value={payloadKg}
                 onChange={e => setPayloadKg(Number(e.target.value))}
-                style={{ width: '100%', accentColor: '#0284c7', marginBottom: '10px' }}
+                style={{ width: '100%', accentColor: '#0284c7', marginBottom: '12px' }}
               />
 
               {/* Hızlı Çipler */}
@@ -913,8 +844,8 @@ export default function PublicVehicleFinder() {
                       border: '1px solid',
                       borderColor: payloadKg === qt.payloadKg ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
                       borderRadius: '12px',
-                      padding: '3px 9px',
-                      fontSize: '0.72rem',
+                      padding: '4px 10px',
+                      fontSize: '0.74rem',
                       fontWeight: payloadKg === qt.payloadKg ? 700 : 500,
                       cursor: 'pointer'
                     }}
@@ -930,8 +861,8 @@ export default function PublicVehicleFinder() {
               background: 'rgba(15, 23, 42, 0.65)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '12px',
-              padding: '14px 16px',
-              marginBottom: '20px'
+              padding: '16px',
+              marginBottom: '18px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
@@ -944,7 +875,7 @@ export default function PublicVehicleFinder() {
                     background: 'none',
                     border: 'none',
                     color: '#38bdf8',
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                     textDecoration: 'underline'
@@ -958,7 +889,7 @@ export default function PublicVehicleFinder() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>İdeal Kasa Hacmi:</span>
-                    <span style={{ fontSize: '1rem', fontWeight: 800, color: '#10b981' }}>{volumeM3} m³</span>
+                    <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981' }}>{volumeM3} m³</span>
                   </div>
                   <input
                     type="range"
@@ -1009,136 +940,94 @@ export default function PublicVehicleFinder() {
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            {/* ⚡ ANLIK EŞLEŞEN İDEAL ŞASİ ÖNİZLEMESİ */}
+            <div style={{
+              background: 'rgba(0, 75, 147, 0.3)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              borderRadius: '12px',
+              padding: '14px 16px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+              flexWrap: 'wrap'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.68rem', color: '#93c5fd', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  OTOMATİK EŞLEŞEN İDEAL ŞASİ:
+                </span>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                  {matched.modelTitle} ({matched.wheelbase})
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '3px' }}>
+                  {matched.kantarTitle} · Kasa: {matched.dims.length} × {matched.dims.width}
+                </div>
+              </div>
+              <div style={{
+                background: matched.kantarStatus === 'safe' ? '#10b981' : '#38bdf8',
+                color: '#0f172a',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                fontSize: '0.74rem',
+                fontWeight: 800
+              }}>
+                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : 'KANTAR DENGELİ'}
+              </div>
+            </div>
+
+            {/* İLERLEME BUTONU */}
+            <button
+              onClick={() => setStep(2)}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px',
+                fontWeight: 800,
+                fontSize: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)'
+              }}
+            >
+              <span>Kredi & Taksit Planına Geç (Kuveyt Türk 6 Ay Ödemesiz)</span>
+              <FiArrowRight size={18} />
+            </button>
+          </div>
+        )}
+
+        {/* ── ADIM 2: EŞLEŞEN ŞASİ, KASA BOYUTLARI, KANTAR & KREDİ ─ */}
+        {step === 2 && (
+          <div>
+            {/* Geri Dön Butonu */}
+            <div style={{ marginBottom: '14px' }}>
               <button
+                type="button"
                 onClick={() => setStep(1)}
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
+                  background: 'rgba(255, 255, 255, 0.08)',
                   color: '#94a3b8',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '10px',
-                  padding: '14px 20px',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
+                  padding: '8px 14px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
                   cursor: 'pointer'
                 }}
               >
-                <FiArrowLeft size={16} />
-              </button>
-
-              <button
-                onClick={() => setStep(3)}
-                style={{
-                  flex: 1,
-                  background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '14px',
-                  fontWeight: 700,
-                  fontSize: '0.92rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
-                }}
-              >
-                Devam Et (Kasa Tipini Seç) <FiArrowRight size={18} />
+                <FiArrowLeft size={14} /> Tonaj ve Metreküpü Değiştir
               </button>
             </div>
-          </div>
-        )}
 
-        {/* ── ADIM 3: KASA TİPİ SEÇİMİ ───────────────────────────── */}
-        {step === 3 && (
-          <div>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '6px', color: '#f8fafc' }}>
-              3. İstediğiniz Kasa / Üstyapı Tipi?
-            </h2>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '16px' }}>
-              Kasa darası toplam kantar ağırlığı hesabına otomatik dahil edilecektir:
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px', marginBottom: '20px' }}>
-              {BODY_TYPES.map(b => {
-                const isSelected = selectedBody === b.id;
-                return (
-                  <div
-                    key={b.id}
-                    onClick={() => setSelectedBody(b.id)}
-                    style={{
-                      background: isSelected ? 'rgba(0, 75, 147, 0.35)' : 'rgba(15, 23, 42, 0.6)',
-                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '12px',
-                      padding: '12px 14px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <span style={{ fontSize: '22px' }}>{b.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: isSelected ? '#38bdf8' : '#f8fafc' }}>
-                        {b.name}
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px' }}>
-                        Kasa Ağırlığı: ~{b.tare} kg · {b.desc}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={() => setStep(2)}
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  color: '#94a3b8',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '10px',
-                  padding: '14px 20px',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer'
-                }}
-              >
-                <FiArrowLeft size={16} />
-              </button>
-
-              <button
-                onClick={() => setStep(4)}
-                style={{
-                  flex: 1,
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '14px',
-                  fontWeight: 700,
-                  fontSize: '0.92rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
-                }}
-              >
-                ⚡ Eşleşen Şasiyi, Kasa Ölçülerini & Kantar Durumunu Gör <FiArrowRight size={18} />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── ADIM 4: EŞLEŞEN ŞASİ, KASA BOYUTLARI, KANTAR & KREDİ ─ */}
-        {step === 4 && (
-          <div>
             {/* Eşleşen Araç Kartı */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.4) 0%, rgba(16, 185, 129, 0.15) 100%)',
@@ -1547,7 +1436,7 @@ export default function PublicVehicleFinder() {
             </button>
 
             <button
-              onClick={() => setStep(2)}
+              onClick={() => setStep(1)}
               style={{
                 width: '100%',
                 background: 'transparent',
