@@ -1204,20 +1204,20 @@ export default function IntentRadar() {
               color: '#e2e8f0',
               whiteSpace: 'pre-wrap'
             }}>
-{`🚛 İŞİNİZE EN UYGUN IVECO'YU VE 6 AY ÖDEMESİZ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲
+{`🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲
 
-Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli aracı ve Kuveyt Türk 6 ay ertelemeli taksit tablonuzu anında özetlesin.
+Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.
 
 👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
 👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum
 
-IVECO ERC Otomotiv • Can Murat`}
+IVECO ERC Otomotiv • Can Murat (Sales Priest)`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE 6 AY ÖDEMESİZ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli aracı ve Kuveyt Türk 6 ay ertelemeli taksit tablonuzu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum\n\nIVECO ERC Otomotiv • Can Murat`;
+                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum\n\nIVECO ERC Otomotiv • Can Murat (Sales Priest)`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

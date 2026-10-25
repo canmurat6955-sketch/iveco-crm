@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { discoveryApi } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
+import { BANK_LIST, getCampaignsForVehicleAndBank } from '../../data/bankCampaigns';
 import {
   FiTruck,
   FiCheckCircle,
@@ -91,9 +92,9 @@ export default function PublicVehicleFinder() {
     BODY_TYPES.some(b => b.id === bodyParam) ? bodyParam : 'frigo'
   );
 
-  // Kredi Parametreleri
-  const [loanPrincipal, setLoanPrincipal] = useState(1500000);
-  const [loanTerm, setLoanTerm] = useState(36);
+  // Kredi Parametreleri (Çoklu Banka & Ekim 2026 Kampanyaları)
+  const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
+  const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
   // Müşteri İletişim Formu (Mevcut Müşteri Linkinden Otomatik Doldurma)
   const [customerName, setCustomerName] = useState(nameParam);
@@ -405,57 +406,23 @@ export default function PublicVehicleFinder() {
     };
   }, [payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
 
-  // Kredi Hesaplama (Kuveyt Türk 6 Ay Ödemesiz)
-  const loanCalculations = useMemo(() => {
-    let monthly = 48808;
-    let total = 1757097;
-    let rate = '%2.40';
+  // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
+  const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
+    return getCampaignsForVehicleAndBank(matched.series, selectedBankId);
+  }, [matched.series, selectedBankId]);
 
-    if (loanPrincipal === 1000000) {
-      if (loanTerm === 24) {
-        monthly = 62390;
-        total = 1497371;
-        rate = '%2.21';
-      } else {
-        monthly = 48808;
-        total = 1757097;
-        rate = '%2.40';
-      }
-    } else if (loanPrincipal === 1500000) {
-      if (loanTerm === 24) {
-        monthly = 98972;
-        total = 2375326;
-        rate = '%2.55';
-      } else {
-        monthly = 77336;
-        total = 2784087;
-        rate = '%2.67';
-      }
-    } else if (loanPrincipal === 2000000) {
-      if (loanTerm === 24) {
-        monthly = 132176;
-        total = 3172216;
-        rate = '%2.20';
-      } else {
-        monthly = 103526;
-        total = 3726932;
-        rate = '%2.32';
-      }
-    } else {
-      // 3.000.000 TL
-      if (loanTerm === 24) {
-        monthly = 198000;
-        total = 4752000;
-        rate = '%2.20';
-      } else {
-        monthly = 154500;
-        total = 5562000;
-        rate = '%2.35';
-      }
+  const currentBankMeta = useMemo(() => {
+    return BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
+  }, [selectedBankId]);
+
+  const activeCampaign = useMemo(() => {
+    if (!availableCampaigns || availableCampaigns.length === 0) return null;
+    if (selectedCampaignId) {
+      const found = availableCampaigns.find(c => c.id === selectedCampaignId);
+      if (found) return found;
     }
-
-    return { monthly, total, rate };
-  }, [loanPrincipal, loanTerm]);
+    return availableCampaigns.find(c => c.highlight) || availableCampaigns[0];
+  }, [availableCampaigns, selectedCampaignId]);
 
   // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {
@@ -469,11 +436,15 @@ export default function PublicVehicleFinder() {
     const durationSeconds = Math.round((Date.now() - startTime) / 1000);
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
 
+    const campaignSummary = activeCampaign
+      ? `${currentBankMeta.name} — ${activeCampaign.title} (Aylık: ${activeCampaign.monthly.toLocaleString('tr-TR')} TL)`
+      : `${currentBankMeta.name} (Resmi IVECO Kredi Kampanyası)`;
+
     const leadPayload = {
       source: customerIdParam ? 'crm_existing_customer' : (refCode || 'whatsapp_link'),
       search_query: `[Şasi & Kasa Seçici]: ${selectedSector} | ${payloadKg} kg | ${volumeM3} m3 | ${selectedBody}`,
       target_model: matched.modelTitle,
-      target_campaign: `Kuveyt Türk 6 Ay Ödemesiz (${loanPrincipal.toLocaleString('tr-TR')} TL / ${loanTerm} Ay)`,
+      target_campaign: campaignSummary,
       company_name: customerCompany.trim() || customerName.trim() || 'WhatsApp Ziyaretçisi',
       city: customerCity,
       phone: customerPhone.trim(),
@@ -484,7 +455,7 @@ export default function PublicVehicleFinder() {
       intent_score: 99,
       intent_level: 'very_high',
       matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
-      notes: `Müşteri Akıllı Şasi Seçiciyi kullandı.\nModel: ${matched.modelTitle}\nŞasi: ${matched.wheelbase}\nYük: ${payloadKg} kg, Hacim: ${matched.dims.volume}\nKasa: ${matched.dims.length} x ${matched.dims.width} x ${matched.dims.height}\nKantar Sınırı: ${matched.kantarLimit} kg, Boş Ağırlık: ${matched.unladenWeight} kg\nMüşteri Notu: ${customerNotes}`
+      notes: `Müşteri Akıllı Şasi & Kredi Seçiciyi kullandı.\nModel: ${matched.modelTitle}\nŞasi: ${matched.wheelbase}\nYük: ${payloadKg} kg, Hacim: ${matched.dims.volume}\nKasa: ${matched.dims.length} x ${matched.dims.width} x ${matched.dims.height}\nKantar Sınırı: ${matched.kantarLimit} kg, Boş Ağırlık: ${matched.unladenWeight} kg\nFinansman: ${campaignSummary}\nMüşteri Notu: ${customerNotes}`
     };
 
     if (isPreviewMode) {
@@ -513,12 +484,17 @@ export default function PublicVehicleFinder() {
       ? `Merhaba Can Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
       : `Merhaba Can Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
 
+    const campaignText = activeCampaign
+      ? `💳 *Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
+        `💰 *Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
+      : `💳 *Finansman Tercihi:* ${currentBankMeta.name} (Resmi IVECO Finansman Desteği)\n\n`;
+
     const msg = (
       clientGreeting +
       `🚛 *Tavsiye Edilen Model:* ${matched.modelTitle}\n` +
       `📐 *Önerilen Kasa Boyutları:* ${matched.dims.length} × ${matched.dims.width} × ${matched.dims.height} (${matched.dims.volume})\n` +
       `⚖️ *Yük İhtiyacım:* ${payloadKg} kg Net Yük | Kantar Durumu: ${matched.kantarTitle}\n` +
-      `💳 *İlgilendiğim Kredi:* Kuveyt Türk 6 Ay Ödemesiz (${loanPrincipal.toLocaleString('tr-TR')} TL / ${loanTerm} Ay)\n\n` +
+      campaignText +
       `Bu aracın hazır şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -528,7 +504,7 @@ export default function PublicVehicleFinder() {
   const handleShareLink = async () => {
     const shareUrl = window.location.href;
     const shareTitle = 'IVECO Akıllı Şasi, Kasa & Finansman Seçici';
-    const shareText = `İşinize en uygun IVECO şasisini, kasa ölçülerini ve 6 ay ödemesiz kredi planını buradan hesaplayabilirsiniz:\n${shareUrl}`;
+    const shareText = `İşinize en uygun IVECO şasisini, kasa ölçülerini ve anlaşmalı banka kredi kampanyalarını (%0 Faiz vb.) buradan hesaplayabilirsiniz:\n${shareUrl}`;
 
     if (navigator.share) {
       try {
@@ -676,7 +652,7 @@ export default function PublicVehicleFinder() {
           İşinize En Uygun IVECO Şasisini, Kasa Ölçüsünü ve Kredi Planını Belirleyin
         </h1>
         <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0 }}>
-          Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>Kuveyt Türk 6 Ay Ödemesiz</strong> taksit tutarını anında hesaplasın.
+          Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>resmi banka kredi kampanyalarını (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.)</strong> anında hesaplasın.
         </p>
 
         {/* Can Murat Temsilci Rozeti (Sales Priest) & Paylaş Butonu */}
@@ -801,7 +777,7 @@ export default function PublicVehicleFinder() {
               1. Taşıyacağınız Net Yük (Tonaj) ve Kasa Hacmi (Metreküp)
             </h2>
             <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '18px' }}>
-              İşinize uygun net tonajı ve metreküpü belirleyin; sistemimiz kantar sınırına en uygun şasiyi ve Kuveyt Türk 6 ay ödemesiz kredi planınızı anında hazırlasın:
+              İşinize uygun net tonajı ve metreküpü belirleyin; sistemimiz kantar sınırına en uygun şasiyi ve anlaşmalı bankaların resmi kredi planlarını anında hazırlasın:
             </p>
 
             {/* Net Yük Ağırlığı Sürgüsü */}
@@ -996,7 +972,7 @@ export default function PublicVehicleFinder() {
                 boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)'
               }}
             >
-              <span>Kredi & Taksit Planına Geç (Kuveyt Türk 6 Ay Ödemesiz)</span>
+              <span>Kredi & Taksit Kampanyalarına Geç (%0 Faiz & Çoklu Banka)</span>
               <FiArrowRight size={18} />
             </button>
           </div>
@@ -1156,116 +1132,301 @@ export default function PublicVehicleFinder() {
               </div>
             </div>
 
-            {/* ── KUVEYT TÜRK 6 AY ÖDEMESİZ FİNANSMAN KARTI ─────── */}
+            {/* ── ÇOKLU BANKA KREDİ KAMPANYALARI (EKİM 2026) ─────── */}
             <div style={{
               background: 'rgba(15, 23, 42, 0.75)',
-              border: '1px solid rgba(245, 158, 11, 0.35)',
-              borderRadius: '14px',
-              padding: '16px',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '16px',
+              padding: '18px 16px',
               marginBottom: '20px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '4px 8px', borderRadius: '6px', fontSize: '12px' }}>
-                  <FiDollarSign />
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{
+                    background: 'rgba(56, 189, 248, 0.2)',
+                    color: '#38bdf8',
+                    padding: '6px 10px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <FiDollarSign />
+                  </span>
+                  <div>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                      Resmi Finansman & Banka Kampanyaları
+                    </h4>
+                    <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                      Ekim 2026 IVECO Yetkili Bayi Destekli Kredi Tablosu
+                    </span>
+                  </div>
+                </div>
+                <span style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  border: '1px solid rgba(52, 211, 153, 0.3)',
+                  borderRadius: '20px',
+                  padding: '3px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700
+                }}>
+                  %0 Faiz Seçenekleri
                 </span>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fbbf24', margin: 0 }}>
-                  Kuveyt Türk 6 Ay Ödemesiz - Bayi Katkılı Kampanya
-                </h4>
               </div>
 
-              <p style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '14px' }}>
-                Aracınızı hemen teslim alın; ilk <strong>6 ay boyunca 0 TL taksit</strong> ödeyin!
+              <p style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '14px', lineHeight: 1.4 }}>
+                Çalıştığınız bankayı seçerek <strong>{matched.series}</strong> modeline özel taksit ve finansman seçeneklerini inceleyebilirsiniz:
               </p>
 
-              {/* Kredi Tutarı Butonları */}
-              <div style={{ marginBottom: '12px' }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
-                  KREDİ TUTARI SEÇİN:
-                </label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {[1000000, 1500000, 2000000].map(amt => (
-                    <button
-                      key={amt}
-                      onClick={() => setLoanPrincipal(amt)}
-                      style={{
-                        flex: 1,
-                        background: loanPrincipal === amt ? '#f59e0b' : 'rgba(255,255,255,0.06)',
-                        color: loanPrincipal === amt ? '#0f172a' : '#f8fafc',
-                        border: '1px solid',
-                        borderColor: loanPrincipal === amt ? '#f59e0b' : 'rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        padding: '8px',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {amt.toLocaleString('tr-TR')} TL
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Vade Seçimi */}
-              <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', marginBottom: '6px' }}>
-                  VADE SEÇENEĞİ (İLK 6 AY ERTELEMELİ):
-                </label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {[
-                    { months: 24, label: '24 Ay (6 Ay Ödemesiz + 18 Taksit)' },
-                    { months: 36, label: '36 Ay (6 Ay Ödemesiz + 30 Taksit)' }
-                  ].map(t => (
-                    <button
-                      key={t.months}
-                      onClick={() => setLoanTerm(t.months)}
-                      style={{
-                        flex: 1,
-                        background: loanTerm === t.months ? '#0284c7' : 'rgba(255,255,255,0.06)',
-                        color: loanTerm === t.months ? '#fff' : '#f8fafc',
-                        border: '1px solid',
-                        borderColor: loanTerm === t.months ? '#38bdf8' : 'rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        padding: '8px 10px',
-                        fontSize: '0.76rem',
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hesaplanan Taksit Özeti */}
+              {/* 1. BANKA SEÇİCİ GRID */}
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                Hangi Banka ile Çalışıyorsunuz?
+              </label>
               <div style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))',
+                gap: '8px',
+                marginBottom: '16px'
               }}>
-                <div>
-                  <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                    İlk 6 Ay Sonraki Aylık Taksit:
+                {BANK_LIST.map(bank => {
+                  const isSelected = selectedBankId === bank.id;
+                  return (
+                    <button
+                      key={bank.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedBankId(bank.id);
+                        setSelectedCampaignId(null);
+                      }}
+                      style={{
+                        background: isSelected ? bank.bg : 'rgba(255, 255, 255, 0.04)',
+                        border: `1.5px solid ${isSelected ? bank.color : 'rgba(255, 255, 255, 0.08)'}`,
+                        borderRadius: '10px',
+                        padding: '10px 8px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'all 0.18s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '1.1rem' }}>{bank.icon}</span>
+                        {isSelected && (
+                          <span style={{
+                            background: bank.color,
+                            color: '#fff',
+                            borderRadius: '50%',
+                            width: '16px',
+                            height: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '10px',
+                            fontWeight: 800
+                          }}>✓</span>
+                        )}
+                      </div>
+                      <div style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 800,
+                        color: isSelected ? '#fff' : '#e2e8f0',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {bank.shortName}
+                      </div>
+                      <div style={{
+                        fontSize: '0.64rem',
+                        color: isSelected ? bank.color : '#94a3b8',
+                        marginTop: '2px',
+                        fontWeight: 600
+                      }}>
+                        {bank.badge}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 2. DİĞER / BANKAM YOK SEÇİLDİĞİNDE ÖZEL TEB CETELEM BİLGİLENDİRMESİ */}
+              {selectedBankId === 'diger_yok' && (
+                <div style={{
+                  background: 'rgba(139, 92, 246, 0.12)',
+                  border: '1px solid rgba(167, 139, 250, 0.35)',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '10px'
+                }}>
+                  <span style={{ fontSize: '1.25rem', marginTop: '2px' }}>🤝</span>
+                  <div style={{ fontSize: '0.76rem', color: '#ddd6fe', lineHeight: 1.45 }}>
+                    <strong>Anlaşmalı bankanız listede yoksa hiç sorun değil!</strong><br />
+                    IVECO resmi taşıt finansman çözüm ortağımız <strong>TEB Cetelem</strong> ile işletmenize özel <strong>%0 faizli</strong> veya <strong>48 aya varan</strong> ticari taşıt kredisi kullandırımı ERC Otomotiv yetkili bayimiz tarafından hızla onaylatılır. Aşağıdaki avantajlı planlardan dilediğinizi seçebilirsiniz:
                   </div>
-                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#fbbf24' }}>
-                    {loanCalculations.monthly.toLocaleString('tr-TR')} TL <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>/ ay</span>
-                  </div>
+                </div>
+              )}
+
+              {/* 3. ARACA VE BANKAYA ÖZEL KAMPANYA SEÇENEKLERİ */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>
+                    {currentBankMeta.name.toUpperCase()} KAMPANYA PLANLARI:
+                  </label>
+                  <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
+                    Araç Grubu: {matched.series}
+                  </span>
                 </div>
 
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700 }}>
-                    İlk 6 Ay: 0 TL
+                {availableCampaigns.length === 0 ? (
+                  <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem' }}>
+                    Bu model için seçilen bankada doğrudan tanımlı kampanya bulunamadı. Lütfen TEB Cetelem veya Kuveyt Türk seçeneklerini inceleyiniz.
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                    Avantajlı Oran: {loanCalculations.rate}
+                ) : (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+                    gap: '8px'
+                  }}>
+                    {availableCampaigns.map(camp => {
+                      const isChosen = activeCampaign?.id === camp.id;
+                      return (
+                        <div
+                          key={camp.id}
+                          onClick={() => setSelectedCampaignId(camp.id)}
+                          style={{
+                            background: isChosen ? 'rgba(56, 189, 248, 0.15)' : 'rgba(0, 0, 0, 0.35)',
+                            border: `1.5px solid ${isChosen ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)'}`,
+                            borderRadius: '10px',
+                            padding: '12px 10px',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            position: 'relative'
+                          }}
+                        >
+                          {camp.tag && (
+                            <span style={{
+                              position: 'absolute',
+                              top: '-7px',
+                              right: '8px',
+                              background: camp.highlight ? '#10b981' : '#0284c7',
+                              color: '#fff',
+                              fontSize: '0.62rem',
+                              fontWeight: 800,
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              letterSpacing: '0.3px'
+                            }}>
+                              {camp.tag}
+                            </span>
+                          )}
+
+                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc', marginBottom: '4px' }}>
+                            {camp.title}
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: '6px' }}>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Aylık Taksit</div>
+                              <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fbbf24' }}>
+                                {camp.monthly.toLocaleString('tr-TR')} TL
+                              </div>
+                            </div>
+
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Faiz / Oran</div>
+                              <div style={{
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                color: camp.rate === 0 ? '#34d399' : '#e2e8f0'
+                              }}>
+                                {camp.rateLabel}
+                              </div>
+                            </div>
+                          </div>
+
+                          {camp.gracePeriodMonths && (
+                            <div style={{ fontSize: '0.66rem', color: '#34d399', fontWeight: 700, marginTop: '4px' }}>
+                              ⚡ İlk {camp.gracePeriodMonths} ay boyunca 0 TL taksit!
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 4. SEÇİLEN KAMPANYA ÖZETİ & DETAY HESAPLAMA KARTI */}
+              {activeCampaign && (
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.45)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                        Seçilen Kredi Planı:
+                      </div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#fbbf24' }}>
+                        {activeCampaign.monthly.toLocaleString('tr-TR')} TL <span style={{ fontSize: '0.78rem', fontWeight: 500, color: '#cbd5e1' }}>/ ay</span>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                        Finans Kuruluşu:
+                      </div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#38bdf8' }}>
+                        {currentBankMeta.name}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '6px',
+                    paddingTop: '8px',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                    fontSize: '0.72rem'
+                  }}>
+                    <div>
+                      <span style={{ color: '#94a3b8' }}>Kredi Tutarı: </span>
+                      <strong style={{ color: '#fff' }}>{activeCampaign.principal.toLocaleString('tr-TR')} TL</strong>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <span style={{ color: '#94a3b8' }}>Vade: </span>
+                      <strong style={{ color: '#fff' }}>{activeCampaign.term} Ay</strong>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ color: '#94a3b8' }}>Oran: </span>
+                      <strong style={{ color: activeCampaign.rate === 0 ? '#34d399' : '#fff' }}>{activeCampaign.rateLabel}</strong>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    fontSize: '0.68rem',
+                    color: '#64748b',
+                    lineHeight: 1.35,
+                    marginTop: '4px'
+                  }}>
+                    🛡️ <em>Resmi IVECO Ekim 2026 anlaşmalı ticari finansman tablosudur. Katkı payı bayimiz ve üretici tarafından sübvanse edilmiş olup ilave masraf veya gizli komisyon yansıtılmaz.</em>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* ── İLETİŞİM & TEKLİF ALMA FORMU ──────────────────────── */}
@@ -1406,7 +1567,7 @@ export default function PublicVehicleFinder() {
                   Talebiniz Can Murat'a (Sales Priest) Ulaştı!
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 10px' }}>
-                  Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve Kuveyt Türk kampanya tablosuyla 15 dakika içinde aranacaksınız.
+                  Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
                 </p>
               </div>
             )}

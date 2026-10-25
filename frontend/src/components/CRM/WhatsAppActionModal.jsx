@@ -243,7 +243,7 @@ export default function WhatsAppActionModal({
       const greeting = comp ? `Sayın ${comp} Yetkilisi,\n\n` : '';
       setMessage(
         `${greeting}Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
-        `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve Kuveyt Türk 6 ay ödemesiz kredi planınızı saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
+        `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve anlaşmalı banka kredi kampanyalarımızı (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.) saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
         `Aşağıdaki firmanıza özel bağlantıdan dilediğiniz tonaj ve hacme göre anında simülasyon yapabilirsiniz:\n` +
         `🔗 ${link}\n\n` +
         `Beğendiğiniz kombinasyonun hazır şasi stok durumu ve resmi teklifi için bu mesajı yanıtlamanız yeterlidir.`
