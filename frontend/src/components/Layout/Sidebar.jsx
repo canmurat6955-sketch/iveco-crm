@@ -93,7 +93,7 @@ export default function Sidebar() {
             Araç Yönetimi
           </NavLink>
           <a
-            href="/arac-secici?preview=true&company=%C3%96rnek%20Lojistik&name=Can%20Murat&phone=05325551014"
+            href="/ozel-teklif?preview=true&company=%C3%96rnek%20Lojistik&name=Can%20Murat&phone=05325551014"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"

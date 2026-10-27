@@ -64,6 +64,11 @@ export default function App() {
               <Route path="/p/:token" element={page(PublicProposalView)} />
               <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
               <Route path="/arac-secici" element={page(PublicVehicleFinder)} />
+              <Route path="/ozel-teklif" element={page(PublicVehicleFinder)} />
+              <Route path="/filo-hesaplayici" element={page(PublicVehicleFinder)} />
+              <Route path="/akilli-kasa" element={page(PublicVehicleFinder)} />
+              <Route path="/iveco-finansman" element={page(PublicVehicleFinder)} />
+              <Route path="/test/finansman" element={page(PublicVehicleFinder)} />
               <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
 
                 <Route index element={page(Dashboard)} />

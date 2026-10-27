@@ -132,9 +132,9 @@ export default function CustomerDetail() {
     if (!customer) return;
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
     const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
-    const link = `${origin}/arac-secici?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_crm`;
+    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_vip`;
     navigator.clipboard.writeText(link).then(() => {
-      toast.success(`${customer.company_name} için özel konfigüratör bağlantısı kopyalandı! 📋`);
+      toast.success(`${customer.company_name} için VIP Özel Teklif bağlantısı kopyalandı! 📋`);
     }).catch(() => toast.error('Link kopyalanamadı'));
   };
 
@@ -145,16 +145,16 @@ export default function CustomerDetail() {
     }
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
     const cleanPhone = customer.phone.replace(/\D/g, '');
-    const link = `${origin}/arac-secici?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_crm`;
+    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_vip`;
     const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;
 
     const msg = (
-      `Sayın ${contactName},\n\n` +
+      `🌟 Sayın ${contactName},\n\n` +
       `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
-      `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve anlaşmalı banka kredi kampanyalarımızı (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.) saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
-      `Aşağıdaki firmanıza özel bağlantıdan dilediğiniz tonaj ve hacme göre anında simülasyon yapabilirsiniz:\n` +
-      `🔗 ${link}\n\n` +
-      `Beğendiğiniz kombinasyonun hazır şasi stok durumu ve resmi teklifi için bu mesajı yanıtlamanız yeterlidir.`
+      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
+      `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
+      `👉 ${link}\n\n` +
+      `Seçtiğiniz aracın hazır fabrika şasi teslim tarihi ve resmi bayi proforma teklifi için bu mesajı yanıtlamanız yeterlidir.`
     );
 
     openWhatsApp(customer.phone, msg, { customer });

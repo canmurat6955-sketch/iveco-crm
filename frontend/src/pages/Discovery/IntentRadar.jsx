@@ -1209,7 +1209,7 @@ export default function IntentRadar() {
 Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.
 
 👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
-👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum
+👉 https://iveco-crm.vercel.app/ozel-teklif?ref=canmurat_vip
 
 IVECO ERC Otomotiv • Can Murat (Sales Priest)`}
             </div>
@@ -1217,7 +1217,7 @@ IVECO ERC Otomotiv • Can Murat (Sales Priest)`}
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/arac-secici?ref=canmurat_durum\n\nIVECO ERC Otomotiv • Can Murat (Sales Priest)`;
+                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=canmurat_vip\n\nIVECO ERC Otomotiv • Can Murat (Sales Priest)`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

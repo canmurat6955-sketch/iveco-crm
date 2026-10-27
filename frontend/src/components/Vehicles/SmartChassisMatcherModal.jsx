@@ -103,7 +103,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
     params.set('payload', payloadKg);
     params.set('body', bodyType);
     params.set('ref', 'canmurat_crm_matcher');
-    return `${origin}/arac-secici?${params.toString()}`;
+    return `${origin}/ozel-teklif?${params.toString()}`;
   };
 
   const handleSendWhatsApp = () => {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { discoveryApi } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
-import { BANK_LIST, getCampaignsForVehicleAndBank } from '../../data/bankCampaigns';
+import { BANK_LIST, AMOUNT_TIERS, getCampaignsForVehicleAndBank } from '../../data/bankCampaigns';
 import {
   FiTruck,
   FiCheckCircle,
@@ -69,7 +69,9 @@ export default function PublicVehicleFinder() {
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
 
-  const isPreviewMode = searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
+  const location = useLocation();
+  const isTestRoute = location.pathname.includes('/test') || searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
+  const isPreviewMode = isTestRoute;
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const [step, setStep] = useState(1);
@@ -92,9 +94,16 @@ export default function PublicVehicleFinder() {
     BODY_TYPES.some(b => b.id === bodyParam) ? bodyParam : 'frigo'
   );
 
-  // Kredi Parametreleri (Çoklu Banka & Ekim 2026 Kampanyaları)
+  // Kredi Parametreleri (Çoklu Banka & Tutar Kırılımları - Ekim 2026 Kampanyaları)
   const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
+  const [selectedTierId, setSelectedTierId] = useState('all');
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
+
+  // VIP Test & Simülasyon Paneli State'leri (Sales Priest: Can Murat)
+  const [showTestPanel, setShowTestPanel] = useState(isTestRoute);
+  const [testGenCompany, setTestGenCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
+  const [testGenPhone, setTestGenPhone] = useState(phoneParam || '0532 555 10 14');
+  const [testSimulationResult, setTestSimulationResult] = useState(null);
 
   // Müşteri İletişim Formu (Mevcut Müşteri Linkinden Otomatik Doldurma)
   const [customerName, setCustomerName] = useState(nameParam);
@@ -408,8 +417,8 @@ export default function PublicVehicleFinder() {
 
   // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
-    return getCampaignsForVehicleAndBank(matched.series, selectedBankId);
-  }, [matched.series, selectedBankId]);
+    return getCampaignsForVehicleAndBank(matched.series, selectedBankId, selectedTierId);
+  }, [matched.series, selectedBankId, selectedTierId]);
 
   const currentBankMeta = useMemo(() => {
     return BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
@@ -461,7 +470,11 @@ export default function PublicVehicleFinder() {
     if (isPreviewMode) {
       setSubmitted(true);
       setSubmitting(false);
-      toast.success('🛠️ TEST MODU: Simülasyon başarılı! Gerçek müşteride bu veriler anında Satış Pipeline\'ına düşer.', { duration: 5000 });
+      setTestSimulationResult({
+        ...leadPayload,
+        timestamp: new Date().toLocaleTimeString('tr-TR')
+      });
+      toast.success('🛠️ VIP TEST: Can Murat Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
       return;
     }
 
@@ -525,6 +538,77 @@ export default function PublicVehicleFinder() {
     }
   };
 
+  // VIP Test Paneli Fonksiyonları (Can Murat - Sales Priest)
+  const handleApplyPreset = (type) => {
+    if (type === '35s') {
+      setPayloadKg(1500);
+      setVolumeM3(14);
+      setSelectedBody('kapali_kutu');
+      setCustomDims(false);
+      toast.success('Daily 35S (Tek Teker / 1.5t / 14m³) konfigürasyonu yüklendi');
+    } else if (type === '35c') {
+      setPayloadKg(3500);
+      setVolumeM3(20);
+      setSelectedBody('kapali_kutu');
+      setCustomDims(false);
+      toast.success('Daily 35C (Çift Teker / 3.5t / 20m³) konfigürasyonu yüklendi');
+    } else if (type === '72c') {
+      setPayloadKg(4800);
+      setVolumeM3(28);
+      setSelectedBody('frigo');
+      setCustomDims(false);
+      toast.success('Daily 72C (4.8t / 28m³ / 7.970 kg kantar) konfigürasyonu yüklendi');
+    } else if (type === '100e') {
+      setPayloadKg(6500);
+      setVolumeM3(35);
+      setSelectedBody('kayar_perde');
+      setCustomDims(false);
+      toast.success('Eurocargo 100E (6.5t / 35m³ / 10.875 kg kantar) konfigürasyonu yüklendi');
+    } else if (type === '120e') {
+      setPayloadKg(8000);
+      setVolumeM3(42);
+      setSelectedBody('kayar_perde');
+      setCustomDims(false);
+      toast.success('Eurocargo 120E (8t / 42m³ / 12.950 kg kantar) konfigürasyonu yüklendi');
+    } else if (type === 'sway') {
+      setPayloadKg(25000);
+      setVolumeM3(85);
+      setSelectedBody('kayar_perde');
+      setCustomDims(false);
+      toast.success('IVECO S-Way Çekici (25t+ / 85m³) konfigürasyonu yüklendi');
+    }
+  };
+
+  const getGeneratedVipLink = (isTest = false) => {
+    const origin = window.location.origin;
+    const cleanCompany = (testGenCompany || 'VIP Müşteri').trim();
+    const cleanPhone = (testGenPhone || '05325551014').trim();
+    const testQuery = isTest ? '&test=true' : '';
+    return `${origin}/ozel-teklif?company=${encodeURIComponent(cleanCompany)}&tel=${encodeURIComponent(cleanPhone)}&ref=canmurat_vip${testQuery}`;
+  };
+
+  const handleCopyGeneratedVipLink = () => {
+    const link = getGeneratedVipLink(false);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link);
+      toast.success('📋 Müşteri VIP Linki Kopyalandı!');
+    } else {
+      prompt('Müşteri VIP Linki:', link);
+    }
+  };
+
+  const handleCopyVipWhatsAppTemplate = () => {
+    const link = getGeneratedVipLink(false);
+    const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat | Sales Priest\nIVECO ERC Otomotiv Samsun\n0532 555 10 14`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
+    } else {
+      prompt('WhatsApp Metni:', text);
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -538,43 +622,236 @@ export default function PublicVehicleFinder() {
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
         
-        {/* Test & Önizleme Modu Rozeti (Can Murat Kontrol Paneli) */}
-        {isPreviewMode && (
+        {/* Can Murat VIP Test & Canlı Simülasyon Dock'u */}
+        {showTestPanel && (
           <div style={{
-            background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.35) 0%, rgba(180, 83, 9, 0.45) 100%)',
-            border: '1px solid rgba(245, 158, 11, 0.65)',
-            borderRadius: '14px',
-            padding: '12px 16px',
-            marginBottom: '16px',
+            background: 'linear-gradient(135deg, rgba(24, 24, 27, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
+            border: '2px solid rgba(245, 158, 11, 0.8)',
+            borderRadius: '16px',
+            padding: '16px 18px',
+            marginBottom: '20px',
+            boxShadow: '0 8px 30px rgba(245, 158, 11, 0.25)',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', borderBottom: '1px solid rgba(245, 158, 11, 0.25)', paddingBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '1.3rem' }}>🛠️</span>
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '0.5px' }}>
+                    CAN MURAT — VIP TEST & SİMÜLASYON DOCK'U
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                    Şasi kantar geçişlerini, yüksek kredi tutarlarını ve prestijli müşteri linklerini buradan test edin.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTestPanel(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#cbd5e1',
+                  borderRadius: '6px',
+                  padding: '3px 8px',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Kapat ✕
+              </button>
+            </div>
+
+            {/* 1. Hızlı Şasi Simülasyonu */}
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f59e0b', marginBottom: '6px' }}>
+                1. HIZLI ŞASİ & KASA ÖLÇÜSÜ TESTİ (TEK TIKLA YÜKLE):
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '6px' }}>
+                {[
+                  { id: '35s', label: 'Daily 35S Tek Teker', desc: '1.5t / 14 m³ (B Ehliyet)' },
+                  { id: '35c', label: 'Daily 35C Çift Teker', desc: '3.5t / 20 m³ (4.130 kg)' },
+                  { id: '72c', label: 'Daily 72C Kamyon', desc: '4.8t / 28 m³ (7.970 kg)' },
+                  { id: '100e', label: 'Eurocargo 100E', desc: '6.5t / 35 m³ (10.875 kg)' },
+                  { id: '120e', label: 'Eurocargo 120E', desc: '8t / 42 m³ (12.950 kg)' },
+                  { id: 'sway', label: 'IVECO S-Way', desc: '25t+ / 85 m³ (Çekici)' }
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleApplyPreset(item.id)}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.4)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      color: '#f8fafc',
+                      padding: '6px 8px',
+                      borderRadius: '8px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <div>{item.label}</div>
+                    <div style={{ fontSize: '0.62rem', color: '#fbbf24', fontWeight: 500 }}>{item.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Müşteri İçin Prestijli Link Üretici */}
+            <div style={{ background: 'rgba(0, 0, 0, 0.45)', borderRadius: '10px', padding: '10px 12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#38bdf8', marginBottom: '8px' }}>
+                2. MÜŞTERİYE ÖZEL PRESTİJLİ LİNK ÜRETİCİ (/ozel-teklif):
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                <div>
+                  <label style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>Firma / Müşteri Adı</label>
+                  <input
+                    type="text"
+                    value={testGenCompany}
+                    onChange={(e) => setTestGenCompany(e.target.value)}
+                    placeholder="Örn: Karadeniz Dağıtım Ltd."
+                    style={{
+                      width: '100%',
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#f8fafc',
+                      borderRadius: '6px',
+                      padding: '6px 8px',
+                      fontSize: '0.76rem'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>Telefon No</label>
+                  <input
+                    type="text"
+                    value={testGenPhone}
+                    onChange={(e) => setTestGenPhone(e.target.value)}
+                    placeholder="0532 555 10 14"
+                    style={{
+                      width: '100%',
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#f8fafc',
+                      borderRadius: '6px',
+                      padding: '6px 8px',
+                      fontSize: '0.76rem'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* URL Önizleme Kutusu */}
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.9)',
+                border: '1px dashed rgba(56, 189, 248, 0.4)',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                fontSize: '0.68rem',
+                color: '#38bdf8',
+                wordBreak: 'break-all',
+                marginBottom: '8px',
+                fontFamily: 'monospace'
+              }}>
+                {getGeneratedVipLink(false)}
+              </div>
+
+              {/* Hızlı Aksiyon Butonları */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <button
+                  type="button"
+                  onClick={handleCopyGeneratedVipLink}
+                  style={{
+                    background: '#0284c7',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '6px 12px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <FiCopy size={12} /> Linki Kopyala
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyVipWhatsAppTemplate}
+                  style={{
+                    background: '#22c55e',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '6px 12px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <FiMessageSquare size={12} /> WhatsApp VIP Mesajını Kopyala
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTestOpenGeneratedLink}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#e2e8f0',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '6px',
+                    padding: '6px 10px',
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🚀 Yeni Sekmede Test Et
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Eğer test panel kapalıysa ama isTestRoute ise ufak bir açma çubuğu göster */}
+        {!showTestPanel && isTestRoute && (
+          <div style={{
+            background: 'rgba(245, 158, 11, 0.12)',
+            border: '1px dashed rgba(245, 158, 11, 0.5)',
+            borderRadius: '10px',
+            padding: '8px 14px',
+            marginBottom: '14px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
-            textAlign: 'left',
-            boxShadow: '0 4px 15px rgba(217, 119, 6, 0.25)'
+            gap: '10px',
+            textAlign: 'left'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '1.4rem' }}>🛠️</span>
-              <div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fbbf24' }}>
-                  CANLI TEST & ÖNİZLEME MODU (Sales Priest: Can Murat)
-                </div>
-                <div style={{ fontSize: '0.74rem', color: '#fef3c7' }}>
-                  Bu ekranı şu anda sadece siz test ediyorsunuz. Müşteriye göndermeden önce tüm kasa ölçülerini, kantar sınırlarını ve WhatsApp butonunu deneyebilirsiniz.
-                </div>
-              </div>
+            <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 700 }}>
+              🛠️ Can Murat Test Modu Aktif (Sales Priest)
             </div>
-            <span style={{
-              background: '#b45309',
-              color: '#fff',
-              padding: '4px 10px',
-              borderRadius: '8px',
-              fontSize: '0.72rem',
-              fontWeight: 800,
-              flexShrink: 0
-            }}>
-              GİZLİ TEST
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowTestPanel(true)}
+              style={{
+                background: '#f59e0b',
+                color: '#0f172a',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '4px 10px',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              Test Dock'unu Aç
+            </button>
           </div>
         )}
 
@@ -712,6 +989,26 @@ export default function PublicVehicleFinder() {
             title="Sistemin linkini kopyala"
           >
             <FiCopy size={12} /> Linki Kopyala
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowTestPanel(prev => !prev)}
+            style={{
+              background: showTestPanel ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
+              color: showTestPanel ? '#0f172a' : '#fbbf24',
+              border: '1px solid rgba(245, 158, 11, 0.45)',
+              borderRadius: '20px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer'
+            }}
+            title="Can Murat VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
+          >
+            <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
           </button>
         </div>
       </div>
@@ -1274,7 +1571,62 @@ export default function PublicVehicleFinder() {
                 </div>
               )}
 
-              {/* 3. ARACA VE BANKAYA ÖZEL KAMPANYA SEÇENEKLERİ */}
+              {/* 3. TUTAR KATEGORİSİ FİLTRESİ (0 Faiz, Yüksek Kredi, Filo) */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '0.74rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>
+                    KREDİ TUTAR KATEGORİSİ:
+                  </label>
+                  <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
+                    {availableCampaigns.length} Kampanya Listelendi
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '6px' }}>
+                  {AMOUNT_TIERS.map(tier => {
+                    const isSelected = selectedTierId === tier.id;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTierId(tier.id);
+                          setSelectedCampaignId(null);
+                        }}
+                        style={{
+                          background: isSelected ? 'rgba(56, 189, 248, 0.18)' : 'rgba(255, 255, 255, 0.04)',
+                          border: `1.5px solid ${isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)'}`,
+                          color: isSelected ? '#38bdf8' : '#cbd5e1',
+                          padding: '8px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.74rem',
+                          fontWeight: isSelected ? 800 : 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: '2px',
+                          transition: 'all 0.15s ease',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%', justifyContent: 'space-between' }}>
+                          <span>{tier.icon} {tier.label}</span>
+                          {isSelected && <span style={{ fontSize: '10px', color: '#38bdf8' }}>●</span>}
+                        </div>
+                        <span style={{
+                          fontSize: '0.64rem',
+                          color: isSelected ? '#bae6fd' : '#94a3b8',
+                          fontWeight: 500
+                        }}>
+                          {tier.range}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 4. ARACA VE BANKAYA ÖZEL KAMPANYA SEÇENEKLERİ */}
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '4px' }}>
                   <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>
@@ -1615,6 +1967,119 @@ export default function PublicVehicleFinder() {
           </div>
         )}
       </div>
+
+      {/* ── CAN MURAT VIP TEST SİMÜLASYON RAPOR MODALI ── */}
+      {testSimulationResult && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            border: '2px solid #f59e0b',
+            borderRadius: '16px',
+            maxWidth: '560px',
+            width: '100%',
+            padding: '20px',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+            color: '#f8fafc',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', borderBottom: '1px solid rgba(245, 158, 11, 0.3)', paddingBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '1.4rem' }}>🛠️</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fbbf24' }}>
+                    CRM PIPELINE SİMÜLASYONU BAŞARILI
+                  </h3>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                    Sales Priest: Can Murat Test Önizleme Raporu ({testSimulationResult.timestamp})
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTestSimulationResult(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  color: '#cbd5e1',
+                  borderRadius: '6px',
+                  padding: '4px 10px',
+                  cursor: 'pointer',
+                  fontWeight: 700
+                }}
+              >
+                ✕ Kapat
+              </button>
+            </div>
+
+            <div style={{ background: 'rgba(0, 0, 0, 0.4)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '0.78rem', lineHeight: 1.6 }}>
+              <div style={{ color: '#38bdf8', fontWeight: 800, marginBottom: '6px' }}>📋 CRM Lead Verisi:</div>
+              <div><strong>Firma / İsim:</strong> {testSimulationResult.company_name}</div>
+              <div><strong>Telefon:</strong> {testSimulationResult.phone} ({testSimulationResult.city})</div>
+              <div><strong>Model & Şasi:</strong> {testSimulationResult.target_model}</div>
+              <div><strong>Kredi Kampanyası:</strong> {testSimulationResult.target_campaign}</div>
+              <div><strong>Lead Kaynağı:</strong> {testSimulationResult.source}</div>
+              <div><strong>Niyet Skoru:</strong> %{testSimulationResult.intent_score} ({testSimulationResult.intent_level.toUpperCase()})</div>
+            </div>
+
+            <div style={{ background: 'rgba(0, 0, 0, 0.3)', borderRadius: '10px', padding: '10px', marginBottom: '14px', fontSize: '0.72rem', color: '#cbd5e1', whiteSpace: 'pre-wrap', fontFamily: 'monospace', maxHeight: '140px', overflowY: 'auto' }}>
+              {testSimulationResult.notes}
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setTestSimulationResult(null);
+                  handleDirectWhatsApp();
+                }}
+                style={{
+                  flex: 1,
+                  background: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiMessageSquare size={14} /> WhatsApp'ta Test Mesajını Gör
+              </button>
+              <button
+                type="button"
+                onClick={() => setTestSimulationResult(null)}
+                style={{
+                  background: '#334155',
+                  color: '#e2e8f0',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 16px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Tamam
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '24px auto 0', textAlign: 'center', color: '#64748b', fontSize: '0.74rem' }}>

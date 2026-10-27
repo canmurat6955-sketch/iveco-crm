@@ -239,16 +239,16 @@ export default function WhatsAppActionModal({
       const cleanPhone = (customerForm.phone || customer.phone || '').replace(/\D/g, '');
       const comp = customerForm.company_name || customer.company_name || '';
       const cid = customer?.id || '';
-      const link = `${origin}/arac-secici?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=canmurat_crm`;
-      const greeting = comp ? `Sayın ${comp} Yetkilisi,\n\n` : '';
+      const link = `${origin}/ozel-teklif?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=canmurat_vip`;
+      const greeting = comp ? `🌟 Sayın ${comp} Yetkilisi,\n\n` : '🌟 Değerli Müşterimiz,\n\n';
       setMessage(
         `${greeting}Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
-        `İşletmenizin taşımacılık operasyonuna tam uyumlu şasiyi, kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve anlaşmalı banka kredi kampanyalarımızı (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.) saniyeler içinde hesaplayabileceğiniz akıllı konfigüratörümüzü sizin için hazırladım.\n\n` +
-        `Aşağıdaki firmanıza özel bağlantıdan dilediğiniz tonaj ve hacme göre anında simülasyon yapabilirsiniz:\n` +
-        `🔗 ${link}\n\n` +
-        `Beğendiğiniz kombinasyonun hazır şasi stok durumu ve resmi teklifi için bu mesajı yanıtlamanız yeterlidir.`
+        `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
+        `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
+        `👉 ${link}\n\n` +
+        `Seçtiğiniz aracın hazır fabrika şasi teslim tarihi ve resmi bayi proforma teklifi için bu mesajı yanıtlamanız yeterlidir.`
       );
-      setInternalNote('Müşteriye özel Akıllı Şasi, Kasa ve Kredi Seçici bağlantısı iletildi.');
+      setInternalNote('Müşteriye özel VIP Şasi, Kasa ve Finansman Seçici bağlantısı iletildi.');
     }
   };
 
