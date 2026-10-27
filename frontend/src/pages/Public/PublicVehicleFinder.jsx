@@ -38,23 +38,408 @@ const SECTORS = [
 // Hızlı Tonaj Seçenekleri
 const QUICK_TONNAGES = [
   { id: '1_5_ton', label: '1.5 Ton', payloadKg: 1500, badge: 'B Ehliyet Kamyonet', desc: 'Otomobil ehliyeti, takografsız, şehir içine 7/24 serbest' },
-  { id: '3_5_ton', label: '3.5 Ton', payloadKg: 3500, badge: 'B Ehliyet / Çift Teker', desc: 'Ağır yük kamyonet dayanımı, şehir içi serbest' },
+  { id: '3_5_ton', label: '3.5 Ton', payloadKg: 3500, badge: 'B Ehliyet / Çift Teker', desc: 'Ağır yük kamyonet dayanımı, kantara girmez, şehir içi serbest' },
   { id: '4_8_ton', label: '4.8 Ton', payloadKg: 4800, badge: 'Daily 72C Kamyon', desc: '7.970 kg kantar geçeri, sınıfının en yüksek net yükü' },
   { id: '6_5_ton', label: '6.5 Ton', payloadKg: 6500, badge: 'Eurocargo 100E', desc: '10.875 kg kantar geçeri, şehirlerarası ve bölge dağıtım' },
   { id: '8_0_ton', label: '8.0 Ton', payloadKg: 8000, badge: 'Eurocargo 120E', desc: '12.950 kg kantar geçeri, 6.50 metreye kadar kasa' },
   { id: '10_5_ton', label: '10.5 Ton', payloadKg: 10500, badge: 'Eurocargo 150E', desc: '16.060 kg kantar geçeri, 7.50 metreye kadar dev kasa' },
   { id: '11_0_ton', label: '11.0 Ton', payloadKg: 11000, badge: 'Eurocargo 160', desc: '17.080 kg kantar geçeri, havalı süspansiyon, 320 BG' },
+  { id: '16_0_ton', label: '16.0 Ton (10 Teker)', payloadKg: 16000, badge: 'Eurocargo 10 Teker', desc: '26.000 kg kantar geçeri, 3 dingil 10 teker, 16 ton net yük, 8.40m dev kasa' },
   { id: '25_0_ton', label: '25 Ton+', payloadKg: 25000, badge: 'IVECO S-Way', desc: '40.000+ kg çekici katar ağırlığı, 13.60 dorse, 530 HP' },
 ];
 
 // Kasa Seçenekleri ve Dara Ağırlıkları
 const BODY_TYPES = [
+  { id: 'panelvan', icon: '🚐', name: 'Fabrika Orijinal Sac Panelvan', tare: 0, desc: '12 m³, 16 m³ ve 18 m³ orijinal sac kargo gövde (Ek kasa maliyetsiz)' },
   { id: 'frigo', icon: '❄️', name: 'Frigorifik Soğutuculu Kasa', tare: 1100, desc: '-18°C dondurucu veya +4°C taze gıda taşımacılığı' },
   { id: 'kapali_kutu', icon: '📦', name: 'Kapalı Kutu / Kargo Kasası', tare: 650, desc: 'Mobilya, tekstil, koli ve kuru gıda taşımacılığı' },
   { id: 'acik_sac', icon: '🪵', name: 'Açık Sac / Ahşap İlave Kasa', tare: 500, desc: 'Demir, profil, inşaat malzemesi ve paletli yük' },
   { id: 'kayar_perde', icon: '🚛', name: 'Kayar Perde / Tente Kasa', tare: 750, desc: 'Hızlı yan yükleme, paletli kargo ve içecek sevkiyatı' },
   { id: 'damper', icon: '🚜', name: 'Damper Kasa', tare: 1700, desc: 'Kum, çakıl, hafriyat ve dökme malzeme boşaltma' },
   { id: 'oto_kurtarma', icon: '🛞', name: 'Kayar Kasa Platform', tare: 1200, desc: 'Araç taşıma, vinç ve oto çekici üstyapısı' }
+];
+
+// IVECO Resmi Araç Kataloğu (Doğrudan Seçim ve Çoklu Öneriler İçin)
+const VEHICLE_CATALOG = [
+  // ── PANELVAN MODELLERİ (FABRİKA SAC KASA) ──
+  {
+    key: 'panelvan_12',
+    category: 'panelvan',
+    categoryLabel: '🚐 Panelvan',
+    title: 'Daily 35S16 Panelvan 12 m³',
+    fullTitle: 'IVECO Daily 35S16 Panelvan (3520 Şasi - 12 m³)',
+    modelTitle: 'IVECO Daily 35S16 Panelvan (3520 Şasi - 12 m³)',
+    series: 'Daily 35S Panelvan',
+    wheelbase: '3520 mm (3520L H2)',
+    payloadKg: 1350,
+    volumeM3: 12,
+    badge: 'B Sınıfı • Kantara Girmez • 12 m³ Sac Gövde',
+    license: 'B Sınıfı (Otomobil Ehliyeti)',
+    kantarLimit: 4130,
+    unladenWeight: 2150,
+    kantarStatus: 'exempt',
+    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
+    kantarDesc: '2.150 kg boş ağırlık (fabrika sac gövde dahil), 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Şehir merkezine 7/24 takografsız serbest giriş.',
+    dims: {
+      length: '354 cm (İç Yükleme)',
+      width: '174 cm (Davlumbaz: 132 cm)',
+      height: '190 cm (İç Tavan H2)',
+      volume: '12.0 m³',
+      pallets: '4 - 5 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
+    pdfName: 'DAILY PANELVAN 12M3 TEKNİK FÖY.pdf',
+    priceRange: '1.850.000 TL - 2.050.000 TL + KDV',
+    defaultLoan: 1000000,
+    bodyType: 'panelvan'
+  },
+  {
+    key: 'panelvan_16',
+    category: 'panelvan',
+    categoryLabel: '🚐 Panelvan',
+    title: 'Daily 35S16 Panelvan 16 m³',
+    fullTitle: 'IVECO Daily 35S16 Panelvan (4100 Şasi - 16 m³)',
+    modelTitle: 'IVECO Daily 35S16 Panelvan (4100 Şasi - 16 m³)',
+    series: 'Daily 35S Panelvan',
+    wheelbase: '4100 mm (4100L H2)',
+    payloadKg: 1250,
+    volumeM3: 16,
+    badge: 'B Sınıfı • Kantara Girmez • 16 m³ Sac Gövde',
+    license: 'B Sınıfı (Otomobil Ehliyeti)',
+    kantarLimit: 4130,
+    unladenWeight: 2280,
+    kantarStatus: 'exempt',
+    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
+    kantarDesc: '2.280 kg boş ağırlık, 4.130 kg yasal kantar geçeri. 4.68 metre iç yükleme boyu ile kargo ve şehir içi e-ticaret dağıtımında standart belirleyici.',
+    dims: {
+      length: '468 cm (İç Yükleme)',
+      width: '174 cm (Davlumbaz: 132 cm)',
+      height: '190 cm (İç Tavan H2)',
+      volume: '16.0 m³',
+      pallets: '5 - 6 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
+    pdfName: 'DAILY PANELVAN 16M3 TEKNİK FÖY.pdf',
+    priceRange: '1.980.000 TL - 2.180.000 TL + KDV',
+    defaultLoan: 1000000,
+    bodyType: 'panelvan'
+  },
+  {
+    key: 'panelvan_18',
+    category: 'panelvan',
+    categoryLabel: '🚐 Panelvan',
+    title: 'Daily 35C16 Panelvan 18 m³ (Çift Teker)',
+    fullTitle: 'IVECO Daily 35C16 Panelvan (4100 Şasi - 18 m³ Çift Teker)',
+    modelTitle: 'IVECO Daily 35C16 Panelvan (4100 Şasi - 18 m³ Çift Teker)',
+    series: 'Daily 35C Panelvan',
+    wheelbase: '4100 mm (4100L H3 Süper Yüksek Tavan)',
+    payloadKg: 1350,
+    volumeM3: 18,
+    badge: 'B Sınıfı • Çift Teker • 18 m³ Dev Hacim',
+    license: 'B Sınıfı (Kamyonet Ruhsatlı)',
+    kantarLimit: 4130,
+    unladenWeight: 2380,
+    kantarStatus: 'exempt',
+    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
+    kantarDesc: '2.380 kg boş ağırlık, 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Çift arka tekerlek dayanımı ve 2.10 m iç tavan yüksekliğiyle 18 m³ dev yükleme hacmi.',
+    dims: {
+      length: '468 cm (İç Yükleme)',
+      width: '174 cm (Davlumbaz: 103 cm)',
+      height: '210 cm (İç Tavan H3 Süper Yüksek)',
+      volume: '18.0 m³ Dev Hacim',
+      pallets: '6 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
+    pdfName: 'DAILY PANELVAN 18M3 ÇİFT TEKER TEKNİK FÖY.pdf',
+    priceRange: '2.100.000 TL - 2.300.000 TL + KDV',
+    defaultLoan: 1000000,
+    bodyType: 'panelvan'
+  },
+
+  // ── ŞASİ KAMYONET (B EHLİYET - KANTARA GİRMEZ) ──
+  {
+    key: 'chassis_35s',
+    category: 'kamyonet',
+    categoryLabel: '🚛 Kamyonet (B)',
+    title: 'Daily 35S16 Tek Teker Şasi',
+    fullTitle: 'IVECO Daily 35S16 Tek Teker Şasi (3450 / 3750 / 4100 mm)',
+    modelTitle: 'IVECO Daily 35S16 Tek Teker Şasi (3450 / 3750 / 4100 mm)',
+    series: 'Daily 35S',
+    wheelbase: '3450 - 4100 mm',
+    payloadKg: 1500,
+    volumeM3: 16,
+    badge: 'B Sınıfı • Kantara Girmez • Şehir İçi Serbest',
+    license: 'B Sınıfı (Otomobil Ehliyeti)',
+    kantarLimit: 4130,
+    unladenWeight: 2000,
+    kantarStatus: 'exempt',
+    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
+    kantarDesc: '2.000 kg boş ağırlık (şoför+yakıt dahil), şehir merkezine 7/24 takografsız serbest giriş. 3.50m - 5.00m kasa seçeneği.',
+    dims: {
+      length: '350 - 500 cm (Önerilen: 430 cm)',
+      width: '215 - 235 cm (Önerilen: 215 cm)',
+      height: '160 - 300 cm (Önerilen: 200 cm)',
+      volume: '16.0 m³',
+      pallets: '8 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
+    pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
+    priceRange: '1.690.000 TL - 1.820.000 TL + KDV',
+    defaultLoan: 1000000,
+    bodyType: 'kapali_kutu'
+  },
+  {
+    key: 'chassis_35c',
+    category: 'kamyonet',
+    categoryLabel: '🚛 Kamyonet (B)',
+    title: 'Daily 35C16 Çift Teker Şasi',
+    fullTitle: 'IVECO Daily 35C16 Çift Teker Şasi (3450 / 3750 / 4100 mm)',
+    modelTitle: 'IVECO Daily 35C16 Çift Teker Şasi (3450 / 3750 / 4100 mm)',
+    series: 'Daily 35C',
+    wheelbase: '3450 - 4100 mm',
+    payloadKg: 3500,
+    volumeM3: 20,
+    badge: 'B Sınıfı • Kantara Girmez • 5 Tona Dayanıklı',
+    license: 'B Sınıfı (Otomobil Ehliyeti)',
+    kantarLimit: 4130,
+    unladenWeight: 2200,
+    kantarStatus: 'exempt',
+    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
+    kantarDesc: '2.200 kg boş ağırlık, 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Çift tekerlekli C-profil ağır hizmet şasisi sayesinde 4-5 tona kadar güvenle taşır.',
+    dims: {
+      length: '350 - 500 cm (Önerilen: 430 cm)',
+      width: '215 - 235 cm (Önerilen: 220 cm)',
+      height: '160 - 300 cm (Önerilen: 210 cm)',
+      volume: '20.0 m³',
+      pallets: '8 - 10 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
+    pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
+    priceRange: '1.780.000 TL - 1.950.000 TL + KDV',
+    defaultLoan: 1000000,
+    bodyType: 'kapali_kutu'
+  },
+
+  // ── KAMYON GRUBU (C EHLİYET - RESMİ KANTARLI) ──
+  {
+    key: 'truck_72c',
+    category: 'kamyon',
+    categoryLabel: '🚚 Kamyon (C)',
+    title: 'Daily 72C18 Şasi Kamyon',
+    fullTitle: 'IVECO Daily 72C18 Şasi Kamyon (3750 / 4350 / 4750 mm)',
+    modelTitle: 'IVECO Daily 72C18 Şasi Kamyon (3750 / 4350 / 4750 mm)',
+    series: 'Daily 72C',
+    wheelbase: '3750 - 4750 mm',
+    payloadKg: 4800,
+    volumeM3: 28,
+    badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 7970,
+    unladenWeight: 2400,
+    kantarStatus: 'safe',
+    kantarTitle: '7.970 kg ile Kantardan Geçer',
+    kantarDesc: '2.400 kg boş ağırlık (şoför+yakıt dahil), 410 cm ila 620 cm kasa seçeneği, 3.0L 180 HP C-profil şasi.',
+    dims: {
+      length: '410 - 620 cm (Önerilen: 600 cm)',
+      width: '215 - 235 cm (Önerilen: 225 cm)',
+      height: '160 - 300 cm (Önerilen: 220 cm)',
+      volume: '28.0 m³',
+      pallets: '12 - 14 Euro Palet'
+    },
+    pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
+    pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
+    priceRange: '2.350.000 TL - 2.580.000 TL + KDV',
+    defaultLoan: 1500000,
+    bodyType: 'frigo'
+  },
+  {
+    key: 'truck_100e',
+    category: 'kamyon',
+    categoryLabel: '🚚 Kamyon (C)',
+    title: 'Eurocargo ML 100 E 19',
+    fullTitle: 'IVECO Eurocargo ML 100 E 19 (3690 mm Şasi)',
+    modelTitle: 'IVECO Eurocargo ML 100 E 19 (3690 mm Şasi)',
+    series: 'Eurocargo 100E',
+    wheelbase: '3690 mm',
+    payloadKg: 6500,
+    volumeM3: 35,
+    badge: '10.875 kg Kantar • 6.5 Ton Net Yük',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 10875,
+    unladenWeight: 3680,
+    kantarStatus: 'safe',
+    kantarTitle: '10.875 kg ile Kantardan Geçer',
+    kantarDesc: '3.680 kg boş ağırlık (şoför+yakıt dahil), 540 cm ila 575 cm kasa boyu, Tector motor.',
+    dims: {
+      length: '540 - 575 cm (Önerilen: 560 cm)',
+      width: '225 - 245 cm',
+      height: '220 - 240 cm',
+      volume: '35.0 m³',
+      pallets: '14 Euro Palet'
+    },
+    pdfUrl: '/specs/eurocargo-ml100e19.pdf',
+    pdfName: 'ML 100 E 19 TEKNİK FÖY .pdf',
+    priceRange: '2.950.000 TL - 3.200.000 TL + KDV',
+    defaultLoan: 1500000,
+    bodyType: 'kayar_perde'
+  },
+  {
+    key: 'truck_120e',
+    category: 'kamyon',
+    categoryLabel: '🚚 Kamyon (C)',
+    title: 'Eurocargo ML 120 EL 19',
+    fullTitle: 'IVECO Eurocargo ML 120 EL 19 (3690 / 4185 mm Şasi)',
+    modelTitle: 'IVECO Eurocargo ML 120 EL 19 (3690 / 4185 mm Şasi)',
+    series: 'Eurocargo 120E',
+    wheelbase: '3690 - 4185 mm',
+    payloadKg: 8000,
+    volumeM3: 42,
+    badge: '12.950 kg Kantar • 8.0 Ton Net Yük',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 12950,
+    unladenWeight: 4000,
+    kantarStatus: 'safe',
+    kantarTitle: '12.950 kg ile Kantardan Geçer',
+    kantarDesc: '4.000 kg boş ağırlık, 540 cm ila 650 cm kasa boyu seçeneği.',
+    dims: {
+      length: '540 - 650 cm (Önerilen: 630 cm)',
+      width: '225 - 245 cm',
+      height: '225 - 250 cm',
+      volume: '42.0 m³',
+      pallets: '14 - 16 Euro Palet'
+    },
+    pdfUrl: '/specs/eurocargo-ml120el19.pdf',
+    pdfName: 'ML 120 EL 19 TEKNİK FÖY .pdf',
+    priceRange: '3.300.000 TL - 3.550.000 TL + KDV',
+    defaultLoan: 2000000,
+    bodyType: 'kayar_perde'
+  },
+  {
+    key: 'truck_150e',
+    category: 'kamyon',
+    categoryLabel: '🚚 Kamyon (C)',
+    title: 'Eurocargo ML 150 E 21',
+    fullTitle: 'IVECO Eurocargo ML 150 E 21 (4455 / 5175 mm Şasi)',
+    modelTitle: 'IVECO Eurocargo ML 150 E 21 (4455 / 5175 mm Şasi)',
+    series: 'Eurocargo 150E',
+    wheelbase: '4455 - 5175 mm',
+    payloadKg: 10500,
+    volumeM3: 48,
+    badge: '16.060 kg Kantar • 10.5 Ton Net Yük',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 16060,
+    unladenWeight: 4750,
+    kantarStatus: 'safe',
+    kantarTitle: '16.060 kg ile Kantardan Geçer',
+    kantarDesc: 'Tector 7 motor, 4.750 kg boş ağırlık, 6.50m - 7.50m kasa boyu seçeneği.',
+    dims: {
+      length: '650 - 750 cm (Önerilen: 710 cm)',
+      width: '230 - 250 cm',
+      height: '230 - 260 cm',
+      volume: '48.0 m³',
+      pallets: '16 - 18 Euro Palet'
+    },
+    pdfUrl: '/specs/eurocargo-ml150e21.pdf',
+    pdfName: 'ML 150 E 21 TEKNİK FÖY .pdf',
+    priceRange: '3.650.000 TL - 3.950.000 TL + KDV',
+    defaultLoan: 2000000,
+    bodyType: 'kayar_perde'
+  },
+  {
+    key: 'truck_160e',
+    category: 'kamyon',
+    categoryLabel: '🚚 Kamyon (C)',
+    title: 'Eurocargo ML 160 E 32P',
+    fullTitle: 'IVECO Eurocargo ML 160 E 32P (5670 mm Şasi)',
+    modelTitle: 'IVECO Eurocargo ML 160 E 32P (5670 mm Şasi)',
+    series: 'Eurocargo 160',
+    wheelbase: '5670 mm',
+    payloadKg: 11000,
+    volumeM3: 54,
+    badge: '17.080 kg Kantar • 11.0 Ton Net Yük',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 17080,
+    unladenWeight: 5475,
+    kantarStatus: 'safe',
+    kantarTitle: '17.080 kg ile Kantardan Geçer',
+    kantarDesc: 'Havalı süspansiyonlu, dingilsiz 5.475 kg boş ağırlık, 7.50m - 8.20m dev kasa hacmi.',
+    dims: {
+      length: '750 - 820 cm (Önerilen: 780 cm)',
+      width: '230 - 255 cm',
+      height: '240 - 270 cm',
+      volume: '54.0 m³',
+      pallets: '18 - 20 Euro Palet'
+    },
+    pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
+    pdfName: 'ML 160 E 32P TEKNİK FÖY .pdf',
+    priceRange: '4.100.000 TL - 4.450.000 TL + KDV',
+    defaultLoan: 2500000,
+    bodyType: 'kayar_perde'
+  },
+  {
+    key: 'truck_10teker',
+    category: 'kamyon',
+    categoryLabel: '🚚 10 Teker Kamyon (C)',
+    title: 'Eurocargo 10 Teker (16 Ton Net Yük)',
+    fullTitle: 'IVECO Eurocargo ML 160/180/260 (6x2 - 10 Teker / 3 Dingil)',
+    modelTitle: 'IVECO Eurocargo 10 Teker ML 160/180 (6x2 İlave Dingilli)',
+    series: 'Eurocargo 10 Teker',
+    wheelbase: '4815 - 5670 mm (İlave Dingilli)',
+    payloadKg: 16000,
+    volumeM3: 60,
+    badge: '26.000 kg Kantar • 16.0 Ton Net Yük • 10 Teker',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 26000,
+    unladenWeight: 6800,
+    kantarStatus: 'safe',
+    kantarTitle: '26.000 kg ile Kantardan Geçer (10 Teker 3 Dingil)',
+    kantarDesc: 'Tector 7 motor (320 BG), 6x2 çift dingilli / kaldırılabilir 3. dingil, 16 Ton net taşıma kapasitesi, 8.40m dev kasa boyu.',
+    dims: {
+      length: '820 - 860 cm (Önerilen: 840 cm)',
+      width: '245 - 255 cm',
+      height: '240 - 270 cm',
+      volume: '60.0 m³',
+      pallets: '20 - 22 Euro Palet'
+    },
+    pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
+    pdfName: 'ML 160 E 32P 10 TEKER TEKNİK FÖY .pdf',
+    priceRange: '4.650.000 TL - 4.950.000 TL + KDV',
+    defaultLoan: 2500000,
+    bodyType: 'kayar_perde'
+  },
+
+  // ── AĞIR VASITA & ÇEKİCİ ──
+  {
+    key: 'tractor_sway',
+    category: 'cekici',
+    categoryLabel: '🛣️ Çekici (CE)',
+    title: 'IVECO S-Way 500 / 580 Çekici',
+    fullTitle: 'IVECO S-Way 500 / 580 Çekici (Cursor 13)',
+    modelTitle: 'IVECO S-Way 500 / 580 Çekici (Cursor 13)',
+    series: 'S-Way 500',
+    wheelbase: '3800 mm',
+    payloadKg: 25000,
+    volumeM3: 92,
+    badge: '40.000+ kg Uluslararası Tır Katarı',
+    license: 'CE Sınıfı Ehliyet',
+    kantarLimit: 40000,
+    unladenWeight: 7800,
+    kantarStatus: 'safe',
+    kantarTitle: '40.000+ kg Uluslararası Tır Katar Limiti',
+    kantarDesc: 'Cursor 13 motor, Hi-Tronix şanzıman ve yüksek tavan çift yataklı kabin.',
+    dims: {
+      length: '1360 cm (Dorse)',
+      width: '248 cm',
+      height: '270 - 300 cm',
+      volume: '90 - 100 m³',
+      pallets: '33 Euro Palet'
+    },
+    pdfUrl: '/specs/s-way-500-full-plus.pdf',
+    pdfName: 'S-WAY 500 FULL PLUS TEKNİK FÖY .pdf',
+    priceRange: '115.000 € - 128.000 € + KDV',
+    defaultLoan: 3000000,
+    bodyType: 'kayar_perde'
+  }
 ];
 
 export default function PublicVehicleFinder() {
@@ -68,6 +453,7 @@ export default function PublicVehicleFinder() {
   const payloadParam = searchParams.get('payload') || searchParams.get('tonaj') || '';
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
+  const modelParam = searchParams.get('model') || searchParams.get('arac') || '';
 
   const location = useLocation();
   const isTestRoute = location.pathname.includes('/test') || searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
@@ -75,6 +461,9 @@ export default function PublicVehicleFinder() {
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const [step, setStep] = useState(1);
+  const [selectorMode, setSelectorMode] = useState(modelParam ? 'catalog' : 'catalog');
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState('all');
+  const [selectedModelKey, setSelectedModelKey] = useState(modelParam || null);
   const [selectedSector, setSelectedSector] = useState(
     SECTORS.some(s => s.id === sectorParam) ? sectorParam : 'gida_frigo'
   );
@@ -93,6 +482,28 @@ export default function PublicVehicleFinder() {
   const [selectedBody, setSelectedBody] = useState(
     BODY_TYPES.some(b => b.id === bodyParam) ? bodyParam : 'frigo'
   );
+
+  // Doğrudan Araç Seçimi & Sürgü Etkileşim Fonksiyonları
+  const handleSelectVehicle = (modelKey) => {
+    const item = VEHICLE_CATALOG.find(v => v.key === modelKey);
+    if (!item) return;
+    setSelectedModelKey(item.key);
+    setPayloadKg(item.payloadKg);
+    setVolumeM3(item.volumeM3);
+    setSelectedBody(item.bodyType || 'kapali_kutu');
+    setCustomDims(false);
+    toast.success(`${item.title} seçildi! ✓`);
+  };
+
+  const handlePayloadChange = (val) => {
+    setSelectedModelKey(null);
+    setPayloadKg(val);
+  };
+
+  const handleVolumeChange = (val) => {
+    setSelectedModelKey(null);
+    setVolumeM3(val);
+  };
 
   // Kredi Parametreleri (Çoklu Banka & Tutar Kırılımları - Ekim 2026 Kampanyaları)
   const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
@@ -141,279 +552,338 @@ export default function PublicVehicleFinder() {
 
   // ── KESİN ŞASİ, KASA BOYUTLARI VE KANTAR EŞLEŞTİRME MOTORU ──────
   const matched = useMemo(() => {
+    // 1. Müşteri doğrudan katalogdan araç seçtiyse:
+    if (selectedModelKey) {
+      const item = VEHICLE_CATALOG.find(v => v.key === selectedModelKey);
+      if (item) {
+        const multiRecs = [];
+        if (item.payloadKg <= 5000 || item.category === 'panelvan' || item.key === 'chassis_35s' || item.key === 'chassis_35c' || item.key === 'truck_72c') {
+          if (item.key !== 'chassis_35c') {
+            multiRecs.push({
+              key: 'chassis_35c',
+              title: 'Daily 35C16 Çift Teker Kamyonet',
+              badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
+              reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf muafiyeti vardır ve B sınıfı otomobil ehliyetiyle kullanılır. Çift tekerlekli C-şasisiyle 4-5 tona kadar yükü rahatlıkla taşır.',
+              icon: '🚛'
+            });
+          }
+          if (item.category !== 'panelvan') {
+            multiRecs.push({
+              key: 'panelvan_16',
+              title: 'Daily Panelvan (12 m³ / 16 m³ / 18 m³ Çift Teker)',
+              badge: 'Fabrika Sac Kasa • Kantara Girmez • Hemen Teslim',
+              reason: 'Harici kasa yaptırma masrafı ve süresi olmadan anahtar teslim. Şehir içi dağıtım, kargo ve lojistikte 18 m³e varan dev iç hacim.',
+              icon: '🚐'
+            });
+          } else {
+            if (item.key !== 'panelvan_18') {
+              multiRecs.push({
+                key: 'panelvan_18',
+                title: 'Daily 35C16 Panelvan 18 m³ (Çift Teker)',
+                badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • Kantara Girmez',
+                reason: 'Süper yüksek tavan (2.10m), çift tekerlekli ağır hizmet yürüyen aksamı ve 18 m³ maksimum yükleme alanı.',
+                icon: '🚐'
+              });
+            }
+            if (item.key !== 'panelvan_12') {
+              multiRecs.push({
+                key: 'panelvan_12',
+                title: 'Daily 35S16 Panelvan 12 m³ (3520 Şasi)',
+                badge: '12 m³ Şehir İçi • B Ehliyet • Kıvrak Gövde',
+                reason: 'Kompakt 3520 mm şasi, dar sokaklarda üstün manevra kabiliyeti ve 12 m³ pratik sac kargo alanı.',
+                icon: '🚐'
+              });
+            }
+          }
+          if (item.key !== 'truck_72c' && item.payloadKg >= 3000) {
+            multiRecs.push({
+              key: 'truck_72c',
+              title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+              badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
+              reason: 'Resmi kantar tescili ile 4.8 ton net yük taşımak ve 6.20 metreye kadar kasa koymak isteyenler için sınıfının lideri.',
+              icon: '🚚'
+            });
+          }
+        }
+        return {
+          ...item,
+          modelKey: item.key,
+          totalGross: item.unladenWeight + item.payloadKg,
+          multiRecommendations: multiRecs
+        };
+      }
+    }
+
+    // 2. Otomatik Eşleştirme (Tonaj & Hacim Parametrelerine Göre)
     const bodyTare = BODY_TYPES.find(b => b.id === selectedBody)?.tare || 650;
     const targetVolume = customDims 
       ? (bodyLengthCm * bodyWidthCm * bodyHeightCm) / 1000000 
       : volumeM3;
 
-    // 1. Ağır Vasıta & Çekici (≥ 18 Ton veya Ağır Nakliye)
-    if (payloadKg >= 18000 || selectedSector === 'agir_nakliye') {
-      return {
-        modelTitle: 'IVECO S-Way 500 / 580 Çekici (Cursor 13)',
-        series: 'S-Way 500',
-        wheelbase: '3800 mm',
-        badge: 'Uluslararası Tır & Çekici',
-        license: 'CE Sınıfı Ehliyet',
-        kantarLimit: 40000,
-        unladenWeight: 7800,
-        totalGross: 7800 + bodyTare + payloadKg,
-        kantarStatus: 'safe',
-        kantarTitle: '40.000+ kg Uluslararası Tır Katar Limiti',
-        kantarDesc: 'Cursor 13 motor, Hi-Tronix şanzıman ve yüksek tavan çift yataklı kabin.',
-        dims: {
-          length: '1360 cm (Dorse)',
-          width: '248 cm',
-          height: '270 - 300 cm',
-          volume: '90 - 100 m³',
-          pallets: '33 Euro Palet'
+    // A. Panelvan seçildiyse (Fabrika Sac Kasa):
+    if (selectedBody === 'panelvan') {
+      let chosenKey = 'panelvan_12';
+      if (targetVolume > 16 || payloadKg > 1300) {
+        chosenKey = 'panelvan_18';
+      } else if (targetVolume > 13) {
+        chosenKey = 'panelvan_16';
+      }
+      const item = VEHICLE_CATALOG.find(v => v.key === chosenKey) || VEHICLE_CATALOG[0];
+      const multiRecs = [
+        {
+          key: 'chassis_35c',
+          title: 'Daily 35C16 Çift Teker Kamyonet',
+          badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
+          reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf muafiyeti vardır ve B sınıfı otomobil ehliyetiyle kullanılır. Çift tekerlekli C-şasisiyle 4-5 tona kadar yükü rahatlıkla taşır.',
+          icon: '🚛'
         },
-        pdfUrl: '/specs/s-way-500-full-plus.pdf',
-        pdfName: 'S-WAY 500 FULL PLUS TEKNİK FÖY .pdf',
-        priceRange: '115.000 € - 128.000 € + KDV',
-        defaultLoan: 3000000
+        chosenKey !== 'panelvan_18' ? {
+          key: 'panelvan_18',
+          title: 'Daily 35C16 Panelvan 18 m³ Çift Teker',
+          badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • Kantara Girmez',
+          reason: 'Çift teker dayanımı ve 2.10m iç tavan yüksekliğiyle 18 m³ dev yükleme hacmi.',
+          icon: '🚐'
+        } : {
+          key: 'panelvan_16',
+          title: 'Daily 35S16 Panelvan 16 m³',
+          badge: '16 m³ Kargo • B Ehliyet • Kantara Girmez',
+          reason: '4.68 m iç yükleme boyu ile uzun koli ve paletli yük dağıtımı.',
+          icon: '🚐'
+        }
+      ];
+      return {
+        ...item,
+        modelKey: item.key,
+        totalGross: item.unladenWeight + payloadKg,
+        multiRecommendations: multiRecs
       };
     }
 
-    // 2. Eurocargo 160 (11 Ton Net Yük veya Dingilsiz 5670 Şasi)
-    if (payloadKg > 10500 || targetVolume > 52) {
+    // B. Ağır Vasıta & Çekici (≥ 18 Ton veya Ağır Nakliye)
+    if (payloadKg >= 18000 || selectedSector === 'agir_nakliye') {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'tractor_sway');
       return {
-        modelTitle: 'IVECO Eurocargo ML 160 E 32P (5670 mm Şasi)',
-        series: 'Eurocargo 160',
-        wheelbase: '5670 mm',
-        badge: '17.080 kg Kantar Geçeri / 320 BG',
-        license: 'C Sınıfı Kamyon',
-        kantarLimit: 17080,
-        unladenWeight: 5475, // Dingilsiz boş ağırlık
+        ...item,
+        modelKey: 'tractor_sway',
+        totalGross: 7800 + bodyTare + payloadKg,
+        multiRecommendations: [
+          {
+            key: 'truck_10teker',
+            title: 'Eurocargo 10 Teker (16 Ton Net Yük)',
+            badge: '26.000 kg Kantar • 3 Dingil 10 Teker',
+            reason: 'Dorse takmadan rijit şasi ile 16 ton net yük taşımak için ekonomik filo alternatifi.',
+            icon: '🚚'
+          }
+        ]
+      };
+    }
+
+    // C. Eurocargo 10 Teker (16 Ton Net Yük / 26.000 kg Kantar)
+    if (payloadKg >= 13500 || targetVolume > 56) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_10teker');
+      return {
+        ...item,
+        modelKey: 'truck_10teker',
+        totalGross: 6800 + bodyTare + payloadKg,
+        kantarStatus: (6800 + bodyTare + payloadKg) <= 26000 ? 'safe' : 'overload',
+        multiRecommendations: [
+          {
+            key: 'truck_160e',
+            title: 'Eurocargo ML 160 E 32P (Dingilsiz 4x2)',
+            badge: '17.080 kg Kantar • 11.0 Ton Net Yük',
+            reason: 'Daha kısa dingil mesafesi ve dar alanlarda manevra kabiliyeti arayanlar için dingilsiz 4x2 seçeneği.',
+            icon: '🚚'
+          },
+          {
+            key: 'tractor_sway',
+            title: 'IVECO S-Way 500 Çekici (40 Ton Katar)',
+            badge: '40.000+ kg Uluslararası Tır',
+            reason: '13.60 dorse ile 25 ton ve 90 m³ üzeri ağır yükler için uluslararası çekici.',
+            icon: '🛣️'
+          }
+        ]
+      };
+    }
+
+    // D. Eurocargo 160 (11 Ton Net Yük / 17.080 kg Kantar)
+    if (payloadKg > 10500 || targetVolume > 50) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_160e');
+      return {
+        ...item,
+        modelKey: 'truck_160e',
         totalGross: 5475 + bodyTare + payloadKg,
         kantarStatus: (5475 + bodyTare + payloadKg) <= 17080 ? 'safe' : 'overload',
-        kantarTitle: '17.080 kg ile Kantardan Geçer',
-        kantarDesc: 'Havalı süspansiyonlu, dingilsiz 5475 kg boş ağırlık, 7.50m - 8.20m dev kasa hacmi.',
-        dims: {
-          length: `${Math.max(750, Math.min(820, customDims ? bodyLengthCm : 780))} cm`,
-          width: '230 - 255 cm',
-          height: `${customDims ? bodyHeightCm : 240} cm`,
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: '18 - 20 Euro Palet'
-        },
-        pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
-        pdfName: 'ML 160 E 32P TEKNİK FÖY .pdf',
-        priceRange: '4.100.000 TL - 4.450.000 TL + KDV',
-        defaultLoan: 2500000
+        multiRecommendations: [
+          {
+            key: 'truck_10teker',
+            title: 'Eurocargo 10 Teker (16 Ton Net Yük)',
+            badge: '26.000 kg Kantar • İlave Dingilli 10 Teker',
+            reason: '11 ton yerine 16 tona kadar resmi kantar kapasitesi ve 8.40m dev kasa hacmi.',
+            icon: '🚚'
+          }
+        ]
       };
     }
 
-    // 3. Eurocargo 150E (10 Ton Net Yük / 4185 - 5175 Şasi)
-    if (payloadKg > 8000 || targetVolume > 42) {
-      const isSleeper = targetVolume > 48;
-      const wb = isSleeper ? '5175 mm Yataklı' : '4455 mm Yataksız';
-      const lenRange = isSleeper ? '710 - 750 cm' : '650 - 690 cm';
+    // E. Eurocargo 150E (10 Ton Net Yük / 16.060 kg Kantar)
+    if (payloadKg > 8000 || targetVolume > 40) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_150e');
       return {
-        modelTitle: `IVECO Eurocargo ML 150 E 21 (${wb} Şasi)`,
-        series: 'Eurocargo 150E',
-        wheelbase: wb,
-        badge: '16.060 kg Kantar Geçeri / 10.5 Ton Net',
-        license: 'C Sınıfı Kamyon',
-        kantarLimit: 16060,
-        unladenWeight: 4750,
+        ...item,
+        modelKey: 'truck_150e',
         totalGross: 4750 + bodyTare + payloadKg,
         kantarStatus: (4750 + bodyTare + payloadKg) <= 16060 ? 'safe' : 'overload',
-        kantarTitle: '16.060 kg ile Kantardan Geçer',
-        kantarDesc: `Tector 7 motor, 4750 kg boş ağırlık, ${lenRange} kasa boyu seçeneği.`,
-        dims: {
-          length: `${isSleeper ? 730 : 670} cm (Kasa aralığı: ${lenRange})`,
-          width: '230 - 250 cm',
-          height: `${customDims ? bodyHeightCm : 230} cm`,
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: isSleeper ? '18 Euro Palet' : '16 Euro Palet'
-        },
-        pdfUrl: '/specs/eurocargo-ml150e21.pdf',
-        pdfName: 'ML 150 E 21 TEKNİK FÖY .pdf',
-        priceRange: '3.650.000 TL - 3.950.000 TL + KDV',
-        defaultLoan: 2000000
+        multiRecommendations: [
+          {
+            key: 'truck_160e',
+            title: 'Eurocargo ML 160 E 32P (17.080 kg Kantar)',
+            badge: '17.080 kg Kantar • 320 BG',
+            reason: 'Daha yüksek motor gücü ve 17 ton kantar kapasitesi.',
+            icon: '🚚'
+          }
+        ]
       };
     }
 
-    // 4. Eurocargo 120E (8 Ton Net Yük / 3690 - 4185 Şasi)
-    if (payloadKg > 6500 || targetVolume > 35) {
-      const isLong = targetVolume > 38 || (customDims && bodyLengthCm > 575);
-      const wb = isLong ? '4185 mm' : '3690 mm';
-      const lenRange = isLong ? '610 - 650 cm' : '540 - 575 cm';
+    // F. Eurocargo 120E (8 Ton Net Yük / 12.950 kg Kantar)
+    if (payloadKg > 6500 || targetVolume > 32) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_120e');
       return {
-        modelTitle: `IVECO Eurocargo ML 120 EL 19 (${wb} Şasi)`,
-        series: 'Eurocargo 120E',
-        wheelbase: wb,
-        badge: '12.950 kg Kantar Geçeri / 8 Ton Net',
-        license: 'C Sınıfı Kamyon',
-        kantarLimit: 12950,
-        unladenWeight: 4000,
+        ...item,
+        modelKey: 'truck_120e',
         totalGross: 4000 + bodyTare + payloadKg,
         kantarStatus: (4000 + bodyTare + payloadKg) <= 12950 ? 'safe' : 'overload',
-        kantarTitle: '12.950 kg ile Kantardan Geçer',
-        kantarDesc: `4.000 kg boş ağırlık (şoför+yakıt dahil), ${lenRange} kasa konulabilir.`,
-        dims: {
-          length: `${isLong ? 630 : 560} cm (Kasa aralığı: ${lenRange})`,
-          width: '225 - 245 cm',
-          height: `${customDims ? bodyHeightCm : 225} cm`,
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: isLong ? '16 Euro Palet' : '14 Euro Palet'
-        },
-        pdfUrl: '/specs/eurocargo-ml120el19.pdf',
-        pdfName: 'ML 120 EL 19 TEKNİK FÖY .pdf',
-        priceRange: '3.300.000 TL - 3.550.000 TL + KDV',
-        defaultLoan: 2000000
+        multiRecommendations: [
+          {
+            key: 'truck_100e',
+            title: 'Eurocargo ML 100 E 19 (10.875 kg Kantar)',
+            badge: '10.875 kg Kantar • 6.5 Ton Net Yük',
+            reason: 'Bölge ve şehirlerarası orta tonaj dağıtımda daha ekonomik işletme maliyeti.',
+            icon: '🚚'
+          }
+        ]
       };
     }
 
-    // 5. Eurocargo 100E (6.5 Ton Net Yük / 3690 Şasi)
-    if (payloadKg > 4800 || targetVolume > 30) {
+    // G. Eurocargo 100E (6.5 Ton Net Yük / 10.875 kg Kantar)
+    if (payloadKg > 4800 || targetVolume > 28) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_100e');
       return {
-        modelTitle: 'IVECO Eurocargo ML 100 E 19 (3690 mm Şasi)',
-        series: 'Eurocargo 100E',
-        wheelbase: '3690 mm',
-        badge: '10.875 kg Kantar Geçeri / 6.5 Ton Net',
-        license: 'C Sınıfı Kamyon',
-        kantarLimit: 10875,
-        unladenWeight: 3680,
+        ...item,
+        modelKey: 'truck_100e',
         totalGross: 3680 + bodyTare + payloadKg,
         kantarStatus: (3680 + bodyTare + payloadKg) <= 10875 ? 'safe' : 'overload',
-        kantarTitle: '10.875 kg ile Kantardan Geçer',
-        kantarDesc: '3.680 kg boş ağırlık (şoför+yakıt dahil), 540 cm ila 575 cm kasa boyu.',
-        dims: {
-          length: '540 - 575 cm (Önerilen: 560 cm)',
-          width: '225 - 245 cm',
-          height: `${customDims ? bodyHeightCm : 220} cm`,
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: '14 Euro Palet'
-        },
-        pdfUrl: '/specs/eurocargo-ml100e19.pdf',
-        pdfName: 'ML 100 E 19 TEKNİK FÖY .pdf',
-        priceRange: '2.950.000 TL - 3.200.000 TL + KDV',
-        defaultLoan: 1500000
+        multiRecommendations: [
+          {
+            key: 'truck_72c',
+            title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+            badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
+            reason: 'Daily şasi hafifliği ve esnekliği ile 4.8 ton net yük taşıma avantajı.',
+            icon: '🚚'
+          },
+          {
+            key: 'chassis_35c',
+            title: 'Daily 35C16 Çift Teker Kamyonet (Kantara Girmez!)',
+            badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
+            reason: 'Kamyonet ruhsatlı, kantara girmez, takograf muaf, şehir içine 7/24 serbest giriş.',
+            icon: '🚛'
+          }
+        ]
       };
     }
 
-    // 6. Daily 72C (4.8 Ton Net Yük / 3750 - 4350 - 4750 Şasi)
-    if (payloadKg > 2000 || targetVolume > 26) {
-      let wb = '4750 mm';
-      let lenRange = '580 - 620 cm';
-      let recLen = 600;
-      if (targetVolume <= 20 && !customDims) {
-        wb = '3750 mm';
-        lenRange = '410 - 450 cm';
-        recLen = 430;
-      } else if (targetVolume <= 26 && !customDims) {
-        wb = '4350 mm';
-        lenRange = '515 - 540 cm';
-        recLen = 525;
-      }
-
+    // H. Daily 72C (4.8 Ton Net Yük / 7.970 kg Kantar)
+    if (payloadKg > 2000 || targetVolume > 22) {
+      const item = VEHICLE_CATALOG.find(v => v.key === 'truck_72c');
       const totalGross = 2400 + bodyTare + payloadKg;
       return {
-        modelTitle: `IVECO Daily 72C18 Şasi (${wb} Şasi)`,
-        series: 'Daily 72C',
-        wheelbase: wb,
-        badge: '7.970 kg Kantar Geçeri / 4.8 Ton Net Yük',
-        license: 'C Sınıfı Kamyon',
-        kantarLimit: 7970,
-        unladenWeight: 2400,
+        ...item,
+        modelKey: 'truck_72c',
         totalGross: totalGross,
         kantarStatus: totalGross <= 7970 ? 'safe' : 'overload',
-        kantarTitle: '7.970 kg ile Kantardan Geçer',
-        kantarDesc: `2.400 kg boş ağırlık (şoför+yakıt dahil), ${lenRange} kasa seçeneği, 3.0L 180 HP C-profil şasi.`,
-        dims: {
-          length: `${recLen} cm (Kasa aralığı: ${lenRange})`,
-          width: '215 - 235 cm (Önerilen: 225 cm)',
-          height: '160 - 300 cm (Önerilen: 220 cm)',
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: '12 - 14 Euro Palet'
-        },
-        pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
-        pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
-        priceRange: '2.350.000 TL - 2.580.000 TL + KDV',
-        defaultLoan: 1500000
+        multiRecommendations: [
+          {
+            key: 'chassis_35c',
+            title: 'Daily 35C16 Çift Teker Kamyonet (Kantara Girmiyor!)',
+            badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
+            reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf zorunluluğu yoktur, B sınıfı otomobil ehliyetiyle kullanılır ve şehir içine 7/24 serbest girer. Çift tekerlekli C-kesit ağır şasisi sayesinde 4-5 tona kadar yükleri güvenle taşır.',
+            icon: '🚛'
+          },
+          {
+            key: 'panelvan_18',
+            title: 'Daily 35C16 Panelvan (18 m³ Çift Teker)',
+            badge: '18 m³ Dev Hacim • Fabrika Sac Kasa • Kantara Girmez',
+            reason: 'Kasa yaptırma masrafı ve bekleme süresi olmadan hazır sac kargo gövde. 18 m³ dev yükleme alanı.',
+            icon: '🚐'
+          }
+        ]
       };
     }
 
-    // 7. Daily 35C (Çift Teker - B Ehliyet)
+    // I. Daily 35C (3.5 Ton Çift Teker - Kantara Girmez!)
     if (payloadKg > 1500 || selectedSector === 'insaat_malzeme' || selectedSector === 'tarim_yem') {
-      let wb = '3750 mm';
-      let lenRange = '410 - 450 cm';
-      let recLen = 430;
-      if (targetVolume <= 18) {
-        wb = '3450 mm';
-        lenRange = '350 - 380 cm';
-        recLen = 365;
-      } else if (targetVolume > 22) {
-        wb = '4100 mm';
-        lenRange = '460 - 500 cm';
-        recLen = 480;
-      }
-
+      const item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35c');
       return {
-        modelTitle: `IVECO Daily 35C16 Çift Teker (${wb} Şasi)`,
-        series: 'Daily 35C',
-        wheelbase: wb,
-        badge: 'B Sınıfı Ehliyet / Çift Arka Teker',
-        license: 'B Sınıfı (Otomobil Ehliyeti)',
-        kantarLimit: 4130,
-        unladenWeight: 2200,
+        ...item,
+        modelKey: 'chassis_35c',
         totalGross: 2200 + bodyTare + payloadKg,
-        kantarStatus: 'exempt',
-        kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-        kantarDesc: '2.200 kg boş ağırlık, 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Çift teker ağır yük dayanımı.',
-        dims: {
-          length: `${recLen} cm (Kasa aralığı: ${lenRange})`,
-          width: '215 - 235 cm (Önerilen: 220 cm)',
-          height: '160 - 300 cm (Önerilen: 210 cm)',
-          volume: `${targetVolume.toFixed(1)} m³`,
-          pallets: '8 - 10 Euro Palet'
-        },
-        pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
-        pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-        priceRange: '1.780.000 TL - 1.950.000 TL + KDV',
-        defaultLoan: 1000000
+        multiRecommendations: [
+          {
+            key: 'panelvan_18',
+            title: 'Daily 35C16 Panelvan 18 m³ (Çift Teker)',
+            badge: '18 m³ Dev Panelvan • Kantara Girmez • Hazır Teslim',
+            reason: 'Kasa yaptırma masrafı olmadan 18 m³ orijinal sac kargo gövde, kantara girmez, B sınıfı ehliyet.',
+            icon: '🚐'
+          },
+          {
+            key: 'panelvan_16',
+            title: 'Daily 35S16 Panelvan 16 m³',
+            badge: '16 m³ Kargo • B Ehliyet • Tek Teker',
+            reason: 'Daha düşük yakıt tüketimi ve tek tekerlekli hafif yürüyen aksam ile 16 m³ hacim.',
+            icon: '🚐'
+          },
+          {
+            key: 'truck_72c',
+            title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+            badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
+            reason: 'Resmi kantar tescilli daha yüksek tonaj ve 6.20 metreye varan kasa boyu arayanlara.',
+            icon: '🚚'
+          }
+        ]
       };
     }
 
-    // 8. Daily 35S (Tek Teker - B Ehliyet)
-    let wb = '3450 mm';
-    let lenRange = '350 - 380 cm';
-    let recLen = 365;
-    if (targetVolume > 20) {
-      wb = '4100 mm';
-      lenRange = '460 - 500 cm';
-      recLen = 480;
-    } else if (targetVolume > 16) {
-      wb = '3750 mm';
-      lenRange = '410 - 450 cm';
-      recLen = 430;
-    }
-
+    // J. Daily 35S (1.5 Ton Tek Teker - Kantara Girmez!)
+    const item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35s');
     return {
-      modelTitle: `IVECO Daily 35S16 Tek Teker (${wb} Şasi)`,
-      series: 'Daily 35S',
-      wheelbase: wb,
-      badge: 'B Sınıfı Ehliyet / Tek Teker Şasi',
-      license: 'B Sınıfı (Otomobil Ehliyeti)',
-      kantarLimit: 4130,
-      unladenWeight: 2000,
+      ...item,
+      modelKey: 'chassis_35s',
       totalGross: 2000 + bodyTare + payloadKg,
-      kantarStatus: 'exempt',
-      kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-      kantarDesc: '2.000 kg boş ağırlık (şoför+yakıt dahil), şehir merkezine 7/24 takografsız serbest giriş.',
-      dims: {
-        length: `${recLen} cm (Kasa aralığı: ${lenRange})`,
-        width: '215 - 235 cm (Önerilen: 215 cm)',
-        height: '160 - 300 cm (Önerilen: 200 cm)',
-        volume: `${targetVolume.toFixed(1)} m³`,
-        pallets: '8 Euro Palet'
-      },
-      pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
-      pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-      priceRange: '1.690.000 TL - 1.820.000 TL + KDV',
-      defaultLoan: 1000000
+      multiRecommendations: [
+        {
+          key: 'panelvan_12',
+          title: 'Daily 35S16 Panelvan 12 m³ (3520 Şasi)',
+          badge: '12 m³ Sac Gövde • Kantara Girmez • B Ehliyet',
+          reason: 'Kasa beklemeden fabrika orijinal sac gövde, şehir içi dar sokaklarda maksimum kıvraklık.',
+          icon: '🚐'
+        },
+        {
+          key: 'panelvan_16',
+          title: 'Daily 35S16 Panelvan 16 m³ (4100 Şasi)',
+          badge: '16 m³ Geniş Hacim • B Ehliyet • Kantara Girmez',
+          reason: '4.68 m iç yükleme boyu ile mobilya, koli ve e-ticaret dağıtımında ideal çözüm.',
+          icon: '🚐'
+        },
+        {
+          key: 'chassis_35c',
+          title: 'Daily 35C16 Çift Teker Kamyonet',
+          badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
+          reason: 'Ağır yük ihtimaline karşı çift tekerlekli C-profil dayanımı, kantara girmez.',
+          icon: '🚛'
+        }
+      ]
     };
-  }, [payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
+  }, [selectedModelKey, payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
 
   // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
@@ -540,42 +1010,30 @@ export default function PublicVehicleFinder() {
 
   // VIP Test Paneli Fonksiyonları (Can Murat - Sales Priest)
   const handleApplyPreset = (type) => {
-    if (type === '35s') {
-      setPayloadKg(1500);
-      setVolumeM3(14);
-      setSelectedBody('kapali_kutu');
-      setCustomDims(false);
-      toast.success('Daily 35S (Tek Teker / 1.5t / 14m³) konfigürasyonu yüklendi');
+    if (type === 'panelvan_12') {
+      handleSelectVehicle('panelvan_12');
+    } else if (type === 'panelvan_16') {
+      handleSelectVehicle('panelvan_16');
+    } else if (type === 'panelvan_18') {
+      handleSelectVehicle('panelvan_18');
+    } else if (type === '35s') {
+      handleSelectVehicle('chassis_35s');
     } else if (type === '35c') {
-      setPayloadKg(3500);
-      setVolumeM3(20);
-      setSelectedBody('kapali_kutu');
-      setCustomDims(false);
-      toast.success('Daily 35C (Çift Teker / 3.5t / 20m³) konfigürasyonu yüklendi');
+      handleSelectVehicle('chassis_35c');
     } else if (type === '72c') {
-      setPayloadKg(4800);
-      setVolumeM3(28);
-      setSelectedBody('frigo');
-      setCustomDims(false);
-      toast.success('Daily 72C (4.8t / 28m³ / 7.970 kg kantar) konfigürasyonu yüklendi');
+      handleSelectVehicle('truck_72c');
     } else if (type === '100e') {
-      setPayloadKg(6500);
-      setVolumeM3(35);
-      setSelectedBody('kayar_perde');
-      setCustomDims(false);
-      toast.success('Eurocargo 100E (6.5t / 35m³ / 10.875 kg kantar) konfigürasyonu yüklendi');
+      handleSelectVehicle('truck_100e');
     } else if (type === '120e') {
-      setPayloadKg(8000);
-      setVolumeM3(42);
-      setSelectedBody('kayar_perde');
-      setCustomDims(false);
-      toast.success('Eurocargo 120E (8t / 42m³ / 12.950 kg kantar) konfigürasyonu yüklendi');
+      handleSelectVehicle('truck_120e');
+    } else if (type === '150e') {
+      handleSelectVehicle('truck_150e');
+    } else if (type === '160e') {
+      handleSelectVehicle('truck_160e');
+    } else if (type === '10teker') {
+      handleSelectVehicle('truck_10teker');
     } else if (type === 'sway') {
-      setPayloadKg(25000);
-      setVolumeM3(85);
-      setSelectedBody('kayar_perde');
-      setCustomDims(false);
-      toast.success('IVECO S-Way Çekici (25t+ / 85m³) konfigürasyonu yüklendi');
+      handleSelectVehicle('tractor_sway');
     }
   };
 
@@ -584,7 +1042,8 @@ export default function PublicVehicleFinder() {
     const cleanCompany = (testGenCompany || 'VIP Müşteri').trim();
     const cleanPhone = (testGenPhone || '05325551014').trim();
     const testQuery = isTest ? '&test=true' : '';
-    return `${origin}/ozel-teklif?company=${encodeURIComponent(cleanCompany)}&tel=${encodeURIComponent(cleanPhone)}&ref=canmurat_vip${testQuery}`;
+    const modelQuery = selectedModelKey ? `&model=${selectedModelKey}` : '';
+    return `${origin}/ozel-teklif?company=${encodeURIComponent(cleanCompany)}&tel=${encodeURIComponent(cleanPhone)}&ref=canmurat_vip${modelQuery}${testQuery}`;
   };
 
   const handleCopyGeneratedVipLink = () => {
@@ -674,12 +1133,17 @@ export default function PublicVehicleFinder() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '6px' }}>
                 {[
-                  { id: '35s', label: 'Daily 35S Tek Teker', desc: '1.5t / 14 m³ (B Ehliyet)' },
-                  { id: '35c', label: 'Daily 35C Çift Teker', desc: '3.5t / 20 m³ (4.130 kg)' },
-                  { id: '72c', label: 'Daily 72C Kamyon', desc: '4.8t / 28 m³ (7.970 kg)' },
-                  { id: '100e', label: 'Eurocargo 100E', desc: '6.5t / 35 m³ (10.875 kg)' },
-                  { id: '120e', label: 'Eurocargo 120E', desc: '8t / 42 m³ (12.950 kg)' },
-                  { id: 'sway', label: 'IVECO S-Way', desc: '25t+ / 85 m³ (Çekici)' }
+                  { id: 'panelvan_12', label: '🚐 35S16 12 m³', desc: '3520 Şasi (Kantara Girmez)' },
+                  { id: 'panelvan_16', label: '🚐 35S16 16 m³', desc: '4100 Şasi (Kantara Girmez)' },
+                  { id: 'panelvan_18', label: '🚐 35C16 18 m³', desc: 'Çift Teker H3 (Kantara Girmez)' },
+                  { id: '35s', label: 'Daily 35S Tek Teker', desc: '1.5t / 16 m³ (B Ehliyet)' },
+                  { id: '35c', label: 'Daily 35C Çift Teker', desc: '3.5t-5t / Kantara Girmez' },
+                  { id: '72c', label: 'Daily 72C Kamyon', desc: '4.8t / 7.970 kg Kantar' },
+                  { id: '100e', label: 'Eurocargo 100E', desc: '6.5t / 10.875 kg Kantar' },
+                  { id: '120e', label: 'Eurocargo 120E', desc: '8t / 12.950 kg Kantar' },
+                  { id: '160e', label: 'Eurocargo 160', desc: '11t / 17.080 kg Kantar' },
+                  { id: '10teker', label: 'Eurocargo 10 Teker', desc: '16 Ton / 26.000 kg Kantar' },
+                  { id: 'sway', label: 'IVECO S-Way', desc: '25t+ / 40 Ton Katar' }
                 ].map(item => (
                   <button
                     key={item.id}
@@ -1073,158 +1537,371 @@ export default function PublicVehicleFinder() {
       }}>
 
         {/* ── ADIM 1: TONAJ & METREKÜP SEÇİMİ ─────────────────────── */}
+        {/* ── ADIM 1: ARAÇ SEÇİMİ VEYA TONAJ & METREKÜP HESAPLAMA ───── */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '6px', color: '#f8fafc' }}>
-              1. Taşıyacağınız Net Yük (Tonaj) ve Kasa Hacmi (Metreküp)
-            </h2>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '18px' }}>
-              İşinize uygun net tonajı ve metreküpü belirleyin; sistemimiz kantar sınırına en uygun şasiyi ve anlaşmalı bankaların resmi kredi planlarını anında hazırlasın:
-            </p>
-
-            {/* Net Yük Ağırlığı Sürgüsü */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
-                  TAŞINACAK NET YÜK AĞIRLIĞI:
-                </span>
-                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8' }}>
-                  {(payloadKg / 1000).toFixed(1)} Ton ({payloadKg.toLocaleString('tr-TR')} kg)
-                </span>
-              </div>
-
-              <input
-                type="range"
-                min="1000"
-                max="25000"
-                step="250"
-                value={payloadKg}
-                onChange={e => setPayloadKg(Number(e.target.value))}
-                style={{ width: '100%', accentColor: '#0284c7', marginBottom: '12px' }}
-              />
-
-              {/* Hızlı Çipler */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {QUICK_TONNAGES.map(qt => (
-                  <button
-                    key={qt.id}
-                    type="button"
-                    onClick={() => setPayloadKg(qt.payloadKg)}
-                    style={{
-                      background: payloadKg === qt.payloadKg ? '#0284c7' : 'rgba(255, 255, 255, 0.05)',
-                      color: payloadKg === qt.payloadKg ? '#fff' : '#94a3b8',
-                      border: '1px solid',
-                      borderColor: payloadKg === qt.payloadKg ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
-                      borderRadius: '12px',
-                      padding: '4px 10px',
-                      fontSize: '0.74rem',
-                      fontWeight: payloadKg === qt.payloadKg ? 700 : 500,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {qt.label}
-                  </button>
-                ))}
-              </div>
+            <div style={{ marginBottom: '14px' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 4px', color: '#f8fafc' }}>
+                1. IVECO Aracınızı Belirleyin
+              </h2>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
+                İster doğrudan araç listesinden model seçin, ister taşıyacağınız yük ağırlığı ve kasa hacmine göre aratın:
+              </p>
             </div>
 
-            {/* Kasa Hacmi (m³) / Boyutlar */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.65)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '18px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
-                  TALEP EDİLEN KASA HACMİ (m³):
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setCustomDims(!customDims)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#38bdf8',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    textDecoration: 'underline'
-                  }}
-                >
-                  {customDims ? 'm³ Sürgüsüne Dön' : 'Özel Kasa Ebatı (cm) Gir'}
-                </button>
-              </div>
+            {/* Seçim Modu Değiştirici (Katalog vs. Tonaj Sürgüsü) */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectorMode('catalog')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: selectorMode === 'catalog' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.05)',
+                  color: selectorMode === 'catalog' ? '#fff' : '#94a3b8',
+                  border: '1px solid',
+                  borderColor: selectorMode === 'catalog' ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: selectorMode === 'catalog' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
+                }}
+              >
+                <FiTruck size={15} /> 📋 Doğrudan Araç Listesinden Seç
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectorMode('slider')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: selectorMode === 'slider' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.05)',
+                  color: selectorMode === 'slider' ? '#fff' : '#94a3b8',
+                  border: '1px solid',
+                  borderColor: selectorMode === 'slider' ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: selectorMode === 'slider' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
+                }}
+              >
+                <FiMaximize2 size={15} /> ⚖️ Tonaj & Hacme Göre Hesapla
+              </button>
+            </div>
 
-              {!customDims ? (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>İdeal Kasa Hacmi:</span>
-                    <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981' }}>{volumeM3} m³</span>
+            {/* SEÇENEK A: DOĞRUDAN ARAÇ KATALOĞU */}
+            {selectorMode === 'catalog' && (
+              <div style={{ marginBottom: '18px' }}>
+                {/* Kategori Filtre Çipleri */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+                  {[
+                    { id: 'all', label: 'Tüm Modeller' },
+                    { id: 'panelvan', label: '🚐 Panelvan Modelleri (12, 16, 18 m³)' },
+                    { id: 'kamyonet', label: '🚛 Kamyonetler (B - Kantara Girmez)' },
+                    { id: 'kamyon', label: '🚚 Kamyonlar (C - 10 Teker Dahil)' },
+                    { id: 'cekici', label: '🛣️ Çekici (S-Way)' }
+                  ].map(cat => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedCategoryTab(cat.id)}
+                      style={{
+                        background: selectedCategoryTab === cat.id ? '#0284c7' : 'rgba(255, 255, 255, 0.05)',
+                        color: selectedCategoryTab === cat.id ? '#fff' : '#94a3b8',
+                        border: '1px solid',
+                        borderColor: selectedCategoryTab === cat.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '20px',
+                        padding: '5px 12px',
+                        fontSize: '0.74rem',
+                        fontWeight: selectedCategoryTab === cat.id ? 800 : 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Model Kartları Izgarası */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
+                  {VEHICLE_CATALOG.filter(v => selectedCategoryTab === 'all' || v.category === selectedCategoryTab).map(v => {
+                    const isSelected = matched.key === v.key || matched.modelTitle === v.modelTitle;
+                    return (
+                      <div
+                        key={v.key}
+                        onClick={() => handleSelectVehicle(v.key)}
+                        style={{
+                          background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)' : 'rgba(15, 23, 42, 0.65)',
+                          border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '12px',
+                          padding: '12px',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          boxShadow: isSelected ? '0 0 16px rgba(56, 189, 248, 0.25)' : 'none'
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700 }}>
+                              {v.categoryLabel}
+                            </span>
+                            {isSelected ? (
+                              <span style={{ background: '#10b981', color: '#0f172a', fontWeight: 800, fontSize: '0.65rem', padding: '2px 8px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                <FiCheck size={11} /> SEÇİLİ
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '0.66rem', color: v.kantarStatus === 'exempt' ? '#38bdf8' : '#10b981', fontWeight: 700 }}>
+                                {v.kantarStatus === 'exempt' ? 'Kantara Girmez' : 'Kantar Tescilli'}
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc' }}>
+                            {v.title}
+                          </h4>
+                          <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 600, marginBottom: '8px' }}>
+                            {v.badge}
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '6px', marginBottom: '8px', textAlign: 'center', fontSize: '0.66rem' }}>
+                            <div>
+                              <span style={{ color: '#64748b', display: 'block' }}>NET YÜK</span>
+                              <strong style={{ color: '#fff' }}>{(v.payloadKg / 1000).toFixed(1)} Ton</strong>
+                            </div>
+                            <div>
+                              <span style={{ color: '#64748b', display: 'block' }}>HACİM</span>
+                              <strong style={{ color: '#10b981' }}>{v.volumeM3} m³</strong>
+                            </div>
+                            <div>
+                              <span style={{ color: '#64748b', display: 'block' }}>EHLİYET</span>
+                              <strong style={{ color: '#e2e8f0' }}>{v.license.split(' ')[0]}</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectVehicle(v.key);
+                          }}
+                          style={{
+                            width: '100%',
+                            background: isSelected ? '#10b981' : 'rgba(255, 255, 255, 0.08)',
+                            color: isSelected ? '#0f172a' : '#cbd5e1',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '6px 10px',
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {isSelected ? '✓ Seçili Araç (Krediye Geçebilirsiniz)' : 'Bu Aracı Seç'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* SEÇENEK B: TONAJ & METREKÜP SÜRGÜLERİ */}
+            {selectorMode === 'slider' && (
+              <div>
+                {/* Net Yük Ağırlığı Sürgüsü */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '16px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
+                      TAŞINACAK NET YÜK AĞIRLIĞI:
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8' }}>
+                      {(payloadKg / 1000).toFixed(1)} Ton ({payloadKg.toLocaleString('tr-TR')} kg)
+                    </span>
                   </div>
+
                   <input
                     type="range"
-                    min="12"
-                    max="65"
-                    step="1"
-                    value={volumeM3}
-                    onChange={e => setVolumeM3(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#10b981', marginBottom: '6px' }}
+                    min="1000"
+                    max="26000"
+                    step="250"
+                    value={payloadKg}
+                    onChange={e => handlePayloadChange(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: '#0284c7', marginBottom: '12px' }}
                   />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748b' }}>
-                    <span>12 m³ (Kamyonet)</span>
-                    <span>28 m³ (7.2 Ton Kamyon)</span>
-                    <span>45 m³ (Eurocargo)</span>
-                    <span>65 m³ (Dev Hacim)</span>
+
+                  {/* Hızlı Çipler */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {QUICK_TONNAGES.map(qt => (
+                      <button
+                        key={qt.id}
+                        type="button"
+                        onClick={() => handlePayloadChange(qt.payloadKg)}
+                        style={{
+                          background: payloadKg === qt.payloadKg ? '#0284c7' : 'rgba(255, 255, 255, 0.05)',
+                          color: payloadKg === qt.payloadKg ? '#fff' : '#94a3b8',
+                          border: '1px solid',
+                          borderColor: payloadKg === qt.payloadKg ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
+                          borderRadius: '12px',
+                          padding: '4px 10px',
+                          fontSize: '0.74rem',
+                          fontWeight: payloadKg === qt.payloadKg ? 700 : 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {qt.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış Boy (cm)</label>
-                    <input
-                      type="number"
-                      value={bodyLengthCm}
-                      onChange={e => setBodyLengthCm(Number(e.target.value))}
-                      style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
-                    />
+
+                {/* Kasa Hacmi (m³) / Boyutlar */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '18px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc' }}>
+                      TALEP EDİLEN KASA HACMİ (m³):
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setCustomDims(!customDims)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#38bdf8',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {customDims ? 'm³ Sürgüsüne Dön' : 'Özel Kasa Ebatı (cm) Gir'}
+                    </button>
                   </div>
-                  <div>
-                    <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış En (cm)</label>
-                    <input
-                      type="number"
-                      value={bodyWidthCm}
-                      onChange={e => setBodyWidthCm(Number(e.target.value))}
-                      style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik (cm)</label>
-                    <input
-                      type="number"
-                      value={bodyHeightCm}
-                      onChange={e => setBodyHeightCm(Number(e.target.value))}
-                      style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
-                    />
+
+                  {!customDims ? (
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>İdeal Kasa Hacmi:</span>
+                        <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981' }}>{volumeM3} m³</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="12"
+                        max="65"
+                        step="1"
+                        value={volumeM3}
+                        onChange={e => handleVolumeChange(Number(e.target.value))}
+                        style={{ width: '100%', accentColor: '#10b981', marginBottom: '6px' }}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748b' }}>
+                        <span>12 m³ (Panelvan / Kamyonet)</span>
+                        <span>28 m³ (7.2 Ton Kamyon)</span>
+                        <span>45 m³ (Eurocargo)</span>
+                        <span>65 m³ (Dev Hacim)</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış Boy (cm)</label>
+                        <input
+                          type="number"
+                          value={bodyLengthCm}
+                          onChange={e => setBodyLengthCm(Number(e.target.value))}
+                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış En (cm)</label>
+                        <input
+                          type="number"
+                          value={bodyWidthCm}
+                          onChange={e => setBodyWidthCm(Number(e.target.value))}
+                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik (cm)</label>
+                        <input
+                          type="number"
+                          value={bodyHeightCm}
+                          onChange={e => setBodyHeightCm(Number(e.target.value))}
+                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '6px 8px', color: '#fff', fontSize: '0.82rem', fontWeight: 700 }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Kasa Tipi Seçimi */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '18px'
+                }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc', display: 'block', marginBottom: '10px' }}>
+                    KASA TİPİ VEYA GÖVDE YAPISI:
+                  </span>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' }}>
+                    {BODY_TYPES.map(b => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => setSelectedBody(b.id)}
+                        style={{
+                          background: selectedBody === b.id ? 'rgba(2, 132, 199, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                          border: '1px solid',
+                          borderColor: selectedBody === b.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
+                          borderRadius: '10px',
+                          padding: '10px 8px',
+                          textAlign: 'left',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <div style={{ fontSize: '1.1rem', marginBottom: '2px' }}>{b.icon}</div>
+                        <div style={{ fontSize: '0.74rem', fontWeight: 700, color: selectedBody === b.id ? '#fff' : '#cbd5e1' }}>{b.name}</div>
+                        <div style={{ fontSize: '0.64rem', color: '#64748b', marginTop: '2px' }}>{b.tare === 0 ? 'Orijinal Sac Gövde' : `+${b.tare} kg Dara`}</div>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* ⚡ ANLIK EŞLEŞEN İDEAL ŞASİ ÖNİZLEMESİ */}
             <div style={{
-              background: 'rgba(0, 75, 147, 0.3)',
+              background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%)',
               border: '1px solid rgba(56, 189, 248, 0.4)',
               borderRadius: '12px',
               padding: '14px 16px',
-              marginBottom: '20px',
+              marginBottom: '14px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -1233,13 +1910,13 @@ export default function PublicVehicleFinder() {
             }}>
               <div>
                 <span style={{ fontSize: '0.68rem', color: '#93c5fd', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  OTOMATİK EŞLEŞEN İDEAL ŞASİ:
+                  {selectedModelKey ? 'SEÇİLEN MODEL:' : 'OTOMATİK EŞLEŞEN İDEAL ŞASİ:'}
                 </span>
                 <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
                   {matched.modelTitle} ({matched.wheelbase})
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '3px' }}>
-                  {matched.kantarTitle} · Kasa: {matched.dims.length} × {matched.dims.width}
+                  {matched.kantarTitle} · {matched.badge}
                 </div>
               </div>
               <div style={{
@@ -1250,9 +1927,79 @@ export default function PublicVehicleFinder() {
                 fontSize: '0.74rem',
                 fontWeight: 800
               }}>
-                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : 'KANTAR DENGELİ'}
+                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : 'KANTARA GİRMİYOR'}
               </div>
             </div>
+
+            {/* 💡 ÇOKLU ÖNERİ & ALTERNATİF ARAÇLAR (Kantara Girmeyen Seçenekler) */}
+            {matched.multiRecommendations && matched.multiRecommendations.length > 0 && (
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.75)',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                marginBottom: '18px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    💡 ÇOKLU ÖNERİ (Kantara Girmeyen Alternatifler):
+                  </span>
+                  <span style={{ fontSize: '0.66rem', color: '#94a3b8' }}>İncelemek için tıkla</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                  {matched.multiRecommendations.map(alt => (
+                    <div
+                      key={alt.key}
+                      onClick={() => handleSelectVehicle(alt.key)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        transition: 'background 0.15s ease'
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                          <span style={{ fontSize: '1.1rem' }}>{alt.icon || '🚛'}</span>
+                          <strong style={{ fontSize: '0.82rem', color: '#f8fafc' }}>{alt.title}</strong>
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 700, marginBottom: '4px' }}>
+                          {alt.badge}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.35, marginBottom: '8px' }}>
+                          {alt.reason}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectVehicle(alt.key);
+                        }}
+                        style={{
+                          width: '100%',
+                          background: 'rgba(56, 189, 248, 0.15)',
+                          color: '#38bdf8',
+                          border: '1px solid rgba(56, 189, 248, 0.35)',
+                          borderRadius: '6px',
+                          padding: '6px 8px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Bu Aracı Seç & Kredisini Gör →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* İLERLEME BUTONU */}
             <button
@@ -1305,6 +2052,52 @@ export default function PublicVehicleFinder() {
                 <FiArrowLeft size={14} /> Tonaj ve Metreküpü Değiştir
               </button>
             </div>
+
+            {/* Adım 2 İçi Çoklu Öneri ve Hızlı Model Değiştirici */}
+            {matched.multiRecommendations && matched.multiRecommendations.length > 0 && (
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.8)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                borderRadius: '12px',
+                padding: '10px 14px',
+                marginBottom: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px'
+              }}>
+                <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700 }}>
+                  💡 Kantara Girmeyen Diğer Alternatifler:
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {matched.multiRecommendations.map(alt => (
+                    <button
+                      key={alt.key}
+                      type="button"
+                      onClick={() => handleSelectVehicle(alt.key)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        color: '#f8fafc',
+                        borderRadius: '16px',
+                        padding: '4px 10px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <span>{alt.icon || '🚛'}</span>
+                      <span>{alt.title.split('(')[0]}</span>
+                      <span style={{ color: '#10b981', fontSize: '0.65rem' }}>→ Kredisini Gör</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Eşleşen Araç Kartı */}
             <div style={{
