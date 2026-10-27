@@ -609,6 +609,11 @@ export default function PublicVehicleFinder() {
     }
   };
 
+  const handleTestOpenGeneratedLink = () => {
+    const link = getGeneratedVipLink(true);
+    window.open(link, '_blank');
+  };
+
   return (
     <div style={{
       minHeight: '100vh',

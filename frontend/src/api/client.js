@@ -118,7 +118,19 @@ api.interceptors.response.use(
       const isAuthUrl = config?.url && (config.url.includes('/auth/login') || config.url.includes('/auth/passcode'));
       if (!isAuthUrl) {
         localStorage.removeItem('token');
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        const path = typeof window !== 'undefined' ? window.location.pathname : '';
+        const isPublicPage = (
+          path.startsWith('/login') ||
+          path.startsWith('/ozel-teklif') ||
+          path.startsWith('/arac-secici') ||
+          path.startsWith('/filo-hesaplayici') ||
+          path.startsWith('/akilli-kasa') ||
+          path.startsWith('/iveco-finansman') ||
+          path.startsWith('/test/') ||
+          path.startsWith('/p/') ||
+          path.startsWith('/proformas/view/')
+        );
+        if (typeof window !== 'undefined' && !isPublicPage) {
           window.location.href = '/login';
         }
       }

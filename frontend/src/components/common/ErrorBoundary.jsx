@@ -54,11 +54,30 @@ export default class ErrorBoundary extends React.Component {
               Uygulama çalışırken beklenmeyen bir aksaklık meydana geldi. Sayfayı yenileyebilir veya ana sayfaya dönebilirsiniz.
             </p>
             {this.state.error && (
-              <details style={{ textAlign: 'left', marginBottom: '1.5rem', background: 'rgba(0, 0, 0, 0.3)', padding: '0.75rem', borderRadius: 8, fontSize: '0.75rem', color: '#fca5a5' }}>
-                <summary style={{ cursor: 'pointer', color: '#94a3b8', marginBottom: 4 }}>Teknik Hata Detayı</summary>
-                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0, fontFamily: 'monospace' }}>
+              <details open style={{ textAlign: 'left', marginBottom: '1.5rem', background: 'rgba(0, 0, 0, 0.4)', padding: '0.85rem', borderRadius: 8, fontSize: '0.75rem', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
+                <summary style={{ cursor: 'pointer', color: '#cbd5e1', marginBottom: 6, fontWeight: 700 }}>Teknik Hata Detayı</summary>
+                <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: '0 0 8px', fontFamily: 'monospace', maxHeight: '160px', overflowY: 'auto' }}>
                   {this.state.error?.toString()}
                 </pre>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const txt = this.state.error?.stack || this.state.error?.toString() || 'Bilinmeyen Hata';
+                    navigator.clipboard.writeText(txt);
+                    alert('Hata detayı panoya kopyalandı! 📋');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: '#e2e8f0',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '0.7rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  📋 Hatayı Kopyala
+                </button>
               </details>
             )}
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>

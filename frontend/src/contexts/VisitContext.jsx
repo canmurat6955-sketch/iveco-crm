@@ -12,8 +12,13 @@ export function VisitProvider({ children }) {
   // GPS hook'unu kullanıyoruz (İhtiyaç anında tetiklemek için)
   const { location, error: gpsError, getLocation } = useGeolocation();
 
-  // İlk yüklemede aktif ziyaret var mı sorgula
+  // İlk yüklemede aktif ziyaret var mı sorgula (yalnızca giriş yapılmışsa)
   useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     salesApi.getActiveVisit()
       .then(res => {
         if (res.data) {
