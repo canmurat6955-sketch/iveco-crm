@@ -22,7 +22,12 @@ import {
   FiAlertCircle,
   FiMaximize2,
   FiShare2,
-  FiCopy
+  FiCopy,
+  FiExternalLink,
+  FiSend,
+  FiSmartphone,
+  FiEye,
+  FiX
 } from 'react-icons/fi';
 
 // Sektör Seçenekleri
@@ -666,6 +671,26 @@ export default function PublicVehicleFinder() {
   const [testGenCompany, setTestGenCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
   const [testGenPhone, setTestGenPhone] = useState(phoneParam || '0532 555 10 14');
   const [testSimulationResult, setTestSimulationResult] = useState(null);
+
+  // Müşteriye Prestijli Link & Teklif Gönderme Masası (WhatsApp / SMS / QR / Kopyala)
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendCompany, setSendCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
+  const [sendPhone, setSendPhone] = useState(phoneParam || '0532 555 10 14');
+  const [sendContactName, setSendContactName] = useState(nameParam || '');
+  const [sendTemplate, setSendTemplate] = useState('vip'); // 'vip' | 'quick' | 'heavy'
+  const [showQrCode, setShowQrCode] = useState(false);
+
+  useEffect(() => {
+    if (companyParam) {
+      setSendCompany(companyParam);
+      setTestGenCompany(companyParam);
+    }
+    if (phoneParam) {
+      setSendPhone(phoneParam);
+      setTestGenPhone(phoneParam);
+    }
+    if (nameParam) setSendContactName(nameParam);
+  }, [companyParam, phoneParam, nameParam]);
 
   // Müşteri İletişim Formu (Mevcut Müşteri Linkinden Otomatik Doldurma)
   const [customerName, setCustomerName] = useState(nameParam);
@@ -1357,6 +1382,122 @@ export default function PublicVehicleFinder() {
     window.open(link, '_blank');
   };
 
+  // Müşteriye Özel Canlı Link (Seçili model ve firma parametreleriyle)
+  const currentClientLink = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const cleanCompany = (sendCompany || 'VIP Müşteri').trim();
+    const cleanPhone = (sendPhone || '').replace(/\D/g, '');
+    const modelKey = selectedModelKey || matched.modelKey;
+    const params = new URLSearchParams();
+    if (cleanCompany) params.set('company', cleanCompany);
+    if (cleanPhone) params.set('tel', cleanPhone);
+    if (modelKey) params.set('model', modelKey);
+    params.set('ref', 'canmurat_vip');
+    return `${origin}/ozel-teklif?${params.toString()}`;
+  }, [sendCompany, sendPhone, selectedModelKey, matched.modelKey]);
+
+  // Prestijli WhatsApp Mesaj Formatlayıcı (3 Farklı Profesyonel Şablon)
+  const getFormattedMessage = (templateKey = sendTemplate) => {
+    const targetCompany = (sendCompany || sendContactName || 'Değerli İş Ortağımız').trim();
+    const targetModel = matched.fullTitle || matched.title;
+    const targetKantar = matched.kantarTitle || '26.000 kg Kantar Uygun';
+    const targetPayload = (matched.payloadKg / 1000).toFixed(1);
+    const link = currentClientLink;
+
+    if (templateKey === 'quick') {
+      return (
+`Sayın ${targetCompany} Yetkilisi,
+
+İşletmeniz için belirlediğimiz *${targetModel}* aracına ait teknik şasi detaylarını ve Ekim 2026 %0 faizli kredi simülatörünü aşağıdaki bağlantıdan tek tıkla inceleyebilirsiniz:
+
+👉 ${link}
+
+• Net Taşıma: ~${targetPayload} Ton
+• Kantar Güvencesi: ${targetKantar}
+• Kredi: 12-48 Ay Resmi Banka Taksit Seçenekleri
+• İletişim: Can Murat (Sales Priest) | 0532 555 10 14`
+      );
+    }
+
+    if (templateKey === 'heavy') {
+      return (
+`🚜 *AĞIR VASITA & ŞANTİYE TEKLİFİ — ${targetCompany.toUpperCase()}*
+
+Sayın Yetkili,
+Ağır hafriyat, maden ve şantiye operasyonunuz için yapılandırdığımız *${targetModel}* aracımıza ait karayolları yasal kantar sınırları, brüt GVW kapasitesi ve Ekim 2026 resmi ticari kredi imkanları hazırlanmıştır:
+
+📌 *Araç:* ${targetModel}
+⚖️ *Kantar / GVW:* ${targetKantar}
+🛠️ *Damper / Kasa:* Ağır Hizmet Hardox Uyumu
+💰 *Ticari Finansman:* 3.000.000 TL - 5.000.000 TL Özel Filo Desteği
+
+Detaylı teknik föyü ve banka ödeme planını buradan anında görüntüleyebilirsiniz:
+🔗 ${link}
+
+Saygılarımla,
+*Can Murat | Sales Priest*
+IVECO ERC Otomotiv Samsun
+📞 0532 555 10 14`
+      );
+    }
+
+    // Default: 'vip'
+    return (
+`🌟 *SAYIN ${targetCompany.toUpperCase()} YETKİLİSİ,*
+
+IVECO ERC Otomotiv olarak, firmanızın taşımacılık operasyonuna özel hazırladığımız dijital şasi konfigürasyonunu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) bilgilerinize sunarım.
+
+🚛 *Önerilen Model:* ${targetModel}
+⚖️ *Kantar Sınırı:* ${targetKantar}
+💎 *Finansman:* %0 Faiz & 5.000.000 TL'ye Varan Esnek Vadeli Kredi
+
+Aşağıdaki firmanıza özel güvenli bağlantıdan kasa boyutlarını, kantar analizini ve banka taksit tablolarını doğrudan inceleyebilirsiniz:
+
+🔗 *Size Özel Teklif Portalı:*
+${link}
+
+Seçtiğiniz şasinin stok ve fabrika teslim tarihleri için bu mesaja yanıt vermeniz yeterlidir.
+
+Saygılarımla,
+*Can Murat | Sales Priest*
+IVECO ERC Otomotiv Samsun
+📞 0532 555 10 14`
+    );
+  };
+
+  const handleSendViaWhatsApp = () => {
+    const cleanPhone = (sendPhone || '').replace(/\D/g, '');
+    const text = getFormattedMessage();
+    let url = '';
+    if (cleanPhone.length >= 10) {
+      const formattedPhone = cleanPhone.startsWith('90') ? cleanPhone : (cleanPhone.startsWith('0') ? `9${cleanPhone}` : `90${cleanPhone}`);
+      url = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(text)}`;
+    } else {
+      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    }
+    window.open(url, '_blank');
+    toast.success('WhatsApp sohbeti açıldı! 📲');
+  };
+
+  const handleCopyMessage = () => {
+    const text = getFormattedMessage();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      toast.success('📋 WhatsApp mesaj metni kopyalandı!');
+    } else {
+      prompt('Mesaj Metni:', text);
+    }
+  };
+
+  const handleCopyOnlyLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(currentClientLink);
+      toast.success('🔗 Müşteri bağlantısı kopyalandı!');
+    } else {
+      prompt('Müşteri Linki:', currentClientLink);
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -1726,6 +1867,27 @@ export default function PublicVehicleFinder() {
             }}
           >
             <FiMessageSquare size={12} /> WhatsApp
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSendModal(true)}
+            style={{
+              background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+              color: '#fff',
+              border: '1px solid #38bdf8',
+              borderRadius: '20px',
+              padding: '4px 12px',
+              fontSize: '0.74rem',
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+              boxShadow: '0 0 14px rgba(56, 189, 248, 0.4)'
+            }}
+            title="Müşteriye özel yakışıklı WhatsApp teklif linki ve QR kod hazırla"
+          >
+            <FiShare2 size={13} /> 📤 Müşteriye Gönder
           </button>
           <button
             onClick={handleShareLink}
@@ -2867,6 +3029,50 @@ export default function PublicVehicleFinder() {
               )}
             </div>
 
+            {/* Can Murat - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
+              border: '1px solid #38bdf8',
+              borderRadius: '14px',
+              padding: '14px 16px',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '10px',
+              boxShadow: '0 4px 16px rgba(2, 132, 199, 0.2)'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>📲</span> Bu Teklifi Müşteriye WhatsApp'tan Gönder
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                  {matched.title} ({activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL Kredi` : ''}) için zengin görsel kartı ve kişiselleştirilmiş bağlantı.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSendModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '9px 16px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
+                }}
+              >
+                <FiShare2 size={14} /> Müşteriye Gönder (WhatsApp / QR)
+              </button>
+            </div>
+
             {/* ── İLETİŞİM & TEKLİF ALMA FORMU ──────────────────────── */}
             {!submitted ? (
               <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
@@ -3162,6 +3368,447 @@ export default function PublicVehicleFinder() {
               >
                 Tamam
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MÜŞTERİYE PRESTİJLİ LİNK & TEKLİF GÖNDERİM MASASI (MODAL) ── */}
+      {showSendModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(2, 6, 23, 0.85)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, #0f172a 0%, #1e293b 100%)',
+            border: '2px solid rgba(56, 189, 248, 0.4)',
+            borderRadius: '20px',
+            width: '100%',
+            maxWidth: '940px',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            padding: '22px',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.25)',
+            position: 'relative'
+          }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.4rem',
+                  boxShadow: '0 0 16px rgba(2, 132, 199, 0.5)'
+                }}>
+                  📤
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    Müşteriye Prestijli Teklif & Link Gönder
+                    <span style={{ fontSize: '0.68rem', background: '#f59e0b', color: '#0f172a', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                      CANLI WHATSAPP SİMÜLASYONU
+                    </span>
+                  </h3>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
+                    Sales Priest: <strong style={{ color: '#e2e8f0' }}>Can Murat</strong> • IVECO ERC Otomotiv Samsun (0532 555 10 14)
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowSendModal(false); setShowQrCode(false); }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#94a3b8',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '1.1rem'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body: 2 Columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: '20px' }}>
+              
+              {/* SOL KOLON: Müşteri Bilgileri & Gönderim Butonları */}
+              <div>
+                <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>
+                  1. Müşteri & Firma Bilgileri
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
+                  <div>
+                    <label style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                      Firma / Müşteri Ünvanı
+                    </label>
+                    <input
+                      type="text"
+                      value={sendCompany}
+                      onChange={(e) => setSendCompany(e.target.value)}
+                      placeholder="Örn: Öz Karadeniz Nakliyat Ltd."
+                      style={{
+                        width: '100%',
+                        background: 'rgba(15, 23, 42, 0.9)',
+                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        color: '#f8fafc',
+                        fontSize: '0.82rem'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                        Müşteri Telefonu (WhatsApp)
+                      </label>
+                      <input
+                        type="text"
+                        value={sendPhone}
+                        onChange={(e) => setSendPhone(e.target.value)}
+                        placeholder="0532 555 10 14"
+                        style={{
+                          width: '100%',
+                          background: 'rgba(15, 23, 42, 0.9)',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          borderRadius: '8px',
+                          padding: '9px 12px',
+                          color: '#f8fafc',
+                          fontSize: '0.82rem'
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                        Yetkili Adı (Opsiyonel)
+                      </label>
+                      <input
+                        type="text"
+                        value={sendContactName}
+                        onChange={(e) => setSendContactName(e.target.value)}
+                        placeholder="Örn: Ahmet Bey"
+                        style={{
+                          width: '100%',
+                          background: 'rgba(15, 23, 42, 0.9)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          borderRadius: '8px',
+                          padding: '9px 12px',
+                          color: '#f8fafc',
+                          fontSize: '0.82rem'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mesaj Şablonu Seçimi */}
+                <div style={{ marginBottom: '14px' }}>
+                  <label style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                    Mesaj Şablonu Seçin:
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                    {[
+                      { id: 'vip', icon: '🌟', label: 'VIP Prestij', desc: 'Kapsamlı Sunum' },
+                      { id: 'quick', icon: '⚡', label: 'Hızlı Özet', desc: 'Net 3 Madde' },
+                      { id: 'heavy', icon: '🚜', label: 'Ağır Şantiye', desc: 'T-Way & Damper' }
+                    ].map(tpl => (
+                      <button
+                        key={tpl.id}
+                        type="button"
+                        onClick={() => setSendTemplate(tpl.id)}
+                        style={{
+                          background: sendTemplate === tpl.id ? 'rgba(2, 132, 199, 0.35)' : 'rgba(255, 255, 255, 0.04)',
+                          border: '1px solid',
+                          borderColor: sendTemplate === tpl.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                          color: sendTemplate === tpl.id ? '#fff' : '#94a3b8',
+                          borderRadius: '8px',
+                          padding: '8px 6px',
+                          cursor: 'pointer',
+                          textAlign: 'center'
+                        }}
+                      >
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{tpl.icon} {tpl.label}</div>
+                        <div style={{ fontSize: '0.62rem', opacity: 0.8, marginTop: '2px' }}>{tpl.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Üretilen Prestijli Link Kutusu */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.95)',
+                  border: '1px dashed rgba(56, 189, 248, 0.5)',
+                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  marginBottom: '14px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 600 }}>Müşteriye Gidecek Özel Link:</span>
+                    <span style={{ fontSize: '0.62rem', color: '#34d399', fontWeight: 700 }}>✓ Aktif Araç: {matched.title}</span>
+                  </div>
+                  <div style={{
+                    fontSize: '0.72rem',
+                    color: '#38bdf8',
+                    fontFamily: 'monospace',
+                    wordBreak: 'break-all',
+                    background: 'rgba(0,0,0,0.4)',
+                    padding: '6px 8px',
+                    borderRadius: '6px'
+                  }}>
+                    {currentClientLink}
+                  </div>
+                </div>
+
+                {/* Aksiyon Butonları */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleSendViaWhatsApp}
+                    style={{
+                      background: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '12px 18px',
+                      fontSize: '0.88rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 16px rgba(34, 197, 94, 0.4)'
+                    }}
+                  >
+                    <FiMessageSquare size={16} /> 📲 WhatsApp'tan Hemen Gönder
+                  </button>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={handleCopyMessage}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: '#f8fafc',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <FiCopy size={13} /> Mesajı Kopyala
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyOnlyLink}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <FiCopy size={13} /> Linki Kopyala
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowQrCode(prev => !prev)}
+                    style={{
+                      background: showQrCode ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
+                      color: showQrCode ? '#0f172a' : '#fbbf24',
+                      border: '1px solid rgba(245, 158, 11, 0.4)',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <FiSmartphone size={13} /> {showQrCode ? 'Karekodu Gizle' : '📱 Showroom / Yüzyüze Karekod (QR Kod) Aç'}
+                  </button>
+
+                  {/* QR Kod Kutusu (Showroom için) */}
+                  {showQrCode && (
+                    <div style={{
+                      background: '#fff',
+                      borderRadius: '12px',
+                      padding: '14px',
+                      textAlign: 'center',
+                      color: '#0f172a',
+                      marginTop: '4px',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+                    }}>
+                      <div style={{ fontSize: '0.76rem', fontWeight: 800, marginBottom: '8px', color: '#0f172a' }}>
+                        Müşteriniz Telefon Kamerasından Okutsun:
+                      </div>
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(currentClientLink)}`}
+                        alt="Müşteri QR Kodu"
+                        style={{ width: '160px', height: '160px', display: 'block', margin: '0 auto', borderRadius: '8px' }}
+                      />
+                      <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '6px', fontWeight: 600 }}>
+                        {sendCompany || 'VIP Müşteri'} için doğrudan açılır
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* SAĞ KOLON: Canlı WhatsApp Görsel Simülasyonu */}
+              <div style={{
+                background: '#0b141a',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                {/* WhatsApp Chat Üst Barı */}
+                <div style={{
+                  background: '#202c33',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+                }}>
+                  <div style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: '#004B93',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: '12px'
+                  }}>
+                    🏢
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#e9edef' }}>
+                      {sendCompany || 'Müşteri Sohbeti'}
+                    </div>
+                    <div style={{ fontSize: '0.62rem', color: '#00a884' }}>
+                      çevrimiçi • WhatsApp Business
+                    </div>
+                  </div>
+                </div>
+
+                {/* WhatsApp Chat İç Alanı */}
+                <div style={{
+                  padding: '14px',
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  background: 'radial-gradient(circle at center, #111b21 0%, #0b141a 100%)'
+                }}>
+                  
+                  {/* WhatsApp Gelen / Gönderilen Balonu */}
+                  <div style={{
+                    background: '#005c4b',
+                    borderRadius: '12px',
+                    padding: '8px 10px',
+                    maxWidth: '100%',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                    alignSelf: 'flex-end',
+                    color: '#e9edef',
+                    fontSize: '0.74rem'
+                  }}>
+                    
+                    {/* ZENGİN GÖRSEL LİNK KARTI (OPEN GRAPH PREVIEW) */}
+                    <div style={{
+                      background: '#025144',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      marginBottom: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      <img
+                        src="/og-iveco-preview.png"
+                        alt="IVECO Önizleme"
+                        style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                      <div style={{ padding: '8px 10px' }}>
+                        <div style={{ fontSize: '0.62rem', color: '#8696a0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          erc-iveco.com/ozel-teklif
+                        </div>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                          IVECO ERC Otomotiv | Firmanıza Özel Şasi & Kredi Teklifi
+                        </div>
+                        <div style={{ fontSize: '0.65rem', color: '#aebac1', marginTop: '2px', lineHeight: 1.3 }}>
+                          İşletmenize özel şasi ölçüleri, karayolları kantar analizi ve Ekim 2026 %0 faizli kredi planları.
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mesaj Metni Önizlemesi */}
+                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45, color: '#e9edef', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}>
+                      {getFormattedMessage()}
+                    </div>
+
+                    {/* WhatsApp Saati & Mavi Tık */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '3px', marginTop: '4px', fontSize: '0.6rem', color: '#8696a0' }}>
+                      <span>20:25</span>
+                      <span style={{ color: '#53bdeb', fontWeight: 800 }}>✓✓</span>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'center', fontSize: '0.65rem', color: '#8696a0', marginTop: '4px' }}>
+                    ✨ Müşteriniz linke tıkladığında adıyla karşılanır ve seçtiğiniz araç hazır açılır.
+                  </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>
