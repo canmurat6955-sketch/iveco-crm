@@ -116,7 +116,7 @@ export default function DiscoveryList() {
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Can Murat';
+    : 'Murat Onay';
 
   // Ana Navigasyon Tabları
   const [activeTab, setActiveTab] = useState('osb_radar'); // osb_radar | tenders | bodybuilders | new_registrations | live_search | sources

@@ -405,7 +405,7 @@ export default function SalesActivityPage() {
                           </span>
                         </td>
                         <td className="text-xs text-muted">
-                          {c.user_name || 'Sales Priest'}
+                          {c.user_name || 'Murat Onay'}
                         </td>
                         <td className="text-xs text-muted" style={{ whiteSpace: 'nowrap' }}>
                           {new Date(c.call_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}

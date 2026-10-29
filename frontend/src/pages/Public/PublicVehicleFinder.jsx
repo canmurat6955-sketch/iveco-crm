@@ -27,8 +27,24 @@ import {
   FiSend,
   FiSmartphone,
   FiEye,
-  FiX
+  FiX,
+  FiPhone,
+  FiMail
 } from 'react-icons/fi';
+
+// ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
+const SALES_REP = {
+  name: 'Murat Onay',
+  title: 'Satış Sorumlusu',
+  dealership: 'IVECO ERC Samsun Otomotiv',
+  dealershipShort: 'IVECO ERC Samsun',
+  phoneDisplay: '0544 622 59 31',
+  phoneClean: '05446225931',
+  phoneWhatsapp: '905446225931',
+  email: 'murat.onay@ercsamsunotomotiv.com',
+  city: 'Samsun',
+  initials: 'MO'
+};
 
 // Sektör Seçenekleri
 const SECTORS = [
@@ -666,16 +682,17 @@ export default function PublicVehicleFinder() {
   const [selectedTierId, setSelectedTierId] = useState('all');
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
-  // VIP Test & Simülasyon Paneli State'leri (Sales Priest: Can Murat)
+  // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Murat Onay)
   const [showTestPanel, setShowTestPanel] = useState(isTestRoute);
   const [testGenCompany, setTestGenCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
-  const [testGenPhone, setTestGenPhone] = useState(phoneParam || '0532 555 10 14');
+  const [testGenPhone, setTestGenPhone] = useState(phoneParam || SALES_REP.phoneDisplay);
   const [testSimulationResult, setTestSimulationResult] = useState(null);
 
-  // Müşteriye Prestijli Link & Teklif Gönderme Masası (WhatsApp / SMS / QR / Kopyala)
+  // Müşteriye Prestijli Link & Teklif Gönderme Masası (WhatsApp / E-Posta / QR / vCard)
   const [showSendModal, setShowSendModal] = useState(false);
   const [sendCompany, setSendCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
-  const [sendPhone, setSendPhone] = useState(phoneParam || '0532 555 10 14');
+  const [sendPhone, setSendPhone] = useState(phoneParam || SALES_REP.phoneDisplay);
+  const [sendEmail, setSendEmail] = useState('');
   const [sendContactName, setSendContactName] = useState(nameParam || '');
   const [sendTemplate, setSendTemplate] = useState('vip'); // 'vip' | 'quick' | 'heavy'
   const [showQrCode, setShowQrCode] = useState(false);
@@ -1208,7 +1225,7 @@ export default function PublicVehicleFinder() {
   const handleSubmitLead = async (e) => {
     e.preventDefault();
     if (!customerPhone.trim() || customerPhone.replace(/\D/g, '').length < 10) {
-      toast.error('Lütfen geçerli bir telefon numarası girin (örn: 0532 555 10 14)');
+      toast.error('Lütfen geçerli bir telefon numarası girin (örn: 0544 622 59 31)');
       return;
     }
 
@@ -1245,14 +1262,14 @@ export default function PublicVehicleFinder() {
         ...leadPayload,
         timestamp: new Date().toLocaleTimeString('tr-TR')
       });
-      toast.success('🛠️ VIP TEST: Can Murat Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
+      toast.success('🛠️ VIP TEST: Murat Onay Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
       return;
     }
 
     try {
       await discoveryApi.recordIntentSignal(leadPayload);
       setSubmitted(true);
-      toast.success('Talebiniz alındı! Satış Temsilcimiz Can Murat (Sales Priest) sizinle iletişime geçecektir.');
+      toast.success('Talebiniz alındı! Satış Sorumlumuz Murat Onay en kısa sürede sizinle iletişime geçecektir.');
     } catch (err) {
       console.error(err);
       toast.error('Kayıt alınırken bir sorun oluştu, lütfen doğrudan WhatsApp üzerinden iletişime geçin.');
@@ -1261,12 +1278,12 @@ export default function PublicVehicleFinder() {
     }
   };
 
-  // Doğrudan WhatsApp Aç (Can Murat)
+  // Doğrudan WhatsApp Aç (Murat Onay - Satış Sorumlusu)
   const handleDirectWhatsApp = () => {
-    const cleanPhone = '905325551014';
+    const cleanPhone = SALES_REP.phoneWhatsapp;
     const clientGreeting = (customerCompany || customerName)
-      ? `Merhaba Can Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
-      : `Merhaba Can Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
+      ? `Merhaba Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
+      : `Merhaba Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
 
     const campaignText = activeCampaign
       ? `💳 *Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
@@ -1282,6 +1299,43 @@ export default function PublicVehicleFinder() {
       `Bu aracın hazır şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  // Murat Onay Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
+  const handleDownloadVCard = () => {
+    const vcard = 
+`BEGIN:VCARD
+VERSION:3.0
+N:Onay;Murat;;;
+FN:Murat Onay
+ORG:IVECO ERC Samsun Otomotiv
+TITLE:Satış Sorumlusu
+TEL;TYPE=CELL,VOICE;VALUE=uri:tel:+905446225931
+EMAIL;TYPE=WORK,INTERNET:murat.onay@ercsamsunotomotiv.com
+URL:https://erc-iveco.com/ozel-teklif
+NOTE:IVECO ERC Samsun Otomotiv Ticari Araçlar Satış Sorumlusu
+END:VCARD`;
+    const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Murat_Onay_IVECO_ERC.vcf');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('📇 Murat Onay dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
+  };
+
+  // Doğrudan E-Posta Gönderme
+  const handleDirectEmail = () => {
+    const subject = `IVECO Araç & Finansman Teklifi Talebi — ${customerCompany || customerName || 'Ticari Müşteri'}`;
+    const body = `Merhaba Murat Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
+      `Seçilen Model: ${matched.modelTitle}\n` +
+      `Yük İhtiyacı: ${payloadKg} kg (${matched.kantarTitle})\n` +
+      `Finansman: ${currentBankMeta.name} — ${activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL (${activeCampaign.term} Ay)` : 'Resmi Kredi'}\n\n` +
+      `Hazır şasi stok teslim tarihi ve resmi proforma teklifi talep ediyorum.\n\n` +
+      `Firma: ${customerCompany || '-'}\nYetkili: ${customerName || '-'}\nTelefon: ${customerPhone || '-'}`;
+    window.location.href = `mailto:${SALES_REP.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   // Sayfayı Paylaş / Linki Kopyala
@@ -1309,7 +1363,7 @@ export default function PublicVehicleFinder() {
     }
   };
 
-  // VIP Test Paneli Fonksiyonları (Can Murat - Sales Priest)
+  // VIP Test Paneli Fonksiyonları (Murat Onay - Satış Sorumlusu)
   const handleApplyPreset = (type) => {
     if (type === 'panelvan_12') {
       handleSelectVehicle('panelvan_12');
@@ -1349,10 +1403,10 @@ export default function PublicVehicleFinder() {
   const getGeneratedVipLink = (isTest = false) => {
     const origin = window.location.origin;
     const cleanCompany = (testGenCompany || 'VIP Müşteri').trim();
-    const cleanPhone = (testGenPhone || '05325551014').trim();
+    const cleanPhone = (testGenPhone || SALES_REP.phoneDisplay).trim();
     const testQuery = isTest ? '&test=true' : '';
     const modelQuery = selectedModelKey ? `&model=${selectedModelKey}` : '';
-    return `${origin}/ozel-teklif?company=${encodeURIComponent(cleanCompany)}&tel=${encodeURIComponent(cleanPhone)}&ref=canmurat_vip${modelQuery}${testQuery}`;
+    return `${origin}/ozel-teklif?company=${encodeURIComponent(cleanCompany)}&tel=${encodeURIComponent(cleanPhone)}&ref=muratonay${modelQuery}${testQuery}`;
   };
 
   const handleCopyGeneratedVipLink = () => {
@@ -1368,7 +1422,7 @@ export default function PublicVehicleFinder() {
   const handleCopyVipWhatsAppTemplate = () => {
     const link = getGeneratedVipLink(false);
     const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
-    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat | Sales Priest\nIVECO ERC Otomotiv Samsun\n0532 555 10 14`;
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nMurat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
@@ -1392,11 +1446,21 @@ export default function PublicVehicleFinder() {
     if (cleanCompany) params.set('company', cleanCompany);
     if (cleanPhone) params.set('tel', cleanPhone);
     if (modelKey) params.set('model', modelKey);
-    params.set('ref', 'canmurat_vip');
+    params.set('ref', 'muratonay');
     return `${origin}/ozel-teklif?${params.toString()}`;
   }, [sendCompany, sendPhone, selectedModelKey, matched.modelKey]);
 
-  // Prestijli WhatsApp Mesaj Formatlayıcı (3 Farklı Profesyonel Şablon)
+  // Telefon Numarası Otomatik Biçimlendirici (Kullanım Kolaylığı)
+  const formatPhoneInput = (val) => {
+    if (!val) return '';
+    const digits = val.replace(/\D/g, '');
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 9)} ${digits.slice(9, 11)}`;
+  };
+
+  // Prestijli WhatsApp & E-Posta Mesaj Formatlayıcı (3 Farklı Profesyonel Şablon)
   const getFormattedMessage = (templateKey = sendTemplate) => {
     const targetCompany = (sendCompany || sendContactName || 'Değerli İş Ortağımız').trim();
     const targetModel = matched.fullTitle || matched.title;
@@ -1415,7 +1479,8 @@ export default function PublicVehicleFinder() {
 • Net Taşıma: ~${targetPayload} Ton
 • Kantar Güvencesi: ${targetKantar}
 • Kredi: 12-48 Ay Resmi Banka Taksit Seçenekleri
-• İletişim: Can Murat (Sales Priest) | 0532 555 10 14`
+• İletişim: Murat Onay (Satış Sorumlusu) | 0544 622 59 31
+• E-Posta: murat.onay@ercsamsunotomotiv.com`
       );
     }
 
@@ -1435,9 +1500,10 @@ Detaylı teknik föyü ve banka ödeme planını buradan anında görüntüleyeb
 🔗 ${link}
 
 Saygılarımla,
-*Can Murat | Sales Priest*
-IVECO ERC Otomotiv Samsun
-📞 0532 555 10 14`
+*Murat Onay | Satış Sorumlusu*
+IVECO ERC Samsun Otomotiv
+📞 0544 622 59 31
+✉️ murat.onay@ercsamsunotomotiv.com`
       );
     }
 
@@ -1445,7 +1511,7 @@ IVECO ERC Otomotiv Samsun
     return (
 `🌟 *SAYIN ${targetCompany.toUpperCase()} YETKİLİSİ,*
 
-IVECO ERC Otomotiv olarak, firmanızın taşımacılık operasyonuna özel hazırladığımız dijital şasi konfigürasyonunu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) bilgilerinize sunarım.
+IVECO ERC Samsun Otomotiv olarak, firmanızın taşımacılık operasyonuna özel hazırladığımız dijital şasi konfigürasyonunu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) bilgilerinize sunarım.
 
 🚛 *Önerilen Model:* ${targetModel}
 ⚖️ *Kantar Sınırı:* ${targetKantar}
@@ -1459,9 +1525,10 @@ ${link}
 Seçtiğiniz şasinin stok ve fabrika teslim tarihleri için bu mesaja yanıt vermeniz yeterlidir.
 
 Saygılarımla,
-*Can Murat | Sales Priest*
-IVECO ERC Otomotiv Samsun
-📞 0532 555 10 14`
+*Murat Onay | Satış Sorumlusu*
+IVECO ERC Samsun Otomotiv
+📞 0544 622 59 31
+✉️ murat.onay@ercsamsunotomotiv.com`
     );
   };
 
@@ -1479,11 +1546,23 @@ IVECO ERC Otomotiv Samsun
     toast.success('WhatsApp sohbeti açıldı! 📲');
   };
 
+  // Müşteriye Hazır E-Posta Taslağı Aç (Outlook / Webmail)
+  const handleSendViaEmail = () => {
+    const cleanMail = (sendEmail || '').trim();
+    const subject = `IVECO ERC Samsun Otomotiv — ${sendCompany || 'Firmanıza Özel'} Şasi ve Finansman Teklifi`;
+    const body = getFormattedMessage();
+    const mailtoUrl = cleanMail
+      ? `mailto:${cleanMail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      : `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    toast.success('E-posta taslağı hazırlandı! ✉️');
+  };
+
   const handleCopyMessage = () => {
     const text = getFormattedMessage();
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
-      toast.success('📋 WhatsApp mesaj metni kopyalandı!');
+      toast.success('📋 Mesaj metni kopyalandı!');
     } else {
       prompt('Mesaj Metni:', text);
     }
@@ -1511,7 +1590,7 @@ IVECO ERC Otomotiv Samsun
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
         
-        {/* Can Murat VIP Test & Canlı Simülasyon Dock'u */}
+        {/* Murat Onay VIP Test & Canlı Simülasyon Dock'u */}
         {showTestPanel && (
           <div style={{
             background: 'linear-gradient(135deg, rgba(24, 24, 27, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
@@ -1527,7 +1606,7 @@ IVECO ERC Otomotiv Samsun
                 <span style={{ fontSize: '1.3rem' }}>🛠️</span>
                 <div>
                   <div style={{ fontSize: '0.86rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '0.5px' }}>
-                    CAN MURAT — VIP TEST & SİMÜLASYON DOCK'U
+                    MURAT ONAY — VIP TEST & SİMÜLASYON DOCK'U
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                     Şasi kantar geçişlerini, yüksek kredi tutarlarını ve prestijli müşteri linklerini buradan test edin.
@@ -1626,7 +1705,7 @@ IVECO ERC Otomotiv Samsun
                     type="text"
                     value={testGenPhone}
                     onChange={(e) => setTestGenPhone(e.target.value)}
-                    placeholder="0532 555 10 14"
+                    placeholder="0544 622 59 31"
                     style={{
                       width: '100%',
                       background: 'rgba(15, 23, 42, 0.8)',
@@ -1731,7 +1810,7 @@ IVECO ERC Otomotiv Samsun
             textAlign: 'left'
           }}>
             <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 700 }}>
-              🛠️ Can Murat Test Modu Aktif (Sales Priest)
+              🛠️ Murat Onay Test Modu Aktif (Satış Sorumlusu)
             </div>
             <button
               type="button"
@@ -1790,7 +1869,7 @@ IVECO ERC Otomotiv Samsun
                   Sayın {customerCompany || customerName || 'Değerli Müşterimiz'}, Hoş Geldiniz!
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
-                  Satış Sorumlunuz <strong style={{ color: '#e2e8f0' }}>Can Murat (Sales Priest)</strong> operasyonunuza özel teknik şasi ve kantar simülasyonunu hazırladı.
+                  Satış Sorumlunuz <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> operasyonunuza özel teknik şasi ve kantar simülasyonunu hazırladı.
                 </div>
               </div>
             </div>
@@ -1818,8 +1897,8 @@ IVECO ERC Otomotiv Samsun
         )}
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 75, 147, 0.25)', border: '1px solid rgba(43, 125, 233, 0.4)', padding: '6px 14px', borderRadius: '30px', marginBottom: '10px' }}>
-          <span style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '1px' }}>IVECO ERC OTOMOTİV</span>
-          <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>• Samsun Yetkili Bayi</span>
+          <span style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '1px' }}>IVECO ERC SAMSUN OTOMOTİV</span>
+          <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>• Yetkili Satıcı & Servis</span>
         </div>
 
         <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.3, margin: '0 0 6px' }}>
@@ -1829,27 +1908,51 @@ IVECO ERC Otomotiv Samsun
           Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>resmi banka kredi kampanyalarını (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.)</strong> anında hesaplasın.
         </p>
 
-        {/* Can Murat Temsilci Rozeti (Sales Priest) & Paylaş Butonu */}
+        {/* Murat Onay Temsilci Rozeti (Satış Sorumlusu) & Hızlı İletişim Butonları */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '10px',
-          background: 'rgba(15, 23, 42, 0.7)',
-          border: '1px solid rgba(99, 179, 237, 0.25)',
+          gap: '8px',
+          background: 'rgba(15, 23, 42, 0.85)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
           borderRadius: '25px',
           padding: '6px 16px',
           marginTop: '12px',
           flexWrap: 'wrap',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: '0 4px 18px rgba(0, 75, 147, 0.25)'
         }}>
-          <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#004B93', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px' }}>
-            CM
+          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>
+            {SALES_REP.initials}
           </div>
-          <div style={{ textAlign: 'left', fontSize: '0.78rem' }}>
-            <span style={{ color: '#f8fafc', fontWeight: 700, display: 'block' }}>Can Murat</span>
-            <span style={{ color: '#38bdf8', fontWeight: 600 }}>Sales Priest</span>
+          <div style={{ textAlign: 'left', fontSize: '0.76rem', marginRight: '4px' }}>
+            <span style={{ color: '#f8fafc', fontWeight: 800, display: 'block' }}>{SALES_REP.name}</span>
+            <span style={{ color: '#38bdf8', fontWeight: 600 }}>{SALES_REP.title} • {SALES_REP.phoneDisplay}</span>
           </div>
+
+          {/* 📞 Hemen Ara */}
+          <a
+            href={`tel:${SALES_REP.phoneClean}`}
+            style={{
+              background: '#0284c7',
+              color: '#fff',
+              borderRadius: '20px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+            title={`${SALES_REP.name}'ı Telefonla Ara`}
+          >
+            <FiPhone size={12} /> Ara
+          </a>
+
+          {/* 💬 WhatsApp */}
           <button
+            type="button"
             onClick={handleDirectWhatsApp}
             style={{
               background: '#22c55e',
@@ -1859,15 +1962,61 @@ IVECO ERC Otomotiv Samsun
               padding: '4px 10px',
               fontSize: '0.72rem',
               fontWeight: 700,
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
-              cursor: 'pointer',
-              marginLeft: '6px'
+              cursor: 'pointer'
             }}
+            title="WhatsApp Üzerinden Görüş"
           >
             <FiMessageSquare size={12} /> WhatsApp
           </button>
+
+          {/* ✉️ E-Posta */}
+          <button
+            type="button"
+            onClick={handleDirectEmail}
+            style={{
+              background: 'rgba(56, 189, 248, 0.15)',
+              color: '#38bdf8',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '20px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer'
+            }}
+            title="Resmi Proforma Talebi İçin E-Posta Gönder"
+          >
+            <FiMail size={12} /> E-Posta
+          </button>
+
+          {/* 📇 Rehbere Kaydet (vCard) */}
+          <button
+            type="button"
+            onClick={handleDownloadVCard}
+            style={{
+              background: 'rgba(245, 158, 11, 0.15)',
+              color: '#fbbf24',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: '20px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              cursor: 'pointer'
+            }}
+            title="Murat Onay İletişim Kartını Telefona İndir & Rehbere Kaydet"
+          >
+            <FiDownload size={12} /> Rehbere Ekle
+          </button>
+
+          {/* 📤 Müşteriye Gönder */}
           <button
             type="button"
             onClick={() => setShowSendModal(true)}
@@ -1879,7 +2028,7 @@ IVECO ERC Otomotiv Samsun
               padding: '4px 12px',
               fontSize: '0.74rem',
               fontWeight: 800,
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '5px',
               cursor: 'pointer',
@@ -1889,17 +2038,18 @@ IVECO ERC Otomotiv Samsun
           >
             <FiShare2 size={13} /> 📤 Müşteriye Gönder
           </button>
+
           <button
             onClick={handleShareLink}
             style={{
-              background: 'rgba(56, 189, 248, 0.15)',
-              color: '#38bdf8',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#94a3b8',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
               borderRadius: '20px',
               padding: '4px 10px',
               fontSize: '0.72rem',
               fontWeight: 700,
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               cursor: 'pointer'
@@ -1924,7 +2074,7 @@ IVECO ERC Otomotiv Samsun
               gap: '4px',
               cursor: 'pointer'
             }}
-            title="Can Murat VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
+            title="Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
           >
             <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
           </button>
@@ -3029,7 +3179,7 @@ IVECO ERC Otomotiv Samsun
               )}
             </div>
 
-            {/* Can Murat - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
+            {/* Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
               border: '1px solid #38bdf8',
@@ -3077,10 +3227,10 @@ IVECO ERC Otomotiv Samsun
             {!submitted ? (
               <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
-                  📋 Can Murat (Sales Priest) — Resmi Teklif & Şasi Rezervasyonu
+                  📋 Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
                 </h4>
                 <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
-                  Bilgilerinizi bırakın; Can Murat aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
+                  Bilgilerinizi bırakın; Murat Onay aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
@@ -3140,7 +3290,7 @@ IVECO ERC Otomotiv Samsun
                       placeholder="Cep Telefonu (05XX XXX XX XX) *"
                       required
                       value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      onChange={(e) => setCustomerPhone(formatPhoneInput(e.target.value))}
                       style={{
                         width: '100%',
                         background: 'rgba(0,0,0,0.4)',
@@ -3194,7 +3344,7 @@ IVECO ERC Otomotiv Samsun
                     boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
                   }}
                 >
-                  {submitting ? 'İletiliyor...' : '📞 Can Murat Beni Arasın & Teklif Göndersin'}
+                  {submitting ? 'İletiliyor...' : '📞 Murat Onay Beni Arasın & Teklif Göndersin'}
                 </button>
               </form>
             ) : (
@@ -3208,7 +3358,7 @@ IVECO ERC Otomotiv Samsun
               }}>
                 <FiCheckCircle size={36} style={{ color: '#10b981', marginBottom: '8px' }} />
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                  Talebiniz Can Murat'a (Sales Priest) Ulaştı!
+                  Talebiniz Murat Onay'a (Satış Sorumlusu) Ulaştı!
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 10px' }}>
                   Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
@@ -3237,7 +3387,7 @@ IVECO ERC Otomotiv Samsun
                 marginBottom: '12px'
               }}
             >
-              <FiMessageSquare size={18} /> Can Murat (Sales Priest) ile WhatsApp'tan Hemen Görüş
+              <FiMessageSquare size={18} /> Murat Onay ile WhatsApp'tan Hemen Görüş
             </button>
 
             <button
@@ -3260,7 +3410,7 @@ IVECO ERC Otomotiv Samsun
         )}
       </div>
 
-      {/* ── CAN MURAT VIP TEST SİMÜLASYON RAPOR MODALI ── */}
+      {/* ── MURAT ONAY VIP TEST SİMÜLASYON RAPOR MODALI ── */}
       {testSimulationResult && (
         <div style={{
           position: 'fixed',
@@ -3292,7 +3442,7 @@ IVECO ERC Otomotiv Samsun
                     CRM PIPELINE SİMÜLASYONU BAŞARILI
                   </h3>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                    Sales Priest: Can Murat Test Önizleme Raporu ({testSimulationResult.timestamp})
+                    Satış Sorumlusu: Murat Onay Test Önizleme Raporu ({testSimulationResult.timestamp})
                   </div>
                 </div>
               </div>
@@ -3425,7 +3575,7 @@ IVECO ERC Otomotiv Samsun
                     </span>
                   </h3>
                   <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
-                    Sales Priest: <strong style={{ color: '#e2e8f0' }}>Can Murat</strong> • IVECO ERC Otomotiv Samsun (0532 555 10 14)
+                    Satış Sorumlusu: <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> • {SALES_REP.dealership} (📞 {SALES_REP.phoneDisplay} • ✉️ {SALES_REP.email})
                   </div>
                 </div>
               </div>
@@ -3489,8 +3639,8 @@ IVECO ERC Otomotiv Samsun
                       <input
                         type="text"
                         value={sendPhone}
-                        onChange={(e) => setSendPhone(e.target.value)}
-                        placeholder="0532 555 10 14"
+                        onChange={(e) => setSendPhone(formatPhoneInput(e.target.value))}
+                        placeholder="0544 622 59 31"
                         style={{
                           width: '100%',
                           background: 'rgba(15, 23, 42, 0.9)',
@@ -3522,6 +3672,27 @@ IVECO ERC Otomotiv Samsun
                         }}
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                      Müşteri E-Posta Adresi (Opsiyonel — Outlook / Webmail İçin)
+                    </label>
+                    <input
+                      type="email"
+                      value={sendEmail}
+                      onChange={(e) => setSendEmail(e.target.value)}
+                      placeholder="Örn: info@karadeniznakliyat.com"
+                      style={{
+                        width: '100%',
+                        background: 'rgba(15, 23, 42, 0.9)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        color: '#f8fafc',
+                        fontSize: '0.82rem'
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -3606,6 +3777,52 @@ IVECO ERC Otomotiv Samsun
                   >
                     <FiMessageSquare size={16} /> 📲 WhatsApp'tan Hemen Gönder
                   </button>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={handleSendViaEmail}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                      title="Müşteriye gitmek üzere Outlook veya varsayılan e-posta istemcisini açar"
+                    >
+                      <FiMail size={13} /> ✉️ E-Posta Aç
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadVCard}
+                      style={{
+                        background: 'rgba(245, 158, 11, 0.15)',
+                        color: '#fbbf24',
+                        border: '1px solid rgba(245, 158, 11, 0.35)',
+                        borderRadius: '8px',
+                        padding: '9px 12px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                      title="Murat Onay iletişim kartvizitini (.vcf) indirir"
+                    >
+                      <FiDownload size={13} /> 📇 vCard İndir
+                    </button>
+                  </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <button
@@ -3814,9 +4031,141 @@ IVECO ERC Otomotiv Samsun
         </div>
       )}
 
+      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (MURAT ONAY) ── */}
+      <div style={{
+        position: 'fixed',
+        bottom: '18px',
+        right: '18px',
+        zIndex: 9000,
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(15, 23, 42, 0.95)',
+        border: '1.5px solid #38bdf8',
+        borderRadius: '35px',
+        padding: '6px 12px 6px 8px',
+        boxShadow: '0 10px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3)',
+        backdropFilter: 'blur(12px)',
+        gap: '8px',
+        maxWidth: 'calc(100vw - 36px)',
+        flexWrap: 'wrap'
+      }}>
+        {/* Avatar & İsim */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 800,
+            fontSize: '12px',
+            boxShadow: '0 0 10px rgba(56, 189, 248, 0.5)'
+          }}>
+            {SALES_REP.initials}
+          </div>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.1 }}>
+              {SALES_REP.name}
+            </div>
+            <div style={{ fontSize: '0.64rem', color: '#38bdf8', fontWeight: 600 }}>
+              {SALES_REP.title} • {SALES_REP.phoneDisplay}
+            </div>
+          </div>
+        </div>
+
+        {/* 📞 Ara */}
+        <a
+          href={`tel:${SALES_REP.phoneClean}`}
+          style={{
+            background: '#0284c7',
+            color: '#fff',
+            borderRadius: '20px',
+            padding: '5px 10px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="Murat Onay'ı Ara"
+        >
+          <FiPhone size={12} /> Ara
+        </a>
+
+        {/* 💬 WhatsApp */}
+        <button
+          type="button"
+          onClick={handleDirectWhatsApp}
+          style={{
+            background: '#22c55e',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '20px',
+            padding: '5px 10px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="WhatsApp'tan Yaz"
+        >
+          <FiMessageSquare size={12} /> WhatsApp
+        </button>
+
+        {/* ✉️ Mail */}
+        <button
+          type="button"
+          onClick={handleDirectEmail}
+          style={{
+            background: 'rgba(56, 189, 248, 0.15)',
+            color: '#38bdf8',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '20px',
+            padding: '5px 10px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="E-Posta Gönder"
+        >
+          <FiMail size={12} /> Mail
+        </button>
+
+        {/* 📇 Rehbere Kaydet */}
+        <button
+          type="button"
+          onClick={handleDownloadVCard}
+          style={{
+            background: 'rgba(245, 158, 11, 0.15)',
+            color: '#fbbf24',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            borderRadius: '20px',
+            padding: '5px 10px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          title="Rehbere Kaydet (vCard)"
+        >
+          <FiDownload size={12} /> Rehbere Ekle
+        </button>
+      </div>
+
       {/* ── FOOTER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '24px auto 0', textAlign: 'center', color: '#64748b', fontSize: '0.74rem' }}>
-        IVECO ERC Otomotiv Ticari Araçlar Yetkili Bayi • Samsun<br />
+        IVECO ERC Samsun Otomotiv Ticari Araçlar Yetkili Satıcısı & Servisi • Samsun<br />
         Tüm boş ağırlıklar şoför ve yakıt dahil resmi teknik föy verileridir.
       </div>
     </div>

@@ -181,7 +181,7 @@ def get_campaign_recipients(
             "status": m.status,
             "read_time": m.created_at.strftime("%H:%M") if m.created_at else None,
             "created_at": m.created_at.isoformat() if m.created_at else None,
-            "sender_name": m.sender_name or "Can Murat",
+            "sender_name": m.sender_name or "Murat Onay",
             "content": m.content,
             "media_url": m.media_url,
             "pipeline_stage": c.pipeline_stage,

@@ -52,7 +52,7 @@ export default function WhatsAppActionModal({
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Can Murat';
+    : 'Murat Onay';
 
   // Adım kontrolü: 'compose' (WhatsApp Mesajı & Hazırlık) | 'post_action' (Bilgi Kartı & Pipeline Onayı)
   const [step, setStep] = useState('compose');
@@ -239,10 +239,10 @@ export default function WhatsAppActionModal({
       const cleanPhone = (customerForm.phone || customer.phone || '').replace(/\D/g, '');
       const comp = customerForm.company_name || customer.company_name || '';
       const cid = customer?.id || '';
-      const link = `${origin}/ozel-teklif?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=canmurat_vip`;
+      const link = `${origin}/ozel-teklif?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=muratonay`;
       const greeting = comp ? `🌟 Sayın ${comp} Yetkilisi,\n\n` : '🌟 Değerli Müşterimiz,\n\n';
       setMessage(
-        `${greeting}Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
+        `${greeting}Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
         `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
         `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
         `👉 ${link}\n\n` +

@@ -36,7 +36,7 @@ export default function CustomerDetail() {
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Can Murat';
+    : 'Murat Onay';
   const [customer, setCustomer] = useState(null);
 
   const [interactions, setInteractions] = useState([]);
@@ -132,7 +132,7 @@ export default function CustomerDetail() {
     if (!customer) return;
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
     const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
-    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_vip`;
+    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
     navigator.clipboard.writeText(link).then(() => {
       toast.success(`${customer.company_name} için VIP Özel Teklif bağlantısı kopyalandı! 📋`);
     }).catch(() => toast.error('Link kopyalanamadı'));
@@ -145,12 +145,12 @@ export default function CustomerDetail() {
     }
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
     const cleanPhone = customer.phone.replace(/\D/g, '');
-    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=canmurat_vip`;
+    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
     const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;
 
     const msg = (
       `🌟 Sayın ${contactName},\n\n` +
-      `Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName} (Sales Priest).\n\n` +
+      `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
       `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
       `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
       `👉 ${link}\n\n` +
@@ -814,7 +814,7 @@ export default function CustomerDetail() {
                     {customer.pipeline_note}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                    Can Murat tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
+                    Murat Onay tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
                   </div>
                 </div>
               </div>

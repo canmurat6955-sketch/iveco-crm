@@ -155,7 +155,7 @@ export default function IntentRadar() {
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const model = signal.target_model || 'IVECO Daily Şasi';
-    const message = `Merhaba, IVECO ERC Otomotiv Satış Sorumlusu Can Murat ben. ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
+    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay ben (0544 622 59 31). ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -164,7 +164,7 @@ export default function IntentRadar() {
   const handleGenerateLink = () => {
     const slug = generatorModel.toLowerCase().replace(/[^a-z0-9]/g, '-');
     const compSlug = generatorCompany.trim() ? encodeURIComponent(generatorCompany.trim().replace(/\s+/g, '_')) : 'kampanya_ziyaretci';
-    const link = `https://iveco-crm.vercel.app/campaigns/${slug}?utm_source=whatsapp&utm_medium=smart_link&camp=${generatorCampaign}&ref=canmurat&cust=${compSlug}`;
+    const link = `https://iveco-crm.vercel.app/campaigns/${slug}?utm_source=whatsapp&utm_medium=smart_link&camp=${generatorCampaign}&ref=muratonay&cust=${compSlug}`;
     setGeneratedLink(link);
     setCopiedLink(false);
   };
@@ -1209,15 +1209,15 @@ export default function IntentRadar() {
 Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.
 
 👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
-👉 https://iveco-crm.vercel.app/ozel-teklif?ref=canmurat_vip
+👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay
 
-IVECO ERC Otomotiv • Can Murat (Sales Priest)`}
+IVECO ERC Samsun Otomotiv • Murat Onay (Satış Sorumlusu) | 0544 622 59 31`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=canmurat_vip\n\nIVECO ERC Otomotiv • Can Murat (Sales Priest)`;
+                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay\n\nIVECO ERC Samsun Otomotiv • Murat Onay (Satış Sorumlusu) | 0544 622 59 31`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

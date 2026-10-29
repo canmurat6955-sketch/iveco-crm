@@ -151,7 +151,7 @@ export default function FleetRenewalRadarWidget({ onOpenWhatsApp = null }) {
                     </span>
                     <a
                       href={`https://wa.me/90${(item.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                        `Ben IVECO ERC Otomotiv Satış Sorumlusu Can Murat. Sizin için hazırladığımız avantajlı IVECO filo yenileme ve takas kampanyamızı paylaşmak istedim. Düşünürseniz detayları görüşmekten memnuniyet duyarım.`
+                        `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay. Sizin için hazırladığımız avantajlı IVECO filo yenileme ve takas kampanyamızı paylaşmak istedim. Düşünürseniz detayları görüşmekten memnuniyet duyarım.`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"

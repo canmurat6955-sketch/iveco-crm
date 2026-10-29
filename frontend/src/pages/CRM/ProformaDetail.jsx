@@ -84,7 +84,7 @@ export default function ProformaDetail() {
       const origin = window.location.origin;
       const trackRes = await crmApi.getProformaTrackingLink(id);
       const trackingUrl = `${origin}/p/${trackRes.data.token}`;
-      const wpMessage = `Ben IVECO ERC Otomotiv Satış Sorumlusu Can Murat. Sizin için hazırladığımız ${proforma.vehicle_model} proforma teklifinizi incelemek için bağlantı:\n${trackingUrl}\n\nİnceledikten sonra detayları ve takas seçeneklerini görüşmekten memnuniyet duyarım.`;
+      const wpMessage = `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay (0544 622 59 31). Sizin için hazırladığımız ${proforma.vehicle_model} proforma teklifinizi incelemek için bağlantı:\n${trackingUrl}\n\nİnceledikten sonra detayları ve takas seçeneklerini görüşmekten memnuniyet duyarım.`;
       const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
       window.open(wpUrl, '_blank');
     } catch (err) {
@@ -233,11 +233,11 @@ export default function ProformaDetail() {
             <div style={{ borderTop: '1px solid #000', marginTop: '8px', paddingTop: '6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <div style={{ display: 'flex' }}>
                 <span style={{ width: '130px', fontWeight: 700 }}>Satış Danışmanı:</span>
-                <span style={{ flex: 1 }}>Can Murat Onay</span>
+                <span style={{ flex: 1 }}>Murat Onay</span>
               </div>
               <div style={{ display: 'flex' }}>
                 <span style={{ width: '130px', fontWeight: 700 }}>Gsm:</span>
-                <span style={{ flex: 1 }}>0 536 340 75 35</span>
+                <span style={{ flex: 1 }}>0544 622 59 31</span>
               </div>
               <div style={{ display: 'flex' }}>
                 <span style={{ width: '130px', fontWeight: 700 }}>E-Mail:</span>

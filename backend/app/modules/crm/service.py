@@ -1222,7 +1222,7 @@ class CRMService:
     def get_public_proforma_view(self, token: str, ip_address: Optional[str] = None, user_agent: Optional[str] = None) -> dict:
         """
         Müşteri teklif bağlantısını açtığında okundu kaydını tutar,
-        Can Murat'a anlık bildirim oluşturur ve teklif detayını döndürür.
+        Murat Onay'a anlık bildirim oluşturur ve teklif detayını döndürür.
         """
         tracking = self.db.query(ProposalTracking).filter(
             (ProposalTracking.token == token) | (ProposalTracking.short_code == token)
@@ -1282,9 +1282,9 @@ class CRMService:
             "delivery_place": proforma.delivery_place,
             "company_name": customer.company_name if customer else "Sayın Müşterimiz",
             "city": customer.city if customer else "",
-            "sales_rep_name": creator.full_name if creator else "Can Murat",
-            "sales_rep_email": creator.email if creator else "can.murat@ivecoerc.com",
-            "sales_rep_phone": "0530 000 00 00",
+            "sales_rep_name": creator.full_name if creator else "Murat Onay",
+            "sales_rep_email": creator.email if creator else "murat.onay@ercsamsunotomotiv.com",
+            "sales_rep_phone": "0544 622 59 31",
             "dealer_title": "ERC SAMSUN OTOMOTİV SAN. VE TİC. A.Ş.",
             "dealer_address": "Kirazlık Mah. 19 Mayıs San. Sit. No:1 Tekkeköy / SAMSUN",
             "view_count": tracking.view_count,

@@ -136,7 +136,7 @@ Taşıma ihtiyacınız (${palletCount} Palet / ${recommendation.maxPayload}) do�
 Samsun, Trabzon ve Çorum'daki anlaşmalı yetkili karoser imalatçılarımız ile anahtar teslim kasa montajı ve garanti koordinasyonunu ERC Otomotiv olarak sağlıyoruz.
 
 Aracın şasi ve hazır üst yapılı teslimat sürelerini görüşmek üzere memnuniyetle yardımcı olmak isterim.
-IVECO ERC Otomotiv - Can Murat`;
+IVECO ERC Samsun Otomotiv - Murat Onay (0544 622 59 31)`;
   }, [customerName, palletCount, recommendation]);
 
   const handleCopy = () => {
