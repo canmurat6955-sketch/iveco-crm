@@ -27,6 +27,7 @@ import {
 
 // Sektör Seçenekleri
 const SECTORS = [
+  { id: 'hafriyat_santiye', icon: '🚜', label: 'Hafriyat, Damper & Şantiye', desc: 'T-Way 10 & 12 teker, kaya, maden, agrega ve hazır beton' },
   { id: 'gida_frigo', icon: '🥩', label: 'Soğuk Zincir & Gıda', desc: 'Et, süt, tavuk, dondurma, peynir ve medikal' },
   { id: 'kargo_dagitim', icon: '📦', label: 'Kargo & Dağıtım', desc: 'Şehir içi koli, e-ticaret, mobilya, beyaz eşya' },
   { id: 'insaat_malzeme', icon: '🏗️', label: 'İnşaat & Nalbur', desc: 'Demir, çimento, kereste, hırdavat, agrega' },
@@ -44,18 +45,20 @@ const QUICK_TONNAGES = [
   { id: '8_0_ton', label: '8.0 Ton', payloadKg: 8000, badge: 'Eurocargo 120E', desc: '12.950 kg kantar geçeri, 6.50 metreye kadar kasa' },
   { id: '10_5_ton', label: '10.5 Ton', payloadKg: 10500, badge: 'Eurocargo 150E', desc: '16.060 kg kantar geçeri, 7.50 metreye kadar dev kasa' },
   { id: '11_0_ton', label: '11.0 Ton', payloadKg: 11000, badge: 'Eurocargo 160', desc: '17.080 kg kantar geçeri, havalı süspansiyon, 320 BG' },
-  { id: '16_0_ton', label: '16.0 Ton (10 Teker)', payloadKg: 16000, badge: 'Eurocargo 10 Teker', desc: '26.000 kg kantar geçeri, 3 dingil 10 teker, 16 ton net yük, 8.40m dev kasa' },
-  { id: '25_0_ton', label: '25 Ton+', payloadKg: 25000, badge: 'IVECO S-Way', desc: '40.000+ kg çekici katar ağırlığı, 13.60 dorse, 530 HP' },
+  { id: '16_0_ton', label: '16.0 Ton (10 Teker Yol)', payloadKg: 16000, badge: 'Eurocargo 10 Teker', desc: '26.000 kg kantar geçeri, 3 dingil 10 teker, 16 ton net yük, 8.40m dev kasa' },
+  { id: '18_0_ton', label: '18.0 Ton (10T T-Way)', payloadKg: 18000, badge: 'T-Way 10 Teker 6x4', desc: '26.000 kg kantar / 41 Ton GVW, 460/540 BG Cursor 13, Hardox Damper' },
+  { id: '24_0_ton', label: '24.0 Ton (12T T-Way)', payloadKg: 24000, badge: 'T-Way 12 Teker 8x4', desc: '32.000 kg kantar / 50 Ton GVW, 4 aks çift çeker, 460/540 BG Cursor 13' },
+  { id: '25_0_ton', label: '25 Ton+ Çekici', payloadKg: 25000, badge: 'IVECO S-Way', desc: '40.000+ kg çekici katar ağırlığı, 13.60 dorse, 530 HP' },
 ];
 
 // Kasa Seçenekleri ve Dara Ağırlıkları
 const BODY_TYPES = [
   { id: 'panelvan', icon: '🚐', name: 'Fabrika Orijinal Sac Panelvan', tare: 0, desc: '12 m³, 16 m³ ve 18 m³ orijinal sac kargo gövde (Ek kasa maliyetsiz)' },
+  { id: 'damper', icon: '🚜', name: 'Damper Kasa (Hardox Hafriyat)', tare: 2500, desc: 'Kum, çakıl, hafriyat, kaya, agrega ve dökme malzeme' },
   { id: 'frigo', icon: '❄️', name: 'Frigorifik Soğutuculu Kasa', tare: 1100, desc: '-18°C dondurucu veya +4°C taze gıda taşımacılığı' },
   { id: 'kapali_kutu', icon: '📦', name: 'Kapalı Kutu / Kargo Kasası', tare: 650, desc: 'Mobilya, tekstil, koli ve kuru gıda taşımacılığı' },
   { id: 'acik_sac', icon: '🪵', name: 'Açık Sac / Ahşap İlave Kasa', tare: 500, desc: 'Demir, profil, inşaat malzemesi ve paletli yük' },
   { id: 'kayar_perde', icon: '🚛', name: 'Kayar Perde / Tente Kasa', tare: 750, desc: 'Hızlı yan yükleme, paletli kargo ve içecek sevkiyatı' },
-  { id: 'damper', icon: '🚜', name: 'Damper Kasa', tare: 1700, desc: 'Kum, çakıl, hafriyat ve dökme malzeme boşaltma' },
   { id: 'oto_kurtarma', icon: '🛞', name: 'Kayar Kasa Platform', tare: 1200, desc: 'Araç taşıma, vinç ve oto çekici üstyapısı' }
 ];
 
@@ -408,6 +411,132 @@ const VEHICLE_CATALOG = [
     bodyType: 'kayar_perde'
   },
 
+  // ── AĞIR ŞANTİYE & HAFRİYAT (T-WAY SERİSİ) ──
+  {
+    key: 'tway_10teker_540',
+    category: 'hafriyat',
+    categoryLabel: '🚜 10 Teker Hafriyat (T-Way)',
+    title: 'T-Way 10 Teker Hafriyat 540 BG (6x4)',
+    fullTitle: 'IVECO T-Way AD 380T 54 (6x4 - 10 Teker 540 BG Damper/Hafriyat)',
+    modelTitle: 'IVECO T-Way AD 380T 54 6x4 (10 Teker 540 BG Hafriyat Damperi)',
+    series: 'T-Way 10 Teker 540',
+    wheelbase: '3500 - 3800 mm (Ağır Hizmet 6x4)',
+    payloadKg: 15000,
+    volumeM3: 18,
+    badge: '6x4 Çift Çeker • 540 BG Cursor 13 • 10 Teker Hafriyat',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 26000,
+    unladenWeight: 11500,
+    kantarStatus: 'safe',
+    kantarTitle: '26.000 kg Karayolları Kantarı / 41.000 kg Şantiye GVW',
+    kantarDesc: 'Cursor 13 (540 BG / 2.500 Nm Tork), 16 ileri Hi-Tronix otomatik şanzıman (Rocking Mode), ağır hizmet poyra redüksiyonlu 6x4 çift çeker akslar, 16-18 m³ Hardox 450 hafriyat damperi.',
+    dims: {
+      length: '540 cm (Damper Kasa)',
+      width: '240 cm',
+      height: '150 cm',
+      volume: '18.0 m³',
+      pallets: 'Hardox 450 Damper'
+    },
+    pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
+    pdfName: 'Teknik Foy_T-Way_AD380T54_Rigid_6x4_Tipper.pdf',
+    priceRange: '135.000 € - 148.000 € + KDV',
+    defaultLoan: 3000000,
+    bodyType: 'damper'
+  },
+  {
+    key: 'tway_10teker_460',
+    category: 'hafriyat',
+    categoryLabel: '🚜 10 Teker Hafriyat (T-Way)',
+    title: 'T-Way 10 Teker Hafriyat 460 BG (6x4)',
+    fullTitle: 'IVECO T-Way AD 380T 46 (6x4 - 10 Teker 460 BG Damper/Hafriyat)',
+    modelTitle: 'IVECO T-Way AD 380T 46 6x4 (10 Teker 460 BG Hafriyat Damperi)',
+    series: 'T-Way 10 Teker 460',
+    wheelbase: '3500 - 3800 mm (Ağır Hizmet 6x4)',
+    payloadKg: 15000,
+    volumeM3: 18,
+    badge: '6x4 Çift Çeker • 460 BG Cursor 11/13 • 10 Teker Hafriyat',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 26000,
+    unladenWeight: 11200,
+    kantarStatus: 'safe',
+    kantarTitle: '26.000 kg Karayolları Kantarı / 41.000 kg Şantiye GVW',
+    kantarDesc: 'Cursor 11/13 (460 BG / 2.150 Nm Tork), 16 ileri Hi-Tronix, 6x4 çift çeker ağır hizmet poyra redüksiyonlu akslar, 16-18 m³ Hardox hafriyat damperi.',
+    dims: {
+      length: '540 cm (Damper Kasa)',
+      width: '240 cm',
+      height: '150 cm',
+      volume: '18.0 m³',
+      pallets: 'Hardox 450 Damper'
+    },
+    pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
+    pdfName: 'T-WAY AD 380T 46 6x4 HAFRİYAT TEKNİK FÖY.pdf',
+    priceRange: '128.000 € - 139.000 € + KDV',
+    defaultLoan: 3000000,
+    bodyType: 'damper'
+  },
+  {
+    key: 'tway_12teker_540',
+    category: 'hafriyat',
+    categoryLabel: '🚜 12 Teker Hafriyat (T-Way)',
+    title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+    fullTitle: 'IVECO T-Way AD 410T 54 (8x4 - 12 Teker 540 BG Ağır Hafriyat Damperi)',
+    modelTitle: 'IVECO T-Way AD 410T 54 8x4 (12 Teker 540 BG Ağır Hafriyat)',
+    series: 'T-Way 12 Teker 540',
+    wheelbase: '4350 - 4750 mm (10 mm Çelik Şasi)',
+    payloadKg: 18000,
+    volumeM3: 24,
+    badge: '8x4 Çift Çeker • 540 BG Cursor 13 • 12 Teker Ağır Hafriyat',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 32000,
+    unladenWeight: 14000,
+    kantarStatus: 'safe',
+    kantarTitle: '32.000 kg Karayolları Kantarı / 50.000 kg Şantiye GVW',
+    kantarDesc: 'Cursor 13 (540 BG / 2.500 Nm Tork), 16 ileri Hi-Tronix otomatik, 10 mm şasi et kalınlığı, ön çift yönlendirilebilir dümen aksı + arka çift çeker tandem akslar, 22-24 m³ Hardox 450/500 kaya ve hafriyat damperi.',
+    dims: {
+      length: '640 cm (Damper Kasa)',
+      width: '240 cm',
+      height: '160 cm',
+      volume: '22.0 - 24.0 m³',
+      pallets: 'Hardox Kaya Damperi'
+    },
+    pdfUrl: '/specs/t-way-ad410t54-tipper.pdf',
+    pdfName: 'Teknik Foy_T-Way_AD410T54_Rigid_8x4_Tipper.pdf',
+    priceRange: '152.000 € - 168.000 € + KDV',
+    defaultLoan: 3000000,
+    bodyType: 'damper'
+  },
+  {
+    key: 'tway_12teker_460',
+    category: 'hafriyat',
+    categoryLabel: '🚜 12 Teker Hafriyat (T-Way)',
+    title: 'T-Way 12 Teker Hafriyat 460 BG (8x4)',
+    fullTitle: 'IVECO T-Way AD 410T 46 (8x4 - 12 Teker 460 BG Hafriyat / Mikser)',
+    modelTitle: 'IVECO T-Way AD 410T 46 8x4 (12 Teker 460 BG Hafriyat)',
+    series: 'T-Way 12 Teker 460',
+    wheelbase: '4350 - 4750 mm (10 mm Şasi)',
+    payloadKg: 18000,
+    volumeM3: 24,
+    badge: '8x4 Çift Çeker • 460 BG Cursor 11/13 • 12 Teker Hafriyat',
+    license: 'C Sınıfı Kamyon',
+    kantarLimit: 32000,
+    unladenWeight: 13800,
+    kantarStatus: 'safe',
+    kantarTitle: '32.000 kg Karayolları Kantarı / 50.000 kg Şantiye GVW',
+    kantarDesc: 'Cursor 11/13 (460 BG / 2.150 Nm Tork), 16 ileri Hi-Tronix, 8x4 çift çeker 4 aks, 20-24 m³ Hardox hafriyat damperi veya 10-12 m³ beton mikseri şasisi.',
+    dims: {
+      length: '640 cm (Damper Kasa)',
+      width: '240 cm',
+      height: '160 cm',
+      volume: '20.0 - 24.0 m³',
+      pallets: 'Hardox Damper / Mikser'
+    },
+    pdfUrl: '/specs/t-way-ad410t46b-mixer.pdf',
+    pdfName: 'Teknik Foy_TW_Rigid_8x4_AD410T46.pdf',
+    priceRange: '142.000 € - 156.000 € + KDV',
+    defaultLoan: 3000000,
+    bodyType: 'damper'
+  },
+
   // ── AĞIR VASITA & ÇEKİCİ ──
   {
     key: 'tractor_sway',
@@ -504,6 +633,28 @@ export default function PublicVehicleFinder() {
     setSelectedModelKey(null);
     setVolumeM3(val);
   };
+
+  // URL'den gelen modelParam parametresini otomatik seç (T-Way kısayolları dahil)
+  useEffect(() => {
+    if (modelParam) {
+      const lower = modelParam.toLowerCase();
+      let matchedKey = null;
+      if (lower === 'tway_10teker_540' || lower === 'tway_10_540' || lower === 'tway10_540') matchedKey = 'tway_10teker_540';
+      else if (lower === 'tway_10teker_460' || lower === 'tway_10_460' || lower === 'tway10_460') matchedKey = 'tway_10teker_460';
+      else if (lower === 'tway_12teker_540' || lower === 'tway_12_540' || lower === 'tway12_540') matchedKey = 'tway_12teker_540';
+      else if (lower === 'tway_12teker_460' || lower === 'tway_12_460' || lower === 'tway12_460') matchedKey = 'tway_12teker_460';
+      else if (lower.includes('12') && lower.includes('tway')) matchedKey = 'tway_12teker_540';
+      else if (lower.includes('10') && lower.includes('tway')) matchedKey = 'tway_10teker_540';
+      else if (lower === 'tway' || lower === 't-way') matchedKey = 'tway_10teker_540';
+      else {
+        const found = VEHICLE_CATALOG.find(v => v.key.toLowerCase() === lower);
+        if (found) matchedKey = found.key;
+      }
+      if (matchedKey) {
+        handleSelectVehicle(matchedKey);
+      }
+    }
+  }, [modelParam]);
 
   // Kredi Parametreleri (Çoklu Banka & Tutar Kırılımları - Ekim 2026 Kampanyaları)
   const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
@@ -605,6 +756,71 @@ export default function PublicVehicleFinder() {
             });
           }
         }
+
+        // T-Way Ağır Şantiye Modelleri Arası Geçiş Önerileri
+        if (item.category === 'hafriyat' || item.key.startsWith('tway_')) {
+          if (item.key === 'tway_10teker_540') {
+            multiRecs.push({
+              key: 'tway_10teker_460',
+              title: 'T-Way 10 Teker Hafriyat 460 BG (6x4)',
+              badge: 'Ekonomik 460 BG • 6x4 Çift Çeker',
+              reason: 'Aynı 26.000 kg karayolları kantar geçeri ve çift çeker gücü, daha optimize yakıt tüketimli Cursor 11/13 460 BG motor seçeneği.',
+              icon: '🚜'
+            });
+            multiRecs.push({
+              key: 'tway_12teker_540',
+              title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+              badge: '32.000 kg Kantar • 50 Ton GVW • 8x4 Zirve',
+              reason: '4 aks (ön çift dümen, arka çift tandem çeker) ile 32 ton yasal kantar ve 50 ton şantiye taşıma kapasitesi.',
+              icon: '🚜'
+            });
+          } else if (item.key === 'tway_10teker_460') {
+            multiRecs.push({
+              key: 'tway_10teker_540',
+              title: 'T-Way 10 Teker Hafriyat 540 BG (6x4)',
+              badge: '540 BG Cursor 13 • 2.500 Nm Zirve Tork',
+              reason: 'Zorlu rampa, derin çamur ve ağır ocak şartları için sınıfının en yüksek motor gücü ve tork kapasitesi.',
+              icon: '🚜'
+            });
+            multiRecs.push({
+              key: 'tway_12teker_460',
+              title: 'T-Way 12 Teker Hafriyat 460 BG (8x4)',
+              badge: '32.000 kg Kantar • 8x4 12 Teker',
+              reason: 'Daha yüksek kasa hacmi (20-24 m³) ve 32 ton yasal kantar için 4 akslı 8x4 şantiye şasisi.',
+              icon: '🚜'
+            });
+          } else if (item.key === 'tway_12teker_540') {
+            multiRecs.push({
+              key: 'tway_12teker_460',
+              title: 'T-Way 12 Teker Hafriyat 460 BG (8x4)',
+              badge: 'Ekonomik 460 BG • 8x4 12 Teker',
+              reason: '32 ton yasal kantar geçeri ve 12 teker dengesiyle hafriyat ve hazır beton mikseri için optimize motor.',
+              icon: '🚜'
+            });
+            multiRecs.push({
+              key: 'tway_10teker_540',
+              title: 'T-Way 10 Teker Hafriyat 540 BG (6x4)',
+              badge: 'Kıvrak 6x4 Şasi • 540 BG Cursor 13',
+              reason: 'Daha kısa dingil mesafesi, dar şantiye yollarında üstün manevra ve 540 BG güç.',
+              icon: '🚜'
+            });
+          } else if (item.key === 'tway_12teker_460') {
+            multiRecs.push({
+              key: 'tway_12teker_540',
+              title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+              badge: '540 BG Cursor 13 • 8x4 En Güçlü Şantiye',
+              reason: 'En dik ocak rampalarında ve ağır madencilik şartlarında maksimum çekiş gücü ve dayanım.',
+              icon: '🚜'
+            });
+            multiRecs.push({
+              key: 'tway_10teker_460',
+              title: 'T-Way 10 Teker Hafriyat 460 BG (6x4)',
+              badge: '6x4 Çift Çeker • 26.000 kg Kantar',
+              reason: '3 akslı kompakt şasi ile hafriyat döküm sahalarında daha pratik dönüş açısı.',
+              icon: '🚜'
+            });
+          }
+        }
         return {
           ...item,
           modelKey: item.key,
@@ -659,7 +875,60 @@ export default function PublicVehicleFinder() {
       };
     }
 
-    // B. Ağır Vasıta & Çekici (≥ 18 Ton veya Ağır Nakliye)
+    // B. Hafriyat, Damper & Şantiye (T-Way Serisi)
+    if (selectedBody === 'damper' || selectedSector === 'hafriyat_santiye') {
+      if (payloadKg > 16000 || targetVolume > 20) {
+        const item = VEHICLE_CATALOG.find(v => v.key === 'tway_12teker_540');
+        return {
+          ...item,
+          modelKey: 'tway_12teker_540',
+          totalGross: 14000 + bodyTare + payloadKg,
+          kantarStatus: (14000 + bodyTare + payloadKg) <= 32000 ? 'safe' : 'overload',
+          multiRecommendations: [
+            {
+              key: 'tway_12teker_460',
+              title: 'T-Way 12 Teker Hafriyat 460 BG (8x4)',
+              badge: 'Ekonomik 460 BG • 8x4 12 Teker',
+              reason: '32 ton yasal kantar geçeri ve 12 teker dengesiyle hafriyat ve hazır beton mikseri için optimize motor.',
+              icon: '🚜'
+            },
+            {
+              key: 'tway_10teker_540',
+              title: 'T-Way 10 Teker Hafriyat 540 BG (6x4)',
+              badge: 'Kıvrak 6x4 Şasi • 540 BG Cursor 13',
+              reason: 'Daha kısa dingil mesafesi, dar şantiye yollarında üstün manevra ve 540 BG güç.',
+              icon: '🚜'
+            }
+          ]
+        };
+      } else {
+        const item = VEHICLE_CATALOG.find(v => v.key === 'tway_10teker_540');
+        return {
+          ...item,
+          modelKey: 'tway_10teker_540',
+          totalGross: 11500 + bodyTare + payloadKg,
+          kantarStatus: (11500 + bodyTare + payloadKg) <= 26000 ? 'safe' : 'overload',
+          multiRecommendations: [
+            {
+              key: 'tway_10teker_460',
+              title: 'T-Way 10 Teker Hafriyat 460 BG (6x4)',
+              badge: 'Ekonomik 460 BG • 6x4 Çift Çeker',
+              reason: 'Aynı 26.000 kg karayolları kantar geçeri ve çift çeker gücü, daha optimize yakıt tüketimli Cursor 11/13 460 BG motor seçeneği.',
+              icon: '🚜'
+            },
+            {
+              key: 'tway_12teker_540',
+              title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+              badge: '32.000 kg Kantar • 50 Ton GVW • 8x4 Zirve',
+              reason: '4 aks (ön çift dümen, arka çift tandem çeker) ile 32 ton yasal kantar ve 50 ton şantiye taşıma kapasitesi.',
+              icon: '🚜'
+            }
+          ]
+        };
+      }
+    }
+
+    // C. Ağır Vasıta & Çekici (≥ 18 Ton veya Ağır Nakliye)
     if (payloadKg >= 18000 || selectedSector === 'agir_nakliye') {
       const item = VEHICLE_CATALOG.find(v => v.key === 'tractor_sway');
       return {
@@ -673,6 +942,13 @@ export default function PublicVehicleFinder() {
             badge: '26.000 kg Kantar • 3 Dingil 10 Teker',
             reason: 'Dorse takmadan rijit şasi ile 16 ton net yük taşımak için ekonomik filo alternatifi.',
             icon: '🚚'
+          },
+          {
+            key: 'tway_12teker_540',
+            title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+            badge: '32.000 kg Kantar • 50 Ton GVW • 8x4 Damper',
+            reason: 'Şantiye ve dökme malzeme taşımacılığı için 8x4 çift çeker ağır hizmet şasisi.',
+            icon: '🚜'
           }
         ]
       };
@@ -1032,6 +1308,14 @@ export default function PublicVehicleFinder() {
       handleSelectVehicle('truck_160e');
     } else if (type === '10teker') {
       handleSelectVehicle('truck_10teker');
+    } else if (type === 'tway_10_540') {
+      handleSelectVehicle('tway_10teker_540');
+    } else if (type === 'tway_10_460') {
+      handleSelectVehicle('tway_10teker_460');
+    } else if (type === 'tway_12_540') {
+      handleSelectVehicle('tway_12teker_540');
+    } else if (type === 'tway_12_460') {
+      handleSelectVehicle('tway_12teker_460');
     } else if (type === 'sway') {
       handleSelectVehicle('tractor_sway');
     }
@@ -1141,8 +1425,11 @@ export default function PublicVehicleFinder() {
                   { id: '72c', label: 'Daily 72C Kamyon', desc: '4.8t / 7.970 kg Kantar' },
                   { id: '100e', label: 'Eurocargo 100E', desc: '6.5t / 10.875 kg Kantar' },
                   { id: '120e', label: 'Eurocargo 120E', desc: '8t / 12.950 kg Kantar' },
-                  { id: '160e', label: 'Eurocargo 160', desc: '11t / 17.080 kg Kantar' },
                   { id: '10teker', label: 'Eurocargo 10 Teker', desc: '16 Ton / 26.000 kg Kantar' },
+                  { id: 'tway_10_540', label: '🚜 T-Way 10T 540 BG', desc: '6x4 / 10 Teker / Cursor 13' },
+                  { id: 'tway_10_460', label: '🚜 T-Way 10T 460 BG', desc: '6x4 / 10 Teker Hafriyat' },
+                  { id: 'tway_12_540', label: '🚜 T-Way 12T 540 BG', desc: '8x4 / 12 Teker / 32-50t GVW' },
+                  { id: 'tway_12_460', label: '🚜 T-Way 12T 460 BG', desc: '8x4 / 12 Teker Hafriyat' },
                   { id: 'sway', label: 'IVECO S-Way', desc: '25t+ / 40 Ton Katar' }
                 ].map(item => (
                   <button
@@ -1606,6 +1893,7 @@ export default function PublicVehicleFinder() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {[
                     { id: 'all', label: 'Tüm Modeller' },
+                    { id: 'hafriyat', label: '🚜 T-Way Hafriyat & Şantiye (10 ve 12 Teker)' },
                     { id: 'panelvan', label: '🚐 Panelvan Modelleri (12, 16, 18 m³)' },
                     { id: 'kamyonet', label: '🚛 Kamyonetler (B - Kantara Girmez)' },
                     { id: 'kamyon', label: '🚚 Kamyonlar (C - 10 Teker Dahil)' },
@@ -1742,7 +2030,7 @@ export default function PublicVehicleFinder() {
                   <input
                     type="range"
                     min="1000"
-                    max="26000"
+                    max="32000"
                     step="250"
                     value={payloadKg}
                     onChange={e => handlePayloadChange(Number(e.target.value))}
@@ -1942,7 +2230,7 @@ export default function PublicVehicleFinder() {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    💡 ÇOKLU ÖNERİ (Kantara Girmeyen Alternatifler):
+                    💡 {matched.payloadKg <= 5000 ? 'ÇOKLU ÖNERİ (Kantara Girmeyen Alternatifler):' : 'ÇOKLU ÖNERİ (Alternatif Modeller & Şasiler):'}
                   </span>
                   <span style={{ fontSize: '0.66rem', color: '#94a3b8' }}>İncelemek için tıkla</span>
                 </div>
@@ -2068,7 +2356,7 @@ export default function PublicVehicleFinder() {
                 gap: '8px'
               }}>
                 <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700 }}>
-                  💡 Kantara Girmeyen Diğer Alternatifler:
+                  💡 {matched.payloadKg <= 5000 ? 'Kantara Girmeyen Diğer Alternatifler:' : 'Diğer Alternatif Modeller & Şasiler:'}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {matched.multiRecommendations.map(alt => (

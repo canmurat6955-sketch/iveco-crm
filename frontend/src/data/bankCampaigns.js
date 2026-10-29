@@ -1661,7 +1661,7 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
     category = 'daily70';
   } else if (lower.includes('eurocargo') || lower.includes('ml') || lower.includes('100e') || lower.includes('120e') || lower.includes('150e') || lower.includes('160e') || lower.includes('180e')) {
     category = 'eurocargo';
-  } else if (lower.includes('çekici') || lower.includes('s-way') || lower.includes('sway')) {
+  } else if (lower.includes('çekici') || lower.includes('s-way') || lower.includes('sway') || lower.includes('t-way') || lower.includes('tway') || lower.includes('hafriyat') || lower.includes('damper')) {
     category = 'eurocargo';
   } else {
     category = 'daily35';

@@ -39,16 +39,25 @@ class VehicleCodeParser:
         if "T-WAY" in upper or "TWAY" in upper:
             group = "T-Way"
             model_code = "T-Way"
-            if "HAFRİYAT" in upper or "HAFRIYAT" in upper:
-                usage_type = "Hafriyat"
-                sub_group = "Hafriyat"
+            if "460" in upper:
+                engine_power = 460
+                engine_power_desc = "460 BG"
+            elif "540" in upper or "510" in upper:
+                engine_power = 540
+                engine_power_desc = "540 BG"
+            elif "HAFRİYAT" in upper or "HAFRIYAT" in upper:
                 engine_power = 540
                 engine_power_desc = "540 BG"
             elif "MİKSER" in upper or "MIKSER" in upper:
-                usage_type = "Mikser"
-                sub_group = "Mikser"
                 engine_power = 460
                 engine_power_desc = "460 BG"
+
+            if "HAFRİYAT" in upper or "HAFRIYAT" in upper or "DAMPER" in upper:
+                usage_type = "Hafriyat"
+                sub_group = "Hafriyat"
+            elif "MİKSER" in upper or "MIKSER" in upper:
+                usage_type = "Mikser"
+                sub_group = "Mikser"
 
             if "10 TEKER" in upper or "10" in upper.split():
                 wheel_count = 10
@@ -278,12 +287,19 @@ class VehicleAIQueryParser:
         # T-Way Check
         if "T-WAY" in upper or "TWAY" in upper or "HAFRİYAT" in upper or "MİKSER" in upper:
             f.vehicle_group = "T-Way"
-            if "HAFRİYAT" in upper or "HAFRIYAT" in upper:
-                f.usage_type = "Hafriyat"
+            if "460" in upper:
+                f.engine_power = 460
+            elif "540" in upper or "510" in upper:
+                f.engine_power = 540
+            elif "HAFRİYAT" in upper or "HAFRIYAT" in upper:
                 f.engine_power = 540
             elif "MİKSER" in upper or "MIKSER" in upper:
-                f.usage_type = "Mikser"
                 f.engine_power = 460
+
+            if "HAFRİYAT" in upper or "HAFRIYAT" in upper or "DAMPER" in upper:
+                f.usage_type = "Hafriyat"
+            elif "MİKSER" in upper or "MIKSER" in upper:
+                f.usage_type = "Mikser"
 
             if "10 TEKER" in upper or re.search(r"\b10\s*TEKER\b", upper):
                 f.wheel_count = 10
