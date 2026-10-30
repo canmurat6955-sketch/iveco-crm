@@ -49,11 +49,11 @@ export default function PublicProposalView() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f1f5f9', padding: '24px 16px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9', padding: 'clamp(12px, 3vw, 24px) clamp(8px, 2vw, 16px)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', background: '#ffffff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
         
         {/* Header Banner */}
-        <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%)', color: '#ffffff', padding: '32px 28px', position: 'relative' }}>
+        <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%)', color: '#ffffff', padding: 'clamp(20px, 4vw, 32px) clamp(16px, 4vw, 28px)', position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '26px', objectFit: 'contain' }} />
             <div style={{ height: '22px', width: '1px', background: 'rgba(255, 255, 255, 0.35)' }} />
@@ -76,7 +76,7 @@ export default function PublicProposalView() {
               <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', marginBottom: '10px' }}>
                 RESMİ TEKLİF & PROFORMA
               </div>
-              <h1 style={{ margin: 0, fontSize: '26px', fontWeight: '800' }}>{proposal.dealer_title}</h1>
+              <h1 style={{ margin: 0, fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: '800' }}>{proposal.dealer_title}</h1>
               <p style={{ margin: '6px 0 0 0', opacity: 0.85, fontSize: '13px' }}>{proposal.dealer_address}</p>
             </div>
             <div style={{ textAlign: 'right', background: 'rgba(255,255,255,0.1)', padding: '10px 16px', borderRadius: '12px' }}>
@@ -88,12 +88,12 @@ export default function PublicProposalView() {
         </div>
 
         {/* Customer & Vehicle Main Box */}
-        <div style={{ padding: '28px' }}>
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '20px', marginBottom: '24px' }}>
+        <div style={{ padding: 'clamp(14px, 4vw, 28px)' }}>
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '16px', marginBottom: '24px' }}>
             <div style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
               Sayın Yetkili / Firma
             </div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+            <div style={{ fontSize: '19px', fontWeight: '800', color: '#0f172a' }}>
               {proposal.company_name}
             </div>
             {proposal.city && (
@@ -106,7 +106,7 @@ export default function PublicProposalView() {
             <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               🚛 Teklif Edilen Araç & Teknik Özellikler
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '12px' }}>
               <div style={{ background: '#fff', border: '1px solid #e2e8f0', padding: '14px', borderRadius: '10px' }}>
                 <span style={{ display: 'block', fontSize: '12px', color: '#64748b' }}>Araç Modeli</span>
                 <strong style={{ fontSize: '15px', color: '#0f172a' }}>{proposal.vehicle_model}</strong>
@@ -125,14 +125,14 @@ export default function PublicProposalView() {
           {/* Price & Grand Total */}
           <div style={{
             background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-            border: '1px solid #bbf7d0', borderRadius: '16px', padding: '24px', marginBottom: '24px',
+            border: '1px solid #bbf7d0', borderRadius: '16px', padding: 'clamp(14px, 4vw, 24px)', marginBottom: '24px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px'
           }}>
             <div>
               <span style={{ fontSize: '13px', fontWeight: '700', color: '#166534', textTransform: 'uppercase' }}>
                 Anahtar Teslim Net Teklif Bedeli (KDV Dahil)
               </span>
-              <div style={{ fontSize: '34px', fontWeight: '900', color: '#15803d', marginTop: '4px' }}>
+              <div style={{ fontSize: 'clamp(22px, 6vw, 34px)', fontWeight: '900', color: '#15803d', marginTop: '4px' }}>
                 {Number(proposal.grand_total).toLocaleString('tr-TR')} TL
               </div>
               {proposal.notes && proposal.notes.toLowerCase().includes('peşin alım indirimi') && (
@@ -159,10 +159,10 @@ export default function PublicProposalView() {
 
           {/* Sales Representative Card & Direct Action */}
           <div style={{
-            background: '#ffffff', border: '2px solid #0284c7', borderRadius: '16px', padding: '20px',
+            background: '#ffffff', border: '2px solid #0284c7', borderRadius: '16px', padding: 'clamp(14px, 4vw, 20px)',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#e0f2fe', color: '#0369a1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
                 👔
               </div>
@@ -173,15 +173,16 @@ export default function PublicProposalView() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flex: '1 1 220px' }}>
               <a
                 href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Murat Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   background: '#22c55e', color: '#fff', padding: '12px 20px', borderRadius: '10px',
-                  fontWeight: '700', fontSize: '14px', textDecoration: 'none', boxShadow: '0 4px 12px rgba(34, 197, 94, 0.25)'
+                  fontWeight: '700', fontSize: '14px', textDecoration: 'none', boxShadow: '0 4px 12px rgba(34, 197, 94, 0.25)',
+                  width: '100%'
                 }}
               >
                 💬 Murat Bey ile WhatsApp'tan Görüş

@@ -612,7 +612,7 @@ export default function ProformaQuick() {
 
                 {/* TL Araçlar İçin: Kampanyalı vs Peşin 2 Büyük Kart */}
                 {selectedCatalogVehicle.currency !== 'EUR' ? (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: '10px' }}>
                     {/* Kart 1: Kampanyalı / Vadeli */}
                     <div
                       onClick={() => handlePaymentTypeChange('campaign')}

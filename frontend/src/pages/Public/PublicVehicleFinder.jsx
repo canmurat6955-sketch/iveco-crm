@@ -2319,7 +2319,7 @@ IVECO ERC Samsun Otomotiv
                 </div>
 
                 {/* Model Kartları Izgarası */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '10px', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
                   {VEHICLE_CATALOG.filter(v => selectedCategoryTab === 'all' || v.category === selectedCategoryTab).map(v => {
                     const isSelected = matched.key === v.key || matched.modelTitle === v.modelTitle;
                     return (
@@ -3042,7 +3042,7 @@ IVECO ERC Samsun Otomotiv
                 </p>
 
                 {/* Ağırlık Dökümü */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', padding: '8px 10px', fontSize: '0.7rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', padding: '8px 10px', fontSize: '0.7rem' }}>
                   <div>
                     <span style={{ color: '#64748b', display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
                     <strong style={{ color: '#fff' }}>{matched.unladenWeight} kg</strong>
@@ -3865,7 +3865,7 @@ IVECO ERC Samsun Otomotiv
             </div>
 
             {/* Modal Body: 2 Columns */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(330px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
               
               {/* SOL KOLON: Müşteri Bilgileri & Gönderim Butonları */}
               <div>
@@ -4310,8 +4310,8 @@ IVECO ERC Samsun Otomotiv
         boxShadow: '0 10px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3)',
         backdropFilter: 'blur(12px)',
         gap: '8px',
-        maxWidth: 'calc(100vw - 36px)',
-        flexWrap: 'wrap'
+        maxWidth: 'calc(100vw - 24px)',
+        flexWrap: 'nowrap'
       }}>
         {/* Avatar & İsim */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -4353,7 +4353,8 @@ IVECO ERC Samsun Otomotiv
             textDecoration: 'none',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            whiteSpace: 'nowrap'
           }}
           title="Can Murat Onay'ı Ara"
         >
@@ -4375,16 +4376,18 @@ IVECO ERC Samsun Otomotiv
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            whiteSpace: 'nowrap'
           }}
           title="WhatsApp'tan Yaz"
         >
           <FiMessageSquare size={12} /> WhatsApp
         </button>
 
-        {/* ✉️ Mail */}
+        {/* ✉️ Mail (Masaüstünde gösterilir) */}
         <button
           type="button"
+          className="hide-on-mobile"
           onClick={handleDirectEmail}
           style={{
             background: 'rgba(56, 189, 248, 0.15)',
@@ -4395,18 +4398,19 @@ IVECO ERC Samsun Otomotiv
             fontSize: '0.72rem',
             fontWeight: 700,
             cursor: 'pointer',
-            display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            whiteSpace: 'nowrap'
           }}
           title="E-Posta Gönder"
         >
           <FiMail size={12} /> Mail
         </button>
 
-        {/* 📇 Rehbere Kaydet */}
+        {/* 📇 Rehbere Kaydet (Masaüstünde gösterilir) */}
         <button
           type="button"
+          className="hide-on-mobile"
           onClick={handleDownloadVCard}
           style={{
             background: 'rgba(245, 158, 11, 0.15)',
@@ -4417,9 +4421,9 @@ IVECO ERC Samsun Otomotiv
             fontSize: '0.72rem',
             fontWeight: 700,
             cursor: 'pointer',
-            display: 'inline-flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '4px',
+            whiteSpace: 'nowrap'
           }}
           title="Rehbere Kaydet (vCard)"
         >
