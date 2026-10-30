@@ -226,42 +226,8 @@ class VehicleService:
             except Exception:
                 self.db.rollback()
 
-        # Seed initial stock examples if empty
-        if self.db.query(VehicleStock).count() == 0:
-            stock_35c16 = self.db.query(VehicleMaster).filter(
-                VehicleMaster.model_code == "35C16",
-                VehicleMaster.wheelbase == 3750
-            ).first()
-            if stock_35c16:
-                self.db.add(VehicleStock(
-                    vehicle_id=stock_35c16.id,
-                    chassis_no="ZCF35C16SAMSUN01",
-                    status="in_stock",
-                    location="Samsun Merkez Bayi",
-                    year=2024,
-                    color="Beyaz",
-                    list_price=42500.0,
-                    currency="EUR",
-                    notes="Hemen teslime hazır açık sac kasa uyumlu şasi"
-                ))
-            
-            stock_150e21 = self.db.query(VehicleMaster).filter(
-                VehicleMaster.model_code == "150E21",
-                VehicleMaster.wbs == 5175
-            ).first()
-            if stock_150e21:
-                self.db.add(VehicleStock(
-                    vehicle_id=stock_150e21.id,
-                    chassis_no="ZCF150E21CORUM02",
-                    status="in_stock",
-                    location="Çorum Şube",
-                    year=2024,
-                    color="Kırmızı",
-                    list_price=89000.0,
-                    currency="EUR",
-                    notes="Fabrikadan yeni intikal etti, 5175 WBS uzun şasi"
-                ))
-            self.db.commit()
+        # NOT: Boş stok tablosuna otomatik örnek şasi (ZCF35C16SAMSUN01 / ZCF150E21CORUM02)
+        # ekleyen blok kaldırıldı (30.10.2026). Stok yalnızca kullanıcı girdikçe dolar.
 
         return created
 

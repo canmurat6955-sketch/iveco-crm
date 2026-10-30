@@ -551,9 +551,13 @@ REGIONAL_TENDERS = [
 
 def seed_regional_discovery_data(db: Session, force_refresh: bool = False):
     """
-    Hedef 9 il için gerçek bölgesel ticaret sicil şirketlerini, üst yapıcıları ve ihaleleri
-    veritabanına ekler. Eğer tablolar boşsa veya force_refresh=True ise çalışır.
+    DEVRE DIŞI (30.10.2026): Bu fonksiyon gerçek bir kaynaktan değil, kod içine yazılmış
+    örnek listelerden "yeni kurulan şirket", kasacı, ihale ve müşteri kaydı üretiyordu ve
+    keşif ekranları her açıldığında çalışıyordu. Sistem bakir kalsın diye artık hiçbir şey eklemez.
+    Aşağıdaki eski kod yalnızca başvuru amaçlı bırakılmıştır.
     """
+    return {"new_companies": 0, "bodybuilders": 0, "referrals": 0, "tenders": 0}
+
     seeded_counts = {"new_companies": 0, "bodybuilders": 0, "referrals": 0, "tenders": 0}
     now = datetime.now(timezone.utc)
 

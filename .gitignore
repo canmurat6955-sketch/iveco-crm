@@ -38,3 +38,7 @@ backend/*.pdf
 backend/pdf_raw_output.txt
 backend/corum_debug.html
 backend/corum_members.json
+
+# Canli veritabani baglantisi - ASLA repoya girmemeli
+backend/.env.prod.local
+backend/.env.*.local
