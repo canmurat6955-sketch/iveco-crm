@@ -4,12 +4,12 @@ import { dashboardApi, crmApi, vehiclesApi, workbenchApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
-import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
+import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle, FiTrash2, FiFileText } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
 import { getWhatsAppUrl } from '../utils/whatsapp';
 import WhatsAppActionModal from '../components/CRM/WhatsAppActionModal';
-import FieldAssistantHero from '../components/CRM/FieldAssistantHero';
+import FieldAssistantHero, { TARGET_CITIES } from '../components/CRM/FieldAssistantHero';
 import TodayOpportunitiesCard from '../components/CRM/TodayOpportunitiesCard';
 import QuickVisitModal from '../components/CRM/QuickVisitModal';
 import NearbyRadarModal from '../components/CRM/NearbyRadarModal';
@@ -155,20 +155,80 @@ export default function Dashboard() {
 
   // ── MOBILE DASHBOARD (Saha Satış Arayüzü) ──────────────────────────
   if (isMobile) {
-    let firstName = user?.full_name?.split(' ')[0] || 'Satışçı';
-    if (firstName === 'Satış' || firstName === 'Satis') {
-      firstName = 'King';
-    }
-    
+    const displayName = user?.full_name || 'Can Murat Onay';
+
     return (
       <div className="mobile-dashboard animate-in">
-        {/* ⚡ Saha Asistanı Hero (Mobil) */}
+        {/* ── MOBİL KARŞILAMA & YÖNETİCİ BAŞLIĞI ── */}
+        <div className="mobile-welcome-header">
+          <div className="mobile-welcome-top">
+            <div className="mobile-welcome-brand">
+              <span className="brand-dot-pulse" />
+              <span className="brand-title">IVECO ERC SAMSUN</span>
+            </div>
+            {/* Hızlı Şehir / Bölge Seçici */}
+            <div className="mobile-city-pill">
+              <FiMapPin size={12} style={{ color: location ? '#10b981' : '#f59e0b' }} />
+              <select
+                value={selectedCity}
+                onChange={(e) => handleCityChange(e.target.value)}
+                className="mobile-city-select"
+              >
+                <option value="Tümü">🌍 Tüm Bölge (9 İl)</option>
+                {TARGET_CITIES.map(c => (
+                  <option key={c} value={c} style={{ background: '#0f172a', color: '#f8fafc' }}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mobile-welcome-main">
+            <div className="mobile-welcome-greeting">
+              <div className="mobile-welcome-text">
+                👋 Hoş Geldiniz, <strong>{displayName}</strong>
+              </div>
+              <div className="mobile-welcome-sub">
+                Saha Satış Yöneticisi · 0544 622 59 31
+              </div>
+            </div>
+            <div className="mobile-live-badge">
+              <span className="live-dot" /> Canlı Saha
+            </div>
+          </div>
+        </div>
+
+        {/* ── ⚡ 1-TIKLA HIZLI TEKLİF & PROFORMA KARTI (MOBİL ÖNCELİKLİ) ── */}
+        <div 
+          className="mobile-quick-proposal-card" 
+          onClick={() => navigate('/proforma/quick')}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="proposal-card-left">
+            <div className="proposal-card-icon">
+              <FiFileText size={22} />
+            </div>
+            <div className="proposal-card-text">
+              <div className="proposal-badge">
+                <FiZap size={11} /> 1-TIKLA HIZLI TEKLİF
+              </div>
+              <div className="proposal-title">Müşteriye Teklif & Proforma Gönder</div>
+              <div className="proposal-sub">WhatsApp'tan anında ilet veya resmi PDF hazırla (30 sn)</div>
+            </div>
+          </div>
+          <button type="button" className="proposal-card-action-btn">
+            Teklif Hazırla ➔
+          </button>
+        </div>
+
+        {/* ⚡ Saha Asistanı Hero (Mobil - 6'lı Minimal Matris) */}
         <FieldAssistantHero
           stats={fieldAssistant?.counts || {}}
           selectedCity={selectedCity}
           onCityChange={handleCityChange}
           onOpenVisitModal={() => setQuickVisitModalOpen(true)}
           onOpenRadar={() => setRadarOpen(true)}
+          isMobile={true}
         />
 
         {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Mobil Saha Satış) ── */}
@@ -357,6 +417,7 @@ export default function Dashboard() {
         onCityChange={handleCityChange}
         onOpenVisitModal={() => setQuickVisitModalOpen(true)}
         onOpenRadar={() => setRadarOpen(true)}
+        isMobile={false}
       />
 
       {/* KPI Stats */}

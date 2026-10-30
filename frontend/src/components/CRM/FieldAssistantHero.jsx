@@ -4,11 +4,11 @@ import useGeolocation from '../../hooks/useGeolocation';
 import { 
   FiZap, FiMapPin, FiSearch, FiNavigation, FiPlus, 
   FiCompass, FiTruck, FiUsers, FiClock, FiAlertCircle,
-  FiCamera
+  FiCamera, FiFileText
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const TARGET_CITIES = [
+export const TARGET_CITIES = [
   'Samsun', 'Ordu', 'Çorum', 'Amasya', 'Tokat', 
   'Sivas', 'Giresun', 'Sinop', 'Kastamonu'
 ];
@@ -18,7 +18,8 @@ export default function FieldAssistantHero({
   selectedCity = 'Samsun', 
   onCityChange, 
   onOpenVisitModal,
-  onOpenRadar 
+  onOpenRadar,
+  isMobile = false
 }) {
   const navigate = useNavigate();
   const { location, loading: gpsLoading } = useGeolocation();
@@ -51,13 +52,13 @@ export default function FieldAssistantHero({
 
   return (
     <div 
-      className="card mb-6" 
+      className="card mb-4" 
       style={{
         background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.4) 50%, rgba(15, 23, 42, 0.95) 100%)',
         border: '1px solid rgba(56, 189, 248, 0.35)',
         boxShadow: '0 10px 30px -5px rgba(2, 132, 199, 0.25), 0 0 15px rgba(56, 189, 248, 0.1)',
         borderRadius: 16,
-        padding: '1.25rem',
+        padding: isMobile ? '0.85rem' : '1.25rem',
         position: 'relative',
         overflow: 'hidden'
       }}
@@ -76,112 +77,114 @@ export default function FieldAssistantHero({
         }}
       />
 
-      {/* Üst Başlık & Konum Barı */}
-      <div 
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginBottom: '1rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingBottom: '0.75rem'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* Üst Başlık & Konum Barı (Masaüstünde veya mobil haricinde gösterilir) */}
+      {!isMobile && (
+        <div 
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: '1rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingBottom: '0.75rem'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                background: 'linear-gradient(135deg, #0284c7, #2563eb)',
+                color: '#fff',
+                boxShadow: '0 0 15px rgba(2, 132, 199, 0.5)'
+              }}
+            >
+              <FiZap size={22} className="animate-pulse" />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.5px', color: '#f8fafc' }}>
+                  ⚡ SAHA SATIŞ ASİSTANI
+                </h2>
+                <span 
+                  style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    background: 'rgba(56, 189, 248, 0.2)',
+                    color: '#38bdf8',
+                    padding: '2px 8px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(56, 189, 248, 0.4)'
+                  }}
+                >
+                  Canlı Saha OS
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>
+                Bölgenizdeki fırsatları yönetin, rota ve ziyaretlerinizi tek merkezden yönlendirin
+              </p>
+            </div>
+          </div>
+
+          {/* Canlı Konum Seçici */}
           <div 
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              width: 38,
-              height: 38,
+              gap: 8,
+              background: 'rgba(15, 23, 42, 0.8)',
+              padding: '6px 12px',
               borderRadius: 10,
-              background: 'linear-gradient(135deg, #0284c7, #2563eb)',
-              color: '#fff',
-              boxShadow: '0 0 15px rgba(2, 132, 199, 0.5)'
+              border: '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
-            <FiZap size={22} className="animate-pulse" />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.5px', color: '#f8fafc' }}>
-                ⚡ SAHA SATIŞ ASİSTANI
-              </h2>
-              <span 
-                style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  background: 'rgba(56, 189, 248, 0.2)',
-                  color: '#38bdf8',
-                  padding: '2px 8px',
-                  borderRadius: 12,
-                  border: '1px solid rgba(56, 189, 248, 0.4)'
-                }}
-              >
-                Canlı Saha OS
-              </span>
-            </div>
-            <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>
-              Bölgenizdeki fırsatları yönetin, rota ve ziyaretlerinizi tek merkezden yönlendirin
-            </p>
-          </div>
-        </div>
-
-        {/* Canlı Konum Seçici */}
-        <div 
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'rgba(15, 23, 42, 0.8)',
-            padding: '6px 12px',
-            borderRadius: 10,
-            border: '1px solid rgba(255, 255, 255, 0.12)'
-          }}
-        >
-          <FiMapPin 
-            size={16} 
-            style={{ 
-              color: location ? '#10b981' : '#f59e0b',
-              animation: gpsLoading ? 'spin 1s linear infinite' : 'none'
-            }} 
-          />
-          <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 600 }}>
-            Konum:
-          </span>
-          <select
-            value={selectedCity}
-            onChange={(e) => onCityChange && onCityChange(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#38bdf8',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              outline: 'none'
-            }}
-          >
-            <option value="Tümü" style={{ background: '#0f172a', color: '#f8fafc' }}>🌍 Tüm Bölge (9 İl)</option>
-            {TARGET_CITIES.map(c => (
-              <option key={c} value={c} style={{ background: '#0f172a', color: '#f8fafc' }}>{c}</option>
-            ))}
-          </select>
-          {location && (
-            <span 
-              title="GPS Uydusu Aktif" 
-              style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }}
+            <FiMapPin 
+              size={16} 
+              style={{ 
+                color: location ? '#10b981' : '#f59e0b',
+                animation: gpsLoading ? 'spin 1s linear infinite' : 'none'
+              }} 
             />
-          )}
+            <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: 600 }}>
+              Konum:
+            </span>
+            <select
+              value={selectedCity}
+              onChange={(e) => onCityChange && onCityChange(e.target.value)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#38bdf8',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              <option value="Tümü" style={{ background: '#0f172a', color: '#f8fafc' }}>🌍 Tüm Bölge (9 İl)</option>
+              {TARGET_CITIES.map(c => (
+                <option key={c} value={c} style={{ background: '#0f172a', color: '#f8fafc' }}>{c}</option>
+              ))}
+            </select>
+            {location && (
+              <span 
+                title="GPS Uydusu Aktif" 
+                style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'inline-block' }}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Hızlı Arama & Prompt Girişi */}
-      <form onSubmit={handlePromptSubmit} style={{ marginBottom: '1rem' }}>
+      <form onSubmit={handlePromptSubmit} style={{ marginBottom: isMobile ? '0.75rem' : '1rem' }}>
         <div 
           style={{
             position: 'relative',
@@ -192,34 +195,34 @@ export default function FieldAssistantHero({
           <input
             type="text"
             className="form-control"
-            placeholder="🔎 Ne aramak istiyorsunuz? (Örn: 'Samsun akaryakıt firmalarını bul', 'Hafriyatçıları listele', 'Çorum S-Way')..."
+            placeholder={isMobile ? "🔎 Firma, sektör veya model ara..." : "🔎 Ne aramak istiyorsunuz? (Örn: 'Samsun akaryakıt firmalarını bul', 'Hafriyatçıları listele', 'Çorum S-Way')..."}
             value={promptQuery}
             onChange={(e) => setPromptQuery(e.target.value)}
             style={{
-              height: 48,
-              paddingLeft: 46,
-              paddingRight: 110,
+              height: isMobile ? 42 : 48,
+              paddingLeft: isMobile ? 38 : 46,
+              paddingRight: isMobile ? 80 : 110,
               background: 'rgba(15, 23, 42, 0.7)',
               border: '1.5px solid rgba(56, 189, 248, 0.3)',
               borderRadius: 12,
-              fontSize: '0.9rem',
+              fontSize: isMobile ? '0.84rem' : '0.9rem',
               color: '#f8fafc',
               boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)'
             }}
           />
           <FiSearch 
-            size={18} 
-            style={{ position: 'absolute', left: 16, color: '#38bdf8', pointerEvents: 'none' }} 
+            size={isMobile ? 16 : 18} 
+            style={{ position: 'absolute', left: isMobile ? 12 : 16, color: '#38bdf8', pointerEvents: 'none' }} 
           />
           <button
             type="submit"
             className="btn btn-primary"
             style={{
               position: 'absolute',
-              right: 6,
-              height: 36,
-              padding: '0 16px',
-              fontSize: '0.82rem',
+              right: 5,
+              height: isMobile ? 32 : 36,
+              padding: isMobile ? '0 12px' : '0 16px',
+              fontSize: isMobile ? '0.78rem' : '0.82rem',
               fontWeight: 700,
               borderRadius: 8,
               background: 'linear-gradient(135deg, #0284c7, #2563eb)'
@@ -234,19 +237,19 @@ export default function FieldAssistantHero({
           style={{
             display: 'flex',
             gap: 6,
-            marginTop: 8,
+            marginTop: 6,
             overflowX: 'auto',
-            paddingBottom: 4,
+            paddingBottom: 2,
             scrollbarWidth: 'none'
           }}
         >
           {[
-            { label: '🚜 Hafriyat & İnşaat', keyword: 'Hafriyat' },
-            { label: '⛽ Akaryakıt & Petrol', keyword: 'Akaryakıt' },
+            { label: '🚜 Hafriyat', keyword: 'Hafriyat' },
+            { label: '⛽ Akaryakıt', keyword: 'Akaryakıt' },
             { label: '❄️ Frigo / Gıda', keyword: 'Gıda' },
-            { label: '🚛 Lojistik & Nakliye', keyword: 'Lojistik' },
+            { label: '🚛 Lojistik', keyword: 'Lojistik' },
             { label: '🌾 Tarım & Yem', keyword: 'Tarım' },
-            { label: '🏛️ Belediye & Kamu', keyword: 'Belediye' },
+            { label: '🏛️ Belediye', keyword: 'Belediye' },
           ].map(chip => (
             <button
               key={chip.keyword}
@@ -256,8 +259,8 @@ export default function FieldAssistantHero({
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: 20,
-                padding: '4px 10px',
-                fontSize: '0.74rem',
+                padding: '3px 9px',
+                fontSize: '0.72rem',
                 color: '#cbd5e1',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
@@ -280,14 +283,42 @@ export default function FieldAssistantHero({
         </div>
       </form>
 
-      {/* 4 Ana Hızlı Aksiyon Butonu */}
+      {/* 6'lı Minimal Saha Aksiyon Matrisi (Mobil: 2 Sütun, Desktop: 6 Sütun) */}
       <div 
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-          gap: 10
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(130px, 1fr))',
+          gap: 8
         }}
       >
+        {/* 1. HIZLI TEKLİF & PROFORMA (En Öncelikli Saha Aracı) */}
+        <button
+          type="button"
+          onClick={() => navigate('/proforma/quick')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '14px 10px',
+            borderRadius: 12,
+            background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.28) 0%, rgba(16, 185, 129, 0.28) 100%)',
+            border: '1.5px solid rgba(56, 189, 248, 0.6)',
+            color: '#f8fafc',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(2, 132, 199, 0.25)',
+            transition: 'transform 0.15s ease'
+          }}
+        >
+          <div style={{ color: '#38bdf8' }}><FiFileText size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '-0.01em' }}>
+            Teklif Gönder
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#6ee7b7', fontWeight: 600 }}>1-Tıkla Proforma</span>
+        </button>
+
+        {/* 2. KARTVİZİT TARA */}
         <button
           type="button"
           onClick={() => navigate('/scan-card')}
@@ -296,31 +327,24 @@ export default function FieldAssistantHero({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '12px 10px',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '12px 10px',
             borderRadius: 12,
             background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.16) 0%, rgba(219, 39, 119, 0.28) 100%)',
             border: '1px solid rgba(236, 72, 153, 0.45)',
             color: '#f8fafc',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, background 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(236, 72, 153, 0.28) 0%, rgba(219, 39, 119, 0.4) 100%)';
-            e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.7)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(236, 72, 153, 0.16) 0%, rgba(219, 39, 119, 0.28) 100%)';
-            e.currentTarget.style.borderColor = 'rgba(236, 72, 153, 0.45)';
+            transition: 'transform 0.15s ease'
           }}
         >
-          <div style={{ color: '#f472b6' }}><FiCamera size={22} /></div>
-          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f472b6', letterSpacing: '-0.01em' }}>Kartvizit Tara</span>
-          <span style={{ fontSize: '0.72rem', color: '#fbcfe8' }}>Kamera & Yönlendir</span>
+          <div style={{ color: '#f472b6' }}><FiCamera size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#f472b6', letterSpacing: '-0.01em' }}>
+            Kartvizit Tara
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#fbcfe8' }}>Kamera & OCR</span>
         </button>
 
+        {/* 3. MÜŞTERİ ARA */}
         <button
           type="button"
           onClick={() => navigate('/customers')}
@@ -329,31 +353,24 @@ export default function FieldAssistantHero({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '14px 10px',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '14px 10px',
             borderRadius: 12,
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#f8fafc',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, background 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            transition: 'transform 0.15s ease'
           }}
         >
-          <div style={{ color: '#60a5fa' }}><FiUsers size={22} /></div>
-          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>Firma Ara</span>
-          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>CRM Portföyü</span>
+          <div style={{ color: '#60a5fa' }}><FiUsers size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>
+            Müşteri Portföyü
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Firma Listesi</span>
         </button>
 
+        {/* 4. YAKINIMDAKİLER / RADAR */}
         <button
           type="button"
           onClick={() => onOpenRadar ? onOpenRadar() : navigate('/map')}
@@ -362,31 +379,26 @@ export default function FieldAssistantHero({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '14px 10px',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '14px 10px',
             borderRadius: 12,
             background: 'rgba(2, 132, 199, 0.14)',
             border: '1px solid rgba(2, 132, 199, 0.35)',
             color: '#f8fafc',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, background 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.25)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(2, 132, 199, 0.14)';
+            transition: 'transform 0.15s ease'
           }}
         >
-          <div style={{ color: '#38bdf8' }}><FiNavigation size={22} /></div>
-          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em', color: '#f8fafc' }}>Yakınımdakiler</span>
-          <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>
-            {stats.nearby_5km ? `${stats.nearby_5km} Müşteri (5 km)` : 'GPS Radarı'}
+          <div style={{ color: '#38bdf8' }}><FiNavigation size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 700, letterSpacing: '-0.01em', color: '#f8fafc' }}>
+            GPS Radarı
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 600 }}>
+            {stats.nearby_5km ? `${stats.nearby_5km} Müşteri (5 km)` : 'Yakındaki Firmalar'}
           </span>
         </button>
 
+        {/* 5. GÜNÜN ROTASI */}
         <button
           type="button"
           onClick={() => navigate('/routes')}
@@ -395,31 +407,24 @@ export default function FieldAssistantHero({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '14px 10px',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '14px 10px',
             borderRadius: 12,
             background: 'rgba(255, 255, 255, 0.04)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#f8fafc',
             cursor: 'pointer',
-            transition: 'transform 0.15s ease, background 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'rgba(245, 158, 11, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            transition: 'transform 0.15s ease'
           }}
         >
-          <div style={{ color: '#f59e0b' }}><FiCompass size={22} /></div>
-          <span style={{ fontSize: '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>Bugünün Rotası</span>
-          <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Güzergah & Sıralama</span>
+          <div style={{ color: '#f59e0b' }}><FiCompass size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 700, letterSpacing: '-0.01em' }}>
+            Günün Rotası
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Güzergah & Sıra</span>
         </button>
 
+        {/* 6. ZİYARET BAŞLAT */}
         <button
           type="button"
           onClick={() => onOpenVisitModal ? onOpenVisitModal() : navigate('/customers')}
@@ -428,28 +433,22 @@ export default function FieldAssistantHero({
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '14px 10px',
+            gap: 4,
+            padding: isMobile ? '10px 8px' : '14px 10px',
             borderRadius: 12,
             background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.38))',
             border: '1px solid rgba(16, 185, 129, 0.5)',
             color: '#f8fafc',
             cursor: 'pointer',
             boxShadow: '0 4px 15px rgba(16, 185, 129, 0.25)',
-            transition: 'transform 0.15s ease, background 0.15s ease'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.5))';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.38))';
+            transition: 'transform 0.15s ease'
           }}
         >
-          <div style={{ color: '#34d399' }}><FiPlus size={22} /></div>
-          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#34d399', letterSpacing: '-0.01em' }}>+ Ziyaret Başlat</span>
-          <span style={{ fontSize: '0.72rem', color: '#a7f3d0' }}>GPS Konumlu</span>
+          <div style={{ color: '#34d399' }}><FiPlus size={isMobile ? 20 : 22} /></div>
+          <span style={{ fontSize: isMobile ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#34d399', letterSpacing: '-0.01em' }}>
+            + Ziyaret Başlat
+          </span>
+          <span style={{ fontSize: '0.68rem', color: '#a7f3d0' }}>GPS Konumlu</span>
         </button>
       </div>
     </div>

@@ -152,7 +152,7 @@ export default function CustomerDetail() {
     const msg = (
       `🌟 Sayın ${contactName},\n\n` +
       `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
-      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
+      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), yasal istiap ve yük kapasitelerini, %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
       `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
       `👉 ${link}\n\n` +
       `Seçtiğiniz aracın hazır fabrika şasi teslim tarihi ve resmi bayi proforma teklifi için bu mesajı yanıtlamanız yeterlidir.`
@@ -613,6 +613,24 @@ export default function CustomerDetail() {
 
               <button
                 className="btn btn-sm"
+                onClick={() => navigate(`/proforma/quick?customer_id=${customer.id}`)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'linear-gradient(135deg, #10b981 0%, #0284c7 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 800,
+                  boxShadow: '0 2px 10px rgba(16, 185, 129, 0.4)'
+                }}
+                title="Bu müşteri için 1-tıkla WhatsApp veya PDF teklif sihirbazını aç"
+              >
+                <FiFileText size={15} /> ⚡ 1-Tıkla Teklif / Proforma
+              </button>
+
+              <button
+                className="btn btn-sm"
                 onClick={() => setShowChassisMatcher(true)}
                 style={{
                   display: 'inline-flex',
@@ -624,7 +642,7 @@ export default function CustomerDetail() {
                   fontWeight: 700,
                   boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)'
                 }}
-                title="Şasi, kasa boyutları ve kantar hesaplayıcısını bu müşteri için aç"
+                title="Şasi, kasa boyutları ve istiap hesaplayıcısını bu müşteri için aç"
               >
                 <FiTruck size={15} /> 🎯 Şasi & Kasa Seçici
               </button>
