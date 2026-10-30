@@ -190,9 +190,14 @@ export default function PublicProposalView() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ background: '#f8fafc', padding: '16px 28px', borderTop: '1px solid #e2e8f0', textAlign: 'center', fontSize: '12px', color: '#94a3b8' }}>
-          IVECO Türkiye Yetkili Bayisi ERC Otomotiv Dijital Satış Sistemi • Güvenli Müşteri Bağlantısı
+        {/* Footer & Yasal Bilgilendirme */}
+        <div style={{ background: '#f8fafc', padding: '18px 28px', borderTop: '1px solid #e2e8f0', textAlign: 'center', fontSize: '11px', color: '#64748b', lineHeight: 1.5 }}>
+          <div style={{ fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
+            IVECO Yetkili Satıcısı ERC Samsun Otomotiv San. ve Tic. A.Ş. • Dijital Proforma Sistemi
+          </div>
+          <div>
+            * Bu teklif bilgilendirme amaçlı olup kesin satış taahhüdü teşkil etmez. Nihai araç fiyatı, teslim tarihi ve resmi banka kredi onay şartları IVECO ERC Samsun Otomotiv ile düzenlenecek resmi satış sözleşmesiyle kesinleşir. Teklifimiz stoklarla sınırlıdır.
+          </div>
         </div>
       </div>
     </div>

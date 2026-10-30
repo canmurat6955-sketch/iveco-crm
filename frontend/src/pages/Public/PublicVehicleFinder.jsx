@@ -2981,6 +2981,9 @@ IVECO ERC Samsun Otomotiv
                       <strong style={{ fontSize: '1.25rem', color: '#10b981', fontWeight: 900 }}>{matched.cashPriceText}</strong>
                     </div>
                   </div>
+                  <div style={{ marginTop: '8px', fontSize: '0.62rem', color: '#64748b', textAlign: 'right' }}>
+                    * Tavsiye edilen bilgilendirme fiyatıdır; resmi sözleşme ve bayi onayı ile kesinleşir.
+                  </div>
                 </div>
               ) : null}
 
@@ -4424,10 +4427,28 @@ IVECO ERC Samsun Otomotiv
         </button>
       </div>
 
-      {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <div style={{ maxWidth: '680px', margin: '24px auto 0', textAlign: 'center', color: '#64748b', fontSize: '0.74rem' }}>
-        IVECO ERC Samsun Otomotiv Ticari Araçlar Yetkili Satıcısı & Servisi • Samsun<br />
-        Tüm boş ağırlıklar şoför ve yakıt dahil resmi teknik föy verileridir.
+      {/* ── FOOTER & YASAL BİLGİLENDİRME ─────────────────────────── */}
+      <div style={{
+        maxWidth: '740px',
+        margin: '28px auto 0',
+        padding: '16px 20px',
+        background: 'rgba(15, 23, 42, 0.45)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderRadius: '12px',
+        textAlign: 'center',
+        color: '#64748b',
+        fontSize: '0.68rem',
+        lineHeight: 1.55
+      }}>
+        <div style={{ color: '#94a3b8', fontWeight: 700, marginBottom: '6px', fontSize: '0.74rem' }}>
+          IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş. • Yetkili Satıcı & Servis
+        </div>
+        <p style={{ margin: '0 0 6px' }}>
+          <strong style={{ color: '#cbd5e1' }}>⚖️ Yasal Bilgilendirme:</strong> Bu portalda sunulan araç fiyatları, teknik ölçüler, kasa tavsiyeleri ve banka finansman simülasyonları tavsiye edilen bilgilendirme niteliğinde olup kesin satış taahhüdü (icap) veya nihai proforma fatura teşkil etmez.
+        </p>
+        <p style={{ margin: 0, color: '#475569', fontSize: '0.65rem' }}>
+          Nihai araç teslim tarihi, anahtar teslim fiyatı, opsiyonel donanımlar ve resmi kredi onay şartları IVECO ERC Samsun Otomotiv ile düzenlenecek resmi satış sözleşmesiyle kesinlik kazanır. Fiyatlar ve stok durumu fabrika/distribütör koşullarına bağlı olarak değişkenlik gösterebilir.
+        </p>
       </div>
     </div>
   );
