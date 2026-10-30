@@ -5,7 +5,10 @@ import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
 import { tsbVehicles } from '../../data/ivecoVehicles';
+import { IVECO_PRICING_CATALOG, calculatePricing } from '../../data/ivecoPricingCatalog';
 import { getPublicOrigin } from '../../utils/publicUrl';
+import { FiTag, FiDollarSign, FiPercent, FiSettings, FiCheck } from 'react-icons/fi';
+
 
 // Speech Dictation Number Converter
 function parseTurkishNumber(text) {
@@ -132,8 +135,79 @@ export default function ProformaQuick() {
   const [listeningField, setListeningField] = useState(null); // 'model' or 'price'
   const recognitionRef = useRef(null);
 
+  // 2026 IVECO Pricing Catalog State
+  const [selectedCatalogVehicle, setSelectedCatalogVehicle] = useState(null);
+  const [selectedSegment, setSelectedSegment] = useState('ALL'); // 'ALL', 'Daily 35', 'Daily 70 C', 'Eurocargo', 'S-Way'
+  const [paymentType, setPaymentType] = useState('cash'); // 'cash' (peşin) or 'campaign' (vadeli/kampanyalı)
+  const [hasAutoTransmission, setHasAutoTransmission] = useState(false);
+  const [eurRate, setEurRate] = useState(38.0);
+
+  // Apply catalog vehicle to form and calculate prices
+  const applyCatalogVehicle = (cv, pType = paymentType, autoTrans = hasAutoTransmission, rate = eurRate) => {
+    if (!cv) return;
+    setSelectedCatalogVehicle(cv);
+
+    const pricing = calculatePricing(cv, pType, {
+      hasAutoTransmission: autoTrans,
+      eurExchangeRate: rate
+    });
+
+    const priceVal = pricing.currency === 'EUR' ? pricing.tryEquivalent : pricing.finalPrice;
+
+    // Commercial Terms and Notes
+    let defaultNotes = '';
+    let defaultPayment = '';
+
+    if (pricing.currency === 'EUR') {
+      defaultNotes = `Teklifimiz ${cv.eurPrice.toLocaleString('tr-TR')} EUR bedel üzerinden, ${rate} TL/EUR kuru baz alınarak hazırlanmıştır. Fatura tarihindeki TCMB Döviz Satış Kuru esas alınacaktır. Vergi kanunlarındaki değişiklikler yansıtılacaktır.`;
+      defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Döviz Karşılığı TL)";
+    } else if (pType === 'cash') {
+      defaultNotes = `Fiyatlarımız peşin satış koşulları esas alınarak ${pricing.discount.toLocaleString('tr-TR')} TL özel peşin alım indirimi uygulanarak oluşturulmuş olup ödeme nakten ve defaten gerçekleştirilecektir. SUBVANSİYONLU kredi kullandırılamaz. Vergi kanunlarında yapılacak değişiklikler lehde ve aleyhte fiyatlarımıza yansıtılacaktır.`;
+      defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Peşin Alım)";
+    } else {
+      defaultNotes = `Fiyatlarımız IVECO resmi sübvansiyonlu banka kampanyası koşulları esas alınarak oluşturulmuştur. Banka kredi tahsis ve onay şartları geçerlidir. Vergi kanunlarında yapılacak değişiklikler yansıtılacaktır.`;
+      defaultPayment = "IVECO Finans / Anlaşmalı Banka Kampanyası Kredisi ve Peşinat Talimatı ile";
+    }
+
+    setVehicle(prev => ({
+      ...prev,
+      vehicle_model: cv.model,
+      model_year: cv.year || '2026',
+      motor_power: cv.power || prev.motor_power,
+      max_weight: cv.tonnage || prev.max_weight,
+      unit_price: priceVal.toString(),
+      otv_rate: cv.otv_rate?.toString() || '4.0',
+      kdv_rate: cv.kdv_rate?.toString() || '20.0',
+      notes: defaultNotes,
+      payment_terms: defaultPayment
+    }));
+  };
+
+  const handlePaymentTypeChange = (newType) => {
+    setPaymentType(newType);
+    if (selectedCatalogVehicle) {
+      applyCatalogVehicle(selectedCatalogVehicle, newType, hasAutoTransmission, eurRate);
+    }
+  };
+
+  const handleAutoTransmissionToggle = (newVal) => {
+    setHasAutoTransmission(newVal);
+    if (selectedCatalogVehicle) {
+      applyCatalogVehicle(selectedCatalogVehicle, paymentType, newVal, eurRate);
+    }
+  };
+
+  const handleEurRateChange = (newRate) => {
+    const r = parseFloat(newRate) || 38.0;
+    setEurRate(r);
+    if (selectedCatalogVehicle && selectedCatalogVehicle.currency === 'EUR') {
+      applyCatalogVehicle(selectedCatalogVehicle, paymentType, hasAutoTransmission, r);
+    }
+  };
+
   useEffect(() => {
     if (location.state?.customer) {
+
       const c = location.state.customer;
       setCustomer(prev => ({
         ...prev,
@@ -319,7 +393,32 @@ export default function ProformaQuick() {
 
       // 3. Share on WhatsApp
       const origin = getPublicOrigin();
-      const wpMessage = `Sayın ${customer.company_name.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: ${origin}/proformas/${proformaId}`;
+      let wpMessage = `Sayın *${customer.company_name.toUpperCase()}*,\nERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı resmi teklifiniz hazırdır.\n\n`;
+
+      if (selectedCatalogVehicle) {
+        const pricing = calculatePricing(selectedCatalogVehicle, paymentType, {
+          hasAutoTransmission,
+          eurExchangeRate: eurRate
+        });
+        if (pricing.currency === 'EUR') {
+          wpMessage += `🚛 *Araç:* ${selectedCatalogVehicle.model}\n` +
+            `💶 *Teklif Bedeli:* ${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} EUR\n` +
+            `🇹🇷 *TL Karşılığı (Kur: ${eurRate}):* ${pricing.tryEquivalent.toLocaleString('tr-TR')} TL\n\n`;
+        } else if (pricing.isCash && pricing.discount > 0) {
+          wpMessage += `🚛 *Araç:* ${selectedCatalogVehicle.model}\n` +
+            `💳 *Kampanyalı Satış Fiyatı:* ${pricing.basePrice.toLocaleString('tr-TR')} TL\n` +
+            `🎁 *Özel Peşin Alım İndirimi:* -${pricing.discount.toLocaleString('tr-TR')} TL\n` +
+            `🌟 *Net Anahtar Teslim:* ${pricing.finalPrice.toLocaleString('tr-TR')} TL\n\n`;
+        } else {
+          wpMessage += `🚛 *Araç:* ${selectedCatalogVehicle.model}\n` +
+            `💳 *Anahtar Teslim Toplam:* ${Number(calculations.grand_total).toLocaleString('tr-TR')} TL\n\n`;
+        }
+      } else {
+        wpMessage += `🚛 *Araç:* ${vehicle.vehicle_model}\n` +
+          `💳 *Anahtar Teslim Toplam:* ${Number(calculations.grand_total).toLocaleString('tr-TR')} TL\n\n`;
+      }
+
+      wpMessage += `Resmi proformanızı incelemek ve indirmek için link:\n${origin}/proformas/${proformaId}\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
       const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
       
       // Navigate to printable detail page first to set history, then redirect current tab to WhatsApp (bypasses popup blocker)
@@ -335,6 +434,24 @@ export default function ProformaQuick() {
     }
   };
 
+  const segments = [
+    { key: 'ALL', label: 'Tümü (28)' },
+    { key: 'Daily 35', label: 'Daily 35 (12)' },
+    { key: 'Daily 70 C', label: 'Daily 70 C (8)' },
+    { key: 'Eurocargo', label: 'Eurocargo (5)' },
+    { key: 'S-Way', label: 'S-Way Çekici (3)' },
+  ];
+
+  const [showLegacyTsb, setShowLegacyTsb] = useState(false);
+
+  const filteredCatalogVehicles = IVECO_PRICING_CATALOG.filter(v => {
+    const matchesSegment = selectedSegment === 'ALL' || v.segment === selectedSegment;
+    const matchesSearch = !vehicleSearchTerm ||
+      v.model.toLowerCase().includes(vehicleSearchTerm.toLowerCase()) ||
+      v.category.toLowerCase().includes(vehicleSearchTerm.toLowerCase());
+    return matchesSegment && matchesSearch;
+  });
+
   const filteredVehicles = tsbVehicles.filter(v => 
     v.model.toLowerCase().includes(vehicleSearchTerm.toLowerCase())
   );
@@ -345,7 +462,7 @@ export default function ProformaQuick() {
         <FiCheckCircle color="#10b981" /> 1-Tıkla Proforma Sihirbazı
       </h2>
       <p className="text-muted" style={{ marginTop: '-12px', marginBottom: '24px' }}>
-        Vergi levhasını yükleyin, araç modelini ve fiyatı yazın/söyleyin ve anında WhatsApp'tan teklifinizi gönderin.
+        2026 Model Fiyat Matrisi ile aracınızı seçin, peşin indirimini tek tıkla uygulayın ve WhatsApp'tan anında paylaşın.
       </p>
 
       <div className="grid grid-2" style={{ gap: '1.5rem', alignItems: 'start' }}>
@@ -409,44 +526,226 @@ export default function ProformaQuick() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           <div className="card glass-card">
-            <div className="section-title">TEKLİF EDİLECEK ARAÇ VE FİYAT</div>
+            <div className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span>TEKLİF EDİLECEK ARAÇ VE 2026 FİYAT MATRİSİ</span>
+              <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700, background: 'rgba(16,185,129,0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                Eylül 2026 Güncel
+              </span>
+            </div>
 
-            {/* Hazır Şablon Seçimi */}
-            <div className="form-group">
-              <label className="form-label" style={{ color: 'var(--accent-blue-light)', fontWeight: 600 }}>
-                Hazır Araç Listesinden Seçin ({tsbVehicles.length} Araç)
-              </label>
+            {/* Segment Seçim Sekmeleri */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              {segments.map(seg => (
+                <button
+                  key={seg.key}
+                  type="button"
+                  onClick={() => setSelectedSegment(seg.key)}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    borderRadius: '16px',
+                    border: selectedSegment === seg.key ? '1px solid #0284c7' : '1px solid rgba(255,255,255,0.12)',
+                    background: selectedSegment === seg.key ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255,255,255,0.04)',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {seg.label}
+                </button>
+              ))}
+            </div>
+
+            {/* 2026 Model Arama & Seçim */}
+            <div className="form-group" style={{ marginBottom: '12px' }}>
               <input 
                 type="text" 
                 className="form-input" 
-                placeholder="Araç listesini aramak için yazın... (Örn: 35 C 13 veya 70 C)" 
+                placeholder="2026 Modellerde filtreleyin... (Örn: 70 C, 35 S, Eurocargo, Hi-Matic)" 
                 value={vehicleSearchTerm} 
                 onChange={e => setVehicleSearchTerm(e.target.value)} 
                 style={{ fontSize: '0.85rem', padding: '6px 12px', marginBottom: '8px' }}
               />
               <select 
                 className="form-input" 
-                value="" 
+                value={selectedCatalogVehicle ? selectedCatalogVehicle.id : ""} 
                 onChange={e => {
-                  const val = e.target.value;
-                  if (val !== "") {
-                    const preset = filteredVehicles[parseInt(val)];
-                    setVehicle(prev => ({
-                      ...prev,
-                      vehicle_model: preset.model,
-                      motor_power: preset.power,
-                      max_weight: preset.weight
-                    }));
+                  const selectedId = e.target.value;
+                  if (selectedId) {
+                    const found = IVECO_PRICING_CATALOG.find(x => x.id === selectedId);
+                    if (found) {
+                      applyCatalogVehicle(found);
+                    }
                   }
                 }}
+                style={{ fontWeight: 600, borderColor: selectedCatalogVehicle ? '#10b981' : undefined }}
               >
                 <option value="">
-                  {filteredVehicles.length === 0 ? "Eşleşen araç bulunamadı" : `-- Eşleşen ${filteredVehicles.length} araç arasından seçin --`}
+                  {filteredCatalogVehicles.length === 0 ? "Eşleşen 2026 model bulunamadı" : `-- 2026 Fiyat Listesinden Araç Seçin (${filteredCatalogVehicles.length} Model) --`}
                 </option>
-                {filteredVehicles.map((p, idx) => (
-                  <option key={idx} value={idx}>{p.model}</option>
+                {filteredCatalogVehicles.map(v => (
+                  <option key={v.id} value={v.id}>
+                    [{v.segment}] {v.model} — {v.currency === 'EUR' ? `${v.eurPrice.toLocaleString('tr-TR')} €` : `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL`}
+                  </option>
                 ))}
               </select>
+            </div>
+
+            {/* 2026 Dinamik Fiyatlandırma & Kampanya Kartı */}
+            {selectedCatalogVehicle && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(2,132,199,0.08) 0%, rgba(16,185,129,0.08) 100%)',
+                border: '1px solid rgba(2,132,199,0.3)',
+                borderRadius: '12px',
+                padding: '14px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--accent-blue-light)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    🎯 2026 FİYATLANDIRMA SEÇENEĞİ
+                  </span>
+                  <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.08)', padding: '2px 8px', borderRadius: '10px', color: '#cbd5e1' }}>
+                    Bayi Maliyeti: {selectedCatalogVehicle.currency === 'EUR' ? `${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} €` : `${selectedCatalogVehicle.dealerCost?.toLocaleString('tr-TR')} TL`}
+                  </span>
+                </div>
+
+                {/* TL Araçlar İçin: Kampanyalı vs Peşin 2 Büyük Kart */}
+                {selectedCatalogVehicle.currency !== 'EUR' ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {/* Kart 1: Kampanyalı / Vadeli */}
+                    <div
+                      onClick={() => handlePaymentTypeChange('campaign')}
+                      style={{
+                        border: paymentType === 'campaign' ? '2px solid #0284c7' : '1px solid rgba(255,255,255,0.1)',
+                        background: paymentType === 'campaign' ? 'rgba(2,132,199,0.18)' : 'rgba(255,255,255,0.03)',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: paymentType === 'campaign' ? '#38bdf8' : 'var(--text-secondary)' }}>
+                          💳 Kampanyalı / Kredili
+                        </span>
+                        {paymentType === 'campaign' && <FiCheck color="#38bdf8" />}
+                      </div>
+                      <div style={{ fontSize: '17px', fontWeight: 800, marginTop: '4px', color: '#ffffff' }}>
+                        {(selectedCatalogVehicle.campaignPrice + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Sübvansiyonlu Kredi Satış
+                      </div>
+                    </div>
+
+                    {/* Kart 2: Peşin / Nakit İndirimli */}
+                    <div
+                      onClick={() => handlePaymentTypeChange('cash')}
+                      style={{
+                        border: paymentType === 'cash' ? '2px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                        background: paymentType === 'cash' ? 'rgba(16,185,129,0.18)' : 'rgba(255,255,255,0.03)',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: paymentType === 'cash' ? '#34d399' : 'var(--text-secondary)' }}>
+                          💵 Peşin / Nakit Alım
+                        </span>
+                        {paymentType === 'cash' && <FiCheck color="#34d399" />}
+                      </div>
+                      <div style={{ fontSize: '17px', fontWeight: 800, marginTop: '4px', color: '#34d399' }}>
+                        {(selectedCatalogVehicle.cashPrice + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
+                      </div>
+                      <div style={{ display: 'inline-block', fontSize: '11px', color: '#10b981', fontWeight: 700, background: 'rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '4px', marginTop: '2px' }}>
+                        🎁 -{selectedCatalogVehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* S-Way Euro Bazlı Araçlar */
+                  <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Euro Satış Fiyatı</div>
+                        <div style={{ fontSize: '20px', fontWeight: 800, color: '#38bdf8' }}>{selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} EUR</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>TCMB/Sabit Kur:</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={eurRate}
+                          onChange={e => handleEurRateChange(e.target.value)}
+                          style={{ width: '80px', padding: '4px 8px', borderRadius: '6px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', fontWeight: 700 }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Hesaplanan TL Teklif Tutar:</span>
+                      <span style={{ fontSize: '16px', fontWeight: 800, color: '#10b981' }}>
+                        {Math.round(selectedCatalogVehicle.eurPrice * eurRate).toLocaleString('tr-TR')} TL
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Eurocargo İçin Otomatik Şanzıman Opsiyonu */}
+                {selectedCatalogVehicle.autoTransmissionCost && (
+                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', color: '#ffffff' }}>
+                      <input
+                        type="checkbox"
+                        checked={hasAutoTransmission}
+                        onChange={e => handleAutoTransmissionToggle(e.target.checked)}
+                        style={{ width: '16px', height: '16px', accentColor: '#0284c7' }}
+                      />
+                      <span style={{ fontWeight: 600 }}>⚙️ Eurocargo Otomatik Şanzıman Farkı Ekle (+220.000 TL Vergiler Dahil)</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Alternatif Eski TSB Kasko Listesi (Gizlenebilir) */}
+            <div style={{ marginBottom: '14px' }}>
+              <button
+                type="button"
+                className="btn btn-sm btn-secondary"
+                onClick={() => setShowLegacyTsb(!showLegacyTsb)}
+                style={{ fontSize: '11px', padding: '3px 8px', opacity: 0.8 }}
+              >
+                {showLegacyTsb ? 'Eski TSB Listesini Gizle' : '📁 Diğer / Eski Model TSB Kataloğu (4.000+ Araç)'}
+              </button>
+              {showLegacyTsb && (
+                <div style={{ marginTop: '8px' }}>
+                  <select 
+                    className="form-input" 
+                    value="" 
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val !== "") {
+                        const preset = filteredVehicles[parseInt(val)];
+                        setSelectedCatalogVehicle(null);
+                        setVehicle(prev => ({
+                          ...prev,
+                          vehicle_model: preset.model,
+                          motor_power: preset.power,
+                          max_weight: preset.weight
+                        }));
+                      }
+                    }}
+                  >
+                    <option value="">-- Eski TSB Araçları Arasından Seçin --</option>
+                    {filteredVehicles.slice(0, 100).map((p, idx) => (
+                      <option key={idx} value={idx}>{p.model}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Vehicle Model & Speech */}
@@ -457,7 +756,7 @@ export default function ProformaQuick() {
                   className="form-input" 
                   value={vehicle.vehicle_model} 
                   onChange={e => setVehicle({ ...vehicle, vehicle_model: e.target.value })} 
-                  placeholder="Örn: IVECO DAILY 70 C 16 H 3.0 A 8 CC 4350 EVIE" 
+                  placeholder="Örn: IVECO DAILY 70 C 16 CC 3750 H 3.0 Klimalı" 
                   required 
                 />
                 <button 
@@ -473,7 +772,16 @@ export default function ProformaQuick() {
 
             {/* Price Box & Speech */}
             <div className="form-group">
-              <label className="form-label">Net Satış Fiyatı (Anahtar Teslim - Her Şey Dahil) Söyleyin veya Yazın *</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <label className="form-label" style={{ margin: 0 }}>
+                  Net Satış Fiyatı (Anahtar Teslim - Her Şey Dahil) *
+                </label>
+                {selectedCatalogVehicle && (
+                  <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>
+                    ✓ 2026 Matrisinden Otomatik Aktarıldı
+                  </span>
+                )}
+              </div>
               <div className="flex gap-2">
                 <input 
                   className="form-input" 
@@ -481,7 +789,7 @@ export default function ProformaQuick() {
                   step="0.01"
                   value={vehicle.unit_price} 
                   onChange={e => setVehicle({ ...vehicle, unit_price: e.target.value })} 
-                  placeholder="Net satış fiyatını girin veya mikrofona konuşun (Örn: 2500000)..." 
+                  placeholder="Net satış fiyatı..." 
                   required 
                 />
                 <button 
@@ -494,6 +802,7 @@ export default function ProformaQuick() {
                 </button>
               </div>
             </div>
+
 
             {/* Calculations preview block */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.25rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>

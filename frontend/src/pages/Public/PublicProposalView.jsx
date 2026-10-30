@@ -130,16 +130,21 @@ export default function PublicProposalView() {
           }}>
             <div>
               <span style={{ fontSize: '13px', fontWeight: '700', color: '#166534', textTransform: 'uppercase' }}>
-                Anahtar Teslim Toplam Teklif Bedeli (KDV Dahil)
+                Anahtar Teslim Net Teklif Bedeli (KDV Dahil)
               </span>
-              <div style={{ fontSize: '32px', fontWeight: '900', color: '#15803d', marginTop: '4px' }}>
+              <div style={{ fontSize: '34px', fontWeight: '900', color: '#15803d', marginTop: '4px' }}>
                 {Number(proposal.grand_total).toLocaleString('tr-TR')} TL
               </div>
+              {proposal.notes && proposal.notes.toLowerCase().includes('peşin alım indirimi') && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#22c55e', color: '#fff', fontSize: '12px', fontWeight: 800, padding: '4px 10px', borderRadius: '20px', marginTop: '8px' }}>
+                  🎁 Özel Peşin Alım İndirimi Uygulanmıştır
+                </div>
+              )}
             </div>
             {proposal.payment_terms && (
-              <div style={{ background: '#fff', padding: '10px 16px', borderRadius: '10px', border: '1px solid #bbf7d0', maxWidth: '320px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#166534' }}>ÖDEME & FİNANSMAN PLANI</span>
-                <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: '600', marginTop: '2px' }}>{proposal.payment_terms}</div>
+              <div style={{ background: '#fff', padding: '12px 18px', borderRadius: '12px', border: '1px solid #bbf7d0', maxWidth: '340px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: '#166534', textTransform: 'uppercase' }}>ÖDEME & FİNANSMAN PLANI</span>
+                <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: '600', marginTop: '4px', lineHeight: 1.4 }}>{proposal.payment_terms}</div>
               </div>
             )}
           </div>
@@ -163,14 +168,14 @@ export default function PublicProposalView() {
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: '#64748b' }}>Satış Sorumlusu</div>
-                <div style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a' }}>{proposal.sales_rep_name}</div>
-                <div style={{ fontSize: '13px', color: '#0284c7' }}>IVECO ERC Samsun Otomotiv</div>
+                <div style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a' }}>{proposal.sales_rep_name || 'Can Murat ONAY'}</div>
+                <div style={{ fontSize: '13px', color: '#0284c7' }}>IVECO ERC Samsun Otomotiv • 0544 622 59 31</div>
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <a
-                href={`https://wa.me/905300000000?text=${encodeURIComponent(`Merhaba Can Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
+                href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Murat Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -179,7 +184,7 @@ export default function PublicProposalView() {
                   fontWeight: '700', fontSize: '14px', textDecoration: 'none', boxShadow: '0 4px 12px rgba(34, 197, 94, 0.25)'
                 }}
               >
-                💬 WhatsApp'tan Görüş
+                💬 Murat Bey ile WhatsApp'tan Görüş
               </a>
             </div>
           </div>

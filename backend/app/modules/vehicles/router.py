@@ -37,6 +37,14 @@ def parse_vehicle_code(code: str = Query(..., description="IVECO model kodu veya
     return VehicleCodeParser.parse_code(code)
 
 
+@router.get("/pricing-catalog")
+def get_vehicle_pricing_catalog(segment: Optional[str] = Query(None)):
+    """Provides the official 2026 IVECO vehicle pricing catalog with campaign prices and cash discounts."""
+    from app.modules.vehicles.pricing_catalog import get_pricing_catalog
+    return get_pricing_catalog(segment)
+
+
+
 # ── 2. Master Vehicle Data Endpoints ─────────────────────────────
 @router.get("/master", response_model=List[VehicleMasterResponse])
 def list_master_vehicles(

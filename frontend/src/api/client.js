@@ -462,6 +462,7 @@ export const vehiclesApi = {
   deleteMasterVehicle: (id) => api.delete(`/vehicles/master/${id}`),
   getCascadeData: () => api.get('/vehicles/cascade-data'),
   parseVehicleCode: (code) => api.get('/vehicles/parse-code', { params: { code } }),
+  getPricingCatalog: (segment) => api.get('/vehicles/pricing-catalog', { params: { segment } }),
 
   // Customer Vehicle Interests
   getCustomerInterests: (customerId) => api.get(`/vehicles/customers/${customerId}/interests`),
