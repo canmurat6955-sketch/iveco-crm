@@ -114,7 +114,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 12M3 TEKNİK FÖY.pdf',
-    priceRange: '1.850.000 TL - 2.050.000 TL + KDV',
+    priceRange: '2.110.000 TL (Peşin) / 2.300.000 TL (Kampanyalı)',
+    campaignPriceText: '2.300.000 TL',
+    cashPriceText: '2.110.000 TL',
+    cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
   },
@@ -145,7 +148,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 16M3 TEKNİK FÖY.pdf',
-    priceRange: '1.980.000 TL - 2.180.000 TL + KDV',
+    priceRange: '2.140.000 TL (Peşin) / 2.330.000 TL (Kampanyalı)',
+    campaignPriceText: '2.330.000 TL',
+    cashPriceText: '2.140.000 TL',
+    cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
   },
@@ -176,7 +182,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 18M3 ÇİFT TEKER TEKNİK FÖY.pdf',
-    priceRange: '2.100.000 TL - 2.300.000 TL + KDV',
+    priceRange: '2.300.000 TL (Peşin) / 2.490.000 TL (Kampanyalı)',
+    campaignPriceText: '2.490.000 TL',
+    cashPriceText: '2.300.000 TL',
+    cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
   },
@@ -209,7 +218,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '1.690.000 TL - 1.820.000 TL + KDV',
+    priceRange: '1.885.000 TL (Peşin) / 2.075.000 TL (Kampanyalı)',
+    campaignPriceText: '2.075.000 TL',
+    cashPriceText: '1.885.000 TL',
+    cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
   },
@@ -240,10 +252,14 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '1.780.000 TL - 1.950.000 TL + KDV',
+    priceRange: '2.145.000 TL (Peşin) / 2.335.000 TL (Kampanyalı)',
+    campaignPriceText: '2.335.000 TL',
+    cashPriceText: '2.145.000 TL',
+    cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
   },
+
 
   // ── KAMYON GRUBU (C EHLİYET - RESMİ KANTARLI) ──
   {
@@ -273,7 +289,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
     pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
-    priceRange: '2.350.000 TL - 2.580.000 TL + KDV',
+    priceRange: '2.220.000 TL (Peşin) / 2.480.000 TL (Kampanyalı)',
+    campaignPriceText: '2.480.000 TL',
+    cashPriceText: '2.220.000 TL',
+    cashDiscountText: '260.000 TL',
     defaultLoan: 1500000,
     bodyType: 'frigo'
   },
@@ -304,7 +323,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml100e19.pdf',
     pdfName: 'ML 100 E 19 TEKNİK FÖY .pdf',
-    priceRange: '2.950.000 TL - 3.200.000 TL + KDV',
+    priceRange: '3.330.000 TL (Peşin) / 3.570.000 TL (Kampanyalı)',
+    campaignPriceText: '3.570.000 TL',
+    cashPriceText: '3.330.000 TL',
+    cashDiscountText: '240.000 TL',
     defaultLoan: 1500000,
     bodyType: 'kayar_perde'
   },
@@ -335,7 +357,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml120el19.pdf',
     pdfName: 'ML 120 EL 19 TEKNİK FÖY .pdf',
-    priceRange: '3.300.000 TL - 3.550.000 TL + KDV',
+    priceRange: '3.820.000 TL (Peşin) / 4.060.000 TL (Kampanyalı)',
+    campaignPriceText: '4.060.000 TL',
+    cashPriceText: '3.820.000 TL',
+    cashDiscountText: '240.000 TL',
     defaultLoan: 2000000,
     bodyType: 'kayar_perde'
   },
@@ -366,7 +391,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml150e21.pdf',
     pdfName: 'ML 150 E 21 TEKNİK FÖY .pdf',
-    priceRange: '3.650.000 TL - 3.950.000 TL + KDV',
+    priceRange: '4.080.000 TL (Peşin) / 4.320.000 TL (Kampanyalı)',
+    campaignPriceText: '4.320.000 TL',
+    cashPriceText: '4.080.000 TL',
+    cashDiscountText: '240.000 TL',
     defaultLoan: 2000000,
     bodyType: 'kayar_perde'
   },
@@ -397,7 +425,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
     pdfName: 'ML 160 E 32P TEKNİK FÖY .pdf',
-    priceRange: '4.100.000 TL - 4.450.000 TL + KDV',
+    priceRange: '4.570.000 TL (Peşin) / 4.810.000 TL (Kampanyalı)',
+    campaignPriceText: '4.810.000 TL',
+    cashPriceText: '4.570.000 TL',
+    cashDiscountText: '240.000 TL',
     defaultLoan: 2500000,
     bodyType: 'kayar_perde'
   },
@@ -428,7 +459,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
     pdfName: 'ML 160 E 32P 10 TEKER TEKNİK FÖY .pdf',
-    priceRange: '4.650.000 TL - 4.950.000 TL + KDV',
+    priceRange: '4.570.000 TL (Peşin) / 4.810.000 TL (Kampanyalı)',
+    campaignPriceText: '4.810.000 TL',
+    cashPriceText: '4.570.000 TL',
+    cashDiscountText: '240.000 TL',
     defaultLoan: 2500000,
     bodyType: 'kayar_perde'
   },
@@ -461,7 +495,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
     pdfName: 'Teknik Foy_T-Way_AD380T54_Rigid_6x4_Tipper.pdf',
-    priceRange: '135.000 € - 148.000 € + KDV',
+    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    isTway: true,
+    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -492,7 +528,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
     pdfName: 'T-WAY AD 380T 46 6x4 HAFRİYAT TEKNİK FÖY.pdf',
-    priceRange: '128.000 € - 139.000 € + KDV',
+    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    isTway: true,
+    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -523,7 +561,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad410t54-tipper.pdf',
     pdfName: 'Teknik Foy_T-Way_AD410T54_Rigid_8x4_Tipper.pdf',
-    priceRange: '152.000 € - 168.000 € + KDV',
+    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    isTway: true,
+    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -554,7 +594,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad410t46b-mixer.pdf',
     pdfName: 'Teknik Foy_TW_Rigid_8x4_AD410T46.pdf',
-    priceRange: '142.000 € - 156.000 € + KDV',
+    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    isTway: true,
+    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -587,11 +629,15 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/s-way-500-full-plus.pdf',
     pdfName: 'S-WAY 500 FULL PLUS TEKNİK FÖY .pdf',
-    priceRange: '115.000 € - 128.000 € + KDV',
+    priceRange: '123.000 € (500 Full Plus) / 126.000 € (580) / 131.000 € (Diamond)',
+    currency: 'EUR',
+    displayPrice: '123.000 € – 131.000 €',
+    modelsDetail: '500 Full Plus: 123.000 € • 580 Full Plus: 126.000 € • 580 Diamond: 131.000 €',
     defaultLoan: 3000000,
     bodyType: 'kayar_perde'
   }
 ];
+
 
 export default function PublicVehicleFinder() {
   const [searchParams] = useSearchParams();
@@ -1286,6 +1332,14 @@ export default function PublicVehicleFinder() {
       ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
       : `Merhaba Can Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
 
+    const priceText = matched.isTway
+      ? `🏷️ *Fiyatlandırma:* T-Way Şantiye & Damper Özel Fiyatı (Can Murat'a Danışılacak)\n`
+      : matched.currency === 'EUR'
+        ? `🏷️ *Fiyat Aralığı:* ${matched.displayPrice} (${matched.modelsDetail || 'Euro Dövizli'})\n`
+        : matched.cashPriceText
+          ? `🏷️ *Kampanyalı Fiyat:* ${matched.campaignPriceText}\n🎁 *Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
+          : '';
+
     const campaignText = activeCampaign
       ? `💳 *Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
         `💰 *Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
@@ -1296,6 +1350,7 @@ export default function PublicVehicleFinder() {
       `🚛 *Tavsiye Edilen Model:* ${matched.modelTitle}\n` +
       `📐 *Önerilen Kasa Boyutları:* ${matched.dims.length} × ${matched.dims.width} × ${matched.dims.height} (${matched.dims.volume})\n` +
       `⚖️ *Yük İhtiyacım:* ${payloadKg} kg Net Yük | Kantar Durumu: ${matched.kantarTitle}\n` +
+      priceText +
       campaignText +
       `Bu aracın hazır şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
     );
@@ -2321,6 +2376,68 @@ IVECO ERC Samsun Otomotiv
                               <strong style={{ color: '#e2e8f0' }}>{v.license.split(' ')[0]}</strong>
                             </div>
                           </div>
+
+                          {/* 🏷️ 2026 ARAÇ FİYATLANDIRMA ALANI */}
+                          {v.isTway ? (
+                            <div style={{
+                              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(180, 83, 9, 0.25) 100%)',
+                              border: '1px solid rgba(245, 158, 11, 0.45)',
+                              borderRadius: '8px',
+                              padding: '8px 10px',
+                              marginBottom: '8px',
+                              textAlign: 'center'
+                            }}>
+                              <div style={{ fontSize: '0.64rem', fontWeight: 800, color: '#fcd34d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                🚜 ŞANTİYE & HAFRİYAT ÖZEL FİYATI
+                              </div>
+                              <div style={{ fontSize: '0.84rem', fontWeight: 900, color: '#fef08a', marginTop: '3px' }}>
+                                Fiyatlandırma için Can Murat'a Danışabilirsiniz
+                              </div>
+                              <div style={{ fontSize: '0.66rem', color: '#cbd5e1', marginTop: '2px' }}>
+                                Can Murat Onay: 0544 622 59 31
+                              </div>
+                            </div>
+                          ) : v.currency === 'EUR' ? (
+                            <div style={{
+                              background: 'rgba(59, 130, 246, 0.12)',
+                              border: '1px solid rgba(59, 130, 246, 0.35)',
+                              borderRadius: '8px',
+                              padding: '8px 10px',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                <span style={{ fontSize: '0.66rem', color: '#93c5fd', fontWeight: 700 }}>ÇEKİCİ FİYAT ARALIĞI:</span>
+                                <span style={{ fontSize: '0.92rem', fontWeight: 900, color: '#60a5fa' }}>{v.displayPrice}</span>
+                              </div>
+                              <div style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: '3px', lineHeight: 1.3 }}>
+                                {v.modelsDetail || '500 Full Plus: 123.000 € • 580: 126.000 € • Diamond: 131.000 €'}
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{
+                              background: 'rgba(16, 185, 129, 0.08)',
+                              border: '1px solid rgba(16, 185, 129, 0.28)',
+                              borderRadius: '8px',
+                              padding: '8px 10px',
+                              marginBottom: '8px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2px' }}>
+                                <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Kampanyalı:</span>
+                                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#cbd5e1', textDecoration: 'line-through' }}>{v.campaignPriceText}</span>
+                              </div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399' }}>NET PEŞİN:</span>
+                                <span style={{ fontSize: '0.96rem', fontWeight: 900, color: '#10b981' }}>{v.cashPriceText}</span>
+                              </div>
+                              {v.cashDiscountText && (
+                                <div style={{ marginTop: '4px', textAlign: 'right' }}>
+                                  <span style={{ fontSize: '0.62rem', background: '#059669', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 800, display: 'inline-block' }}>
+                                    🎁 -{v.cashDiscountText} Peşin İndirimi
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <button
@@ -2753,6 +2870,119 @@ IVECO ERC Samsun Otomotiv
               <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: '0 0 14px' }}>
                 Şasi: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong> · Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
               </p>
+
+              {/* 🏷️ 2026 RESMİ SATIŞ FİYATI & PEŞİN İNDİRİMİ */}
+              {matched.isTway ? (
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.28) 100%)',
+                  border: '1.5px solid rgba(245, 158, 11, 0.5)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fcd34d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      🚜 T-WAY ŞANTİYE & HAFRİYAT ÖZEL FİYATLANDIRMA
+                    </div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fef08a', marginTop: '4px' }}>
+                      Fiyatlandırma için Can Murat'a Danışabilirsiniz
+                    </div>
+                    <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '3px' }}>
+                      Can Murat Onay · IVECO ERC Samsun Satış Sorumlusu (0544 622 59 31)
+                    </div>
+                  </div>
+                  <a
+                    href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Murat Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: '#22c55e',
+                      color: '#0f172a',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
+                    }}
+                  >
+                    <FiPhoneCall size={16} /> Fiyat Sor (0544 622 59 31)
+                  </a>
+                </div>
+              ) : matched.currency === 'EUR' ? (
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%)',
+                  border: '1.5px solid rgba(59, 130, 246, 0.45)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  marginBottom: '14px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase' }}>
+                        🛣️ 2026 S-WAY ÇEKİCİ RESMİ LİSTE FİYATLARI
+                      </span>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#60a5fa', marginTop: '2px' }}>
+                        {matched.displayPrice || '123.000 € – 131.000 €'}
+                      </div>
+                    </div>
+                    <span style={{ background: '#1d4ed8', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
+                      EUR DÖVİZLİ / KREDİYE UYGUN
+                    </span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginTop: '8px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>500 Full Plus:</span>
+                      <strong style={{ fontSize: '0.95rem', color: '#fff' }}>123.000 €</strong>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>580 Full Plus:</span>
+                      <strong style={{ fontSize: '0.95rem', color: '#fff' }}>126.000 €</strong>
+                    </div>
+                    <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#fbbf24', display: 'block' }}>580 Diamond:</span>
+                      <strong style={{ fontSize: '0.95rem', color: '#fef08a' }}>131.000 €</strong>
+                    </div>
+                  </div>
+                </div>
+              ) : matched.campaignPriceText ? (
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)',
+                  border: '1.5px solid rgba(16, 185, 129, 0.45)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  marginBottom: '14px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      🏷️ 2026 RESMİ KAMPANYALI & PEŞİN SATIŞ FİYATI
+                    </span>
+                    {matched.cashDiscountText && (
+                      <span style={{ background: '#059669', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: '6px' }}>
+                        🎁 -{matched.cashDiscountText} Peşin Alım İndirimi
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>KAMPANYALI / KREDİLİ FİYAT</span>
+                      <strong style={{ fontSize: '1.05rem', color: '#cbd5e1' }}>{matched.campaignPriceText}</strong>
+                    </div>
+                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#34d399', display: 'block', marginBottom: '2px', fontWeight: 700 }}>NET PEŞİN ALIM FİYATI</span>
+                      <strong style={{ fontSize: '1.25rem', color: '#10b981', fontWeight: 900 }}>{matched.cashPriceText}</strong>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               {/* 📐 KASA ÖLÇÜLERİ & HACİM KUTUSU */}
               <div style={{
