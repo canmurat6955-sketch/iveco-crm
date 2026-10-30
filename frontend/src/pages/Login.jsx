@@ -121,20 +121,38 @@ export default function Login() {
         boxShadow: '0 12px 40px 0 rgba(0, 0, 0, 0.5)',
         textAlign: 'center'
       }}>
+        {/* Official Brand Logos */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          background: 'rgba(15, 23, 42, 0.6)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          padding: '8px 16px',
+          borderRadius: '30px',
+          margin: '0 auto 18px',
+          width: 'fit-content'
+        }}>
+          <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '22px', objectFit: 'contain' }} />
+          <span style={{ height: '18px', width: '1px', background: 'rgba(255, 255, 255, 0.2)' }} />
+          <img src="/logo-erc-samsun-white.png" alt="ERC Samsun" style={{ height: '26px', objectFit: 'contain' }} />
+        </div>
+
         {/* Logo / Başlık */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 56,
-          height: 56,
-          borderRadius: 16,
+          width: 50,
+          height: 50,
+          borderRadius: 14,
           background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)',
           border: '1px solid rgba(96, 165, 250, 0.3)',
-          marginBottom: 16,
+          marginBottom: 12,
           color: '#60a5fa'
         }}>
-          <FiKey size={26} />
+          <FiKey size={24} />
         </div>
 
         <h1 style={{

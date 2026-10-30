@@ -54,6 +54,23 @@ export default function PublicProposalView() {
         
         {/* Header Banner */}
         <div style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%)', color: '#ffffff', padding: '32px 28px', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '26px', objectFit: 'contain' }} />
+            <div style={{ height: '22px', width: '1px', background: 'rgba(255, 255, 255, 0.35)' }} />
+            <img src="/logo-erc-samsun-white.png" alt="ERC Samsun Otomotiv" style={{ height: '30px', objectFit: 'contain' }} />
+            <div style={{
+              fontSize: '11px',
+              fontWeight: 800,
+              color: '#fef08a',
+              background: 'rgba(254, 240, 138, 0.15)',
+              padding: '3px 10px',
+              borderRadius: '12px',
+              border: '1px solid rgba(254, 240, 138, 0.3)',
+              letterSpacing: '0.5px'
+            }}>
+              YETKİLİ SATICI & SERVİS
+            </div>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.15)', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', letterSpacing: '1px', marginBottom: '10px' }}>

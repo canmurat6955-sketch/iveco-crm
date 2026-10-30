@@ -29,9 +29,16 @@ export default function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">
-        <h1>IVECO CRM</h1>
-        <p>Müşteri İstihbarat</p>
+      <div className="sidebar-brand" style={{ padding: '16px 12px 14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%' }}>
+          <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '20px', objectFit: 'contain' }} />
+          <div style={{ height: '18px', width: '1px', background: 'rgba(255, 255, 255, 0.2)' }} />
+          <img src="/logo-erc-samsun-white.png" alt="ERC Samsun" style={{ height: '24px', objectFit: 'contain' }} />
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.5px' }}>MÜŞTERİ İSTİHBARAT</div>
+          <div style={{ fontSize: '0.64rem', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>Yetkili Satıcı & Servis</div>
+        </div>
       </div>
 
       <nav className="sidebar-nav">

@@ -173,29 +173,18 @@ export default function ProformaDetail() {
         overflow: 'hidden'
       }}>
         {/* Header Block */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '12px' }}>
-          {/* Logo ERC */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '50%',
-              border: '4px solid #cc0000',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              color: '#cc0000',
-              fontSize: '24px',
-              fontStyle: 'italic'
-            }}>e</div>
-            <div>
-              <div style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.5px', color: '#000' }}>ERC SAMSUN</div>
-              <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '2px', color: '#000', marginTop: '-4px' }}>OTOMOTİV</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #000', paddingBottom: '12px', marginBottom: '12px' }}>
+          {/* Official Dealer & Brand Logos */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <img src="/logo-erc-samsun.png" alt="ERC Samsun Otomotiv" style={{ height: '44px', objectFit: 'contain' }} />
+            <div style={{ height: '34px', width: '1.5px', background: '#94a3b8' }} />
+            <img src="/logo-iveco.png" alt="IVECO" style={{ height: '28px', objectFit: 'contain' }} />
+            <div style={{ fontSize: '10px', fontWeight: 800, color: '#475569', letterSpacing: '0.8px', borderLeft: '1.5px solid #94a3b8', paddingLeft: '12px' }}>
+              YETKİLİ SATICI & SERVİS
             </div>
           </div>
           
-          <div style={{ fontWeight: 800, fontSize: '20px', letterSpacing: '0.5px' }}>
+          <div style={{ fontWeight: 900, fontSize: '20px', letterSpacing: '0.5px', color: '#000' }}>
             PROFORMA / INVOICE
           </div>
         </div>

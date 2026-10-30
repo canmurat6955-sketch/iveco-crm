@@ -1896,9 +1896,35 @@ IVECO ERC Samsun Otomotiv
           </div>
         )}
 
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 75, 147, 0.25)', border: '1px solid rgba(43, 125, 233, 0.4)', padding: '6px 14px', borderRadius: '30px', marginBottom: '10px' }}>
-          <span style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.82rem', letterSpacing: '1px' }}>IVECO ERC SAMSUN OTOMOTİV</span>
-          <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>• Yetkili Satıcı & Servis</span>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: 'rgba(15, 23, 42, 0.85)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          padding: '8px 18px',
+          borderRadius: '35px',
+          marginBottom: '14px',
+          boxShadow: '0 4px 20px rgba(0, 75, 147, 0.35)',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
+          <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '24px', objectFit: 'contain' }} />
+          <span style={{ height: '20px', width: '1px', background: 'rgba(56, 189, 248, 0.4)', display: 'inline-block' }} />
+          <img src="/logo-erc-samsun-white.png" alt="ERC Samsun Otomotiv" style={{ height: '28px', objectFit: 'contain' }} />
+          <span style={{
+            fontSize: '0.70rem',
+            color: '#fbbf24',
+            fontWeight: 800,
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            padding: '3px 9px',
+            borderRadius: '12px',
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase'
+          }}>
+            Yetkili Satıcı & Servis
+          </span>
         </div>
 
         <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.3, margin: '0 0 6px' }}>
@@ -3553,19 +3579,19 @@ IVECO ERC Samsun Otomotiv
           }}>
             {/* Modal Header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                 <div style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.4rem',
-                  boxShadow: '0 0 16px rgba(2, 132, 199, 0.5)'
+                  gap: '8px',
+                  background: 'rgba(2, 132, 199, 0.15)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  padding: '6px 12px',
+                  borderRadius: '12px'
                 }}>
-                  📤
+                  <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '20px', objectFit: 'contain' }} />
+                  <div style={{ height: '16px', width: '1px', background: 'rgba(255, 255, 255, 0.25)' }} />
+                  <img src="/logo-erc-samsun-white.png" alt="ERC Samsun" style={{ height: '24px', objectFit: 'contain' }} />
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
