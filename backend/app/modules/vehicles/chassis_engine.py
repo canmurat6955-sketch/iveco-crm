@@ -116,7 +116,7 @@ CHASSIS_CONFIGURATIONS: List[Dict[str, Any]] = [
         "unladen_weight_kg": 2200,
         "scale_limit_kg": 4130,
         "scale_call_active": False,
-        "kantar_status_text": "Kamyonet statüsünde (Çift teker ağır yük dayanımı, kantara girmez)",
+        "kantar_status_text": "Kamyonet statüsünde (Çift teker ağır yük dayanımı, 3.5 Ton B Ehliyet)",
         "body_length_min_cm": 350,
         "body_length_max_cm": 380,
         "body_width_min_cm": 215,
@@ -645,8 +645,8 @@ class ChassisMatchingEngine:
                 kantar_desc = f"Bu yük ile toplam ağırlık ({int(total_gross_kg)} kg), kantar sınırını ({best_cfg['scale_limit_kg']} kg) {abs(int(kantar_margin))} kg aşıyor. Bir üst tonajlı şasi önerilir."
         else:
             kantar_status = "exempt"
-            kantar_title = "KAMYONET STATÜSÜ (Kantara Girmiyor)"
-            kantar_desc = f"3.5 Ton sınıfı araçlarda aktif kantar çağrısı bulunmamaktadır. B ehliyet ile şehir içine 7/24 serbest giriş yapabilir."
+            kantar_title = "KAMYONET STATÜSÜ (3.5 Ton B Sınıfı Ehliyet)"
+            kantar_desc = f"3.5 Ton azami yüklü ağırlık sınıfında olup B sınıfı ehliyet ile kullanılır. Şehir içine 7/24 takografsız serbest giriş yapabilir."
 
         # WhatsApp Paylaşım Mesajı Taslağı
         wa_message = (

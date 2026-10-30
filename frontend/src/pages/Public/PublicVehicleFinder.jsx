@@ -61,7 +61,7 @@ const SECTORS = [
 // Hızlı Tonaj Seçenekleri
 const QUICK_TONNAGES = [
   { id: '1_5_ton', label: '1.5 Ton', payloadKg: 1500, badge: 'B Ehliyet Kamyonet', desc: 'Otomobil ehliyeti, takografsız, şehir içine 7/24 serbest' },
-  { id: '3_5_ton', label: '3.5 Ton', payloadKg: 3500, badge: 'B Ehliyet / Çift Teker', desc: 'Ağır yük kamyonet dayanımı, kantara girmez, şehir içi serbest' },
+  { id: '3_5_ton', label: '3.5 Ton', payloadKg: 3500, badge: 'B Ehliyet / Çift Teker', desc: '3.5 Ton kamyonet dayanımı, B sınıfı ehliyet, şehir içi serbest dağıtım' },
   { id: '4_8_ton', label: '4.8 Ton', payloadKg: 4800, badge: 'Daily 72C Kamyon', desc: '7.970 kg kantar geçeri, sınıfının en yüksek net yükü' },
   { id: '6_5_ton', label: '6.5 Ton', payloadKg: 6500, badge: 'Eurocargo 100E', desc: '10.875 kg kantar geçeri, şehirlerarası ve bölge dağıtım' },
   { id: '8_0_ton', label: '8.0 Ton', payloadKg: 8000, badge: 'Eurocargo 120E', desc: '12.950 kg kantar geçeri, 6.50 metreye kadar kasa' },
@@ -98,13 +98,13 @@ const VEHICLE_CATALOG = [
     wheelbase: '3520 mm (3520L H2)',
     payloadKg: 1350,
     volumeM3: 12,
-    badge: 'B Sınıfı • Kantara Girmez • 12 m³ Sac Gövde',
+    badge: 'B Sınıfı • 3.5 Ton Kamyonet • 12 m³ Sac Gövde',
     license: 'B Sınıfı (Otomobil Ehliyeti)',
     kantarLimit: 4130,
     unladenWeight: 2150,
     kantarStatus: 'exempt',
-    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-    kantarDesc: '2.150 kg boş ağırlık (fabrika sac gövde dahil), 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Şehir merkezine 7/24 takografsız serbest giriş.',
+    kantarTitle: '3.5 Ton Kamyonet Statüsünde (B Sınıfı Ehliyet)',
+    kantarDesc: '2.150 kg boş ağırlık (fabrika sac gövde dahil), 3.500 kg azami yüklü ağırlık kapasitesi. Şehir merkezine 7/24 takografsız serbest giriş.',
     dims: {
       length: '354 cm (İç Yükleme)',
       width: '174 cm (Davlumbaz: 132 cm)',
@@ -132,13 +132,13 @@ const VEHICLE_CATALOG = [
     wheelbase: '4100 mm (4100L H2)',
     payloadKg: 1250,
     volumeM3: 16,
-    badge: 'B Sınıfı • Kantara Girmez • 16 m³ Sac Gövde',
+    badge: 'B Sınıfı • 3.5 Ton Kamyonet • 16 m³ Sac Gövde',
     license: 'B Sınıfı (Otomobil Ehliyeti)',
     kantarLimit: 4130,
     unladenWeight: 2280,
     kantarStatus: 'exempt',
-    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-    kantarDesc: '2.280 kg boş ağırlık, 4.130 kg yasal kantar geçeri. 4.68 metre iç yükleme boyu ile kargo ve şehir içi e-ticaret dağıtımında standart belirleyici.',
+    kantarTitle: '3.5 Ton Kamyonet Statüsünde (B Sınıfı Ehliyet)',
+    kantarDesc: '2.280 kg boş ağırlık, 3.500 kg azami yüklü ağırlık kapasitesi. 4.68 metre iç yükleme boyu ile kargo ve şehir içi e-ticaret dağıtımında standart belirleyici.',
     dims: {
       length: '468 cm (İç Yükleme)',
       width: '174 cm (Davlumbaz: 132 cm)',
@@ -171,8 +171,8 @@ const VEHICLE_CATALOG = [
     kantarLimit: 4130,
     unladenWeight: 2380,
     kantarStatus: 'exempt',
-    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-    kantarDesc: '2.380 kg boş ağırlık, 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Çift arka tekerlek dayanımı ve 2.10 m iç tavan yüksekliğiyle 18 m³ dev yükleme hacmi.',
+    kantarTitle: '3.5 Ton Kamyonet Statüsünde (B Sınıfı Ehliyet)',
+    kantarDesc: '2.380 kg boş ağırlık, 3.500 kg azami yüklü ağırlık kapasitesi. Çift arka tekerlek dayanımı ve 2.10 m iç tavan yüksekliğiyle 18 m³ dev yükleme hacmi.',
     dims: {
       length: '468 cm (İç Yükleme)',
       width: '174 cm (Davlumbaz: 103 cm)',
@@ -190,7 +190,7 @@ const VEHICLE_CATALOG = [
     bodyType: 'panelvan'
   },
 
-  // ── ŞASİ KAMYONET (B EHLİYET - KANTARA GİRMEZ) ──
+  // ── ŞASİ KAMYONET (B EHLİYET - 3.5 TON KAMYONET) ──
   {
     key: 'chassis_35s',
     category: 'kamyonet',
@@ -202,13 +202,13 @@ const VEHICLE_CATALOG = [
     wheelbase: '3450 - 4100 mm',
     payloadKg: 1500,
     volumeM3: 16,
-    badge: 'B Sınıfı • Kantara Girmez • Şehir İçi Serbest',
+    badge: 'B Sınıfı • 3.5 Ton Kamyonet • Şehir İçi Serbest',
     license: 'B Sınıfı (Otomobil Ehliyeti)',
     kantarLimit: 4130,
     unladenWeight: 2000,
     kantarStatus: 'exempt',
-    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-    kantarDesc: '2.000 kg boş ağırlık (şoför+yakıt dahil), şehir merkezine 7/24 takografsız serbest giriş. 3.50m - 5.00m kasa seçeneği.',
+    kantarTitle: '3.5 Ton Kamyonet Statüsünde (B Sınıfı Ehliyet)',
+    kantarDesc: '2.000 kg boş ağırlık (şoför+yakıt dahil), 3.500 kg azami yüklü ağırlık, şehir merkezine 7/24 takografsız serbest giriş. 3.50m - 5.00m kasa seçeneği.',
     dims: {
       length: '350 - 500 cm (Önerilen: 430 cm)',
       width: '215 - 235 cm (Önerilen: 215 cm)',
@@ -236,13 +236,13 @@ const VEHICLE_CATALOG = [
     wheelbase: '3450 - 4100 mm',
     payloadKg: 3500,
     volumeM3: 20,
-    badge: 'B Sınıfı • Kantara Girmez • 5 Tona Dayanıklı',
+    badge: 'B Sınıfı • 3.5 Ton Kamyonet • Çift Teker Dayanımı',
     license: 'B Sınıfı (Otomobil Ehliyeti)',
     kantarLimit: 4130,
     unladenWeight: 2200,
     kantarStatus: 'exempt',
-    kantarTitle: 'Kamyonet Statüsünde (Kantara Girmiyor)',
-    kantarDesc: '2.200 kg boş ağırlık, 4.130 kg yasal kantar geçeri (aktif kantar çağrısı yok). Çift tekerlekli C-profil ağır hizmet şasisi sayesinde 4-5 tona kadar güvenle taşır.',
+    kantarTitle: '3.5 Ton Kamyonet Statüsünde (B Sınıfı Ehliyet)',
+    kantarDesc: '2.200 kg boş ağırlık, 3.500 kg azami yüklü ağırlık. Çift tekerlekli C-profil ağır hizmet şasisi sayesinde yüksek taşıma mukavemetine sahiptir.',
     dims: {
       length: '350 - 500 cm (Önerilen: 430 cm)',
       width: '215 - 235 cm (Önerilen: 220 cm)',
@@ -802,8 +802,8 @@ export default function PublicVehicleFinder() {
             multiRecs.push({
               key: 'chassis_35c',
               title: 'Daily 35C16 Çift Teker Kamyonet',
-              badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
-              reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf muafiyeti vardır ve B sınıfı otomobil ehliyetiyle kullanılır. Çift tekerlekli C-şasisiyle 4-5 tona kadar yükü rahatlıkla taşır.',
+              badge: 'B Ehliyet • Kamyonet Ruhsatlı • Çift Teker',
+              reason: 'Kamyonet statüsünde olup B sınıfı ehliyetle kullanılır, takograf muafiyeti vardır. Çift tekerlekli C-şasisiyle yüksek yük dayanımına sahiptir.',
               icon: '🚛'
             });
           }
@@ -811,7 +811,7 @@ export default function PublicVehicleFinder() {
             multiRecs.push({
               key: 'panelvan_16',
               title: 'Daily Panelvan (12 m³ / 16 m³ / 18 m³ Çift Teker)',
-              badge: 'Fabrika Sac Kasa • Kantara Girmez • Hemen Teslim',
+              badge: 'Fabrika Sac Kasa • 3.5 Ton Kamyonet • Hemen Teslim',
               reason: 'Harici kasa yaptırma masrafı ve süresi olmadan anahtar teslim. Şehir içi dağıtım, kargo ve lojistikte 18 m³e varan dev iç hacim.',
               icon: '🚐'
             });
@@ -820,7 +820,7 @@ export default function PublicVehicleFinder() {
               multiRecs.push({
                 key: 'panelvan_18',
                 title: 'Daily 35C16 Panelvan 18 m³ (Çift Teker)',
-                badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • Kantara Girmez',
+                badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • B Ehliyet',
                 reason: 'Süper yüksek tavan (2.10m), çift tekerlekli ağır hizmet yürüyen aksamı ve 18 m³ maksimum yükleme alanı.',
                 icon: '🚐'
               });
@@ -938,20 +938,20 @@ export default function PublicVehicleFinder() {
         {
           key: 'chassis_35c',
           title: 'Daily 35C16 Çift Teker Kamyonet',
-          badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
-          reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf muafiyeti vardır ve B sınıfı otomobil ehliyetiyle kullanılır. Çift tekerlekli C-şasisiyle 4-5 tona kadar yükü rahatlıkla taşır.',
+          badge: 'B Ehliyet • Kamyonet Ruhsatlı • Çift Teker',
+          reason: 'Kamyonet statüsünde olup B sınıfı ehliyetle kullanılır, takograf muafiyeti vardır. Çift tekerlekli C-şasisiyle yüksek yük dayanımına sahiptir.',
           icon: '🚛'
         },
         chosenKey !== 'panelvan_18' ? {
           key: 'panelvan_18',
           title: 'Daily 35C16 Panelvan 18 m³ Çift Teker',
-          badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • Kantara Girmez',
+          badge: '18 m³ Dev Hacim • H3 Yüksek Tavan • B Ehliyet',
           reason: 'Çift teker dayanımı ve 2.10m iç tavan yüksekliğiyle 18 m³ dev yükleme hacmi.',
           icon: '🚐'
         } : {
           key: 'panelvan_16',
           title: 'Daily 35S16 Panelvan 16 m³',
-          badge: '16 m³ Kargo • B Ehliyet • Kantara Girmez',
+          badge: '16 m³ Kargo • B Ehliyet • Şehir İçi Dağıtım',
           reason: '4.68 m iç yükleme boyu ile uzun koli ve paletli yük dağıtımı.',
           icon: '🚐'
         }
@@ -1148,9 +1148,9 @@ export default function PublicVehicleFinder() {
           },
           {
             key: 'chassis_35c',
-            title: 'Daily 35C16 Çift Teker Kamyonet (Kantara Girmez!)',
-            badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
-            reason: 'Kamyonet ruhsatlı, kantara girmez, takograf muaf, şehir içine 7/24 serbest giriş.',
+            title: 'Daily 35C16 Çift Teker Kamyonet (B Sınıfı Kamyonet)',
+            badge: 'B Ehliyet • Kamyonet Ruhsatlı • Çift Teker',
+            reason: '3.5 Ton kamyonet ruhsatlı, takograf muafiyetli, B sınıfı ehliyet ve şehir içine 7/24 serbest dağıtım.',
             icon: '🚛'
           }
         ]
@@ -1169,15 +1169,15 @@ export default function PublicVehicleFinder() {
         multiRecommendations: [
           {
             key: 'chassis_35c',
-            title: 'Daily 35C16 Çift Teker Kamyonet (Kantara Girmiyor!)',
-            badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
-            reason: 'Kamyonet statüsünde olduğu için kantara girmez, takograf zorunluluğu yoktur, B sınıfı otomobil ehliyetiyle kullanılır ve şehir içine 7/24 serbest girer. Çift tekerlekli C-kesit ağır şasisi sayesinde 4-5 tona kadar yükleri güvenle taşır.',
+            title: 'Daily 35C16 Çift Teker Kamyonet (3.5 Ton Kamyonet)',
+            badge: 'B Ehliyet • Kamyonet Ruhsatlı • Çift Teker Dayanımı',
+            reason: 'Kamyonet statüsünde olup takograf zorunluluğu yoktur, B sınıfı otomobil ehliyetiyle kullanılır ve şehir içine 7/24 serbest girer. Çift tekerlekli C-kesit ağır şasisi sayesinde yüksek taşıma mukavemetine sahiptir.',
             icon: '🚛'
           },
           {
             key: 'panelvan_18',
             title: 'Daily 35C16 Panelvan (18 m³ Çift Teker)',
-            badge: '18 m³ Dev Hacim • Fabrika Sac Kasa • Kantara Girmez',
+            badge: '18 m³ Dev Hacim • Fabrika Sac Kasa • B Ehliyet',
             reason: 'Kasa yaptırma masrafı ve bekleme süresi olmadan hazır sac kargo gövde. 18 m³ dev yükleme alanı.',
             icon: '🚐'
           }
@@ -1185,7 +1185,7 @@ export default function PublicVehicleFinder() {
       };
     }
 
-    // I. Daily 35C (3.5 Ton Çift Teker - Kantara Girmez!)
+    // I. Daily 35C (3.5 Ton Çift Teker Kamyonet)
     if (payloadKg > 1500 || selectedSector === 'insaat_malzeme' || selectedSector === 'tarim_yem') {
       const item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35c');
       return {
@@ -1196,8 +1196,8 @@ export default function PublicVehicleFinder() {
           {
             key: 'panelvan_18',
             title: 'Daily 35C16 Panelvan 18 m³ (Çift Teker)',
-            badge: '18 m³ Dev Panelvan • Kantara Girmez • Hazır Teslim',
-            reason: 'Kasa yaptırma masrafı olmadan 18 m³ orijinal sac kargo gövde, kantara girmez, B sınıfı ehliyet.',
+            badge: '18 m³ Dev Panelvan • 3.5 Ton Kamyonet • Hazır Teslim',
+            reason: 'Kasa yaptırma masrafı olmadan 18 m³ orijinal sac kargo gövde, 3.5 ton hafif ticari statüsü, B sınıfı ehliyet.',
             icon: '🚐'
           },
           {
@@ -1218,7 +1218,7 @@ export default function PublicVehicleFinder() {
       };
     }
 
-    // J. Daily 35S (1.5 Ton Tek Teker - Kantara Girmez!)
+    // J. Daily 35S (1.5 Ton Tek Teker Kamyonet)
     const item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35s');
     return {
       ...item,
@@ -1228,22 +1228,22 @@ export default function PublicVehicleFinder() {
         {
           key: 'panelvan_12',
           title: 'Daily 35S16 Panelvan 12 m³ (3520 Şasi)',
-          badge: '12 m³ Sac Gövde • Kantara Girmez • B Ehliyet',
+          badge: '12 m³ Sac Gövde • 3.5 Ton Kamyonet • B Ehliyet',
           reason: 'Kasa beklemeden fabrika orijinal sac gövde, şehir içi dar sokaklarda maksimum kıvraklık.',
           icon: '🚐'
         },
         {
           key: 'panelvan_16',
           title: 'Daily 35S16 Panelvan 16 m³ (4100 Şasi)',
-          badge: '16 m³ Geniş Hacim • B Ehliyet • Kantara Girmez',
+          badge: '16 m³ Geniş Hacim • B Ehliyet • Şehir İçi Dağıtım',
           reason: '4.68 m iç yükleme boyu ile mobilya, koli ve e-ticaret dağıtımında ideal çözüm.',
           icon: '🚐'
         },
         {
           key: 'chassis_35c',
           title: 'Daily 35C16 Çift Teker Kamyonet',
-          badge: 'Kantara Girmez • B Ehliyet • 5 Tona Dayanıklı',
-          reason: 'Ağır yük ihtimaline karşı çift tekerlekli C-profil dayanımı, kantara girmez.',
+          badge: 'B Ehliyet • Kamyonet Ruhsatlı • Çift Teker Dayanımı',
+          reason: 'Ağır yük ihtimaline karşı çift tekerlekli C-profil dayanımı, 3.5 ton kamyonet ruhsatı.',
           icon: '🚛'
         }
       ]
@@ -1697,11 +1697,11 @@ IVECO ERC Samsun Otomotiv
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '6px' }}>
                 {[
-                  { id: 'panelvan_12', label: '🚐 35S16 12 m³', desc: '3520 Şasi (Kantara Girmez)' },
-                  { id: 'panelvan_16', label: '🚐 35S16 16 m³', desc: '4100 Şasi (Kantara Girmez)' },
-                  { id: 'panelvan_18', label: '🚐 35C16 18 m³', desc: 'Çift Teker H3 (Kantara Girmez)' },
+                  { id: 'panelvan_12', label: '🚐 35S16 12 m³', desc: '3520 Şasi (3.5 Ton B Ehliyet)' },
+                  { id: 'panelvan_16', label: '🚐 35S16 16 m³', desc: '4100 Şasi (3.5 Ton B Ehliyet)' },
+                  { id: 'panelvan_18', label: '🚐 35C16 18 m³', desc: 'Çift Teker H3 (3.5 Ton B Ehliyet)' },
                   { id: '35s', label: 'Daily 35S Tek Teker', desc: '1.5t / 16 m³ (B Ehliyet)' },
-                  { id: '35c', label: 'Daily 35C Çift Teker', desc: '3.5t-5t / Kantara Girmez' },
+                  { id: '35c', label: 'Daily 35C Çift Teker', desc: '3.5t / B Ehliyet Çift Teker' },
                   { id: '72c', label: 'Daily 72C Kamyon', desc: '4.8t / 7.970 kg Kantar' },
                   { id: '100e', label: 'Eurocargo 100E', desc: '6.5t / 10.875 kg Kantar' },
                   { id: '120e', label: 'Eurocargo 120E', desc: '8t / 12.950 kg Kantar' },
@@ -2293,7 +2293,7 @@ IVECO ERC Samsun Otomotiv
                     { id: 'all', label: 'Tüm Modeller' },
                     { id: 'hafriyat', label: '🚜 T-Way Hafriyat & Şantiye (10 ve 12 Teker)' },
                     { id: 'panelvan', label: '🚐 Panelvan Modelleri (12, 16, 18 m³)' },
-                    { id: 'kamyonet', label: '🚛 Kamyonetler (B - Kantara Girmez)' },
+                    { id: 'kamyonet', label: '🚛 Kamyonetler (B Sınıfı / 3.5 Ton)' },
                     { id: 'kamyon', label: '🚚 Kamyonlar (C - 10 Teker Dahil)' },
                     { id: 'cekici', label: '🛣️ Çekici (S-Way)' }
                   ].map(cat => (
@@ -2350,7 +2350,7 @@ IVECO ERC Samsun Otomotiv
                               </span>
                             ) : (
                               <span style={{ fontSize: '0.66rem', color: v.kantarStatus === 'exempt' ? '#38bdf8' : '#10b981', fontWeight: 700 }}>
-                                {v.kantarStatus === 'exempt' ? 'Kantara Girmez' : 'Kantar Tescilli'}
+                                {v.kantarStatus === 'exempt' ? 'B Ehliyet / 3.5 Ton' : 'Kantar Tescilli (C)'}
                               </span>
                             )}
                           </div>
@@ -2675,11 +2675,11 @@ IVECO ERC Samsun Otomotiv
                 fontSize: '0.74rem',
                 fontWeight: 800
               }}>
-                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : 'KANTARA GİRMİYOR'}
+                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : '3.5 TON B EHLİYET'}
               </div>
             </div>
 
-            {/* 💡 ÇOKLU ÖNERİ & ALTERNATİF ARAÇLAR (Kantara Girmeyen Seçenekler) */}
+            {/* 💡 ÇOKLU ÖNERİ & ALTERNATİF ARAÇLAR */}
             {matched.multiRecommendations && matched.multiRecommendations.length > 0 && (
               <div style={{
                 background: 'rgba(15, 23, 42, 0.75)',
@@ -2690,7 +2690,7 @@ IVECO ERC Samsun Otomotiv
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    💡 {matched.payloadKg <= 5000 ? 'ÇOKLU ÖNERİ (Kantara Girmeyen Alternatifler):' : 'ÇOKLU ÖNERİ (Alternatif Modeller & Şasiler):'}
+                    💡 {matched.payloadKg <= 5000 ? 'ÇOKLU ÖNERİ (3.5 Ton Alternatifler):' : 'ÇOKLU ÖNERİ (Alternatif Modeller & Şasiler):'}
                   </span>
                   <span style={{ fontSize: '0.66rem', color: '#94a3b8' }}>İncelemek için tıkla</span>
                 </div>
@@ -2816,7 +2816,7 @@ IVECO ERC Samsun Otomotiv
                 gap: '8px'
               }}>
                 <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700 }}>
-                  💡 {matched.payloadKg <= 5000 ? 'Kantara Girmeyen Diğer Alternatifler:' : 'Diğer Alternatif Modeller & Şasiler:'}
+                  💡 {matched.payloadKg <= 5000 ? '3.5 Ton Diğer Alternatifler:' : 'Diğer Alternatif Modeller & Şasiler:'}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {matched.multiRecommendations.map(alt => (
