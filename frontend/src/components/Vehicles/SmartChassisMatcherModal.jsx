@@ -7,6 +7,7 @@ import {
 import { vehiclesApi } from '../../api/client';
 import { openWhatsApp } from '../../utils/whatsapp';
 import toast from 'react-hot-toast';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 const QUICK_PAYLOADS = [
   { label: '1.5 Ton (B Ehliyet)', kg: 1500 },
@@ -92,7 +93,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
   const scale = rec?.scale_analysis;
 
   const getCustomerShareUrl = () => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const origin = getPublicOrigin();
     const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
     const compName = customer?.company_name || '';
     const cid = customer?.id || '';

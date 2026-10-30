@@ -11,6 +11,7 @@ import { salesApi, vehiclesApi, crmApi, campaignsApi } from '../../api/client';
 import { launchNativeWhatsApp } from '../../utils/whatsapp';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 const PIPELINE_STAGES = [
   { key: 'lead', label: 'Lead', color: '#818cf8', emoji: '🎯' },
@@ -235,7 +236,7 @@ export default function WhatsAppActionModal({
     } else if (type === 'arac_secici') {
       setStatus('sent');
       setPipelineStage('proposal');
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+      const origin = getPublicOrigin();
       const cleanPhone = (customerForm.phone || customer.phone || '').replace(/\D/g, '');
       const comp = customerForm.company_name || customer.company_name || '';
       const cid = customer?.id || '';

@@ -31,6 +31,7 @@ import {
   FiPhone,
   FiMail
 } from 'react-icons/fi';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
@@ -1401,7 +1402,7 @@ END:VCARD`;
   };
 
   const getGeneratedVipLink = (isTest = false) => {
-    const origin = window.location.origin;
+    const origin = getPublicOrigin();
     const cleanCompany = (testGenCompany || 'VIP Müşteri').trim();
     const cleanPhone = (testGenPhone || SALES_REP.phoneDisplay).trim();
     const testQuery = isTest ? '&test=true' : '';
@@ -1437,8 +1438,10 @@ END:VCARD`;
   };
 
   // Müşteriye Özel Canlı Link (Seçili model ve firma parametreleriyle)
+  // Link HER ZAMAN herkese açık canlı adresle üretilir: localhost / 10.x / 192.168.x adresleri
+  // müşterinin telefonunda açılmaz.
   const currentClientLink = useMemo(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const origin = getPublicOrigin();
     const cleanCompany = (sendCompany || 'VIP Müşteri').trim();
     const cleanPhone = (sendPhone || '').replace(/\D/g, '');
     const modelKey = selectedModelKey || matched.modelKey;
@@ -1447,6 +1450,8 @@ END:VCARD`;
     if (cleanPhone) params.set('tel', cleanPhone);
     if (modelKey) params.set('model', modelKey);
     params.set('ref', 'muratonay');
+    // WhatsApp önizleme önbelleğini kırmak için günlük sürüm kodu (aynı gün aynı link sabit kalır)
+    params.set('v', new Date().toISOString().slice(0, 10).replace(/-/g, ''));
     return `${origin}/ozel-teklif?${params.toString()}`;
   }, [sendCompany, sendPhone, selectedModelKey, matched.modelKey]);
 

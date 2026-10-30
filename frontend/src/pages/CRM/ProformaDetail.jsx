@@ -4,6 +4,7 @@ import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileText } from 'react-icons/fi';
 import html2pdf from 'html2pdf.js';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 export default function ProformaDetail() {
   const { id } = useParams();
@@ -81,7 +82,7 @@ export default function ProformaDetail() {
 
   const handleWhatsAppShare = async () => {
     try {
-      const origin = window.location.origin;
+      const origin = getPublicOrigin();
       const trackRes = await crmApi.getProformaTrackingLink(id);
       const trackingUrl = `${origin}/p/${trackRes.data.token}`;
       const wpMessage = `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay (0544 622 59 31). Sizin için hazırladığımız ${proforma.vehicle_model} proforma teklifinizi incelemek için bağlantı:\n${trackingUrl}\n\nİnceledikten sonra detayları ve takas seçeneklerini görüşmekten memnuniyet duyarım.`;
@@ -96,7 +97,7 @@ export default function ProformaDetail() {
   const handleCopySmartLink = async () => {
     try {
       toast.loading('Akıllı teklif linki oluşturuluyor...', { id: 'track' });
-      const origin = window.location.origin;
+      const origin = getPublicOrigin();
       const trackRes = await crmApi.getProformaTrackingLink(id);
       const trackingUrl = `${origin}/p/${trackRes.data.token}`;
       await navigator.clipboard.writeText(trackingUrl);

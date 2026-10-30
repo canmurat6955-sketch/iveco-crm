@@ -19,6 +19,7 @@ import {
   FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw,
   FiCamera, FiNavigation, FiRepeat, FiShare2, FiCopy
 } from 'react-icons/fi';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 
 const INTERACTION_ICONS = {
@@ -130,7 +131,7 @@ export default function CustomerDetail() {
 
   const handleCopyPersonalizedLink = () => {
     if (!customer) return;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const origin = getPublicOrigin();
     const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
     const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
     navigator.clipboard.writeText(link).then(() => {
@@ -143,7 +144,7 @@ export default function CustomerDetail() {
       toast.error('Müşterinin telefon numarası kayıtlı değil.');
       return;
     }
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://iveco-crm.vercel.app';
+    const origin = getPublicOrigin();
     const cleanPhone = customer.phone.replace(/\D/g, '');
     const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
     const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;

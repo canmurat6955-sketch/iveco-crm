@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
 import { tsbVehicles } from '../../data/ivecoVehicles';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 // Speech Dictation Number Converter
 function parseTurkishNumber(text) {
@@ -317,7 +318,7 @@ export default function ProformaQuick() {
       toast.success('Proforma başarıyla oluşturuldu!', { id: 'save' });
 
       // 3. Share on WhatsApp
-      const origin = window.location.origin;
+      const origin = getPublicOrigin();
       const wpMessage = `Sayın ${customer.company_name.toUpperCase()}, ERC Samsun Otomotiv adına hazırladığımız ${proformaRes.data.invoice_number} numaralı proforma faturanız hazırdır. Detaylar ve yazdırma için link: ${origin}/proformas/${proformaId}`;
       const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
       

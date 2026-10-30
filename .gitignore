@@ -32,3 +32,9 @@ backend/mega_match_report.json
 *.sqlite
 scratch/
 cloudflared.exe
+
+# Ham kaynak PDF'ler (oda üye listeleri vb.) - repoya girmemeli
+backend/*.pdf
+backend/pdf_raw_output.txt
+backend/corum_debug.html
+backend/corum_members.json
