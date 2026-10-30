@@ -23,7 +23,7 @@ export default function Sidebar() {
   const isActive = (path) => location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
   
   const { user } = useAuth();
-  let userName = user?.full_name || 'Murat Onay';
+  let userName = user?.full_name || 'Can Murat Onay';
   const userRole = (user?.role === 'admin' && !userName.includes('Murat')) ? 'Yönetici' : 'Satış Sorumlusu';
   const userAvatar = userName.charAt(0);
 
@@ -90,7 +90,7 @@ export default function Sidebar() {
             Araç Yönetimi
           </NavLink>
           <a
-            href="/ozel-teklif?preview=true&company=%C3%96rnek%20Lojistik&name=Murat%20Onay&phone=05446225931"
+            href="/ozel-teklif?preview=true&company=%C3%96rnek%20Lojistik&name=Can%20Murat%20Onay&phone=05446225931"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"

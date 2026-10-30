@@ -34,7 +34,7 @@ import {
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
-  name: 'Murat Onay',
+  name: 'Can Murat Onay',
   title: 'Satış Sorumlusu',
   dealership: 'IVECO ERC Samsun Otomotiv',
   dealershipShort: 'IVECO ERC Samsun',
@@ -43,7 +43,7 @@ const SALES_REP = {
   phoneWhatsapp: '905446225931',
   email: 'murat.onay@ercsamsunotomotiv.com',
   city: 'Samsun',
-  initials: 'MO'
+  initials: 'CMO'
 };
 
 // Sektör Seçenekleri
@@ -682,7 +682,7 @@ export default function PublicVehicleFinder() {
   const [selectedTierId, setSelectedTierId] = useState('all');
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
-  // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Murat Onay)
+  // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Can Murat Onay)
   const [showTestPanel, setShowTestPanel] = useState(isTestRoute);
   const [testGenCompany, setTestGenCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
   const [testGenPhone, setTestGenPhone] = useState(phoneParam || SALES_REP.phoneDisplay);
@@ -1262,14 +1262,14 @@ export default function PublicVehicleFinder() {
         ...leadPayload,
         timestamp: new Date().toLocaleTimeString('tr-TR')
       });
-      toast.success('🛠️ VIP TEST: Murat Onay Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
+      toast.success('🛠️ VIP TEST: Can Murat Onay Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
       return;
     }
 
     try {
       await discoveryApi.recordIntentSignal(leadPayload);
       setSubmitted(true);
-      toast.success('Talebiniz alındı! Satış Sorumlumuz Murat Onay en kısa sürede sizinle iletişime geçecektir.');
+      toast.success('Talebiniz alındı! Satış Sorumlumuz Can Murat Onay en kısa sürede sizinle iletişime geçecektir.');
     } catch (err) {
       console.error(err);
       toast.error('Kayıt alınırken bir sorun oluştu, lütfen doğrudan WhatsApp üzerinden iletişime geçin.');
@@ -1278,12 +1278,12 @@ export default function PublicVehicleFinder() {
     }
   };
 
-  // Doğrudan WhatsApp Aç (Murat Onay - Satış Sorumlusu)
+  // Doğrudan WhatsApp Aç (Can Murat Onay - Satış Sorumlusu)
   const handleDirectWhatsApp = () => {
     const cleanPhone = SALES_REP.phoneWhatsapp;
     const clientGreeting = (customerCompany || customerName)
-      ? `Merhaba Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
-      : `Merhaba Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
+      ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
+      : `Merhaba Can Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
 
     const campaignText = activeCampaign
       ? `💳 *Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
@@ -1301,13 +1301,13 @@ export default function PublicVehicleFinder() {
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  // Murat Onay Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
+  // Can Murat Onay Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
   const handleDownloadVCard = () => {
     const vcard = 
 `BEGIN:VCARD
 VERSION:3.0
-N:Onay;Murat;;;
-FN:Murat Onay
+N:Onay;Can Murat;;;
+FN:Can Murat Onay
 ORG:IVECO ERC Samsun Otomotiv
 TITLE:Satış Sorumlusu
 TEL;TYPE=CELL,VOICE;VALUE=uri:tel:+905446225931
@@ -1319,17 +1319,17 @@ END:VCARD`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'Murat_Onay_IVECO_ERC.vcf');
+    link.setAttribute('download', 'Can_Murat_Onay_IVECO_ERC.vcf');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('📇 Murat Onay dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
+    toast.success('📇 Can Murat Onay dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
   };
 
   // Doğrudan E-Posta Gönderme
   const handleDirectEmail = () => {
     const subject = `IVECO Araç & Finansman Teklifi Talebi — ${customerCompany || customerName || 'Ticari Müşteri'}`;
-    const body = `Merhaba Murat Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
+    const body = `Merhaba Can Murat Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
       `Seçilen Model: ${matched.modelTitle}\n` +
       `Yük İhtiyacı: ${payloadKg} kg (${matched.kantarTitle})\n` +
       `Finansman: ${currentBankMeta.name} — ${activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL (${activeCampaign.term} Ay)` : 'Resmi Kredi'}\n\n` +
@@ -1363,7 +1363,7 @@ END:VCARD`;
     }
   };
 
-  // VIP Test Paneli Fonksiyonları (Murat Onay - Satış Sorumlusu)
+  // VIP Test Paneli Fonksiyonları (Can Murat Onay - Satış Sorumlusu)
   const handleApplyPreset = (type) => {
     if (type === 'panelvan_12') {
       handleSelectVehicle('panelvan_12');
@@ -1422,7 +1422,7 @@ END:VCARD`;
   const handleCopyVipWhatsAppTemplate = () => {
     const link = getGeneratedVipLink(false);
     const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
-    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nMurat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
@@ -1479,7 +1479,7 @@ END:VCARD`;
 • Net Taşıma: ~${targetPayload} Ton
 • Kantar Güvencesi: ${targetKantar}
 • Kredi: 12-48 Ay Resmi Banka Taksit Seçenekleri
-• İletişim: Murat Onay (Satış Sorumlusu) | 0544 622 59 31
+• İletişim: Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31
 • E-Posta: murat.onay@ercsamsunotomotiv.com`
       );
     }
@@ -1500,7 +1500,7 @@ Detaylı teknik föyü ve banka ödeme planını buradan anında görüntüleyeb
 🔗 ${link}
 
 Saygılarımla,
-*Murat Onay | Satış Sorumlusu*
+*Can Murat Onay | Satış Sorumlusu*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -1525,7 +1525,7 @@ ${link}
 Seçtiğiniz şasinin stok ve fabrika teslim tarihleri için bu mesaja yanıt vermeniz yeterlidir.
 
 Saygılarımla,
-*Murat Onay | Satış Sorumlusu*
+*Can Murat Onay | Satış Sorumlusu*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -1590,7 +1590,7 @@ IVECO ERC Samsun Otomotiv
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
         
-        {/* Murat Onay VIP Test & Canlı Simülasyon Dock'u */}
+        {/* Can Murat Onay VIP Test & Canlı Simülasyon Dock'u */}
         {showTestPanel && (
           <div style={{
             background: 'linear-gradient(135deg, rgba(24, 24, 27, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
@@ -1606,7 +1606,7 @@ IVECO ERC Samsun Otomotiv
                 <span style={{ fontSize: '1.3rem' }}>🛠️</span>
                 <div>
                   <div style={{ fontSize: '0.86rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '0.5px' }}>
-                    MURAT ONAY — VIP TEST & SİMÜLASYON DOCK'U
+                    CAN MURAT ONAY — VIP TEST & SİMÜLASYON DOCK'U
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                     Şasi kantar geçişlerini, yüksek kredi tutarlarını ve prestijli müşteri linklerini buradan test edin.
@@ -1810,7 +1810,7 @@ IVECO ERC Samsun Otomotiv
             textAlign: 'left'
           }}>
             <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 700 }}>
-              🛠️ Murat Onay Test Modu Aktif (Satış Sorumlusu)
+              🛠️ Can Murat Onay Test Modu Aktif (Satış Sorumlusu)
             </div>
             <button
               type="button"
@@ -1908,7 +1908,7 @@ IVECO ERC Samsun Otomotiv
           Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>resmi banka kredi kampanyalarını (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.)</strong> anında hesaplasın.
         </p>
 
-        {/* Murat Onay Temsilci Rozeti (Satış Sorumlusu) & Hızlı İletişim Butonları */}
+        {/* Can Murat Onay Temsilci Rozeti (Satış Sorumlusu) & Hızlı İletişim Butonları */}
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -2011,7 +2011,7 @@ IVECO ERC Samsun Otomotiv
               gap: '4px',
               cursor: 'pointer'
             }}
-            title="Murat Onay İletişim Kartını Telefona İndir & Rehbere Kaydet"
+            title="Can Murat Onay İletişim Kartını Telefona İndir & Rehbere Kaydet"
           >
             <FiDownload size={12} /> Rehbere Ekle
           </button>
@@ -2074,7 +2074,7 @@ IVECO ERC Samsun Otomotiv
               gap: '4px',
               cursor: 'pointer'
             }}
-            title="Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
+            title="Can Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
           >
             <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
           </button>
@@ -3179,7 +3179,7 @@ IVECO ERC Samsun Otomotiv
               )}
             </div>
 
-            {/* Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
+            {/* Can Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
               border: '1px solid #38bdf8',
@@ -3227,10 +3227,10 @@ IVECO ERC Samsun Otomotiv
             {!submitted ? (
               <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
-                  📋 Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
+                  📋 Can Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
                 </h4>
                 <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
-                  Bilgilerinizi bırakın; Murat Onay aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
+                  Bilgilerinizi bırakın; Can Murat Onay aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
@@ -3344,7 +3344,7 @@ IVECO ERC Samsun Otomotiv
                     boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
                   }}
                 >
-                  {submitting ? 'İletiliyor...' : '📞 Murat Onay Beni Arasın & Teklif Göndersin'}
+                  {submitting ? 'İletiliyor...' : '📞 Can Murat Onay Beni Arasın & Teklif Göndersin'}
                 </button>
               </form>
             ) : (
@@ -3358,7 +3358,7 @@ IVECO ERC Samsun Otomotiv
               }}>
                 <FiCheckCircle size={36} style={{ color: '#10b981', marginBottom: '8px' }} />
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                  Talebiniz Murat Onay'a (Satış Sorumlusu) Ulaştı!
+                  Talebiniz Can Murat Onay'a (Satış Sorumlusu) Ulaştı!
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 10px' }}>
                   Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
@@ -3387,7 +3387,7 @@ IVECO ERC Samsun Otomotiv
                 marginBottom: '12px'
               }}
             >
-              <FiMessageSquare size={18} /> Murat Onay ile WhatsApp'tan Hemen Görüş
+              <FiMessageSquare size={18} /> Can Murat Onay ile WhatsApp'tan Hemen Görüş
             </button>
 
             <button
@@ -3410,7 +3410,7 @@ IVECO ERC Samsun Otomotiv
         )}
       </div>
 
-      {/* ── MURAT ONAY VIP TEST SİMÜLASYON RAPOR MODALI ── */}
+      {/* ── CAN MURAT ONAY VIP TEST SİMÜLASYON RAPOR MODALI ── */}
       {testSimulationResult && (
         <div style={{
           position: 'fixed',
@@ -3442,7 +3442,7 @@ IVECO ERC Samsun Otomotiv
                     CRM PIPELINE SİMÜLASYONU BAŞARILI
                   </h3>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                    Satış Sorumlusu: Murat Onay Test Önizleme Raporu ({testSimulationResult.timestamp})
+                    Satış Sorumlusu: Can Murat Onay Test Önizleme Raporu ({testSimulationResult.timestamp})
                   </div>
                 </div>
               </div>
@@ -3818,7 +3818,7 @@ IVECO ERC Samsun Otomotiv
                         justifyContent: 'center',
                         gap: '6px'
                       }}
-                      title="Murat Onay iletişim kartvizitini (.vcf) indirir"
+                      title="Can Murat Onay iletişim kartvizitini (.vcf) indirir"
                     >
                       <FiDownload size={13} /> 📇 vCard İndir
                     </button>
@@ -4031,7 +4031,7 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
-      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (MURAT ONAY) ── */}
+      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (CAN MURAT ONAY) ── */}
       <div style={{
         position: 'fixed',
         bottom: '18px',
@@ -4091,7 +4091,7 @@ IVECO ERC Samsun Otomotiv
             alignItems: 'center',
             gap: '4px'
           }}
-          title="Murat Onay'ı Ara"
+          title="Can Murat Onay'ı Ara"
         >
           <FiPhone size={12} /> Ara
         </a>

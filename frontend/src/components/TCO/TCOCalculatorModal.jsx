@@ -117,7 +117,7 @@ IVECO ERC Otomotiv olarak filonuz için hazırladığımız ${years} Yıllık ($
 IVECO Daily yüksek torklu 3.0L motoru ve uzatılmış bakım periyoduyla ilk alım fiyat farkını ilk yılda amorti eder. 
 
 Detaylı filo maliyet raporumuzu ve takas teklifimizi görüşmekten memnuniyet duyarım.
-IVECO ERC Samsun Otomotiv - Murat Onay (0544 622 59 31)`;
+IVECO ERC Samsun Otomotiv - Can Murat Onay (0544 622 59 31)`;
   }, [customerName, years, totalKm, metrics]);
 
   const handleCopyPitch = () => {

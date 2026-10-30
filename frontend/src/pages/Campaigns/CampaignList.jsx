@@ -378,11 +378,11 @@ export default function CampaignList() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: '1.1rem' }}>💬</span>
                   <span>
-                    <strong>İletilen Resmi Mesaj:</strong> "Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay. Sizin için hazırladığımız avantajlı IVECO Daily Şasi kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım."
+                    <strong>İletilen Resmi Mesaj:</strong> "Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay. Sizin için hazırladığımız avantajlı IVECO Daily Şasi kampanyamızı sizinle paylaşmak istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım."
                   </span>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span>Temsilci: Murat Onay (0544 622 59 31)</span> • <span>Eki: Kuveyt Türk Taksit Tablosu</span>
+                  <span>Temsilci: Can Murat Onay (0544 622 59 31)</span> • <span>Eki: Kuveyt Türk Taksit Tablosu</span>
                 </div>
               </div>
 

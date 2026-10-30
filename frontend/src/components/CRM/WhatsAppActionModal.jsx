@@ -52,7 +52,7 @@ export default function WhatsAppActionModal({
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Murat Onay';
+    : 'Can Murat Onay';
 
   // Adım kontrolü: 'compose' (WhatsApp Mesajı & Hazırlık) | 'post_action' (Bilgi Kartı & Pipeline Onayı)
   const [step, setStep] = useState('compose');

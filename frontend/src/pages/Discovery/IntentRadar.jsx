@@ -155,7 +155,7 @@ export default function IntentRadar() {
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const model = signal.target_model || 'IVECO Daily Şasi';
-    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay ben (0544 622 59 31). ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
+    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay ben (0544 622 59 31). ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -1211,13 +1211,13 @@ Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmal
 👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
 👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay
 
-IVECO ERC Samsun Otomotiv • Murat Onay (Satış Sorumlusu) | 0544 622 59 31`}
+IVECO ERC Samsun Otomotiv • Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay\n\nIVECO ERC Samsun Otomotiv • Murat Onay (Satış Sorumlusu) | 0544 622 59 31`;
+                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay\n\nIVECO ERC Samsun Otomotiv • Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

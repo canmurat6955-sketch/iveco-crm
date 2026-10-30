@@ -33,7 +33,7 @@ export default function CardScanner() {
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Murat Onay';
+    : 'Can Murat Onay';
 
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);

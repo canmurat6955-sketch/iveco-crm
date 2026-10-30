@@ -511,10 +511,10 @@ def _seed_initial_data():
         from app.modules.campaigns.models import Campaign
         from app.modules.contacts.models import PersonalContact
 
-        # Ensure sales_rep name is Murat Onay
+        # Ensure sales_rep name is Can Murat Onay
         sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
-        if sales_rep and sales_rep.full_name != "Murat Onay":
-            sales_rep.full_name = "Murat Onay"
+        if sales_rep and sales_rep.full_name != "Can Murat Onay":
+            sales_rep.full_name = "Can Murat Onay"
             db.add(sales_rep)
             db.commit()
 
@@ -677,7 +677,7 @@ def _seed_initial_data():
         ]
 
         outreach_msg = (
-            "Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Murat Onay (0544 622 59 31). "
+            "Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay (0544 622 59 31). "
             "Sizin için hazırladığımız avantajlı IVECO Daily Şasi kampanyamızı sizinle paylaşmak istedim. "
             "Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım."
         )
@@ -795,7 +795,7 @@ def _seed_initial_data():
                     phone_number=c_data["phone"],
                     normalized_phone=norm_phone,
                     direction="outbound",
-                    sender_name="Murat Onay",
+                    sender_name="Can Murat Onay",
                     message_type="image",
                     content=outreach_msg,
                     media_url="/campaigns/kuveyt_turk_daily_6ay.png",
@@ -922,7 +922,7 @@ def _seed_initial_data():
                     intent_score=99,
                     intent_level="very_high",
                     status="contacted",
-                    notes="WhatsApp'tan Murat Onay'ın ilettiği akıllı kampanya linkine 3 kez girdi. Kuveyt Türk ödeme tablosunu 5+ dakika inceledi."
+                    notes="WhatsApp'tan Can Murat Onay'ın ilettiği akıllı kampanya linkine 3 kez girdi. Kuveyt Türk ödeme tablosunu 5+ dakika inceledi."
                 ),
                 WebIntentSignal(
                     source="google_search",

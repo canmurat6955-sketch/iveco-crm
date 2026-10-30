@@ -36,7 +36,7 @@ export default function CustomerDetail() {
   const { user } = useAuth();
   const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
     ? user.full_name
-    : 'Murat Onay';
+    : 'Can Murat Onay';
   const [customer, setCustomer] = useState(null);
 
   const [interactions, setInteractions] = useState([]);
@@ -814,7 +814,7 @@ export default function CustomerDetail() {
                     {customer.pipeline_note}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                    Murat Onay tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
+                    Can Murat Onay tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
                   </div>
                 </div>
               </div>
