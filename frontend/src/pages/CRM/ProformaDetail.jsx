@@ -86,23 +86,20 @@ export default function ProformaDetail() {
       return;
     }
 
-    // Ekrandaki taşma ve mobildeki kapsayıcı kırpmalarını önlemek için offscreen klon:
-    const clone = element.cloneNode(true);
-    clone.id = 'proforma-sheet-download-clone';
-    clone.style.position = 'fixed';
-    clone.style.left = '-9999px';
-    clone.style.top = '0';
-    clone.style.width = `${SHEET_BASE_WIDTH}px`;
-    clone.style.minWidth = `${SHEET_BASE_WIDTH}px`;
-    clone.style.maxWidth = `${SHEET_BASE_WIDTH}px`;
-    clone.style.transform = 'none';
-    clone.style.margin = '0';
-    clone.style.boxSizing = 'border-box';
-    clone.style.overflow = 'visible';
-    document.body.appendChild(clone);
+    // Mobil ölçeklemeyi ve taşmayı geçici olarak sıfırla (Canlı elemandan tam çözünürlüklü capture)
+    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
+    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
+
+    if (sheetRef.current) sheetRef.current.style.transform = 'none';
+    if (wrapper) {
+      wrapper.style.width = `${SHEET_BASE_WIDTH}px`;
+      wrapper.style.overflow = 'visible';
+    }
 
     const opt = {
-      margin:       [8, 12, 8, 12],
+      margin:       [8, 10, 8, 10],
       filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
@@ -112,14 +109,16 @@ export default function ProformaDetail() {
     toast.loading('PDF hazırlanıyor ve indiriliyor...', { id: 'pdf' });
     
     try {
-      await html2pdf().from(clone).set(opt).save();
+      await html2pdf().from(element).set(opt).save();
       toast.success('PDF başarıyla indirildi!', { id: 'pdf' });
     } catch (err) {
       console.error(err);
       toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
     } finally {
-      if (document.body.contains(clone)) {
-        document.body.removeChild(clone);
+      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
+      if (wrapper) {
+        wrapper.style.width = prevWrapperWidth;
+        wrapper.style.overflow = prevWrapperOverflow;
       }
     }
   };
@@ -152,33 +151,29 @@ export default function ProformaDetail() {
       return;
     }
 
-    const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp açılıyor...', { id: 'pdf-share' });
+    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
+    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
 
-    // Ekran boyutundan bağımsız, sıfır kırpılma için offscreen klon:
-    const clone = element.cloneNode(true);
-    clone.id = 'proforma-sheet-share-clone';
-    clone.style.position = 'fixed';
-    clone.style.left = '-9999px';
-    clone.style.top = '0';
-    clone.style.width = `${SHEET_BASE_WIDTH}px`;
-    clone.style.minWidth = `${SHEET_BASE_WIDTH}px`;
-    clone.style.maxWidth = `${SHEET_BASE_WIDTH}px`;
-    clone.style.transform = 'none';
-    clone.style.margin = '0';
-    clone.style.boxSizing = 'border-box';
-    clone.style.overflow = 'visible';
-    document.body.appendChild(clone);
+    if (sheetRef.current) sheetRef.current.style.transform = 'none';
+    if (wrapper) {
+      wrapper.style.width = `${SHEET_BASE_WIDTH}px`;
+      wrapper.style.overflow = 'visible';
+    }
+
+    const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp açılıyor...', { id: 'pdf-share' });
 
     try {
       const opt = {
-        margin:       [8, 12, 8, 12],
+        margin:       [8, 10, 8, 10],
         filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      const pdfBlob = await html2pdf().from(clone).set(opt).output('blob');
+      const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
       const filename = `IVECO_PROFORMA_${proforma.invoice_number}.pdf`;
 
       const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
@@ -197,12 +192,12 @@ export default function ProformaDetail() {
       document.body.removeChild(a);
       setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 2000);
 
-      // 2. WhatsApp'ı aç (navigator.share KESİNLİKLE kullanılmaz! Çünkü mobil ve masaüstü tarayıcılar WhatsApp'a geçici blob URL'si basmaktadır.)
+      // 2. WhatsApp'ı aç (navigator.share KESİNLİKLE kullanılmaz!)
       const wpUrl = recipientPhone
         ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
-      toast.success('📄 PDF indirildi! WhatsApp açıldı, indirilen PDF\'i sohbete ekleyin.', { id: 'pdf-share', duration: 7000 });
+      toast.success('📄 PDF indirildi! WhatsApp açıldı. Lütfen ataş (📎) simgesine basıp Belge olarak ekleyin.', { id: 'pdf-share', duration: 8000 });
 
       setTimeout(() => {
         window.open(wpUrl, '_blank');
@@ -212,8 +207,10 @@ export default function ProformaDetail() {
       console.error(err);
       toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf-share' });
     } finally {
-      if (document.body.contains(clone)) {
-        document.body.removeChild(clone);
+      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
+      if (wrapper) {
+        wrapper.style.width = prevWrapperWidth;
+        wrapper.style.overflow = prevWrapperOverflow;
       }
     }
   };
@@ -306,6 +303,9 @@ export default function ProformaDetail() {
             >
               <FiMessageCircle size={20} /> 📲 PDF Olarak WhatsApp'tan Gönder
             </button>
+            <div style={{ fontSize: '10.5px', color: '#94a3b8', textAlign: 'center', margin: '4px 0 6px 0' }}>
+              💡 PDF cihazınıza iner. WhatsApp'ta <strong>Ataş (📎) &gt; Belge</strong>'den ekleyiniz.
+            </div>
 
             {/* 2. İkincil Butonlar Izgarası */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
