@@ -55,7 +55,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. YOL: Doğrudan hızlı passcode endpoint'i (backend erccrm / admin.erccrm ve takma adları tanır)
+      // 1. YOL: Doğrudan hızlı passcode endpoint'i (backend Barlas tanır)
       await loginPasscode(clean);
       toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
       navigate('/');
@@ -72,7 +72,7 @@ export default function Login() {
       }
 
       // 2. YOL: Klasik OAuth2 form girişi ile tek bir geri dönüş denemesi
-      const isAdmin = clean.includes('admin') || clean === 'yonetici';
+      const isAdmin = clean === 'barlas' || clean.includes('admin') || clean === 'yonetici';
       const targetEmail = isAdmin ? 'admin@iveco-crm.local' : 'satis@iveco-crm.local';
 
       try {
@@ -82,7 +82,7 @@ export default function Login() {
         return;
       } catch (err2) {
         console.error('Login error:', err2);
-        const detail = err1.response?.data?.detail || err2.response?.data?.detail || 'Hatalı giriş kodu! Lütfen "erccrm" veya yönetici için "admin.erccrm" yazın.';
+        const detail = err1.response?.data?.detail || err2.response?.data?.detail || 'Hatalı giriş kodu! Lütfen "Barlas" yazın.';
         toast.error(detail);
       }
     } finally {
@@ -191,7 +191,7 @@ export default function Login() {
           </div>
           <button
             type="button"
-            onClick={() => handleQuickLogin('erccrm')}
+            onClick={() => handleQuickLogin('Barlas')}
             disabled={loading}
             style={{
               width: '100%',
@@ -210,7 +210,7 @@ export default function Login() {
               boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
             }}
           >
-            ⚡ "erccrm" ile Giriş Yap
+            ⚡ "Barlas" ile Giriş Yap
           </button>
         </div>
 
@@ -240,10 +240,10 @@ export default function Login() {
             }}>
               <span>Giriş Kodu</span>
               <span 
-                onClick={() => setAccessCode('erccrm')}
+                onClick={() => setAccessCode('Barlas')}
                 style={{ color: '#60a5fa', cursor: 'pointer', fontSize: 11, fontWeight: 500 }}
               >
-                erccrm doldur
+                Barlas doldur
               </span>
             </label>
             
@@ -252,7 +252,7 @@ export default function Login() {
                 id="login-access-code"
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder="Örn: erccrm"
+                placeholder="Örn: Barlas"
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value)}
                 autoCapitalize="none"
@@ -360,8 +360,7 @@ export default function Login() {
           color: '#64748b',
           lineHeight: 1.5
         }}>
-          Giriş kodunuz: <strong style={{ color: '#93c5fd' }}>erccrm</strong><br/>
-          Yönetici girişi için: <strong style={{ color: '#cbd5e1' }}>admin.erccrm</strong>
+          Giriş kodunuz: <strong style={{ color: '#93c5fd' }}>Barlas</strong>
         </p>
       </div>
     </div>

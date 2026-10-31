@@ -30,7 +30,7 @@ class AuthService:
         if not user:
             user = User(
                 email=email,
-                hashed_password=get_password_hash("erccrm"),
+                hashed_password=get_password_hash("Barlas"),
                 full_name=name,
                 role=role,
                 is_active=True,
@@ -39,8 +39,9 @@ class AuthService:
             self.db.commit()
             self.db.refresh(user)
         else:
-            if not user.is_active:
+            if not user.is_active or not verify_password("Barlas", user.hashed_password):
                 user.is_active = True
+                user.hashed_password = get_password_hash("Barlas")
                 self.db.commit()
         return user
 
@@ -49,8 +50,8 @@ class AuthService:
         clean_pwd = (password or "").strip()
 
         # Check if identifier is an alias/passcode
-        is_admin_alias = clean_id in ["admin.erccrm", "admin", "admin@iveco-crm.local", "yonetici"]
-        is_sales_alias = clean_id in ["erccrm", "satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"]
+        is_admin_alias = clean_id in ["barlas", "admin.barlas", "admin", "admin@iveco-crm.local", "yonetici"]
+        is_sales_alias = clean_id in ["satis.barlas", "satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"]
 
         user = None
         if is_admin_alias:
@@ -60,18 +61,25 @@ class AuthService:
         else:
             user = self.get_user_by_email(email_or_identifier.strip())
 
-        # If user still not found, check if there's any active user or fallback to sales_rep
+        # If user still not found, check if there's any active admin/user or fallback to admin
         if not user:
-            user = self.db.query(User).filter(User.is_active == True).first()
+            user = self.db.query(User).filter(User.role == "admin", User.is_active == True).first()
             if not user:
-                user = self._ensure_default_user("satis@iveco-crm.local", "sales_rep", "King Temsilcisi")
+                user = self._ensure_default_user("admin@iveco-crm.local", "admin", "Sistem Yöneticisi")
 
         if not user or not user.is_active:
             return None
 
-        # Master passcodes accepted for quick company mobile login (erccrm / admin.erccrm)
-        master_passwords = {"erccrm", "admin.erccrm", "admin123", "satis123"}
+        # Master passcodes accepted for quick company mobile login (Barlas)
+        master_passwords = {"barlas", "admin.barlas", "satis.barlas", "admin123", "satis123"}
         if clean_pwd.lower() in master_passwords or clean_id in master_passwords:
+            # Sync hash if needed
+            try:
+                if not verify_password("Barlas", user.hashed_password):
+                    user.hashed_password = get_password_hash("Barlas")
+                    self.db.commit()
+            except Exception:
+                pass
             return user
 
         # Standard password verification

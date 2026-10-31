@@ -146,23 +146,29 @@ def _seed_initial_data():
         if not admin:
             admin = User(
                 email="admin@iveco-crm.local",
-                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "erccrm")),
+                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "Barlas")),
                 full_name="Sistem Yöneticisi",
                 role="admin",
                 is_active=True,
             )
             db.add(admin)
+        else:
+            admin.hashed_password = get_password_hash("Barlas")
+            admin.is_active = True
 
         sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
         if not sales_rep:
             sales_rep = User(
                 email="satis@iveco-crm.local",
-                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "erccrm")),
+                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "Barlas")),
                 full_name="King Temsilcisi",
                 role="sales_rep",
                 is_active=True,
             )
             db.add(sales_rep)
+        else:
+            sales_rep.hashed_password = get_password_hash("Barlas")
+            sales_rep.is_active = True
 
         db.commit()
 

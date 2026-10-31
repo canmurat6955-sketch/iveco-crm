@@ -81,7 +81,7 @@ def login_with_passcode(
     request: Request,
     db: Session = Depends(get_db),
 ):
-    """Giriş kodu (erccrm / admin.erccrm) ile doğrudan mobil hızlı giriş."""
+    """Giriş kodu (Barlas) ile doğrudan mobil hızlı giriş."""
     ip = _check_rate(request)
     service = AuthService(db)
     user = service.authenticate_user(payload.code, payload.code)
@@ -89,7 +89,7 @@ def login_with_passcode(
         _register_fail(ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Geçersiz giriş kodu.",
+            detail="Geçersiz giriş kodu. Lütfen 'Barlas' yazın.",
         )
     token = create_access_token(data={"sub": str(user.id)})
     return TokenResponse(
