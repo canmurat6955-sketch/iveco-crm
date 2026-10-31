@@ -566,3 +566,17 @@ def get_pricing_catalog(segment: Optional[str] = None) -> List[Dict[str, Any]]:
         return IVECO_PRICING_CATALOG
     seg_lower = segment.lower()
     return [v for v in IVECO_PRICING_CATALOG if seg_lower in v["segment"].lower()]
+
+
+def get_public_pricing_catalog(segment: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Returns the pricing catalog SANITIZED for public consumption.
+    Strictly removes 'dealer_cost' and any internal margin fields so
+    confidential dealer data is never leaked to public visitors or search crawlers.
+    """
+    catalog = get_pricing_catalog(segment)
+    sanitized: List[Dict[str, Any]] = []
+    for item in catalog:
+        clean = {k: v for k, v in item.items() if k != "dealer_cost"}
+        sanitized.append(clean)
+    return sanitized

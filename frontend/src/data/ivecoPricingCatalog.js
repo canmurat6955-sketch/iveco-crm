@@ -4,7 +4,6 @@
 export const IVECO_PRICING_CATALOG = [
   // ==========================================
   // GRUP 1: 2026 MODEL DAILY 35 ŞASİ KAMYONET
-  // Kural: Maliyet + 250.000 TL | Peşin İndirimi: -190.000 TL
   // ==========================================
   {
     id: 'daily-35s16-3450-h',
@@ -17,7 +16,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3450,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 1825000,
     campaignPrice: 2075000,
     cashDiscount: 190000,
     cashPrice: 1885000,
@@ -36,7 +34,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3450,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 1935000,
     campaignPrice: 2185000,
     cashDiscount: 190000,
     cashPrice: 1995000,
@@ -55,7 +52,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3750,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 1855000,
     campaignPrice: 2105000,
     cashDiscount: 190000,
     cashPrice: 1915000,
@@ -74,7 +70,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3450,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2190000,
     campaignPrice: 2440000,
     cashDiscount: 190000,
     cashPrice: 2250000,
@@ -93,7 +88,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3750,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 1995000,
     campaignPrice: 2245000,
     cashDiscount: 190000,
     cashPrice: 2055000,
@@ -112,7 +106,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3750,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2105000,
     campaignPrice: 2355000,
     cashDiscount: 190000,
     cashPrice: 2165000,
@@ -131,7 +124,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4100,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2115000,
     campaignPrice: 2365000,
     cashDiscount: 190000,
     cashPrice: 2175000,
@@ -150,7 +142,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4100,
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2220000,
     campaignPrice: 2470000,
     cashDiscount: 190000,
     cashPrice: 2280000,
@@ -161,7 +152,6 @@ export const IVECO_PRICING_CATALOG = [
 
   // ==========================================
   // GRUP 2: 2026 MODEL DAILY 35 PANELVAN
-  // Kural: Maliyet + 250.000 TL | Peşin İndirimi: -190.000 TL
   // ==========================================
   {
     id: 'daily-35s16-van-3520l-h2',
@@ -175,7 +165,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '12 m³',
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2050000,
     campaignPrice: 2300000,
     cashDiscount: 190000,
     cashPrice: 2110000,
@@ -195,7 +184,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '16 m³',
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2080000,
     campaignPrice: 2330000,
     cashDiscount: 190000,
     cashPrice: 2140000,
@@ -215,7 +203,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '16 m³',
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2220000,
     campaignPrice: 2470000,
     cashDiscount: 190000,
     cashPrice: 2280000,
@@ -235,7 +222,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '18 m³',
     tonnage: '3500 KG',
     year: '2026',
-    dealerCost: 2240000,
     campaignPrice: 2490000,
     cashDiscount: 190000,
     cashPrice: 2300000,
@@ -246,7 +232,6 @@ export const IVECO_PRICING_CATALOG = [
 
   // ==========================================
   // GRUP 3: 2026 MODEL DAILY 70 C (7 TON KAMYON ŞASİ & PANELVAN)
-  // Kural: Maliyet + 80.000 TL | Peşin İndirimi: -260.000 TL
   // ==========================================
   {
     id: 'daily-70c16-3750-klima',
@@ -259,7 +244,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3750,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2400000,
     campaignPrice: 2480000,
     cashDiscount: 260000,
     cashPrice: 2220000,
@@ -278,7 +262,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3750,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2530000,
     campaignPrice: 2610000,
     cashDiscount: 260000,
     cashPrice: 2350000,
@@ -297,7 +280,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4350,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2470000,
     campaignPrice: 2550000,
     cashDiscount: 260000,
     cashPrice: 2290000,
@@ -316,7 +298,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4350,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2590000,
     campaignPrice: 2670000,
     cashDiscount: 260000,
     cashPrice: 2410000,
@@ -335,7 +316,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4750,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2590000,
     campaignPrice: 2670000,
     cashDiscount: 260000,
     cashPrice: 2410000,
@@ -354,7 +334,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4750,
     tonnage: '7000 KG / 7200 KG',
     year: '2026',
-    dealerCost: 2710000,
     campaignPrice: 2790000,
     cashDiscount: 260000,
     cashPrice: 2530000,
@@ -374,7 +353,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '19.6 m³',
     tonnage: '7000 KG',
     year: '2026',
-    dealerCost: 2580000,
     campaignPrice: 2660000,
     cashDiscount: 260000,
     cashPrice: 2400000,
@@ -394,7 +372,6 @@ export const IVECO_PRICING_CATALOG = [
     bodyVolume: '19.6 m³',
     tonnage: '7000 KG',
     year: '2026',
-    dealerCost: 2700000,
     campaignPrice: 2780000,
     cashDiscount: 260000,
     cashPrice: 2520000,
@@ -405,7 +382,6 @@ export const IVECO_PRICING_CATALOG = [
 
   // ==========================================
   // GRUP 4: 2026 MODEL EUROCARGO (ORTA SEGMENT KAMYON)
-  // Kural: Maliyet + 320.000 TL | Peşin İndirimi: -240.000 TL
   // Opsiyon: Otomatik Şanzıman +220.000 TL (Vergiler Dahil)
   // ==========================================
   {
@@ -419,7 +395,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3690,
     tonnage: '10000 KG',
     year: '2026',
-    dealerCost: 3250000,
     campaignPrice: 3570000,
     cashDiscount: 240000,
     cashPrice: 3330000,
@@ -439,7 +414,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4185,
     tonnage: '12000 KG',
     year: '2026',
-    dealerCost: 3740000,
     campaignPrice: 4060000,
     cashDiscount: 240000,
     cashPrice: 3820000,
@@ -459,7 +433,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4185,
     tonnage: '15000 KG',
     year: '2026',
-    dealerCost: 4000000,
     campaignPrice: 4320000,
     cashDiscount: 240000,
     cashPrice: 4080000,
@@ -479,7 +452,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 5175,
     tonnage: '15000 KG',
     year: '2026',
-    dealerCost: 4200000,
     campaignPrice: 4520000,
     cashDiscount: 240000,
     cashPrice: 4280000,
@@ -499,7 +471,6 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 5175,
     tonnage: '16000 KG',
     year: '2026',
-    dealerCost: 4490000,
     campaignPrice: 4810000,
     cashDiscount: 240000,
     cashPrice: 4570000,

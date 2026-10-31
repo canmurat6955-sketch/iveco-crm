@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_user_optional
 from app.modules.vehicles.service import VehicleService
 from app.modules.vehicles.schemas import (
     VehicleMasterCreate, VehicleMasterUpdate, VehicleMasterResponse,
@@ -38,10 +38,19 @@ def parse_vehicle_code(code: str = Query(..., description="IVECO model kodu veya
 
 
 @router.get("/pricing-catalog")
-def get_vehicle_pricing_catalog(segment: Optional[str] = Query(None)):
-    """Provides the official 2026 IVECO vehicle pricing catalog with campaign prices and cash discounts."""
-    from app.modules.vehicles.pricing_catalog import get_pricing_catalog
-    return get_pricing_catalog(segment)
+def get_vehicle_pricing_catalog(
+    segment: Optional[str] = Query(None),
+    current_user = Depends(get_current_user_optional)
+):
+    """
+    Provides the official 2026 IVECO vehicle pricing catalog.
+    If authenticated (CRM sales consultant/admin), includes dealer_cost.
+    If unauthenticated (public customer portal), strictly excludes dealer_cost.
+    """
+    from app.modules.vehicles.pricing_catalog import get_pricing_catalog, get_public_pricing_catalog
+    if current_user:
+        return get_pricing_catalog(segment)
+    return get_public_pricing_catalog(segment)
 
 
 
@@ -53,7 +62,8 @@ def list_master_vehicles(
     active_only: bool = Query(True),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=200),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """Lists vehicle master records with optional filtering."""
     return VehicleService(db).list_master_vehicles(
@@ -109,7 +119,8 @@ def delete_master_vehicle(
 @router.get("/customers/{customer_id}/interests", response_model=List[CustomerVehicleInterestResponse])
 def get_customer_interests(
     customer_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """Returns all vehicle interests for a specific customer."""
     return VehicleService(db).get_customer_interests(customer_id)
@@ -175,7 +186,8 @@ def list_stock(
     status: Optional[str] = Query(None),
     vehicle_group: Optional[str] = Query(None),
     location: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """Lists vehicles in stock with matching customer counts."""
     return VehicleService(db).list_stock(status=status, vehicle_group=vehicle_group, location=location)
@@ -221,7 +233,8 @@ def delete_stock(
 @router.get("/stock/{stock_id}/matching-customers", response_model=StockMatchSummaryResponse)
 def get_stock_matching_customers(
     stock_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """
     Returns all customers interested in this stock vehicle,
@@ -237,7 +250,8 @@ def get_stock_matching_customers(
 @router.post("/ai-search", response_model=AIQueryResponse)
 def ai_search(
     body: AIQueryRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """
     Executes a natural language AI query across customer vehicle demands.
@@ -248,13 +262,19 @@ def ai_search(
 
 # ── 6. Opportunities & Dashboard Endpoints ───────────────────────
 @router.get("/opportunities/today", response_model=TodayOpportunitiesResponse)
-def get_today_opportunities(db: Session = Depends(get_db)):
+def get_today_opportunities(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
     """Returns today's high-impact vehicle sales opportunities."""
     return VehicleService(db).get_today_opportunities()
 
 
 @router.get("/pipeline", response_model=VehiclePipelineResponse)
-def get_vehicle_pipeline(db: Session = Depends(get_db)):
+def get_vehicle_pipeline(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
     """Calculates dynamic customer demand pipeline distribution across vehicle groups."""
     return VehicleService(db).get_vehicle_pipeline()
 
@@ -264,7 +284,8 @@ def get_vehicle_pipeline(db: Session = Depends(get_db)):
 def get_demand_reports(
     date_from: Optional[date] = Query(None),
     date_to: Optional[date] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """Generates demand intelligence reports across groups, models, engines, and cities."""
     return VehicleService(db).get_demand_reports(date_from=date_from, date_to=date_to)

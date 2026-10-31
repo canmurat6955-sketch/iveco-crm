@@ -136,11 +136,30 @@ export default function ProformaQuick() {
   const recognitionRef = useRef(null);
 
   // 2026 IVECO Pricing Catalog State
+  const [pricingCatalog, setPricingCatalog] = useState(IVECO_PRICING_CATALOG);
   const [selectedCatalogVehicle, setSelectedCatalogVehicle] = useState(null);
   const [selectedSegment, setSelectedSegment] = useState('ALL'); // 'ALL', 'Daily 35', 'Daily 70 C', 'Eurocargo', 'S-Way'
   const [paymentType, setPaymentType] = useState('cash'); // 'cash' (peşin) or 'campaign' (vadeli/kampanyalı)
   const [hasAutoTransmission, setHasAutoTransmission] = useState(false);
   const [eurRate, setEurRate] = useState(38.0);
+
+  // Authenticated CRM users fetch live pricing with internal dealer cost
+  useEffect(() => {
+    crmApi.get('/vehicles/pricing-catalog').then(res => {
+      if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+        const mapped = res.data.map(v => ({
+          ...v,
+          dealerCost: v.dealer_cost || v.dealerCost,
+          campaignPrice: v.campaign_price || v.campaignPrice,
+          cashDiscount: v.cash_discount || v.cashDiscount,
+          cashPrice: v.cash_price || v.cashPrice,
+          eurPrice: v.eur_price || v.eurPrice,
+          autoTransmissionCost: v.auto_transmission_cost || v.autoTransmissionCost
+        }));
+        setPricingCatalog(mapped);
+      }
+    }).catch(() => {});
+  }, []);
 
   // Apply catalog vehicle to form and calculate prices
   const applyCatalogVehicle = (cv, pType = paymentType, autoTrans = hasAutoTransmission, rate = eurRate) => {
@@ -438,7 +457,7 @@ export default function ProformaQuick() {
 
   const [showLegacyTsb, setShowLegacyTsb] = useState(false);
 
-  const filteredCatalogVehicles = IVECO_PRICING_CATALOG.filter(v => {
+  const filteredCatalogVehicles = pricingCatalog.filter(v => {
     const matchesSegment = selectedSegment === 'ALL' || v.segment === selectedSegment;
     const matchesSearch = !vehicleSearchTerm ||
       v.model.toLowerCase().includes(vehicleSearchTerm.toLowerCase()) ||
@@ -567,7 +586,7 @@ export default function ProformaQuick() {
                 onChange={e => {
                   const selectedId = e.target.value;
                   if (selectedId) {
-                    const found = IVECO_PRICING_CATALOG.find(x => x.id === selectedId);
+                    const found = pricingCatalog.find(x => x.id === selectedId);
                     if (found) {
                       applyCatalogVehicle(found);
                     }
@@ -580,7 +599,7 @@ export default function ProformaQuick() {
                 </option>
                 {filteredCatalogVehicles.map(v => (
                   <option key={v.id} value={v.id}>
-                    [{v.segment}] {v.model} — {v.currency === 'EUR' ? `${v.eurPrice.toLocaleString('tr-TR')} €` : `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL`}
+                    [{v.segment}] {v.model} — {v.currency === 'EUR' ? `${v.eurPrice.toLocaleString('tr-TR')} €` : (v.dealerCost ? `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL` : `Peşin: ${(v.cashPrice / 1000).toLocaleString('tr-TR')}k TL`)}
                   </option>
                 ))}
               </select>
@@ -600,7 +619,7 @@ export default function ProformaQuick() {
                     🎯 2026 FİYATLANDIRMA SEÇENEĞİ
                   </span>
                   <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.08)', padding: '2px 8px', borderRadius: '10px', color: '#cbd5e1' }}>
-                    Bayi Maliyeti: {selectedCatalogVehicle.currency === 'EUR' ? `${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} €` : `${selectedCatalogVehicle.dealerCost?.toLocaleString('tr-TR')} TL`}
+                    {selectedCatalogVehicle.currency === 'EUR' ? `EUR: ${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} €` : (selectedCatalogVehicle.dealerCost ? `Bayi Maliyeti: ${selectedCatalogVehicle.dealerCost.toLocaleString('tr-TR')} TL` : `Peşin Fiyat: ${selectedCatalogVehicle.cashPrice?.toLocaleString('tr-TR')} TL`)}
                   </span>
                 </div>
 

@@ -1,7 +1,6 @@
-"""
-Discovery API endpoints.
-"""
-from fastapi import APIRouter, Depends, Query
+import time
+from collections import defaultdict
+from fastapi import APIRouter, Depends, Query, Request, HTTPException, status
 from typing import Optional, List
 from sqlalchemy.orm import Session
 
@@ -246,12 +245,36 @@ def list_intent_signals(
     return DiscoveryService(db).get_intent_signals(source, intent_level, city, search, limit)
 
 
+_INTENT_SIGNAL_HITS = defaultdict(list)
+_INTENT_SIGNAL_WINDOW = 60  # 1 minute window
+_INTENT_SIGNAL_MAX = 20  # max 20 signals per minute per IP
+
+
+def _check_intent_signal_rate_limit(request: Request):
+    client_ip = (
+        request.headers.get("cf-connecting-ip")
+        or (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+        or (request.client.host if request.client else "unknown")
+    )
+    now = time.time()
+    hits = [t for t in _INTENT_SIGNAL_HITS[client_ip] if now - t < _INTENT_SIGNAL_WINDOW]
+    if len(hits) >= _INTENT_SIGNAL_MAX:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Çok fazla niyet sinyali gönderildi. Lütfen bir dakika sonra tekrar deneyin."
+        )
+    hits.append(now)
+    _INTENT_SIGNAL_HITS[client_ip] = hits
+
+
 @router.post("/intent-signals")
 def record_intent_signal(
     data: WebIntentSignalCreate,
+    request: Request,
     db: Session = Depends(get_db)
 ):
-    """Web sitesi, kampanya linki veya Google üzerinden gelen niyet sinyalini kaydeder."""
+    """Web sitesi, kampanya linki veya Google üzerinden gelen niyet sinyalini kaydeder (IP Rate Limited)."""
+    _check_intent_signal_rate_limit(request)
     return DiscoveryService(db).create_intent_signal(data)
 
 

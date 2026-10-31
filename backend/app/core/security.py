@@ -97,3 +97,29 @@ def get_current_admin(current_user=Depends(get_current_user)):
         )
     return current_user
 
+
+def get_current_user_optional(
+    token: Optional[str] = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """
+    FastAPI dependency that returns the current authenticated user if valid Bearer
+    token is present, otherwise returns None without raising an HTTPException.
+    Ideal for dual-mode endpoints (public vs dealer authenticated views).
+    """
+    from app.modules.auth.models import User
+
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            return None
+        user = db.query(User).filter(User.id == int(user_id)).first()
+        if user and user.is_active:
+            return user
+        return None
+    except Exception:
+        return None
+

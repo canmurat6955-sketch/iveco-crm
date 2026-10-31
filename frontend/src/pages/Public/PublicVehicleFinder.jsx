@@ -1522,7 +1522,7 @@ END:VCARD`;
 💼 Sayın Lojistik, Dağıtım ve Filo Yöneticileri;
 IVECO ERC Samsun Otomotiv olarak hazırladığımız dijital müşteri ve bilgi merkezimizde:
 ✅ B Sınıfı Ehliyetle Kullanılan Daily 35 Kamyonetler (Şehir İçi Serbest Dağıtım)
-✅ Çift Teker Ağır Hizmet Şasilerinde Güncel 90.000 TL Maliyet Avantajı
+✅ Kamyonetlerde 190.000 TL Resmi Nakit Alım İndirimi
 ✅ Frigo, Damper, Kapalı Kutu ve Kayar Perde Üst Yapı Kasa Ölçüleri & Palet Kapasiteleri
 ✅ 1.000.000 TL'ye kadar %0 Faiz ve Anlaşmalı Banka Ticari Kredi Simülatörü
 ✅ Şirketler İçin %20 KDV Mahsubu ve 5 Yıllık Amortisman Rehberi
@@ -2305,7 +2305,7 @@ IVECO ERC Samsun Otomotiv
       }}>
         {[
           { id: 'secici', label: '🎯 Akıllı Şasi Seçici & Kredi', badge: null },
-          { id: 'fiyatlar', label: '🏷️ 2026 Model Fiyat Listesi', badge: '-90k İndirim' },
+          { id: 'fiyatlar', label: '🏷️ 2026 Model Fiyat Listesi', badge: '190.000 TL İndirim' },
           { id: 'ust-yapi', label: '🛠️ Üst Yapı & Kasa Rehberi', badge: 'TSE Onaylı' },
           { id: 'krediler', label: '💳 Krediler & Finansman', badge: '%0 Faiz' },
           { id: 'sss', label: '❓ Aklınıza Gelen Sorular (SSS)', badge: 'LinkedIn SSS' }

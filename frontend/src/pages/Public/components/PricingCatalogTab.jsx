@@ -81,7 +81,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
             IVECO Sıfır Kilometre Araç Fiyat Listesi
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            Tüm modellerde şeffaf bayi maliyeti bazlı liste fiyatı ve özel peşin indirimleri uygulanmıştır.
+            Tüm modellerde şeffaf resmi liste fiyatları ve kampanyalı peşin alım indirimleri uygulanmıştır.
           </p>
         </div>
         <div style={{
@@ -91,8 +91,8 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
           padding: '8px 14px',
           textAlign: 'right'
         }}>
-          <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>🔥 GÜNCEL AVANTAJ</div>
-          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Çift Tekerlerde 90.000 TL İndirim</div>
+          <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>💎 PEŞİN ALIM AVANTAJI</div>
+          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kamyonette 190.000 TL İndirim</div>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               onChange={(e) => setOnlyDoubleWheels(e.target.checked)}
               style={{ accentColor: '#f59e0b', cursor: 'pointer' }}
             />
-            Yalnızca Çift Teker Modelleri (-90k)
+            Yalnızca Çift Teker Modelleri
           </label>
         </div>
       </div>
@@ -172,20 +172,18 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       {/* Vehicle Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {filteredVehicles.map(vehicle => {
-          const isDoubleWheel35 = vehicle.segment === 'Daily 35' && (vehicle.category.includes('Çift Teker') || vehicle.id.includes('35c16'));
           return (
             <div
               key={vehicle.id}
               style={{
                 background: 'rgba(15, 23, 42, 0.85)',
-                border: isDoubleWheel35 ? '1.5px solid rgba(245, 158, 11, 0.5)' : '1px solid rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '14px',
                 padding: '16px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 position: 'relative',
-                boxShadow: isDoubleWheel35 ? '0 4px 20px rgba(245, 158, 11, 0.15)' : 'none',
                 transition: 'transform 0.2s, border-color 0.2s'
               }}
             >
@@ -202,20 +200,19 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 }}>
                   {vehicle.category}
                 </span>
-
-                {isDoubleWheel35 && (
+                {vehicle.cashDiscount ? (
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
-                    background: 'rgba(245, 158, 11, 0.2)',
-                    color: '#fbbf24',
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    color: '#4ade80',
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    border: '1px solid rgba(245, 158, 11, 0.4)'
+                    border: '1px solid rgba(34, 197, 94, 0.3)'
                   }}>
-                    🔥 90.000 TL İndirimli
+                    {vehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
                   </span>
-                )}
+                ) : null}
               </div>
 
               {/* Title & Specs */}
