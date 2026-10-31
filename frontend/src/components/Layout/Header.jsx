@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FiSearch, FiBell, FiZap } from 'react-icons/fi';
+import { FiSearch, FiBell, FiZap, FiLogOut } from 'react-icons/fi';
+import { useAuth } from '../../contexts/AuthContext';
 import VehicleAISearchModal from '../Search/VehicleAISearchModal';
 import VoiceDebriefModal from '../VoiceDebrief/VoiceDebriefModal';
 import TCOCalculatorModal from '../TCO/TCOCalculatorModal';
@@ -22,6 +23,7 @@ const PAGE_TITLES = {
 
 export default function Header() {
   const location = useLocation();
+  const { logout } = useAuth();
   const [time, setTime] = useState(new Date());
   const [showAiSearch, setShowAiSearch] = useState(false);
   const [showVoiceDebrief, setShowVoiceDebrief] = useState(false);
@@ -112,6 +114,30 @@ export default function Header() {
               {time.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm('Oturumu kapatmak istediğinize emin misiniz?')) {
+                logout();
+              }
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: 'rgba(239, 68, 68, 0.1)', color: '#f87171',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              padding: '6px 12px', borderRadius: '20px',
+              fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+              marginLeft: '6px',
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.22)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+            title="Sistemden Güvenli Çıkış Yap"
+          >
+            <FiLogOut size={13} />
+            <span>Çıkış Yap</span>
+          </button>
         </div>
       </header>
 

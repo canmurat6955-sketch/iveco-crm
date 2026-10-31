@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget, FiEye } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget, FiEye, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function Sidebar() {
@@ -22,7 +22,7 @@ export default function Sidebar() {
 
   const isActive = (path) => location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
   
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   let userName = user?.full_name || 'Can Murat Onay';
   const userRole = (user?.role === 'admin' && !userName.includes('Murat')) ? 'Yönetici' : 'Satış Sorumlusu';
   const userAvatar = userName.charAt(0);
@@ -126,12 +126,43 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      <div className="sidebar-user">
-        <div className="user-avatar">{userAvatar}</div>
-        <div className="user-info">
-          <div className="user-name">{userName}</div>
-          <div className="user-role">{userRole}</div>
+      <div className="sidebar-user" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+          <div className="user-avatar">{userAvatar}</div>
+          <div className="user-info" style={{ minWidth: 0 }}>
+            <div className="user-name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userName}</div>
+            <div className="user-role">{userRole}</div>
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm('Oturumu kapatmak istediğinize emin misiniz?')) {
+              logout();
+            }
+          }}
+          title="Güvenli Çıkış Yap"
+          style={{
+            background: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#f87171',
+            padding: '6px 10px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '11.5px',
+            fontWeight: 700,
+            flexShrink: 0,
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)'; }}
+        >
+          <FiLogOut size={14} />
+          <span>Çıkış</span>
+        </button>
       </div>
     </aside>
   );

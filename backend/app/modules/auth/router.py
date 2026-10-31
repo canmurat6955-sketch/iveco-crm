@@ -81,7 +81,7 @@ def login_with_passcode(
     request: Request,
     db: Session = Depends(get_db),
 ):
-    """Giriş kodu (Barlas) ile doğrudan mobil hızlı giriş."""
+    """Giriş kodu ile doğrudan mobil hızlı giriş."""
     ip = _check_rate(request)
     service = AuthService(db)
     user = service.authenticate_user(payload.code, payload.code)
@@ -89,7 +89,7 @@ def login_with_passcode(
         _register_fail(ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Geçersiz giriş kodu. Lütfen 'Barlas' yazın.",
+            detail="Geçersiz giriş kodu. Lütfen tekrar deneyin.",
         )
     token = create_access_token(data={"sub": str(user.id)})
     return TokenResponse(

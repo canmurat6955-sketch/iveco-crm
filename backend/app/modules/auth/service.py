@@ -30,7 +30,7 @@ class AuthService:
         if not user:
             user = User(
                 email=email,
-                hashed_password=get_password_hash("Barlas"),
+                hashed_password=get_password_hash("barlas.1992"),
                 full_name=name,
                 role=role,
                 is_active=True,
@@ -39,9 +39,9 @@ class AuthService:
             self.db.commit()
             self.db.refresh(user)
         else:
-            if not user.is_active or not verify_password("Barlas", user.hashed_password):
+            if not user.is_active or not verify_password("barlas.1992", user.hashed_password):
                 user.is_active = True
-                user.hashed_password = get_password_hash("Barlas")
+                user.hashed_password = get_password_hash("barlas.1992")
                 self.db.commit()
         return user
 
@@ -50,8 +50,8 @@ class AuthService:
         clean_pwd = (password or "").strip()
 
         # Check if identifier is an alias/passcode
-        is_admin_alias = clean_id in ["barlas", "admin.barlas", "admin", "admin@iveco-crm.local", "yonetici"]
-        is_sales_alias = clean_id in ["satis.barlas", "satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"]
+        is_admin_alias = clean_id in ["barlas.1992", "admin.barlas.1992", "admin", "admin@iveco-crm.local", "yonetici"]
+        is_sales_alias = clean_id in ["satis.barlas.1992", "satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"]
 
         user = None
         if is_admin_alias:
@@ -70,13 +70,13 @@ class AuthService:
         if not user or not user.is_active:
             return None
 
-        # Master passcodes accepted for quick company mobile login (Barlas)
-        master_passwords = {"barlas", "admin.barlas", "satis.barlas", "admin123", "satis123"}
+        # Master passcodes accepted for quick company mobile login (barlas.1992)
+        master_passwords = {"barlas.1992", "admin.barlas.1992", "admin123", "satis123"}
         if clean_pwd.lower() in master_passwords or clean_id in master_passwords:
             # Sync hash if needed
             try:
-                if not verify_password("Barlas", user.hashed_password):
-                    user.hashed_password = get_password_hash("Barlas")
+                if not verify_password("barlas.1992", user.hashed_password):
+                    user.hashed_password = get_password_hash("barlas.1992")
                     self.db.commit()
             except Exception:
                 pass

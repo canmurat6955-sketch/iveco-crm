@@ -55,7 +55,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 1. YOL: Doğrudan hızlı passcode endpoint'i (backend Barlas tanır)
+      // 1. YOL: Doğrudan hızlı passcode endpoint'i
       await loginPasscode(clean);
       toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
       navigate('/');
@@ -72,7 +72,7 @@ export default function Login() {
       }
 
       // 2. YOL: Klasik OAuth2 form girişi ile tek bir geri dönüş denemesi
-      const isAdmin = clean === 'barlas' || clean.includes('admin') || clean === 'yonetici';
+      const isAdmin = clean === 'barlas.1992' || clean.includes('admin') || clean === 'yonetici';
       const targetEmail = isAdmin ? 'admin@iveco-crm.local' : 'satis@iveco-crm.local';
 
       try {
@@ -82,8 +82,7 @@ export default function Login() {
         return;
       } catch (err2) {
         console.error('Login error:', err2);
-        const detail = err1.response?.data?.detail || err2.response?.data?.detail || 'Hatalı giriş kodu! Lütfen "Barlas" yazın.';
-        toast.error(detail);
+        toast.error('Hatalı giriş kodu! Lütfen kontrol edip tekrar deneyin.');
       }
     } finally {
       setLoading(false);
@@ -93,11 +92,6 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     performLogin(accessCode);
-  };
-
-  const handleQuickLogin = (codeToUse) => {
-    setAccessCode(codeToUse);
-    performLogin(codeToUse);
   };
 
   return (
@@ -173,78 +167,17 @@ export default function Login() {
           Saha Satış İstihbarat Platformu
         </p>
 
-        {/* Hızlı Tek Tıkla Giriş Kartı */}
-        <div style={{
-          background: 'rgba(59, 130, 246, 0.08)',
-          border: '1px solid rgba(59, 130, 246, 0.25)',
-          borderRadius: 12,
-          padding: '12px 14px',
-          marginBottom: 24,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          alignItems: 'center'
-        }}>
-          <div style={{ fontSize: 11, color: '#93c5fd', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <FiCheckCircle size={14} color="#60a5fa" />
-            Tek Tıkla Hızlı Giriş (Önerilen)
-          </div>
-          <button
-            type="button"
-            onClick={() => handleQuickLogin('Barlas')}
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              border: 'none',
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.4)'
-            }}
-          >
-            ⚡ "Barlas" ile Giriş Yap
-          </button>
-        </div>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          margin: '16px 0',
-          color: '#64748b',
-          fontSize: 12
-        }}>
-          <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.1)' }} />
-          <span>veya manuel yazın</span>
-          <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.1)' }} />
-        </div>
-
         {/* Kod Giriş Formu */}
         <form onSubmit={handleSubmit}>
-          <div className="form-group" style={{ textAlign: 'left', marginBottom: 16 }}>
+          <div className="form-group" style={{ textAlign: 'left', marginBottom: 18 }}>
             <label className="form-label" htmlFor="login-access-code" style={{
-              fontSize: 12,
+              fontSize: 12.5,
               fontWeight: 600,
               color: '#cbd5e1',
               marginBottom: 8,
-              display: 'flex',
-              justifyContent: 'space-between'
+              display: 'block'
             }}>
-              <span>Giriş Kodu</span>
-              <span 
-                onClick={() => setAccessCode('Barlas')}
-                style={{ color: '#60a5fa', cursor: 'pointer', fontSize: 11, fontWeight: 500 }}
-              >
-                Barlas doldur
-              </span>
+              Güvenlik Giriş Kodu
             </label>
             
             <div style={{ position: 'relative' }}>
@@ -252,7 +185,7 @@ export default function Login() {
                 id="login-access-code"
                 type={showPassword ? 'text' : 'password'}
                 className="form-input"
-                placeholder="Örn: Barlas"
+                placeholder="Güvenlik kodunuzu giriniz..."
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value)}
                 autoCapitalize="none"
@@ -353,15 +286,6 @@ export default function Login() {
             </div>
           </div>
         )}
-
-        <p style={{
-          marginTop: 22,
-          fontSize: 11,
-          color: '#64748b',
-          lineHeight: 1.5
-        }}>
-          Giriş kodunuz: <strong style={{ color: '#93c5fd' }}>Barlas</strong>
-        </p>
       </div>
     </div>
   );
