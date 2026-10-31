@@ -16,8 +16,9 @@ export default function ProformaDetail() {
 
   // Mobil Görünüm Sığdırma & Zoom State'leri
   const [isFitToScreen, setIsFitToScreen] = useState(true);
-  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
+  const containerRef = useRef(null);
   const sheetRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [sheetHeight, setSheetHeight] = useState(1150);
 
   useEffect(() => {
@@ -37,16 +38,39 @@ export default function ProformaDetail() {
   }, [id, navigate]);
 
   useEffect(() => {
-    const handleResize = () => setViewportWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const cw = containerRef.current.clientWidth;
+        if (cw > 0) setContainerWidth(cw);
+      }
+      if (sheetRef.current) {
+        const sh = sheetRef.current.offsetHeight;
+        if (sh > 0) setSheetHeight(sh);
+      }
+    };
 
-  useEffect(() => {
-    if (sheetRef.current) {
-      setSheetHeight(sheetRef.current.offsetHeight || 1150);
+    updateDimensions();
+
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      ro = new ResizeObserver(updateDimensions);
+      ro.observe(containerRef.current);
     }
-  }, [proforma, customer, isFitToScreen, viewportWidth]);
+
+    window.addEventListener('resize', updateDimensions);
+    window.addEventListener('orientationchange', updateDimensions);
+
+    const t1 = setTimeout(updateDimensions, 100);
+    const t2 = setTimeout(updateDimensions, 400);
+
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('orientationchange', updateDimensions);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [loading, proforma, customer, isFitToScreen]);
 
   const handlePrint = () => {
     window.print();
@@ -60,7 +84,15 @@ export default function ProformaDetail() {
     }
 
     const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
+    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
+
     if (sheetRef.current) sheetRef.current.style.transform = 'none';
+    if (wrapper) {
+      wrapper.style.width = `${sheetBaseWidth}px`;
+      wrapper.style.overflow = 'visible';
+    }
 
     const opt = {
       margin:       0.25,
@@ -80,6 +112,10 @@ export default function ProformaDetail() {
       toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
     } finally {
       if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
+      if (wrapper) {
+        wrapper.style.width = prevWrapperWidth;
+        wrapper.style.overflow = prevWrapperOverflow;
+      }
     }
   };
 
@@ -112,7 +148,15 @@ export default function ProformaDetail() {
     }
 
     const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
+    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
+
     if (sheetRef.current) sheetRef.current.style.transform = 'none';
+    if (wrapper) {
+      wrapper.style.width = `${sheetBaseWidth}px`;
+      wrapper.style.overflow = 'visible';
+    }
 
     const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp\'a aktarılıyor...', { id: 'pdf-share' });
 
@@ -174,6 +218,10 @@ export default function ProformaDetail() {
       }
     } finally {
       if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
+      if (wrapper) {
+        wrapper.style.width = prevWrapperWidth;
+        wrapper.style.overflow = prevWrapperOverflow;
+      }
     }
   };
 
@@ -199,37 +247,71 @@ export default function ProformaDetail() {
 
   // Standart A4 96 DPI Genişliği
   const sheetBaseWidth = 794;
-  const availableWidth = isMobile ? Math.max(300, viewportWidth - 28) : sheetBaseWidth;
-  const scale = (isMobile && isFitToScreen) ? (availableWidth / sheetBaseWidth) : 1;
+  
+  // Efektif genişlik (ResizeObserver ile okunan gerçek iç genişlik, yoksa güvenli ekran genişliği)
+  const effectiveContainerWidth = containerWidth > 0 
+    ? containerWidth 
+    : (typeof window !== 'undefined' ? (window.innerWidth - 36) : sheetBaseWidth);
+
+  // Kenarlardan 12px nefes payı bırakıyoruz ki çerçeve kenara yapışmasın veya 1px dahi taşmasın
+  const targetWidth = isMobile 
+    ? Math.max(260, effectiveContainerWidth - 12) 
+    : sheetBaseWidth;
+
+  const scale = (isMobile && isFitToScreen) 
+    ? Math.min(1, Math.max(0.3, targetWidth / sheetBaseWidth)) 
+    : 1;
+
+  const scaledWidth = (isMobile && isFitToScreen) 
+    ? Math.floor(sheetBaseWidth * scale) 
+    : sheetBaseWidth;
+
+  const scaledHeight = (isMobile && isFitToScreen && sheetHeight) 
+    ? Math.ceil(sheetHeight * scale) 
+    : 'auto';
 
   return (
     <div className="animate-in pb-12">
       {/* ── AKSİYON BARI (MOBİL ÖNCELİKLİ & DESKTOP) ── */}
-      <div className="no-print mb-4">
+      <div className="no-print mb-3">
         {isMobile ? (
-          /* MOBİL AKSİYON PANELİ */
-          <div className="mobile-proforma-actions">
+          /* MOBİL AKSİYON PANELİ - ÜSTTE SABİT (STICKY) */
+          <div 
+            className="mobile-proforma-actions"
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 40,
+              background: 'rgba(8, 11, 22, 0.94)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              padding: '6px 0 10px 0',
+              borderBottom: '1px solid rgba(56, 189, 248, 0.15)',
+              marginBottom: '10px'
+            }}
+          >
             {/* 1. Birincil Buton: 📲 PDF Olarak WhatsApp'tan Gönder */}
             <button
               type="button"
               onClick={handleSharePDFViaWhatsApp}
-              className="btn btn-lg w-full mb-3"
+              className="btn btn-lg w-full mb-2"
               style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 color: '#ffffff',
                 border: 'none',
-                fontSize: '0.95rem',
+                fontSize: '0.92rem',
                 fontWeight: 800,
-                padding: '13px 16px',
+                padding: '12px 14px',
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.35)',
+                cursor: 'pointer'
               }}
             >
-              <FiMessageCircle size={22} /> 📲 PDF Olarak WhatsApp'tan Gönder
+              <FiMessageCircle size={20} /> 📲 PDF Olarak WhatsApp'tan Gönder
             </button>
 
             {/* 2. İkincil Butonlar Izgarası */}
@@ -238,9 +320,9 @@ export default function ProformaDetail() {
                 type="button"
                 onClick={handleDownloadPDF}
                 className="btn btn-secondary btn-sm"
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 2px', fontSize: '11px', fontWeight: 700 }}
               >
-                <FiDownload size={16} />
+                <FiDownload size={15} />
                 <span>PDF İndir</span>
               </button>
 
@@ -248,9 +330,9 @@ export default function ProformaDetail() {
                 type="button"
                 onClick={handleDownloadExcel}
                 className="btn btn-secondary btn-sm"
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 2px', fontSize: '11px', fontWeight: 700 }}
               >
-                <FiFileText size={16} />
+                <FiFileText size={15} />
                 <span>Excel</span>
               </button>
 
@@ -263,14 +345,14 @@ export default function ProformaDetail() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 3,
-                  padding: '8px 2px',
+                  padding: '7px 2px',
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: isFitToScreen ? '#38bdf8' : 'inherit',
-                  borderColor: isFitToScreen ? '#38bdf8' : 'inherit'
+                  color: isFitToScreen ? '#38bdf8' : '#cbd5e1',
+                  borderColor: isFitToScreen ? '#38bdf8' : 'rgba(99, 179, 237, 0.2)'
                 }}
               >
-                <span style={{ fontSize: '15px' }}>{isFitToScreen ? '🔍' : '📱'}</span>
+                <span style={{ fontSize: '14px' }}>{isFitToScreen ? '🔍' : '📱'}</span>
                 <span>{isFitToScreen ? '%100 Boyut' : 'Sığdır'}</span>
               </button>
 
@@ -278,9 +360,9 @@ export default function ProformaDetail() {
                 type="button"
                 onClick={() => navigate(`/customers/${proforma.customer_id}`)}
                 className="btn btn-secondary btn-sm"
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 2px', fontSize: '11px', fontWeight: 700 }}
               >
-                <FiArrowLeft size={16} />
+                <FiArrowLeft size={15} />
                 <span>Müşteri</span>
               </button>
             </div>
@@ -344,31 +426,38 @@ export default function ProformaDetail() {
               textDecoration: 'underline'
             }}
           >
-            {isFitToScreen ? 'Büyüt' : 'Sığdır'}
+            {isFitToScreen ? '🔍 Büyüt' : '📱 Sığdır'}
           </button>
         </div>
       )}
 
       {/* ── YATAY TAŞMAYI ENGELLEYEN RESPONSIVE VIEWPORT ── */}
       <div 
+        ref={containerRef}
         className="proforma-outer-viewport" 
         style={{
           width: '100%',
+          maxWidth: '100%',
           overflowX: (isFitToScreen && isMobile) ? 'hidden' : 'auto',
           WebkitOverflowScrolling: 'touch',
           display: 'flex',
           justifyContent: 'center',
-          padding: isMobile ? '2px 0 16px 0' : '0'
+          alignItems: 'flex-start',
+          padding: isMobile ? '2px 0 24px 0' : '0',
+          boxSizing: 'border-box'
         }}
       >
         <div 
           style={{
-            width: (isMobile && isFitToScreen) ? `${Math.round(sheetBaseWidth * scale)}px` : `${sheetBaseWidth}px`,
-            height: (isMobile && isFitToScreen && sheetHeight) ? `${Math.round(sheetHeight * scale)}px` : 'auto',
+            width: `${scaledWidth}px`,
+            maxWidth: '100%',
+            height: scaledHeight === 'auto' ? 'auto' : `${scaledHeight}px`,
             overflow: 'hidden',
-            transition: 'width 0.2s ease, height 0.2s ease',
+            transition: 'width 0.15s ease, height 0.15s ease',
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            margin: '0 auto',
+            flexShrink: 0
           }}
         >
           <div
@@ -377,7 +466,9 @@ export default function ProformaDetail() {
               transform: (isMobile && isFitToScreen) ? `scale(${scale})` : 'none',
               transformOrigin: 'top left',
               width: `${sheetBaseWidth}px`,
-              minWidth: `${sheetBaseWidth}px`
+              minWidth: `${sheetBaseWidth}px`,
+              maxWidth: `${sheetBaseWidth}px`,
+              boxSizing: 'border-box'
             }}
           >
             {/* Printable Sheet A4 styled */}
