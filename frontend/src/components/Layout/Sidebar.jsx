@@ -97,21 +97,21 @@ export default function Sidebar() {
             Araç Yönetimi
           </NavLink>
           <a
-            href="/ozel-teklif?preview=true&company=%C3%96rnek%20Lojistik&name=Can%20Murat%20Onay&phone=05446225931"
+            href="/musteri?preview=true"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"
             style={{
-              background: 'rgba(217, 119, 6, 0.12)',
-              color: '#f59e0b',
-              border: '1px dashed rgba(245, 158, 11, 0.4)',
+              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(0, 75, 147, 0.25) 100%)',
+              color: '#38bdf8',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
               fontWeight: 700,
-              marginTop: '4px'
+              marginTop: '6px'
             }}
-            title="Müşterinin göreceği akıllı şasi ve kredi ekranını test et"
+            title="Müşterilerinize göndereceğiniz fiyat, kasa, kredi ve LinkedIn SSS portalını aç & test et"
           >
-            <span className="nav-icon" style={{ color: '#f59e0b' }}><FiEye size={18} /></span>
-            Müşteri Ekranı Test & Önizle
+            <span className="nav-icon" style={{ color: '#38bdf8' }}><FiEye size={18} /></span>
+            🌟 Müşteri Portalı & SSS
           </a>
         </div>
 
