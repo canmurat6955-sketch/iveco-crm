@@ -6,6 +6,9 @@ import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileTe
 import html2pdf from 'html2pdf.js';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 
+// Standart A4 Genişliği - PDF kenar payı, sıfır kırpılma ve mobil ekran uyumu için daraltılmış (630px)
+const SHEET_BASE_WIDTH = 630;
+
 export default function ProformaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -83,19 +86,23 @@ export default function ProformaDetail() {
       return;
     }
 
-    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
-    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
-    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
-    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
-
-    if (sheetRef.current) sheetRef.current.style.transform = 'none';
-    if (wrapper) {
-      wrapper.style.width = `${sheetBaseWidth}px`;
-      wrapper.style.overflow = 'visible';
-    }
+    // Ekrandaki taşma ve mobildeki kapsayıcı kırpmalarını önlemek için offscreen klon:
+    const clone = element.cloneNode(true);
+    clone.id = 'proforma-sheet-download-clone';
+    clone.style.position = 'fixed';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.width = `${SHEET_BASE_WIDTH}px`;
+    clone.style.minWidth = `${SHEET_BASE_WIDTH}px`;
+    clone.style.maxWidth = `${SHEET_BASE_WIDTH}px`;
+    clone.style.transform = 'none';
+    clone.style.margin = '0';
+    clone.style.boxSizing = 'border-box';
+    clone.style.overflow = 'visible';
+    document.body.appendChild(clone);
 
     const opt = {
-      margin:       [8, 8, 8, 8],
+      margin:       [8, 12, 8, 12],
       filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
@@ -105,16 +112,14 @@ export default function ProformaDetail() {
     toast.loading('PDF hazırlanıyor ve indiriliyor...', { id: 'pdf' });
     
     try {
-      await html2pdf().from(element).set(opt).save();
+      await html2pdf().from(clone).set(opt).save();
       toast.success('PDF başarıyla indirildi!', { id: 'pdf' });
     } catch (err) {
       console.error(err);
       toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
     } finally {
-      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
-      if (wrapper) {
-        wrapper.style.width = prevWrapperWidth;
-        wrapper.style.overflow = prevWrapperOverflow;
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
       }
     }
   };
@@ -139,7 +144,7 @@ export default function ProformaDetail() {
     }
   };
 
-  // 📲 DOĞRUDAN PDF DOSYASI OLARAK WHATSAPP PAYLAŞIMI (Link Yok, Belge Dosyası)
+  // 📲 DOĞRUDAN PDF DOSYASI OLARAK WHATSAPP PAYLAŞIMI (SIFIR LİNK! ASLA BLOB VEYA WEB LİNKİ YOK!)
   const handleSharePDFViaWhatsApp = async () => {
     const element = document.getElementById('proforma-sheet');
     if (!element) {
@@ -147,55 +152,42 @@ export default function ProformaDetail() {
       return;
     }
 
-    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
-    const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
-    const prevWrapperWidth = wrapper ? wrapper.style.width : '';
-    const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
+    const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp açılıyor...', { id: 'pdf-share' });
 
-    if (sheetRef.current) sheetRef.current.style.transform = 'none';
-    if (wrapper) {
-      wrapper.style.width = `${sheetBaseWidth}px`;
-      wrapper.style.overflow = 'visible';
-    }
-
-    const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp\'a aktarılıyor...', { id: 'pdf-share' });
+    // Ekran boyutundan bağımsız, sıfır kırpılma için offscreen klon:
+    const clone = element.cloneNode(true);
+    clone.id = 'proforma-sheet-share-clone';
+    clone.style.position = 'fixed';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.width = `${SHEET_BASE_WIDTH}px`;
+    clone.style.minWidth = `${SHEET_BASE_WIDTH}px`;
+    clone.style.maxWidth = `${SHEET_BASE_WIDTH}px`;
+    clone.style.transform = 'none';
+    clone.style.margin = '0';
+    clone.style.boxSizing = 'border-box';
+    clone.style.overflow = 'visible';
+    document.body.appendChild(clone);
 
     try {
       const opt = {
-        margin:       [8, 8, 8, 8],
+        margin:       [8, 12, 8, 12],
         filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
+      const pdfBlob = await html2pdf().from(clone).set(opt).output('blob');
       const filename = `IVECO_PROFORMA_${proforma.invoice_number}.pdf`;
-      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
 
       const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
       const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
 
-      const shareText = `Sayın Yetkili,\n\nIVECO ERC Samsun Otomotiv olarak firmanız (${customer?.company_name || 'Değerli Müşterimiz'}) için hazırladığımız ${proforma.vehicle_model} resmi bayi proforma faturamız ekteki PDF belgesinde bilgilerinize sunulmuştur.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+      // KESİNLİKLE SIFIR LİNK: Sadece saygın, kurumsal bir mesaj
+      const shareText = `Sayın Yetkili,\n\nIVECO ERC Samsun Otomotiv olarak firmanız (${customer?.company_name || 'Değerli Müşterimiz'}) için hazırladığımız ${proforma.vehicle_model} resmi bayi proforma faturamız ekte bilgilerinize sunulmuştur.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
 
-      // 1. Yalnızca gerçek akıllı telefonlarda (iOS Safari / Android) Web Share API kullan.
-      // Windows/Masaüstü Edge/Chrome tarayıcılarında Windows Share arayüzü WhatsApp Desktop'a
-      // tarayıcı bellek linkini (blob:https://...) mesaj olarak ekler.
-      // Bu yüzden masaüstünde doğrudan PDF indirme + WhatsApp metni açılışı yapılır, link KESİNLİKLE gitmez.
-      const isMobilePhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
-
-      if (isMobilePhone && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        toast.dismiss(toastId);
-        await navigator.share({
-          files: [pdfFile],
-          title: `IVECO Proforma - ${proforma.invoice_number}`,
-          text: shareText
-        });
-        toast.success('Proforma PDF başarıyla paylaşıldı!');
-        return;
-      }
-
-      // 2. Masaüstü (Windows / Mac): PDF dosyasını tertemiz indirir ve WhatsApp'ı açar (Asla link içermez)
+      // 1. PDF dosyasını kullanıcının cihazına (telefona / bilgisayara) hemen indir
       const downloadUrl = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = downloadUrl;
@@ -203,30 +195,25 @@ export default function ProformaDetail() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 1000);
+      setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 2000);
 
-      toast.success('✅ PDF indirildi! WhatsApp açıldı, indirilen PDF dosyasını sohbete ekleyin.', { id: 'pdf-share', duration: 6000 });
-
+      // 2. WhatsApp'ı aç (navigator.share KESİNLİKLE kullanılmaz! Çünkü mobil ve masaüstü tarayıcılar WhatsApp'a geçici blob URL'si basmaktadır.)
       const wpUrl = recipientPhone
         ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
+      toast.success('📄 PDF indirildi! WhatsApp açıldı, indirilen PDF\'i sohbete ekleyin.', { id: 'pdf-share', duration: 7000 });
+
       setTimeout(() => {
         window.open(wpUrl, '_blank');
-      }, 300);
+      }, 400);
 
     } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error(err);
-        toast.error('PDF paylaşımı sırasında bir hata oluştu.', { id: 'pdf-share' });
-      } else {
-        toast.dismiss(toastId);
-      }
+      console.error(err);
+      toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf-share' });
     } finally {
-      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
-      if (wrapper) {
-        wrapper.style.width = prevWrapperWidth;
-        wrapper.style.overflow = prevWrapperOverflow;
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
       }
     }
   };
@@ -251,8 +238,8 @@ export default function ProformaDetail() {
     );
   }
 
-  // Standart A4 Genişliği - PDF kenar payı ve mobil uyumu için daraltılmış (680px)
-  const sheetBaseWidth = 680;
+  // Standart A4 Genişliği - PDF kenar payı ve mobil uyumu için daraltılmış (630px)
+  const sheetBaseWidth = SHEET_BASE_WIDTH;
   
   // Efektif genişlik (ResizeObserver ile okunan gerçek iç genişlik, yoksa güvenli ekran genişliği)
   const effectiveContainerWidth = containerWidth > 0 
@@ -477,11 +464,11 @@ export default function ProformaDetail() {
               boxSizing: 'border-box'
             }}
           >
-            {/* Printable Sheet A4 styled (Daraltılmış 680px - PDF ve Mobil taşma korumalı) */}
+            {/* Printable Sheet A4 styled (Daraltılmış 630px - PDF ve Mobil taşma korumalı) */}
             <div id="proforma-sheet" className="print-container" style={{
               background: '#fff',
               color: '#000',
-              padding: '18px 20px',
+              padding: '16px 18px',
               border: '2px solid #000',
               borderRadius: '0px',
               width: `${sheetBaseWidth}px`,
@@ -490,81 +477,81 @@ export default function ProformaDetail() {
               margin: '0 auto',
               fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
               lineHeight: 1.25,
-              fontSize: '11px',
+              fontSize: '10.5px',
               overflow: 'hidden'
             }}>
         {/* Header Block */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #000', paddingBottom: '8px', marginBottom: '8px' }}>
           {/* Official Dealer & Brand Logos */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src="/logo-erc-samsun.png" alt="ERC Samsun Otomotiv" style={{ height: '38px', objectFit: 'contain' }} />
-            <div style={{ height: '28px', width: '1.5px', background: '#94a3b8' }} />
-            <img src="/logo-iveco.png" alt="IVECO" style={{ height: '24px', objectFit: 'contain' }} />
-            <div style={{ fontSize: '9.5px', fontWeight: 800, color: '#475569', letterSpacing: '0.6px', borderLeft: '1.5px solid #94a3b8', paddingLeft: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src="/logo-erc-samsun.png" alt="ERC Samsun Otomotiv" style={{ height: '34px', objectFit: 'contain' }} />
+            <div style={{ height: '24px', width: '1.5px', background: '#94a3b8' }} />
+            <img src="/logo-iveco.png" alt="IVECO" style={{ height: '22px', objectFit: 'contain' }} />
+            <div style={{ fontSize: '9px', fontWeight: 800, color: '#475569', letterSpacing: '0.5px', borderLeft: '1.5px solid #94a3b8', paddingLeft: '8px' }}>
               YETKİLİ SATICI & SERVİS
             </div>
           </div>
           
-          <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '0.5px', color: '#000' }}>
+          <div style={{ fontWeight: 900, fontSize: '17px', letterSpacing: '0.4px', color: '#000' }}>
             PROFORMA / INVOICE
           </div>
         </div>
 
         {/* Info Split Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: '12px', marginBottom: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: '10px', marginBottom: '8px' }}>
           {/* Left: Buyer Details */}
-          <div style={{ border: '2px solid #000', padding: '8px', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <div style={{ border: '2px solid #000', padding: '7px 8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <div style={{ display: 'flex' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>Sayın:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>Sayın:</span>
               <span style={{ flex: 1, textTransform: 'uppercase', fontWeight: 700 }}>{customer.company_name}</span>
             </div>
             <div style={{ display: 'flex', marginTop: '2px' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>Adres:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>Adres:</span>
               <span style={{ flex: 1 }}>{customer.address || '—'} {customer.district ? `${customer.district}/` : ''}{customer.city}</span>
             </div>
             <div style={{ display: 'flex', marginTop: '2px' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>Vergi Dairesi:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>Vergi Dairesi:</span>
               <span style={{ flex: 1 }}>{customer.vergi_dairesi || (customer.city ? `${customer.city.toUpperCase()} V.D.` : '—')}</span>
             </div>
             <div style={{ display: 'flex' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>T.C. / Vergi No:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>T.C. / Vergi No:</span>
               <span style={{ flex: 1 }}>{customer.tax_number || '—'}</span>
             </div>
             <div style={{ display: 'flex' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>Tel:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>Tel:</span>
               <span style={{ flex: 1 }}>{customer.phone || '—'}</span>
             </div>
             <div style={{ display: 'flex' }}>
-              <span style={{ width: '105px', fontWeight: 700 }}>Gsm:</span>
+              <span style={{ width: '95px', fontWeight: 700 }}>Gsm:</span>
               <span style={{ flex: 1 }}>—</span>
             </div>
             
             {/* Sales Consultant */}
-            <div style={{ borderTop: '1px solid #000', marginTop: '6px', paddingTop: '5px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div style={{ borderTop: '1px solid #000', marginTop: '4px', paddingTop: '4px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <div style={{ display: 'flex' }}>
-                <span style={{ width: '105px', fontWeight: 700 }}>Satış Danışmanı:</span>
+                <span style={{ width: '95px', fontWeight: 700 }}>Satış Danışmanı:</span>
                 <span style={{ flex: 1 }}>Can Murat Onay</span>
               </div>
               <div style={{ display: 'flex' }}>
-                <span style={{ width: '105px', fontWeight: 700 }}>Gsm:</span>
+                <span style={{ width: '95px', fontWeight: 700 }}>Gsm:</span>
                 <span style={{ flex: 1 }}>0544 622 59 31</span>
               </div>
               <div style={{ display: 'flex' }}>
-                <span style={{ width: '105px', fontWeight: 700 }}>E-Mail:</span>
+                <span style={{ width: '95px', fontWeight: 700 }}>E-Mail:</span>
                 <span style={{ flex: 1 }}>murat.onay@ercsamsunotomotiv.com</span>
               </div>
               <div style={{ display: 'flex' }}>
-                <span style={{ width: '105px', fontWeight: 700 }}>Tarih:</span>
+                <span style={{ width: '95px', fontWeight: 700 }}>Tarih:</span>
                 <span style={{ flex: 1, fontWeight: 700 }}>{new Date(proforma.date).toLocaleDateString('tr-TR')}</span>
               </div>
             </div>
           </div>
 
           {/* Right: Seller Details */}
-          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '3px', paddingRight: '4px' }}>
-            <div style={{ fontWeight: 800, fontSize: '14px', letterSpacing: '-0.2px' }}>ERC SAMSUN OTOMOTİV</div>
-            <div style={{ fontWeight: 800, fontSize: '14px', marginTop: '-3px' }}>SAN.VE TİC.A.Ş.</div>
-            <div style={{ fontSize: '10.5px', marginTop: '4px', lineHeight: 1.35 }}>
+          <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '2px', paddingRight: '2px' }}>
+            <div style={{ fontWeight: 800, fontSize: '13.5px', letterSpacing: '-0.2px' }}>ERC SAMSUN OTOMOTİV</div>
+            <div style={{ fontWeight: 800, fontSize: '13.5px', marginTop: '-3px' }}>SAN.VE TİC.A.Ş.</div>
+            <div style={{ fontSize: '10px', marginTop: '3px', lineHeight: 1.35 }}>
               Eğercili Mah. Atatürk Bulv. No:122/3<br />
               Çarşamba / SAMSUN<br />
               Telefon : 0 362 238 06 93<br />
@@ -578,21 +565,21 @@ export default function ProformaDetail() {
           width: '100%',
           borderCollapse: 'collapse',
           border: '2px solid #000',
-          marginBottom: '10px',
-          fontSize: '10.5px'
+          marginBottom: '8px',
+          fontSize: '10px'
         }}>
           <thead>
             <tr style={{ background: '#f5f5f5', borderBottom: '2px solid #000' }}>
               <th style={{ borderRight: '1px solid #000', padding: '5px 6px', textAlign: 'left', fontWeight: 700 }}>Teklif / Proforma Fatura Konusu Araca Ait Bilgiler</th>
-              <th style={{ borderRight: '1px solid #000', padding: '5px 6px', width: '95px', textAlign: 'right', fontWeight: 700 }}>Birim Fiyat (TL)</th>
-              <th style={{ borderRight: '1px solid #000', padding: '5px 6px', width: '38px', textAlign: 'center', fontWeight: 700 }}>Adet</th>
-              <th style={{ padding: '5px 6px', width: '105px', textAlign: 'right', fontWeight: 700 }}>Toplam Tutar</th>
+              <th style={{ borderRight: '1px solid #000', padding: '5px 6px', width: '90px', textAlign: 'right', fontWeight: 700 }}>Birim Fiyat (TL)</th>
+              <th style={{ borderRight: '1px solid #000', padding: '5px 6px', width: '34px', textAlign: 'center', fontWeight: 700 }}>Adet</th>
+              <th style={{ padding: '5px 6px', width: '98px', textAlign: 'right', fontWeight: 700 }}>Toplam Tutar</th>
             </tr>
           </thead>
           <tbody>
             {/* Vehicle Model & Price */}
             <tr style={{ borderBottom: '1px solid #000' }}>
-              <td style={{ borderRight: '1px solid #000', padding: '8px 6px', fontWeight: 700, verticalAlign: 'middle', textTransform: 'uppercase' }}>
+              <td style={{ borderRight: '1px solid #000', padding: '7px 6px', fontWeight: 700, verticalAlign: 'middle', textTransform: 'uppercase' }}>
                 {proforma.vehicle_model}
               </td>
               <td style={{ borderRight: '1px solid #000', padding: '5px 6px', textAlign: 'right', verticalAlign: 'middle' }}>
@@ -644,7 +631,7 @@ export default function ProformaDetail() {
             <tr style={{ background: '#f0f0f0' }}>
               <td style={{ borderRight: '1px solid #000', padding: '5px 6px', fontWeight: 800, display: 'flex', justifyContent: 'space-between' }}>
                 <span>GENEL TOPLAM</span>
-                <span style={{ fontStyle: 'italic', fontWeight: 700, fontSize: '9.5px' }}>{proforma.grand_total_words}</span>
+                <span style={{ fontStyle: 'italic', fontWeight: 700, fontSize: '9px' }}>{proforma.grand_total_words}</span>
               </td>
               <td style={{ borderRight: '1px solid #000', padding: '5px 6px', textAlign: 'right', fontWeight: 800 }}>
                 {proforma.grand_total.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL
@@ -660,35 +647,35 @@ export default function ProformaDetail() {
         {/* Specs Box */}
         <div style={{
           border: '2px solid #000',
-          padding: '6px 8px',
+          padding: '5px 8px',
           marginBottom: '8px',
           display: 'grid',
           gridTemplateColumns: '1fr 1.15fr',
-          gap: '5px 16px',
-          fontSize: '10.5px'
+          gap: '4px 14px',
+          fontSize: '10px'
         }}>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>MODEL YILI:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>MODEL YILI:</span>
             <span>{proforma.model_year || '—'}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>ŞASİ NO:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>ŞASİ NO:</span>
             <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{proforma.chassis_no || '—'}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>MOTOR NO:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>MOTOR NO:</span>
             <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>{proforma.motor_no || '—'}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>MOTOR GÜCÜ:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>MOTOR GÜCÜ:</span>
             <span>{proforma.motor_power || '—'}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>RENGİ:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>RENGİ:</span>
             <span>{proforma.color || '—'}</span>
           </div>
           <div style={{ display: 'flex' }}>
-            <span style={{ width: '110px', fontWeight: 700 }}>AZAMİ YÜKLÜ AĞIRLIĞI:</span>
+            <span style={{ width: '95px', fontWeight: 700 }}>AZAMİ YÜKLÜ AĞIRLIĞI:</span>
             <span>{proforma.max_weight || '—'}</span>
           </div>
         </div>
@@ -698,9 +685,9 @@ export default function ProformaDetail() {
           color: '#cc0000',
           fontWeight: 800,
           textAlign: 'center',
-          fontSize: '9.5px',
+          fontSize: '9px',
           border: '1.5px solid #cc0000',
-          padding: '5px',
+          padding: '4px 6px',
           marginBottom: '8px',
           letterSpacing: '0.2px'
         }}>
@@ -712,25 +699,25 @@ export default function ProformaDetail() {
           width: '100%',
           borderCollapse: 'collapse',
           border: '2px solid #000',
-          fontSize: '9.5px',
-          marginBottom: '12px'
+          fontSize: '9px',
+          marginBottom: '10px'
         }}>
           <tbody>
             <tr style={{ borderBottom: '1px solid #000' }}>
-              <td style={{ width: '110px', fontWeight: 700, padding: '4px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>TESLİMAT YERİ</td>
-              <td style={{ padding: '4px 6px', fontWeight: 600 }}>{proforma.delivery_place || '—'}</td>
+              <td style={{ width: '100px', fontWeight: 700, padding: '3px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>TESLİMAT YERİ</td>
+              <td style={{ padding: '3px 6px', fontWeight: 600 }}>{proforma.delivery_place || '—'}</td>
             </tr>
             <tr style={{ borderBottom: '1px solid #000' }}>
-              <td style={{ width: '110px', fontWeight: 700, padding: '4px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>ÖDEME ŞEKLİ</td>
-              <td style={{ padding: '4px 6px', fontWeight: 700 }}>{proforma.payment_terms || '—'}</td>
+              <td style={{ width: '100px', fontWeight: 700, padding: '3px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>ÖDEME ŞEKLİ</td>
+              <td style={{ padding: '3px 6px', fontWeight: 700 }}>{proforma.payment_terms || '—'}</td>
             </tr>
             <tr style={{ borderBottom: '1px solid #000' }}>
-              <td style={{ width: '110px', fontWeight: 700, padding: '4px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>GEÇERLİLİK SÜRESİ</td>
-              <td style={{ padding: '4px 6px', fontWeight: 700 }}>{proforma.validity_date ? new Date(proforma.validity_date).toLocaleDateString('tr-TR') : '—'}</td>
+              <td style={{ width: '100px', fontWeight: 700, padding: '3px 6px', borderRight: '1px solid #000', background: '#f9f9f9' }}>GEÇERLİLİK SÜRESİ</td>
+              <td style={{ padding: '3px 6px', fontWeight: 700 }}>{proforma.validity_date ? new Date(proforma.validity_date).toLocaleDateString('tr-TR') : '—'}</td>
             </tr>
             <tr>
-              <td style={{ width: '110px', fontWeight: 700, padding: '4px 6px', borderRight: '1px solid #000', background: '#f9f9f9', verticalAlign: 'top' }}>AÇIKLAMALAR</td>
-              <td style={{ padding: '4px 6px', textAlign: 'justify', lineHeight: 1.3 }}>{proforma.notes || '—'}</td>
+              <td style={{ width: '100px', fontWeight: 700, padding: '3px 6px', borderRight: '1px solid #000', background: '#f9f9f9', verticalAlign: 'top' }}>AÇIKLAMALAR</td>
+              <td style={{ padding: '3px 6px', textAlign: 'justify', lineHeight: 1.3 }}>{proforma.notes || '—'}</td>
             </tr>
           </tbody>
         </table>
