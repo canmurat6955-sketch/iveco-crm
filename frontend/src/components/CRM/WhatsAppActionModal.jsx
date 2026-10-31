@@ -236,20 +236,15 @@ export default function WhatsAppActionModal({
     } else if (type === 'arac_secici') {
       setStatus('sent');
       setPipelineStage('proposal');
-      const origin = getPublicOrigin();
-      const cleanPhone = (customerForm.phone || customer.phone || '').replace(/\D/g, '');
       const comp = customerForm.company_name || customer.company_name || '';
-      const cid = customer?.id || '';
-      const link = `${origin}/ozel-teklif?cid=${cid}&company=${encodeURIComponent(comp)}&phone=${cleanPhone}&ref=muratonay`;
-      const greeting = comp ? `🌟 Sayın ${comp} Yetkilisi,\n\n` : '🌟 Değerli Müşterimiz,\n\n';
+      const greeting = comp ? `Sayın ${comp} Yetkilisi,\n\n` : 'Sayın Yetkili,\n\n';
       setMessage(
         `${greeting}Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
-        `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), kantar sınırlarını ve %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
-        `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
-        `👉 ${link}\n\n` +
-        `Seçtiğiniz aracın hazır fabrika şasi teslim tarihi ve resmi bayi proforma teklifi için bu mesajı yanıtlamanız yeterlidir.`
+        `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasimiz, özel kasa ebatları, yasal istiap kapasiteleri ve resmi banka sübvansiyonlu faiz/kredi kampanyası koşullarımız hazırlanmıştır.\n\n` +
+        `Firmanıza özel resmi bayi proforma teklifimiz, stok teslim durumları ve avantajlı fiyatlarımız hakkında bilgi almak için bu mesajı yanıtlamanız yeterlidir.\n\n` +
+        `İyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`
       );
-      setInternalNote('Müşteriye özel VIP Şasi, Kasa ve Finansman Seçici bağlantısı iletildi.');
+      setInternalNote('Müşteriye şasi, kasa ve finansman teklif bilgilendirmesi iletildi.');
     }
   };
 

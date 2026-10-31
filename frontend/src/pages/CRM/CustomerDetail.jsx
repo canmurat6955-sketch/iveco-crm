@@ -144,18 +144,14 @@ export default function CustomerDetail() {
       toast.error('Müşterinin telefon numarası kayıtlı değil.');
       return;
     }
-    const origin = getPublicOrigin();
-    const cleanPhone = customer.phone.replace(/\D/g, '');
-    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
     const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;
 
     const msg = (
-      `🌟 Sayın ${contactName},\n\n` +
+      `Sayın ${contactName},\n\n` +
       `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
-      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasisini, özel kasa ebatlarını (uzunluk, genişlik, yükseklik), yasal istiap ve yük kapasitelerini, %0 faizden 5.000.000 TL'ye varan resmi banka kredi kampanyalarımızı tek ekranda hesaplayabileceğiniz VIP Konfigüratörümüzü firmanıza özel hazırladım.\n\n` +
-      `Aşağıdaki size özel bağlantıdan dilediğiniz tonaj ve finansman planını anında simüle edebilirsiniz:\n` +
-      `👉 ${link}\n\n` +
-      `Seçtiğiniz aracın hazır fabrika şasi teslim tarihi ve resmi bayi proforma teklifi için bu mesajı yanıtlamanız yeterlidir.`
+      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO Daily şasi, panelvan ve ağır vasıta modellerimiz, resmi banka sübvansiyonlu faiz ve takas kampanyalarımız hakkında bilgi paylaşmak isterim.\n\n` +
+      `Firmanıza özel resmi bayi proforma teklifimiz, stok teslim durumları ve avantajlı fiyatlarımız için bu mesaj üzerinden veya telefonla bana her zaman ulaşabilirsiniz.\n\n` +
+      `İyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`
     );
 
     openWhatsApp(customer.phone, msg, { customer });
@@ -660,9 +656,9 @@ export default function CustomerDetail() {
                   fontWeight: 700,
                   boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
                 }}
-                title="Müşteriye özel hesaplayıcı linkini WhatsApp mesajı olarak gönder"
+                title="Müşteriye resmi kampanya ve teklif tanıtım mesajı gönder"
               >
-                <FiShare2 size={14} /> 📲 VIP Link Paylaş
+                <FiMessageSquare size={14} /> 💬 WhatsApp Mesajı
               </button>
 
               <button

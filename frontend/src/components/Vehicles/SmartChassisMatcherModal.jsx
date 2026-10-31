@@ -109,11 +109,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
 
   const handleSendWhatsApp = () => {
     const phone = customer?.phone || '';
-    let text = rec?.whatsapp_proposal || '';
-    const shareUrl = getCustomerShareUrl();
-    if (text) {
-      text += `\n\n🔗 *Özel Konfigüratörünüzü Buradan İnceleyebilirsiniz:*\n${shareUrl}`;
-    }
+    const text = rec?.whatsapp_proposal || '';
     openWhatsApp(phone, text, { customer });
   };
 
