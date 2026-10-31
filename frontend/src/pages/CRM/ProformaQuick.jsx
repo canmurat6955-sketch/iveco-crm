@@ -418,14 +418,8 @@ export default function ProformaQuick() {
           `💳 *Anahtar Teslim Toplam:* ${Number(calculations.grand_total).toLocaleString('tr-TR')} TL\n\n`;
       }
 
-      wpMessage += `Resmi proformanızı incelemek ve indirmek için link:\n${origin}/proformas/${proformaId}\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
-      const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
-      
-      // Navigate to printable detail page first to set history, then redirect current tab to WhatsApp (bypasses popup blocker)
+      toast.success('Proforma faturanız hazırlandı! PDF ekranına yönlendiriliyorsunuz...', { id: 'save' });
       navigate(`/proformas/${proformaId}`);
-      setTimeout(() => {
-        window.location.href = wpUrl;
-      }, 150);
 
     } catch (err) {
       toast.error('İşlem kaydedilirken hata oluştu.', { id: 'save' });
@@ -838,7 +832,7 @@ export default function ProformaQuick() {
                 height: '52px', fontSize: '1.1rem', fontWeight: 700, borderRadius: 'var(--radius-md)'
               }}
             >
-              <FiCheckCircle size={22} /> {saving ? 'İşleniyor...' : 'Proforma Oluştur & WhatsApp ile Paylaş'}
+              <FiCheckCircle size={22} /> {saving ? 'İşleniyor...' : '📄 Proforma Oluştur & PDF Hazırla'}
             </button>
           </div>
           

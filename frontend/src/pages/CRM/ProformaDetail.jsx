@@ -1,17 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileText } from 'react-icons/fi';
 import html2pdf from 'html2pdf.js';
-import { getPublicOrigin } from '../../utils/publicUrl';
+import useDeviceDetect from '../../hooks/useDeviceDetect';
 
 export default function ProformaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const isMobile = useDeviceDetect();
   const [proforma, setProforma] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Mobil Görünüm Sığdırma & Zoom State'leri
+  const [isFitToScreen, setIsFitToScreen] = useState(true);
+  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
+  const sheetRef = useRef(null);
+  const [sheetHeight, setSheetHeight] = useState(1150);
 
   useEffect(() => {
     crmApi.getProforma(id)
@@ -29,35 +36,51 @@ export default function ProformaDetail() {
       });
   }, [id, navigate]);
 
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (sheetRef.current) {
+      setSheetHeight(sheetRef.current.offsetHeight || 1150);
+    }
+  }, [proforma, customer, isFitToScreen, viewportWidth]);
+
   const handlePrint = () => {
     window.print();
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const element = document.getElementById('proforma-sheet');
     if (!element) {
       toast.error('Proforma şablonu bulunamadı.');
       return;
     }
-    
+
+    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    if (sheetRef.current) sheetRef.current.style.transform = 'none';
+
     const opt = {
-      margin:       0.3,
-      filename:     `PROFORMA_${proforma.invoice_number}.pdf`,
+      margin:       0.25,
+      filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, logging: false, useCORS: true },
+      html2canvas:  { scale: 2, logging: false, useCORS: true, windowWidth: 800 },
       jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
     
     toast.loading('PDF hazırlanıyor ve indiriliyor...', { id: 'pdf' });
     
-    html2pdf().from(element).set(opt).save()
-      .then(() => {
-        toast.success('PDF başarıyla indirildi!', { id: 'pdf' });
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
-      });
+    try {
+      await html2pdf().from(element).set(opt).save();
+      toast.success('PDF başarıyla indirildi!', { id: 'pdf' });
+    } catch (err) {
+      console.error(err);
+      toast.error('PDF oluşturulurken bir hata oluştu.', { id: 'pdf' });
+    } finally {
+      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
+    }
   };
 
   const handleDownloadExcel = async () => {
@@ -80,31 +103,77 @@ export default function ProformaDetail() {
     }
   };
 
-  const handleWhatsAppShare = async () => {
-    try {
-      const origin = getPublicOrigin();
-      const trackRes = await crmApi.getProformaTrackingLink(id);
-      const trackingUrl = `${origin}/p/${trackRes.data.token}`;
-      const wpMessage = `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay (0544 622 59 31). Sizin için hazırladığımız ${proforma.vehicle_model} proforma teklifinizi incelemek için bağlantı:\n${trackingUrl}\n\nİnceledikten sonra detayları ve takas seçeneklerini görüşmekten memnuniyet duyarım.`;
-      const wpUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(wpMessage)}`;
-      window.open(wpUrl, '_blank');
-    } catch (err) {
-      console.error(err);
-      toast.error('Akıllı takip bağlantısı oluşturulamadı.');
+  // 📲 DOĞRUDAN PDF DOSYASI OLARAK WHATSAPP PAYLAŞIMI (Link Yok, Belge Dosyası)
+  const handleSharePDFViaWhatsApp = async () => {
+    const element = document.getElementById('proforma-sheet');
+    if (!element) {
+      toast.error('Proforma şablonu bulunamadı.');
+      return;
     }
-  };
 
-  const handleCopySmartLink = async () => {
+    const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
+    if (sheetRef.current) sheetRef.current.style.transform = 'none';
+
+    const toastId = toast.loading('PDF hazırlanıyor ve WhatsApp\'a aktarılıyor...', { id: 'pdf-share' });
+
     try {
-      toast.loading('Akıllı teklif linki oluşturuluyor...', { id: 'track' });
-      const origin = getPublicOrigin();
-      const trackRes = await crmApi.getProformaTrackingLink(id);
-      const trackingUrl = `${origin}/p/${trackRes.data.token}`;
-      await navigator.clipboard.writeText(trackingUrl);
-      toast.success('Akıllı takip linki kopyalandı! Müşteri açtığında anında bildirim alacaksınız.', { id: 'track', duration: 4000 });
+      const opt = {
+        margin:       0.25,
+        filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, logging: false, useCORS: true, windowWidth: 800 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
+      const filename = `IVECO_PROFORMA_${proforma.invoice_number}.pdf`;
+      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+      const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
+      const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
+
+      const shareText = `Sayın Yetkili,\n\nIVECO ERC Samsun Otomotiv olarak firmanız (${customer?.company_name || 'Değerli Müşterimiz'}) için hazırladığımız ${proforma.vehicle_model} resmi bayi proforma faturamız ekteki PDF belgesinde bilgilerinize sunulmuştur.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+
+      // 1. Mobil Cihazlarda Doğrudan Dosya Paylaşımı (iOS Safari & Android)
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        toast.dismiss(toastId);
+        await navigator.share({
+          files: [pdfFile],
+          title: `IVECO Proforma - ${proforma.invoice_number}`,
+          text: shareText
+        });
+        toast.success('Proforma PDF başarıyla paylaşıldı!');
+        return;
+      }
+
+      // 2. Masaüstü veya Dosya Paylaşımını Desteklemeyen Tarayıcılar İçin Otomatik İndirme + WhatsApp Açılışı
+      const downloadUrl = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      toast.success('✅ PDF indirildi! WhatsApp açılıyor, indirilen dosyayı sohbete ekleyin.', { id: 'pdf-share', duration: 5000 });
+
+      const wpUrl = recipientPhone
+        ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+
+      setTimeout(() => {
+        window.open(wpUrl, '_blank');
+      }, 400);
+
     } catch (err) {
-      console.error(err);
-      toast.error('Bağlantı kopyalanamadı.', { id: 'track' });
+      if (err.name !== 'AbortError') {
+        console.error(err);
+        toast.error('PDF paylaşımı sırasında bir hata oluştu.', { id: 'pdf-share' });
+      } else {
+        toast.dismiss(toastId);
+      }
+    } finally {
+      if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
     }
   };
 
@@ -128,51 +197,204 @@ export default function ProformaDetail() {
     );
   }
 
+  // Standart A4 96 DPI Genişliği
+  const sheetBaseWidth = 794;
+  const availableWidth = isMobile ? Math.max(300, viewportWidth - 28) : sheetBaseWidth;
+  const scale = (isMobile && isFitToScreen) ? (availableWidth / sheetBaseWidth) : 1;
+
   return (
     <div className="animate-in pb-12">
-      {/* Action Header (Hidden in Print) */}
-      <div className="flex justify-between items-center mb-6 no-print">
-        <button onClick={() => navigate(`/customers/${proforma.customer_id}`)} className="btn btn-secondary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <FiArrowLeft size={16} /> Müşteri Kartına Dön
-        </button>
-        <div className="flex gap-2">
-          <button onClick={handleDelete} className="btn btn-danger btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <FiTrash2 size={16} /> Sil
-          </button>
-          <button onClick={handleCopySmartLink} className="btn btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#6366f1', color: '#fff', border: 'none' }} title="Müşteri açtığında bildirim düşer">
-            🔗 Akıllı Takip Linki Kopyala
-          </button>
-          <button onClick={handleWhatsAppShare} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#25D366', borderColor: '#25D366' }}>
-            <FiMessageCircle size={16} /> WhatsApp Paylaş (Takip Linkli)
-          </button>
-          <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#1e40af', borderColor: '#1e40af' }}>
-            <FiDownload size={16} /> PDF İndir
-          </button>
-          <button onClick={handleDownloadExcel} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#047857', borderColor: '#047857' }}>
-            <FiFileText size={16} /> Excel İndir (Bankacı İçin)
-          </button>
-          <button onClick={handlePrint} className="btn btn-success btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <FiPrinter size={16} /> Yazdır / PDF Kaydet
-          </button>
-        </div>
+      {/* ── AKSİYON BARI (MOBİL ÖNCELİKLİ & DESKTOP) ── */}
+      <div className="no-print mb-4">
+        {isMobile ? (
+          /* MOBİL AKSİYON PANELİ */
+          <div className="mobile-proforma-actions">
+            {/* 1. Birincil Buton: 📲 PDF Olarak WhatsApp'tan Gönder */}
+            <button
+              type="button"
+              onClick={handleSharePDFViaWhatsApp}
+              className="btn btn-lg w-full mb-3"
+              style={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '0.95rem',
+                fontWeight: 800,
+                padding: '13px 16px',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+              }}
+            >
+              <FiMessageCircle size={22} /> 📲 PDF Olarak WhatsApp'tan Gönder
+            </button>
+
+            {/* 2. İkincil Butonlar Izgarası */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                className="btn btn-secondary btn-sm"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+              >
+                <FiDownload size={16} />
+                <span>PDF İndir</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadExcel}
+                className="btn btn-secondary btn-sm"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+              >
+                <FiFileText size={16} />
+                <span>Excel</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsFitToScreen(!isFitToScreen)}
+                className="btn btn-secondary btn-sm"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 3,
+                  padding: '8px 2px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: isFitToScreen ? '#38bdf8' : 'inherit',
+                  borderColor: isFitToScreen ? '#38bdf8' : 'inherit'
+                }}
+              >
+                <span style={{ fontSize: '15px' }}>{isFitToScreen ? '🔍' : '📱'}</span>
+                <span>{isFitToScreen ? '%100 Boyut' : 'Sığdır'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate(`/customers/${proforma.customer_id}`)}
+                className="btn btn-secondary btn-sm"
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 2px', fontSize: '11px', fontWeight: 700 }}
+              >
+                <FiArrowLeft size={16} />
+                <span>Müşteri</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* MASAÜSTÜ AKSİYON BARI */
+          <div className="flex justify-between items-center mb-6">
+            <button onClick={() => navigate(`/customers/${proforma.customer_id}`)} className="btn btn-secondary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <FiArrowLeft size={16} /> Müşteri Kartına Dön
+            </button>
+            <div className="flex gap-2">
+              <button onClick={handleDelete} className="btn btn-danger btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <FiTrash2 size={16} /> Sil
+              </button>
+              <button 
+                onClick={handleSharePDFViaWhatsApp} 
+                className="btn btn-success btn-sm" 
+                style={{ padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6, background: '#10b981', borderColor: '#10b981', fontWeight: 800 }}
+              >
+                <FiMessageCircle size={16} /> 📲 PDF Olarak WhatsApp'tan Gönder
+              </button>
+              <button onClick={handleDownloadPDF} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#1e40af', borderColor: '#1e40af' }}>
+                <FiDownload size={16} /> PDF İndir
+              </button>
+              <button onClick={handleDownloadExcel} className="btn btn-primary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, background: '#047857', borderColor: '#047857' }}>
+                <FiFileText size={16} /> Excel İndir (Banka)
+              </button>
+              <button onClick={handlePrint} className="btn btn-secondary btn-sm" style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <FiPrinter size={16} /> Yazdır
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* ── MOBİL BİLGİLENDİRME ÇUBUĞU (ÖNİZLEME MODU) ── */}
+      {isMobile && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '6px 12px',
+          marginBottom: '10px',
+          background: 'rgba(15, 23, 42, 0.7)',
+          border: '1px solid rgba(56, 189, 248, 0.2)',
+          borderRadius: '10px',
+          fontSize: '0.74rem',
+          color: '#cbd5e1'
+        }}>
+          <span>📄 {isFitToScreen ? 'Mobil Görünüm (Ekrana Tam Sığdırıldı)' : 'Orijinal Boyut (Kaydırarak İnceleyin)'}</span>
+          <button
+            type="button"
+            onClick={() => setIsFitToScreen(!isFitToScreen)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#38bdf8',
+              fontSize: '0.74rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            {isFitToScreen ? 'Büyüt' : 'Sığdır'}
+          </button>
+        </div>
+      )}
 
-      {/* Printable Sheet A4 styled */}
-      <div id="proforma-sheet" className="print-container" style={{
-        background: '#fff',
-        color: '#000',
-        padding: '24px',
-        border: '2px solid #000',
-        borderRadius: '0px',
-        maxWidth: '820px',
-        margin: '0 auto',
-        fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-        lineHeight: 1.3,
-        fontSize: '12px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-        overflow: 'hidden'
-      }}>
+      {/* ── YATAY TAŞMAYI ENGELLEYEN RESPONSIVE VIEWPORT ── */}
+      <div 
+        className="proforma-outer-viewport" 
+        style={{
+          width: '100%',
+          overflowX: (isFitToScreen && isMobile) ? 'hidden' : 'auto',
+          WebkitOverflowScrolling: 'touch',
+          display: 'flex',
+          justifyContent: 'center',
+          padding: isMobile ? '2px 0 16px 0' : '0'
+        }}
+      >
+        <div 
+          style={{
+            width: (isMobile && isFitToScreen) ? `${Math.round(sheetBaseWidth * scale)}px` : `${sheetBaseWidth}px`,
+            height: (isMobile && isFitToScreen && sheetHeight) ? `${Math.round(sheetHeight * scale)}px` : 'auto',
+            overflow: 'hidden',
+            transition: 'width 0.2s ease, height 0.2s ease',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+            borderRadius: '4px'
+          }}
+        >
+          <div
+            ref={sheetRef}
+            style={{
+              transform: (isMobile && isFitToScreen) ? `scale(${scale})` : 'none',
+              transformOrigin: 'top left',
+              width: `${sheetBaseWidth}px`,
+              minWidth: `${sheetBaseWidth}px`
+            }}
+          >
+            {/* Printable Sheet A4 styled */}
+            <div id="proforma-sheet" className="print-container" style={{
+              background: '#fff',
+              color: '#000',
+              padding: '24px',
+              border: '2px solid #000',
+              borderRadius: '0px',
+              width: `${sheetBaseWidth}px`,
+              boxSizing: 'border-box',
+              margin: '0 auto',
+              fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+              lineHeight: 1.3,
+              fontSize: '12px',
+              overflow: 'hidden'
+            }}>
         {/* Header Block */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #000', paddingBottom: '12px', marginBottom: '12px' }}>
           {/* Official Dealer & Brand Logos */}
@@ -440,6 +662,9 @@ export default function ProformaDetail() {
             lineHeight: 1
           }}>
             IVECO
+          </div>
+        </div>
+      </div>
           </div>
         </div>
       </div>
