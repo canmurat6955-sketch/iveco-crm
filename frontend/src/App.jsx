@@ -65,6 +65,13 @@ export default function App() {
               <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
               <Route path="/arac-secici" element={page(PublicVehicleFinder)} />
               <Route path="/ozel-teklif" element={page(PublicVehicleFinder)} />
+              <Route path="/musteri" element={page(PublicVehicleFinder)} />
+              <Route path="/fiyat-listesi" element={page(PublicVehicleFinder)} />
+              <Route path="/arac-fiyatlari" element={page(PublicVehicleFinder)} />
+              <Route path="/ust-yapi" element={page(PublicVehicleFinder)} />
+              <Route path="/krediler" element={page(PublicVehicleFinder)} />
+              <Route path="/sorular" element={page(PublicVehicleFinder)} />
+              <Route path="/sss" element={page(PublicVehicleFinder)} />
               <Route path="/filo-hesaplayici" element={page(PublicVehicleFinder)} />
               <Route path="/akilli-kasa" element={page(PublicVehicleFinder)} />
               <Route path="/iveco-finansman" element={page(PublicVehicleFinder)} />

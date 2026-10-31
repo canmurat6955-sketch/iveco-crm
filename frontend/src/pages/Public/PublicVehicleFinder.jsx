@@ -32,6 +32,10 @@ import {
   FiMail
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
+import PricingCatalogTab from './components/PricingCatalogTab';
+import BodyStructureTab from './components/BodyStructureTab';
+import LoanFinanceTab from './components/LoanFinanceTab';
+import FaqLinkedInTab from './components/FaqLinkedInTab';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
@@ -656,6 +660,24 @@ export default function PublicVehicleFinder() {
   const isTestRoute = location.pathname.includes('/test') || searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
   const isPreviewMode = isTestRoute;
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
+
+  const tabFromUrl = searchParams.get('tab');
+  const path = location.pathname;
+  let initialTab = 'secici';
+  if (tabFromUrl) {
+    initialTab = tabFromUrl;
+  } else if (path === '/fiyat-listesi' || path === '/arac-fiyatlari') {
+    initialTab = 'fiyatlar';
+  } else if (path === '/ust-yapi') {
+    initialTab = 'ust-yapi';
+  } else if (path === '/krediler' || path === '/iveco-finansman') {
+    initialTab = 'krediler';
+  } else if (path === '/sss' || path === '/sorular') {
+    initialTab = 'sss';
+  }
+
+  const [activeMainTab, setActiveMainTab] = useState(initialTab);
+  const isFromLinkedIn = refCode === 'linkedin' || searchParams.get('source') === 'linkedin';
 
   const [step, setStep] = useState(1);
   const [selectorMode, setSelectorMode] = useState(modelParam ? 'catalog' : 'catalog');
@@ -1326,8 +1348,12 @@ export default function PublicVehicleFinder() {
   };
 
   // Doğrudan WhatsApp Aç (Can Murat Onay - Satış Sorumlusu)
-  const handleDirectWhatsApp = () => {
+  const handleDirectWhatsApp = (customMsg) => {
     const cleanPhone = SALES_REP.phoneWhatsapp;
+    if (typeof customMsg === 'string' && customMsg.trim()) {
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(customMsg)}`, '_blank');
+      return;
+    }
     const clientGreeting = (customerCompany || customerName)
       ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
       : `Merhaba Can Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
@@ -1484,6 +1510,37 @@ END:VCARD`;
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
     } else {
       prompt('WhatsApp Metni:', text);
+    }
+  };
+
+  const handleCopyLinkedInPostTemplate = () => {
+    const origin = getPublicOrigin();
+    const link = `${origin}/musteri?ref=linkedin`;
+    const postText = 
+`🚛 Ticari araç filonuz ve taşımacılık operasyonunuz için merak edilen tüm soruların yanıtlarını, kasa çözümlerini ve güncel fiyat listesini tek bir interaktif portalda topladık!
+
+💼 Sayın Lojistik, Dağıtım ve Filo Yöneticileri;
+IVECO ERC Samsun Otomotiv olarak hazırladığımız dijital müşteri ve bilgi merkezimizde:
+✅ B Sınıfı Ehliyetle Kullanılan Daily 35 Kamyonetler (Şehir İçi Serbest Dağıtım)
+✅ Çift Teker Ağır Hizmet Şasilerinde Güncel 90.000 TL Maliyet Avantajı
+✅ Frigo, Damper, Kapalı Kutu ve Kayar Perde Üst Yapı Kasa Ölçüleri & Palet Kapasiteleri
+✅ 1.000.000 TL'ye kadar %0 Faiz ve Anlaşmalı Banka Ticari Kredi Simülatörü
+✅ Şirketler İçin %20 KDV Mahsubu ve 5 Yıllık Amortisman Rehberi
+✅ Kantar Toleransları, Motor Ömrü ve Merak Edilen 10 Kritik Soru & Yanıtları
+
+Aşağıdaki bağlantıdan doğrudan inceleyebilir, aklınıza takılan her konuyu bana sorabilirsiniz:
+👉 ${link}
+
+📞 İletişim: Can Murat Onay | 0544 622 59 31
+IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
+
+#IVECO #Daily35 #Eurocargo #Kamyonet #TicariAraç #Lojistik #FiloYönetimi #Taşıma #Samsun #ERCSamsun #Kredi #Finansman`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(postText);
+      toast.success('💼 LinkedIn Gönderi Metni & Linki Kopyalandı!');
+    } else {
+      prompt('LinkedIn Gönderi Metni:', postText);
     }
   };
 
@@ -1836,6 +1893,26 @@ IVECO ERC Samsun Otomotiv
                 </button>
                 <button
                   type="button"
+                  onClick={handleCopyLinkedInPostTemplate}
+                  style={{
+                    background: 'linear-gradient(135deg, #0077b5 0%, #004182 100%)',
+                    color: '#fff',
+                    border: '1px solid #0077b5',
+                    borderRadius: '6px',
+                    padding: '6px 12px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="LinkedIn'de paylaşılacak hazır profesyonel gönderi metnini kopyala"
+                >
+                  <FiShare2 size={12} /> 💼 LinkedIn Gönderisini Kopyala
+                </button>
+                <button
+                  type="button"
                   onClick={handleTestOpenGeneratedLink}
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
@@ -2167,8 +2244,167 @@ IVECO ERC Samsun Otomotiv
         </div>
       </div>
 
-      {/* ── STEPPER BAR (2 ADIM: TONAJ & METREKÜP ➔ KREDİ & TEKLİF PLANI) ── */}
-      <div style={{ maxWidth: '680px', margin: '0 auto 20px', display: 'flex', justifyContent: 'center', gap: '14px', position: 'relative' }}>
+      {/* ── LINKEDIN ZİYARETÇİSİ ÖZEL KARŞILAMA BANNER'I ── */}
+      {isFromLinkedIn && (
+        <div style={{
+          maxWidth: '880px',
+          margin: '0 auto 16px',
+          background: 'linear-gradient(135deg, rgba(0, 119, 181, 0.35) 0%, rgba(15, 23, 42, 0.85) 100%)',
+          border: '1.5px solid rgba(0, 119, 181, 0.6)',
+          borderRadius: '16px',
+          padding: '14px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          boxShadow: '0 8px 24px rgba(0, 119, 181, 0.25)',
+          textAlign: 'left'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              background: '#0077b5',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.3rem',
+              flexShrink: 0
+            }}>
+              💼
+            </div>
+            <div>
+              <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                LINKEDIN BAĞLANTISINDAN HOŞ GELDİNİZ
+              </div>
+              <div style={{ fontSize: '1.02rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.25 }}>
+                IVECO ERC Samsun Otomotiv Müşteri & Bilgi Merkezine Hoş Geldiniz!
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
+                Satış Sorumlumuz <strong>{SALES_REP.name}</strong> tarafından hazırlanan güncel araç fiyatlarını, kasa çözümlerini, kredi simülatörünü ve merak ettiğiniz soruların yanıtlarını aşağıdaki sekmelerden inceleyebilirsiniz.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MÜŞTERİ MODÜLÜ ANA SEKMELERİ (TABS) ── */}
+      <div style={{
+        maxWidth: '880px',
+        margin: '0 auto 20px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '8px',
+        justifyContent: 'center',
+        background: 'rgba(15, 23, 42, 0.75)',
+        padding: '6px',
+        borderRadius: '30px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+      }}>
+        {[
+          { id: 'secici', label: '🎯 Akıllı Şasi Seçici & Kredi', badge: null },
+          { id: 'fiyatlar', label: '🏷️ 2026 Model Fiyat Listesi', badge: '-90k İndirim' },
+          { id: 'ust-yapi', label: '🛠️ Üst Yapı & Kasa Rehberi', badge: 'TSE Onaylı' },
+          { id: 'krediler', label: '💳 Krediler & Finansman', badge: '%0 Faiz' },
+          { id: 'sss', label: '❓ Aklınıza Gelen Sorular (SSS)', badge: 'LinkedIn SSS' }
+        ].map((tab) => {
+          const isActive = activeMainTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveMainTab(tab.id)}
+              style={{
+                background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'transparent',
+                color: isActive ? '#fff' : '#94a3b8',
+                border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
+                borderRadius: '25px',
+                padding: '8px 16px',
+                fontSize: '0.80rem',
+                fontWeight: isActive ? 800 : 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s',
+                boxShadow: isActive ? '0 4px 14px rgba(2, 132, 199, 0.4)' : 'none'
+              }}
+            >
+              <span>{tab.label}</span>
+              {tab.badge && (
+                <span style={{
+                  fontSize: '0.62rem',
+                  fontWeight: 800,
+                  background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(56, 189, 248, 0.15)',
+                  color: isActive ? '#fff' : '#38bdf8',
+                  padding: '2px 6px',
+                  borderRadius: '10px'
+                }}>
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── SEKME 2: 2026 MODEL FİYAT LİSTESİ ── */}
+      {activeMainTab === 'fiyatlar' && (
+        <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
+          <PricingCatalogTab
+            onSelectVehicle={(vehicle) => {
+              handleSelectVehicle(vehicle.id || vehicle.key);
+              setActiveMainTab('secici');
+              setStep(2);
+            }}
+            onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            salesRep={SALES_REP}
+          />
+        </div>
+      )}
+
+      {/* ── SEKME 3: ÜST YAPI & KASA REHBERİ ── */}
+      {activeMainTab === 'ust-yapi' && (
+        <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
+          <BodyStructureTab
+            onSelectBody={(bodyId) => {
+              setSelectedBody(bodyId);
+              setActiveMainTab('secici');
+              setStep(1);
+            }}
+            onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            salesRep={SALES_REP}
+          />
+        </div>
+      )}
+
+      {/* ── SEKME 4: KREDİLER & FİNANSMAN ── */}
+      {activeMainTab === 'krediler' && (
+        <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
+          <LoanFinanceTab
+            onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            salesRep={SALES_REP}
+          />
+        </div>
+      )}
+
+      {/* ── SEKME 5: SIKÇA SORULAN SORULAR (LINKEDIN & MÜŞTERİ SSS) ── */}
+      {activeMainTab === 'sss' && (
+        <div style={{ maxWidth: '980px', margin: '0 auto 30px' }}>
+          <FaqLinkedInTab
+            onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            salesRep={SALES_REP}
+          />
+        </div>
+      )}
+
+      {/* ── SEKME 1: AKILLI ŞASİ SEÇİCİ & KREDİ (ORİJİNAL STEPPER & KART) ── */}
+      {activeMainTab === 'secici' && (
+        <>
+          {/* ── STEPPER BAR (2 ADIM: TONAJ & METREKÜP ➔ KREDİ & TEKLİF PLANI) ── */}
+          <div style={{ maxWidth: '680px', margin: '0 auto 20px', display: 'flex', justifyContent: 'center', gap: '14px', position: 'relative' }}>
         {[
           { num: 1, label: '1. Tonaj & Metreküp' },
           { num: 2, label: '2. Kredi & Teklif Planı' }
@@ -3673,6 +3909,8 @@ IVECO ERC Samsun Otomotiv
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* ── CAN MURAT ONAY VIP TEST SİMÜLASYON RAPOR MODALI ── */}
       {testSimulationResult && (
