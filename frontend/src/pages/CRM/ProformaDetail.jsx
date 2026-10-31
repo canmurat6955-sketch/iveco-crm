@@ -86,15 +86,21 @@ export default function ProformaDetail() {
       return;
     }
 
+    // Capture'ın doğru koordinatlardan başlaması için tepeye kaydır
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    await new Promise(r => setTimeout(r, 80));
+
     // Mobil ölçeklemeyi ve taşmayı geçici olarak sıfırla (Canlı elemandan tam çözünürlüklü capture)
     const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
     const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
     const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperHeight = wrapper ? wrapper.style.height : '';
     const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
 
     if (sheetRef.current) sheetRef.current.style.transform = 'none';
     if (wrapper) {
       wrapper.style.width = `${SHEET_BASE_WIDTH}px`;
+      wrapper.style.height = 'auto';
       wrapper.style.overflow = 'visible';
     }
 
@@ -102,7 +108,7 @@ export default function ProformaDetail() {
       margin:       [8, 10, 8, 10],
       filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
+      html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: 1280 },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
@@ -118,6 +124,7 @@ export default function ProformaDetail() {
       if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
       if (wrapper) {
         wrapper.style.width = prevWrapperWidth;
+        wrapper.style.height = prevWrapperHeight;
         wrapper.style.overflow = prevWrapperOverflow;
       }
     }
@@ -151,14 +158,20 @@ export default function ProformaDetail() {
       return;
     }
 
+    // Capture'ın doğru koordinatlardan başlaması için tepeye kaydır
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    await new Promise(r => setTimeout(r, 80));
+
     const prevTransform = sheetRef.current ? sheetRef.current.style.transform : '';
     const wrapper = sheetRef.current ? sheetRef.current.parentElement : null;
     const prevWrapperWidth = wrapper ? wrapper.style.width : '';
+    const prevWrapperHeight = wrapper ? wrapper.style.height : '';
     const prevWrapperOverflow = wrapper ? wrapper.style.overflow : '';
 
     if (sheetRef.current) sheetRef.current.style.transform = 'none';
     if (wrapper) {
       wrapper.style.width = `${SHEET_BASE_WIDTH}px`;
+      wrapper.style.height = 'auto';
       wrapper.style.overflow = 'visible';
     }
 
@@ -169,7 +182,7 @@ export default function ProformaDetail() {
         margin:       [8, 10, 8, 10],
         filename:     `IVECO_PROFORMA_${proforma.invoice_number}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0 },
+        html2canvas:  { scale: 2, logging: false, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: 1280 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
@@ -190,14 +203,14 @@ export default function ProformaDetail() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 2000);
+      setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 3000);
 
       // 2. WhatsApp'ı aç (navigator.share KESİNLİKLE kullanılmaz!)
       const wpUrl = recipientPhone
         ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
-      toast.success('📄 PDF indirildi! WhatsApp açıldı. Lütfen ataş (📎) simgesine basıp Belge olarak ekleyin.', { id: 'pdf-share', duration: 8000 });
+      toast.success('📄 PDF indirildi! WhatsApp açıldı. Sohbete Ataş (📎) > Belge ile ekleyiniz.', { id: 'pdf-share', duration: 9000 });
 
       setTimeout(() => {
         window.open(wpUrl, '_blank');
@@ -210,6 +223,7 @@ export default function ProformaDetail() {
       if (sheetRef.current) sheetRef.current.style.transform = prevTransform;
       if (wrapper) {
         wrapper.style.width = prevWrapperWidth;
+        wrapper.style.height = prevWrapperHeight;
         wrapper.style.overflow = prevWrapperOverflow;
       }
     }
