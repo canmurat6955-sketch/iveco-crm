@@ -178,8 +178,13 @@ export default function ProformaDetail() {
 
       const shareText = `Sayın Yetkili,\n\nIVECO ERC Samsun Otomotiv olarak firmanız (${customer?.company_name || 'Değerli Müşterimiz'}) için hazırladığımız ${proforma.vehicle_model} resmi bayi proforma faturamız ekteki PDF belgesinde bilgilerinize sunulmuştur.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
 
-      // 1. Mobil Cihazlarda Doğrudan Dosya Paylaşımı (iOS Safari & Android)
-      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+      // 1. Yalnızca gerçek akıllı telefonlarda (iOS Safari / Android) Web Share API kullan.
+      // Windows/Masaüstü Edge/Chrome tarayıcılarında Windows Share arayüzü WhatsApp Desktop'a
+      // tarayıcı bellek linkini (blob:https://...) mesaj olarak ekler.
+      // Bu yüzden masaüstünde doğrudan PDF indirme + WhatsApp metni açılışı yapılır, link KESİNLİKLE gitmez.
+      const isMobilePhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+
+      if (isMobilePhone && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
         toast.dismiss(toastId);
         await navigator.share({
           files: [pdfFile],
@@ -190,7 +195,7 @@ export default function ProformaDetail() {
         return;
       }
 
-      // 2. Masaüstü veya Dosya Paylaşımını Desteklemeyen Tarayıcılar İçin Otomatik İndirme + WhatsApp Açılışı
+      // 2. Masaüstü (Windows / Mac): PDF dosyasını tertemiz indirir ve WhatsApp'ı açar (Asla link içermez)
       const downloadUrl = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = downloadUrl;
@@ -198,8 +203,9 @@ export default function ProformaDetail() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 1000);
 
-      toast.success('✅ PDF indirildi! WhatsApp açılıyor, indirilen dosyayı sohbete ekleyin.', { id: 'pdf-share', duration: 5000 });
+      toast.success('✅ PDF indirildi! WhatsApp açıldı, indirilen PDF dosyasını sohbete ekleyin.', { id: 'pdf-share', duration: 6000 });
 
       const wpUrl = recipientPhone
         ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
@@ -207,7 +213,7 @@ export default function ProformaDetail() {
 
       setTimeout(() => {
         window.open(wpUrl, '_blank');
-      }, 400);
+      }, 300);
 
     } catch (err) {
       if (err.name !== 'AbortError') {
