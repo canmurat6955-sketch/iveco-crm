@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authApi } from '../api/client';
-import { FiEye, FiEyeOff, FiKey, FiLock, FiCheckCircle } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiKey, FiLock, FiCheckCircle, FiRefreshCw } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function Login() {
