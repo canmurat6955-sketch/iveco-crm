@@ -161,7 +161,7 @@ export default function VehicleManagement() {
         year: parseInt(stockForm.year) || 2024,
         list_price: stockForm.list_price ? parseFloat(stockForm.list_price) : null
       });
-      toast.success('Stok aracı başarıyla eklendi 🎉');
+      toast.success('Stok aracı envantere eklendi.');
       setShowAddStockModal(false);
       loadStocks();
     } catch {
@@ -203,36 +203,36 @@ export default function VehicleManagement() {
             onClick={() => setActiveTab('master')}
             style={{
               padding: '8px 16px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 700,
-              border: 'none', cursor: 'pointer',
-              background: activeTab === 'master' ? '#3b82f6' : 'transparent',
+              border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: activeTab === 'master' ? '#004B93' : 'transparent',
               color: activeTab === 'master' ? '#fff' : '#94a3b8'
             }}
           >
-            📋 Araç Kataloğu ({masterVehicles.length})
+            <FiTruck size={14} /> Araç Kataloğu ({masterVehicles.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('stock')}
             style={{
               padding: '8px 16px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 700,
-              border: 'none', cursor: 'pointer',
-              background: activeTab === 'stock' ? '#10b981' : 'transparent',
+              border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: activeTab === 'stock' ? '#059669' : 'transparent',
               color: activeTab === 'stock' ? '#fff' : '#94a3b8'
             }}
           >
-            📦 Stok Envanteri ({stocks.length})
+            <FiPackage size={14} /> Stok Envanteri ({stocks.length})
           </button>
           <button
             type="button"
             onClick={() => { setActiveTab('reports'); loadReports(); }}
             style={{
               padding: '8px 16px', borderRadius: 8, fontSize: '0.82rem', fontWeight: 700,
-              border: 'none', cursor: 'pointer',
-              background: activeTab === 'reports' ? '#8b5cf6' : 'transparent',
+              border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: activeTab === 'reports' ? '#4f46e5' : 'transparent',
               color: activeTab === 'reports' ? '#fff' : '#94a3b8'
             }}
           >
-            📊 Talep Zekâsı Raporları
+            <FiBarChart2 size={14} /> Talep & Trend Raporları
           </button>
           <button
             type="button"
@@ -245,7 +245,7 @@ export default function VehicleManagement() {
               boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)'
             }}
           >
-            🎯 Akıllı Şasi & Kasa Hesaplayıcı
+            <FiLayers size={14} /> Şasi & Üstyapı Hesaplayıcı
           </button>
         </div>
       </div>
@@ -350,8 +350,8 @@ export default function VehicleManagement() {
       {activeTab === 'stock' && (
         <div className="card">
           <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="card-title" style={{ margin: 0 }}>
-              📦 Bayi Araç Envanteri & Müşteri Eşleştirme
+            <h3 className="card-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FiPackage size={18} color="#059669" /> Bayi Araç Envanteri & Müşteri Eşleştirme
             </h3>
             <button
               className="btn btn-success btn-sm"
@@ -434,8 +434,8 @@ export default function VehicleManagement() {
             <>
               {/* Total demand summary bar */}
               <div className="card" style={{ padding: '1.25rem', background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8))' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>
-                  📊 IVECO Müşteri Talep Dağılımı ve Trend Analizi
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <FiBarChart2 size={18} color="#38bdf8" /> IVECO Müşteri Talep Dağılımı ve Trend Analizi
                 </h3>
                 <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
                   Toplam İncelenen Talep: <strong>{reports.total_interests} Araç İhtiyacı</strong>

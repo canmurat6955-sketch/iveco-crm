@@ -469,7 +469,7 @@ export default function Workbench() {
                       </div>
                       {c.address && (
                         <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
-                          📍 {c.address}
+                          {c.address}
                         </div>
                       )}
                     </div>
@@ -729,7 +729,7 @@ export default function Workbench() {
                                 fontSize: '11px', fontWeight: 700,
                                 color: isPrimary ? '#10b981' : '#94a3b8'
                               }}>
-                                {isPrimary ? '★ KALACAK ANA KAYIT' : 'İkincil (Birleşecek)'}
+                                {isPrimary ? 'Ana Kayıt (Aktif Kalacak)' : 'İkincil (Birleşecek)'}
                               </span>
                             </div>
 
@@ -737,8 +737,8 @@ export default function Workbench() {
                               {c.company_name}
                             </div>
                             <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.4 }}>
-                              <div>📞 {c.phone || 'Telefon yok'}</div>
-                              <div>📍 {c.city || '-'} {c.district ? `/ ${c.district}` : ''}</div>
+                              <div>{c.phone || 'Telefon yok'}</div>
+                              <div>{c.city || '-'} {c.district ? `/ ${c.district}` : ''}</div>
                               {c.pipeline_stage && (
                                 <div style={{ color: '#38bdf8', fontWeight: 600, marginTop: '2px' }}>
                                   Aşama: {c.pipeline_stage} ({c.activity_count} aktivite)
@@ -800,7 +800,7 @@ function renderCallCard(c, onRefresh, openWhatsAppModal, openCallModal) {
 
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', margin: '6px 0' }}>
           <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', color: '#cbd5e1' }}>
-            📍 {c.city || 'İl Yok'}
+            {c.city || 'İl Yok'}
           </span>
           {c.pipeline_stage && (
             <span style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', background: 'rgba(16,185,129,0.15)', color: '#34d399', fontWeight: 600 }}>
@@ -814,7 +814,7 @@ function renderCallCard(c, onRefresh, openWhatsAppModal, openCallModal) {
 
         {c.phone && (
           <div style={{ fontSize: '13px', color: '#38bdf8', fontWeight: 600, marginTop: '4px' }}>
-            📞 {c.phone}
+            {c.phone}
           </div>
         )}
         {c.note && (

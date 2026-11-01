@@ -272,7 +272,7 @@ export default function IntentRadar() {
             }}
           >
             <FiMessageSquare size={16} />
-            📲 WhatsApp Durumunda Paylaş
+            WhatsApp Durumunda Paylaş
           </button>
 
           <button
@@ -333,7 +333,7 @@ export default function IntentRadar() {
           boxShadow: 'var(--shadow-card)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700 }}>🔥 ÇOK SICAK (%90+ NİYET)</span>
+            <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 700 }}>YÜKSEK SATIN ALMA NİYETİ (%90+)</span>
             <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '6px', borderRadius: '8px' }}><FiTrendingUp size={18} /></span>
           </div>
           <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#f87171' }}>
@@ -453,9 +453,8 @@ export default function IntentRadar() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                <span>🔍</span>
                 <span>"{item.tag}"</span>
-                {item.hot && <span style={{ fontSize: '11px' }}>🔥</span>}
+                {item.hot && <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 700 }}>(Aktif)</span>}
               </button>
             );
           })}
@@ -480,9 +479,9 @@ export default function IntentRadar() {
           <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>KAYNAK:</span>
           {[
             { id: 'all', label: 'Tümü' },
-            { id: 'google_search', label: '🔍 Google Organik' },
-            { id: 'google_ads', label: '🎯 Google Ads' },
-            { id: 'whatsapp_link', label: '💬 WhatsApp Link' }
+            { id: 'google_search', label: 'Google Organik' },
+            { id: 'google_ads', label: 'Google Ads' },
+            { id: 'whatsapp_link', label: 'WhatsApp Link' }
           ].map(f => (
             <button
               key={f.id}
@@ -506,8 +505,8 @@ export default function IntentRadar() {
           <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600, marginLeft: '8px' }}>NİYET:</span>
           {[
             { id: 'all', label: 'Tümü' },
-            { id: 'very_high', label: '🔥 Çok Sıcak (%90+)' },
-            { id: 'high', label: 'Sıcak (%75+)' }
+            { id: 'very_high', label: 'Yüksek Öncelikli (%90+)' },
+            { id: 'high', label: 'Aktif İlgi (%75+)' }
           ].map(f => (
             <button
               key={f.id}
@@ -702,7 +701,7 @@ export default function IntentRadar() {
 
                   {signal.ip_address && (
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                      🌐 IP: {signal.ip_address}
+                      IP: {signal.ip_address}
                     </div>
                   )}
                 </div>
@@ -754,7 +753,7 @@ export default function IntentRadar() {
                         fontSize: '0.78rem',
                         fontWeight: 500
                       }}>
-                        🏷️ {signal.target_campaign}
+                        {signal.target_campaign}
                       </span>
                     )}
                   </div>
@@ -781,7 +780,7 @@ export default function IntentRadar() {
                       fontWeight: 700,
                       color: isVeryHot ? '#ef4444' : '#f59e0b'
                     }}>
-                      {isVeryHot ? '🔥 Çok Sıcak' : 'Sıcak Niyet'}
+                      {isVeryHot ? 'Yüksek Öncelik' : 'Aktif İlgi'}
                     </span>
                   </div>
 

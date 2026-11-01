@@ -2304,11 +2304,11 @@ IVECO ERC Samsun Otomotiv
         boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
       }}>
         {[
-          { id: 'secici', label: '🎯 Akıllı Şasi Seçici & Kredi', badge: null },
-          { id: 'fiyatlar', label: '🏷️ 2026 Model Fiyat Listesi', badge: '190.000 TL İndirim' },
-          { id: 'ust-yapi', label: '🛠️ Üst Yapı & Kasa Rehberi', badge: 'TSE Onaylı' },
-          { id: 'krediler', label: '💳 Krediler & Finansman', badge: '%0 Faiz' },
-          { id: 'sss', label: '❓ Aklınıza Gelen Sorular (SSS)', badge: 'LinkedIn SSS' }
+          { id: 'secici', label: 'Şasi Konfigüratörü & Kredi Planı', badge: null },
+          { id: 'fiyatlar', label: '2026 Model Fiyat Kataloğu', badge: 'Kampanyalı' },
+          { id: 'ust-yapi', label: 'Üst Yapı & Kasa Rehberi', badge: 'TSE Onaylı' },
+          { id: 'krediler', label: 'Ticari Finansman & Kredi', badge: '%0 Faiz' },
+          { id: 'sss', label: 'Sıkça Sorulan Sorular (SSS)', badge: 'Teknik Bilgi' }
         ].map((tab) => {
           const isActive = activeMainTab === tab.id;
           return (
@@ -2493,7 +2493,7 @@ IVECO ERC Samsun Otomotiv
                   boxShadow: selectorMode === 'catalog' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
                 }}
               >
-                <FiTruck size={15} /> 📋 Doğrudan Araç Listesinden Seç
+                <FiTruck size={15} /> Doğrudan Model Kataloğundan Seç
               </button>
               <button
                 type="button"
@@ -2516,7 +2516,7 @@ IVECO ERC Samsun Otomotiv
                   boxShadow: selectorMode === 'slider' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
                 }}
               >
-                <FiMaximize2 size={15} /> ⚖️ Tonaj & Hacme Göre Hesapla
+                <FiMaximize2 size={15} /> Tonaj & Hacme Göre Hesapla
               </button>
             </div>
 
@@ -2527,11 +2527,11 @@ IVECO ERC Samsun Otomotiv
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {[
                     { id: 'all', label: 'Tüm Modeller' },
-                    { id: 'hafriyat', label: '🚜 T-Way Hafriyat & Şantiye (10 ve 12 Teker)' },
-                    { id: 'panelvan', label: '🚐 Panelvan Modelleri (12, 16, 18 m³)' },
-                    { id: 'kamyonet', label: '🚛 Kamyonetler (B Sınıfı / 3.5 Ton)' },
-                    { id: 'kamyon', label: '🚚 Kamyonlar (C - 10 Teker Dahil)' },
-                    { id: 'cekici', label: '🛣️ Çekici (S-Way)' }
+                    { id: 'hafriyat', label: 'T-Way Hafriyat & Şantiye (6x4 / 8x4)' },
+                    { id: 'panelvan', label: 'Daily Panelvan (12 - 18 m³)' },
+                    { id: 'kamyonet', label: 'Daily Şasi Kamyonet (3.5 Ton / B Ehliyet)' },
+                    { id: 'kamyon', label: 'Eurocargo & Daily Ağır Kamyonlar' },
+                    { id: 'cekici', label: 'S-Way Çekici Grubu' }
                   ].map(cat => (
                     <button
                       key={cat.id}
@@ -3695,7 +3695,7 @@ IVECO ERC Samsun Otomotiv
             }}>
               <div>
                 <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>📲</span> Bu Teklifi Müşteriye WhatsApp'tan Gönder
+                  <FiShare2 size={16} color="#22c55e" /> Bu Teklifi Müşteriye WhatsApp'tan Gönder
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
                   {matched.title} ({activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL Kredi` : ''}) için zengin görsel kartı ve kişiselleştirilmiş bağlantı.
@@ -3726,8 +3726,8 @@ IVECO ERC Samsun Otomotiv
             {/* ── İLETİŞİM & TEKLİF ALMA FORMU ──────────────────────── */}
             {!submitted ? (
               <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
-                  📋 Can Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <FiFileText size={16} color="#38bdf8" /> Can Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
                 </h4>
                 <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
                   Bilgilerinizi bırakın; Can Murat Onay aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
@@ -3844,7 +3844,8 @@ IVECO ERC Samsun Otomotiv
                     boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
                   }}
                 >
-                  {submitting ? 'İletiliyor...' : '📞 Can Murat Onay Beni Arasın & Teklif Göndersin'}
+                  <FiPhone size={15} />
+                  {submitting ? 'İletiliyor...' : 'Can Murat Onay Beni Arasın & Teklif Göndersin'}
                 </button>
               </form>
             ) : (

@@ -24,11 +24,11 @@ export default function TodayOpportunitiesCard({
   const hotLeadsCount = (opportunities?.counts?.hot_leads ?? 0) + (opportunities?.counts?.stock_matches ?? 0);
 
   const TABS = [
-    { key: 'unvisited_a', label: unvisitedACount > 0 ? '⚠️ Ziyaretsiz (A)' : '⭐ Ziyaretsiz (A)', fullLabel: '⭐ Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: unvisitedACount > 0 ? '#ef4444' : '#64748b' },
-    { key: 'quote_pending', label: '📋 Teklif Bekleyen', fullLabel: '📋 Teklif & Şasi Bekleyenler', count: quotePendingCount, color: '#3b82f6' },
-    { key: 'follow_ups', label: '⏰ Takip Günü', fullLabel: '⏰ Takip Tarihi Gelenler', count: followUpsCount, color: '#f59e0b' },
-    { key: 'new_discoveries', label: '✨ Yeni Keşifler', fullLabel: '✨ Yeni Kurulan / Keşifler', count: newDiscoveriesCount, color: '#a855f7' },
-    { key: 'hot_leads', label: '🔥 Sıcak / Stok', fullLabel: '🔥 Sıcak Müşteri & Stok Eşleşmesi', count: hotLeadsCount, color: '#10b981' },
+    { key: 'unvisited_a', label: 'Ziyaretsiz (A)', fullLabel: 'Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: unvisitedACount > 0 ? '#ef4444' : '#64748b' },
+    { key: 'quote_pending', label: 'Teklif Bekleyen', fullLabel: 'Teklif & Proforma Bekleyenler', count: quotePendingCount, color: '#004B93' },
+    { key: 'follow_ups', label: 'Takip Günü', fullLabel: 'Takip Tarihi Gelenler', count: followUpsCount, color: '#f59e0b' },
+    { key: 'new_discoveries', label: 'Yeni Keşifler', fullLabel: 'Yeni Kurulan / Keşifler', count: newDiscoveriesCount, color: '#8b5cf6' },
+    { key: 'hot_leads', label: 'Sıcak / Stok', fullLabel: 'Sıcak Müşteri & Stok Eşleşmesi', count: hotLeadsCount, color: '#10b981' },
   ];
 
   return (
@@ -163,7 +163,7 @@ export default function TodayOpportunitiesCard({
                           {item.company_name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                          📍 {item.city} / {item.district || 'Merkez'} · {item.sector || 'Genel Ticaret'}
+                          {item.city} / {item.district || 'Merkez'} · {item.sector || 'Genel Ticaret'}
                         </span>
                       </div>
                       <span className="badge" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', fontSize: '0.7rem' }}>
@@ -177,7 +177,7 @@ export default function TodayOpportunitiesCard({
                       borderLeft: '3px solid #ef4444'
                     }}>
                       <FiAlertTriangle size={13} />
-                      <span>{item.days_since_visit ? `⚠️ ${item.days_since_visit} gündür ziyaret edilmedi` : '⚠️ Hiç ziyaret edilmedi!'}</span>
+                      <span>{item.days_since_visit ? `${item.days_since_visit} gündür ziyaret edilmedi` : 'Ziyaret kaydı bulunmuyor'}</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: '#38bdf8', fontWeight: 600 }}>
@@ -239,7 +239,7 @@ export default function TodayOpportunitiesCard({
                 borderRadius: 12,
                 border: '1px dashed rgba(255, 255, 255, 0.12)'
               }}>
-                <div style={{ fontSize: '2rem', marginBottom: '0.6rem' }}>🎯</div>
+                <FiCheckCircle size={32} style={{ color: '#10b981', marginBottom: '0.6rem' }} />
                 <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.96rem', fontWeight: 700, color: '#f8fafc' }}>
                   Ziyaret Bekleyen A-Segment Müşteri Yok
                 </h4>
@@ -278,7 +278,7 @@ export default function TodayOpportunitiesCard({
                           {item.company_name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                          📍 {item.city} {item.district ? `/ ${item.district}` : ''}
+                          {item.city} {item.district ? `/ ${item.district}` : ''}
                         </span>
                       </div>
                       <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontSize: '0.7rem' }}>
@@ -353,7 +353,7 @@ export default function TodayOpportunitiesCard({
                           {item.company_name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                          📍 {item.city}
+                          {item.city}
                         </span>
                       </div>
                       <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '0.7rem' }}>
@@ -429,7 +429,7 @@ export default function TodayOpportunitiesCard({
                           {item.company_name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                          📍 {item.city} / {item.district || 'Merkez'}
+                          {item.city} / {item.district || 'Merkez'}
                         </span>
                       </div>
                       <span className="badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', fontSize: '0.7rem' }}>
@@ -492,7 +492,7 @@ export default function TodayOpportunitiesCard({
                           {item.company_name}
                         </h4>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                          📍 {item.city || 'Şehir Yok'} · Tel: {item.phone || '-'}
+                          {item.city || 'Şehir Yok'} · Tel: {item.phone || '-'}
                         </span>
                       </div>
                       <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', fontSize: '0.7rem' }}>

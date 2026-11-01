@@ -17,12 +17,12 @@ import FleetRenewalRadarWidget from '../components/FleetRadar/FleetRenewalRadarW
 
 
 const STAT_CARDS = [
-  { key: 'total_customers', label: 'Toplam Müşteri', icon: FiUsers, gradient: 'linear-gradient(135deg, #1e3a5f, #2b7de9)' },
-  { key: 'high_potential_customers', label: 'Yüksek Potansiyel', icon: FiStar, gradient: 'linear-gradient(135deg, #064e3b, #10b981)' },
-  { key: 'new_discoveries', label: 'Yeni Keşifler', icon: FiSearch, gradient: 'linear-gradient(135deg, #78350f, #f59e0b)' },
-  { key: 'today_follow_ups', label: 'Bugün Aranacak', icon: FiPhone, gradient: 'linear-gradient(135deg, #3b0764, #8b5cf6)' },
-  { key: 'unread_notifications', label: 'Okunmamış Bildirim', icon: FiBell, gradient: 'linear-gradient(135deg, #7f1d1d, #ef4444)' },
-  { key: 'active_campaigns', label: 'Aktif Kampanya', icon: FiFolder, gradient: 'linear-gradient(135deg, #164e63, #06b6d4)' },
+  { key: 'total_customers', label: 'Toplam Müşteri Portföyü', icon: FiUsers, gradient: 'linear-gradient(135deg, #0f2d59, #004B93)' },
+  { key: 'high_potential_customers', label: 'A-Segment Öncelikli', icon: FiStar, gradient: 'linear-gradient(135deg, #064e3b, #059669)' },
+  { key: 'new_discoveries', label: 'Bölgesel Yeni Keşifler', icon: FiSearch, gradient: 'linear-gradient(135deg, #78350f, #d97706)' },
+  { key: 'today_follow_ups', label: 'Bugün Aranacak & Takip', icon: FiPhone, gradient: 'linear-gradient(135deg, #0369a1, #0284c7)' },
+  { key: 'unread_notifications', label: 'Aksiyon Bekleyen Talepler', icon: FiBell, gradient: 'linear-gradient(135deg, #881337, #e11d48)' },
+  { key: 'active_campaigns', label: 'Aktif Satış Kampanyaları', icon: FiFolder, gradient: 'linear-gradient(135deg, #312e81, #4f46e5)' },
 ];
 
 
@@ -174,7 +174,7 @@ export default function Dashboard() {
                 onChange={(e) => handleCityChange(e.target.value)}
                 className="mobile-city-select"
               >
-                <option value="Tümü">🌍 Tüm Bölge (9 İl)</option>
+                <option value="Tümü">Tüm Bölge (9 İl)</option>
                 {TARGET_CITIES.map(c => (
                   <option key={c} value={c} style={{ background: '#0f172a', color: '#f8fafc' }}>{c}</option>
                 ))}
@@ -185,7 +185,7 @@ export default function Dashboard() {
           <div className="mobile-welcome-main">
             <div className="mobile-welcome-greeting">
               <div className="mobile-welcome-text">
-                👋 Hoş Geldiniz, <strong>{displayName}</strong>
+                Hoş Geldiniz, <strong>{displayName}</strong>
               </div>
               <div className="mobile-welcome-sub">
                 Saha Satış Yöneticisi · 0544 622 59 31
@@ -197,7 +197,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── ⚡ 1-TIKLA HIZLI TEKLİF & PROFORMA KARTI (MOBİL ÖNCELİKLİ) ── */}
+        {/* ── HIZLI TEKLİF & PROFORMA KARTI (MOBİL ÖNCELİKLİ) ── */}
         <div 
           className="mobile-quick-proposal-card" 
           onClick={() => navigate('/proforma/quick')}
@@ -217,7 +217,7 @@ export default function Dashboard() {
             </div>
           </div>
           <button type="button" className="proposal-card-action-btn">
-            Teklif Hazırla ➔
+            Teklif Hazırla
           </button>
         </div>
 

@@ -75,7 +75,7 @@ export const offlineSync = {
     localStorage.setItem('offline_requests_queue', JSON.stringify(failed));
 
     if (failed.length === 0) {
-      toast.success("Tüm çevrimdışı işlemler başarıyla eşitlendi! 📡✅", { id: 'sync_load' });
+      toast.success("Tüm çevrimdışı işlemler sunucu ile eşitlendi.", { id: 'sync_load' });
     } else {
       toast.error(`${failed.length} işlem eşitlenemedi, daha sonra tekrar denenecek.`, { id: 'sync_load' });
     }

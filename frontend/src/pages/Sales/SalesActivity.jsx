@@ -124,7 +124,7 @@ export default function SalesActivityPage() {
         notes: callForm.notes,
         source: 'manual'
       });
-      toast.success('Telefon görüşmesi kaydedildi 📞');
+      toast.success('Telefon görüşmesi kaydedildi');
       setShowCallModal(false);
       setCallForm({ phone_number: '', direction: 'outbound', duration_minutes: 2, duration_seconds: 30, outcome: 'Olumlu', notes: '' });
       loadCalls();
@@ -220,21 +220,21 @@ export default function SalesActivityPage() {
             onClick={() => setActiveMainTab('calls')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            <FiPhone size={14} /> 📞 Arama Günlüğü ({callStats?.total_calls ?? '...'})
+            <FiPhone size={14} /> Arama Günlüğü ({callStats?.total_calls ?? '...'})
           </button>
           <button
             className={`btn btn-sm ${activeMainTab === 'whatsapp' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveMainTab('whatsapp')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            <FiMessageSquare size={14} /> 💬 WhatsApp Akışı ({whatsappMessages.length})
+            <FiMessageSquare size={14} /> WhatsApp İletişim Akışı ({whatsappMessages.length})
           </button>
           <button
             className={`btn btn-sm ${activeMainTab === 'activities' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setActiveMainTab('activities')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            <FiLayers size={14} /> 📊 Pipeline & Şablonlar
+            <FiLayers size={14} /> Satış Hattı & Şablonlar
           </button>
         </div>
       </div>
@@ -266,9 +266,9 @@ export default function SalesActivityPage() {
               <div className="card" style={{ padding: '1.25rem' }}>
                 <div className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Giden / Gelen</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#38bdf8', marginTop: 4 }}>
-                  ↗️ {callStats.outbound_count} <span style={{ fontSize: '1.1rem', color: '#94a3b8' }}>/</span> ↙️ {callStats.inbound_count}
+                  {callStats.outbound_count} <span style={{ fontSize: '1.1rem', color: '#94a3b8' }}>/</span> {callStats.inbound_count}
                 </div>
-                <div className="text-xs text-muted mt-1">❌ {callStats.missed_count} cevapsız</div>
+                <div className="text-xs text-muted mt-1">{callStats.missed_count} cevapsız arama</div>
               </div>
 
               <div className="card" style={{ padding: '1.25rem', borderLeft: callStats.unmatched_count > 0 ? '4px solid #f59e0b' : undefined }}>
@@ -296,26 +296,26 @@ export default function SalesActivityPage() {
                 className={`btn btn-sm ${callDirectionFilter === 'outbound' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCallDirectionFilter('outbound')}
               >
-                ↗️ Giden Aramalar
+                Giden Aramalar
               </button>
               <button
                 className={`btn btn-sm ${callDirectionFilter === 'inbound' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCallDirectionFilter('inbound')}
               >
-                ↙️ Gelen Aramalar
+                Gelen Aramalar
               </button>
               <button
                 className={`btn btn-sm ${callDirectionFilter === 'missed' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCallDirectionFilter('missed')}
               >
-                ❌ Cevapsızlar
+                Cevapsız Aramalar
               </button>
               <button
                 className={`btn btn-sm ${callDirectionFilter === 'unmatched' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCallDirectionFilter('unmatched')}
                 style={{ borderColor: '#f59e0b', color: callDirectionFilter === 'unmatched' ? '#fff' : '#f59e0b' }}
               >
-                ❓ Bilinmeyen Numaralar
+                Bilinmeyen Numaralar
               </button>
             </div>
 
@@ -351,10 +351,10 @@ export default function SalesActivityPage() {
                     const isMissed = c.direction === 'missed';
 
                     const dirBadge = isOutbound
-                      ? { label: '↗️ Giden', style: { background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa' } }
+                      ? { label: 'Giden', style: { background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa' } }
                       : isInbound
-                        ? { label: '↙️ Gelen', style: { background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' } }
-                        : { label: '❌ Cevapsız', style: { background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' } };
+                        ? { label: 'Gelen', style: { background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' } }
+                        : { label: 'Cevapsız', style: { background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' } };
 
                     const mins = Math.floor(c.duration_seconds / 60);
                     const secs = c.duration_seconds % 60;
@@ -666,9 +666,9 @@ export default function SalesActivityPage() {
                     value={callForm.direction}
                     onChange={e => setCallForm({ ...callForm, direction: e.target.value })}
                   >
-                    <option value="outbound">↗️ Giden Arama</option>
-                    <option value="inbound">↙️ Gelen Arama</option>
-                    <option value="missed">❌ Cevapsız Arama</option>
+                    <option value="outbound">Giden Arama (Outbound)</option>
+                    <option value="inbound">Gelen Arama (Inbound)</option>
+                    <option value="missed">Cevapsız Arama</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -678,12 +678,12 @@ export default function SalesActivityPage() {
                     value={callForm.outcome}
                     onChange={e => setCallForm({ ...callForm, outcome: e.target.value })}
                   >
-                    <option value="Olumlu">✅ Olumlu / İlgili</option>
-                    <option value="Teklif İstendi">📋 Teklif / Fiyat İstendi</option>
-                    <option value="Randevu Alındı">📅 Randevu Alındı</option>
-                    <option value="Daha Sonra Aranacak">⏰ Daha Sonra Aranacak</option>
-                    <option value="Ulaşılamadı">📵 Ulaşılamadı / Meşgul</option>
-                    <option value="İlgilenmiyor">⛔ İlgilenmiyor</option>
+                    <option value="Olumlu">Olumlu / İlgili</option>
+                    <option value="Teklif İstendi">Teklif / Proforma İstendi</option>
+                    <option value="Randevu Alındı">Ziyaret Randevusu Alındı</option>
+                    <option value="Daha Sonra Aranacak">Daha Sonra Aranacak</option>
+                    <option value="Ulaşılamadı">Ulaşılamadı / Meşgul</option>
+                    <option value="İlgilenmiyor">İlgilenmiyor / Olumsuz</option>
                   </select>
                 </div>
               </div>

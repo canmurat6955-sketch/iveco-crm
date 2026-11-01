@@ -57,7 +57,7 @@ export default function Login() {
     try {
       // 1. YOL: Doğrudan hızlı passcode endpoint'i
       await loginPasscode(clean);
-      toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
+      toast.success('Giriş başarılı.');
       navigate('/');
       return;
     } catch (err1) {
@@ -66,7 +66,7 @@ export default function Login() {
       const isNetwork = !err1.response || err1.code === 'ERR_NETWORK' || err1.code === 'ECONNABORTED' || [502, 503, 504].includes(err1.response?.status);
       
       if (isNetwork) {
-        toast.error('Bulut sunucusu (Render) şu anda uyanıyor. Lütfen 10-15 saniye bekleyip tekrar deneyin.', { duration: 6000 });
+        toast.error('Bulut sunucusu bağlantı kuruyor. Lütfen birkaç saniye bekleyip tekrar deneyin.', { duration: 6000 });
         setLoading(false);
         return;
       }
@@ -77,7 +77,7 @@ export default function Login() {
 
       try {
         await login(targetEmail, clean);
-        toast.success('Giriş başarılı! Hoş geldiniz. 🎉');
+        toast.success('Giriş başarılı.');
         navigate('/');
         return;
       } catch (err2) {
@@ -255,7 +255,7 @@ export default function Login() {
           >
             <FiLock size={16} />
             {loading 
-              ? (waitSeconds > 2 ? `⏳ Sunucu Uyanıyor (${waitSeconds}s)...` : '🔒 Giriş Yapılıyor...') 
+              ? (waitSeconds > 2 ? `Sunucu Bağlanıyor (${waitSeconds}s)...` : 'Giriş Yapılıyor...') 
               : 'Sisteme Bağlan'}
           </button>
         </form>
@@ -275,13 +275,13 @@ export default function Login() {
             alignItems: 'center',
             gap: 10
           }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>⏳</span>
+            <FiRefreshCw size={16} className="animate-spin" style={{ flexShrink: 0, color: '#38bdf8' }} />
             <div>
               <strong style={{ color: '#fff', display: 'block', fontSize: 12.5 }}>
-                {waitSeconds > 2 ? `Bulut sunucusu uyanıyor (${waitSeconds} sn)...` : 'Sisteme bağlanılıyor...'}
+                {waitSeconds > 2 ? `Bulut sunucusu ile bağlantı kuruluyor (${waitSeconds} sn)...` : 'Sisteme bağlanılıyor...'}
               </strong>
               <span style={{ fontSize: 11, color: '#94a3b8' }}>
-                Render ücretsiz sunucusu 15 dk boşta kalınca uyur; ilk açılış ~25-40 sn sürebilir. Lütfen bekleyin.
+                Güvenli IVECO kurumsal oturumu doğrulanıyor. Lütfen bekleyin.
               </span>
             </div>
           </div>

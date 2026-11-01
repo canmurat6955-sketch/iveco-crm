@@ -34,7 +34,7 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
 
   const getInterestBadge = (level) => {
     const map = {
-      purchase_ready: { label: 'Satın Alma Aşamasında 🔥', color: '#ef4444' },
+      purchase_ready: { label: 'Satın Alma Aşamasında', color: '#ef4444' },
       high: { label: 'Yüksek İlgi', color: '#f97316' },
       medium: { label: 'Orta İlgi', color: '#f59e0b' },
       low: { label: 'Düşük İlgi', color: '#3b82f6' },

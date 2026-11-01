@@ -101,7 +101,7 @@ export default function RoutePlanner() {
         toast.error('Kriterlere uyan müşteri bulunamadı');
       } else {
         setSelectedCustomerIds(prev => Array.from(new Set([...prev, ...foundIds])));
-        toast.success(`${foundIds.length} müşteri bulundu ve rotaya eklendi! 🎉`);
+        toast.success(`${foundIds.length} müşteri bulundu ve rotaya eklendi.`);
       }
     } catch {
       toast.error('Araç ilgisine göre müşteri aranırken hata oluştu');
@@ -120,7 +120,7 @@ export default function RoutePlanner() {
     const startLon = location?.longitude || 36.4385;
 
     setOptimizing(true);
-    toast.loading("Google ve local algoritmalar ile sürüş rotası optimize ediliyor...", { id: 'opt_load' });
+    toast.loading("Sürüş rotası optimize ediliyor...", { id: 'opt_load' });
 
     try {
       const res = await salesApi.optimizeRoute({
@@ -129,7 +129,7 @@ export default function RoutePlanner() {
         customer_ids: selectedCustomerIds
       });
       setOptimizedStops(res.data.optimized_stops || []);
-      toast.success("Rota başarıyla optimize edildi! En yakın noktalar sıraya dizildi.", { id: 'opt_load' });
+      toast.success("Rota başarıyla optimize edildi. En yakın noktalar sıraya dizildi.", { id: 'opt_load' });
     } catch (err) {
       toast.error("Rota optimizasyonu başarısız oldu.", { id: 'opt_load' });
     } finally {
@@ -159,7 +159,7 @@ export default function RoutePlanner() {
         stops
       });
 
-      toast.success("Rota planı başarıyla kaydedildi! 🗺️");
+      toast.success("Rota planı başarıyla kaydedildi.");
       setShowCreate(false);
       setRouteName('');
       setSelectedCustomerIds([]);
@@ -216,7 +216,7 @@ export default function RoutePlanner() {
     const end = CITY_COORDS[endCity];
 
     setSearchingAlong(true);
-    toast.loading(`${startCity} ➔ ${endCity} güzergahında firmalar taranıyor...`, { id: 'search_along_load' });
+    toast.loading(`${startCity} - ${endCity} güzergahında firmalar taranıyor...`, { id: 'search_along_load' });
 
     try {
       const res = await crmApi.searchRouteAlong({
@@ -349,7 +349,7 @@ export default function RoutePlanner() {
           }}
           onClick={() => setActiveTab('along')}
         >
-          <FiNavigation size={16} /> 🧭 Yolum Üzerindeki Firmaları Bul
+          <FiNavigation size={16} /> Güzergah Üzerindeki Firmaları Bul
         </button>
       </div>
 
@@ -359,7 +359,7 @@ export default function RoutePlanner() {
             <div className="card mb-4" style={{ border: '1px solid rgba(56, 189, 248, 0.3)', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}>
               <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 className="card-title" style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>
-                  🗺️ Yeni Saha Satış Rotası
+                  Yeni Saha Satış Rotası Planla
                 </h3>
                 <button 
                   type="button" 
@@ -474,14 +474,14 @@ export default function RoutePlanner() {
                     disabled={optimizing || selectedCustomerIds.length === 0}
                     style={{ fontWeight: 700, background: 'linear-gradient(135deg, #0284c7, #2563eb)' }}
                   >
-                    {optimizing ? 'Algoritma Çalışıyor...' : '🎯 Sıralamayı & Rotayı Optimize Et'}
+                    {optimizing ? 'Algoritma Çalışıyor...' : 'Sıralamayı & Rotayı Optimize Et'}
                   </button>
                 </div>
 
                 {optimizedStops.length > 0 && (
                   <div className="mt-3 p-3" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 10 }}>
                     <h4 style={{ fontSize: '0.88rem', fontWeight: 800, marginBottom: 8, color: '#34d399' }}>
-                      ✓ Satış Odaklı Optimize Sıralama
+                      Satış Odaklı Optimize Sıralama
                     </h4>
                     <ol style={{ fontSize: '0.8rem', paddingLeft: 18, color: '#cbd5e1' }}>
                       {optimizedStops.map((stop, i) => {
@@ -495,7 +495,7 @@ export default function RoutePlanner() {
                       })}
                     </ol>
                     <button type="button" className="btn btn-success w-full mt-3" onClick={handleSaveRoute} style={{ fontWeight: 800 }}>
-                      💾 Rotayı Kaydet ve Başlat
+                      Rotayı Kaydet ve Başlat
                     </button>
                   </div>
                 )}
@@ -534,7 +534,7 @@ export default function RoutePlanner() {
                     {selectedRoute.name}
                   </h3>
                   <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: 0 }}>
-                    📅 Tarih: {selectedRoute.date} · {selectedRoute.stops?.length || 0} Durak
+                    Tarih: {selectedRoute.date} · {selectedRoute.stops?.length || 0} Durak
                   </p>
                 </div>
                 <button 
@@ -563,7 +563,7 @@ export default function RoutePlanner() {
                         <FiZap size={16} /> SATIŞ ODAKLI ROTA DEĞERLENDİRMESİ
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: 4 }}>
-                        💡 <strong>Saha Satış Tavsiyesi:</strong> Bu rotadaki {selectedRoute.stops?.length} firmayı gezmek, tahmini <strong>₺ {currentRouteStats.potentialEst.toLocaleString('tr-TR')}</strong> potansiyel ve araç ihtiyacı barındırıyor.
+                        <strong>Saha Satış Tavsiyesi:</strong> Bu rotadaki {selectedRoute.stops?.length} firmayı gezmek, tahmini <strong>₺ {currentRouteStats.potentialEst.toLocaleString('tr-TR')}</strong> potansiyel ve araç ihtiyacı barındırıyor.
                       </div>
                     </div>
 
@@ -638,7 +638,7 @@ export default function RoutePlanner() {
                           {stop.company_name}
                         </div>
                         <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                          📍 {stop.district || 'Merkez'} · {stop.city}
+                          {stop.district || 'Merkez'} · {stop.city}
                         </div>
                       </div>
 
@@ -687,7 +687,7 @@ export default function RoutePlanner() {
         <div className="animate-in flex flex-col gap-4">
           <div className="card" style={{ border: '1px solid rgba(56, 189, 248, 0.3)' }}>
             <h3 className="card-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc' }}>
-              🧭 Yolum Üzerindeki Firmaları Bul
+              Güzergah Üzerindeki Firmaları Bul
             </h3>
             <p style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 14 }}>
               Örn: Samsun'dan Ordu'ya seyahat ederken yol koridorunun 5 km yakınındaki akaryakıt & lojistik firmalarını tespit edin.
@@ -750,7 +750,7 @@ export default function RoutePlanner() {
                 background: 'linear-gradient(135deg, #0284c7, #2563eb)'
               }}
             >
-              {searchingAlong ? 'Güzergah Taranıyor...' : `🧭 ${startCity} ➔ ${endCity} Yolundaki Firmaları Bul`}
+              {searchingAlong ? 'Güzergah Taranıyor...' : `${startCity} - ${endCity} Yolundaki Firmaları Bul`}
             </button>
           </div>
 
@@ -758,7 +758,7 @@ export default function RoutePlanner() {
             <div className="card">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="card-title" style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>
-                  🔍 Yol Koridorunda Bulunan Firmalar ({alongResults.length})
+                  Yol Koridorunda Bulunan Firmalar ({alongResults.length})
                 </h3>
                 <button className="btn btn-success btn-sm" onClick={handleApplyAlongToRoute} style={{ fontWeight: 700 }}>
                   Tümünü Rotaya Aktar ({alongResults.length})

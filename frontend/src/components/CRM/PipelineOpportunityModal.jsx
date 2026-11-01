@@ -13,12 +13,12 @@ const TARGET_PROVINCES = [
 ];
 
 const STAGES = [
-  { key: 'lead', label: 'Lead (Aday)', emoji: '🎯', color: '#6366f1' },
-  { key: 'contact', label: 'İlk Görüşme', emoji: '📞', color: '#3b82f6' },
-  { key: 'proposal', label: 'Teklif Verildi', emoji: '📋', color: '#f59e0b' },
-  { key: 'negotiation', label: 'Pazarlık', emoji: '🤝', color: '#f97316' },
-  { key: 'won', label: 'Kazanıldı (Satış)', emoji: '✅', color: '#10b981' },
-  { key: 'lost', label: 'Kaybedildi', emoji: '❌', color: '#ef4444' },
+  { key: 'lead', label: 'Potansiyel (Lead)', color: '#38bdf8' },
+  { key: 'contact', label: 'İlk Temas & Ziyaret', color: '#004B93' },
+  { key: 'proposal', label: 'Teklif & Proforma', color: '#d97706' },
+  { key: 'negotiation', label: 'Ticari Pazarlık', color: '#ea580c' },
+  { key: 'won', label: 'Satış / Teslimat', color: '#059669' },
+  { key: 'lost', label: 'Arşiv / İptal', color: '#64748b' },
 ];
 
 const ACTIVITY_TYPES = [
@@ -614,9 +614,9 @@ export default function PipelineOpportunityModal({
                               {c.company_name}
                             </div>
                             <div style={{ fontSize: 11, color: '#94a3b8', display: 'flex', gap: 10, marginTop: 2 }}>
-                              <span>📍 {c.city || 'Bilinmiyor'}</span>
-                              {c.phone && <span>📞 {c.phone}</span>}
-                              {c.sector && <span>🏷️ {c.sector}</span>}
+                              <span>{c.city || 'Bilinmiyor'}</span>
+                              {c.phone && <span>{c.phone}</span>}
+                              {c.sector && <span>{c.sector}</span>}
                             </div>
                           </div>
                           <div>
@@ -950,7 +950,7 @@ export default function PipelineOpportunityModal({
               >
                 {STAGES.map(s => (
                   <option key={s.key} value={s.key}>
-                    {s.emoji} {s.label}
+                    {s.label}
                   </option>
                 ))}
               </select>
@@ -981,10 +981,10 @@ export default function PipelineOpportunityModal({
                 style={{ fontSize: 13 }}
               >
                 <option value="">Belirlenmedi (Sonra Değerlendir)</option>
-                <option value="A">⭐ A-Segment (Öncelikli Ziyaret)</option>
-                <option value="B">🔹 B-Segment (Aktif Müşteri)</option>
-                <option value="C">🔸 C-Segment (Standart)</option>
-                <option value="D">⚪ D-Segment (Düşük)</option>
+                <option value="A">A-Segment (Yüksek Öncelikli Filo)</option>
+                <option value="B">B-Segment (Aktif Ticari Müşteri)</option>
+                <option value="C">C-Segment (Standart Potansiyel)</option>
+                <option value="D">D-Segment (Takipte)</option>
               </select>
             </div>
           </div>

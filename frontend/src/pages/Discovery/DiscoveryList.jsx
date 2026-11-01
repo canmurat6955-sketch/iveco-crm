@@ -1220,18 +1220,18 @@ export default function DiscoveryList() {
                 WebkitOverflowScrolling: 'touch'
               }}>
                 {[
-                  { label: '🥫 Gıda Toptan (Samsun & Çorum)', q: 'Gıda toptan' },
-                  { label: '🌾 Un & Bakliyat Fabrikaları', q: 'Un fabrikaları' },
-                  { label: '🥩 Et, Tavuk & Süt Ürünleri', q: 'Süt et toptan' },
-                  { label: '🚜 Samsun Hafriyat', q: 'Samsun hafriyat' },
-                  { label: '🚜 Çorum Hafriyat', q: 'Çorum hafriyat' },
-                  { label: '🚜 Sivas Hafriyat', q: 'Sivas hafriyat' },
-                  { label: '🚜 Ordu Hafriyat', q: 'Ordu hafriyat' },
-                  { label: '🏢 Nurkaya Group (Çorum)', q: 'nurkaya' },
-                  { label: '🏗️ Samsun Beton Santralleri', q: 'Samsun beton santralleri' },
-                  { label: '🚛 Çarşamba Nakliyat & Lojistik', q: 'Çarşamba nakliyat lojistik' },
-                  { label: '❄️ Bafra Soğuk Hava Deposu', q: 'Bafra soğuk hava deposu' },
-                  { label: '🏭 Samsun OSB Fabrikaları', q: 'Samsun OSB sanayi' },
+                  { label: 'Gıda Toptan (Samsun & Çorum)', q: 'Gıda toptan' },
+                  { label: 'Un & Bakliyat Fabrikaları', q: 'Un fabrikaları' },
+                  { label: 'Et, Tavuk & Süt Ürünleri', q: 'Süt et toptan' },
+                  { label: 'Samsun Hafriyat & İnşaat', q: 'Samsun hafriyat' },
+                  { label: 'Çorum Hafriyat', q: 'Çorum hafriyat' },
+                  { label: 'Sivas Hafriyat', q: 'Sivas hafriyat' },
+                  { label: 'Ordu Hafriyat', q: 'Ordu hafriyat' },
+                  { label: 'Nurkaya Group (Çorum)', q: 'nurkaya' },
+                  { label: 'Samsun Beton Santralleri', q: 'Samsun beton santralleri' },
+                  { label: 'Çarşamba Nakliyat & Lojistik', q: 'Çarşamba nakliyat lojistik' },
+                  { label: 'Bafra Soğuk Hava Deposu', q: 'Bafra soğuk hava deposu' },
+                  { label: 'Samsun OSB Fabrikaları', q: 'Samsun OSB sanayi' },
                 ].map(item => (
                   <button
                     key={item.q}
@@ -1338,7 +1338,7 @@ export default function DiscoveryList() {
                             fontWeight: 600,
                             border: `1px solid ${biz.verified === false ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.3)'}`
                           }} title={biz.verified === false ? 'Bu kaydın telefon/adres bilgisi doğrulanmadı. Aramadan önce Google\'da kontrol edin.' : ''}>
-                            {biz.verified === false ? '⚠️ ' : '✓ '}{biz.source_label || (biz.source === 'google_places' ? 'Google Haritalar' : 'Kayıt')}
+                            {biz.source_label || (biz.source === 'google_places' ? 'Google Haritalar' : 'Kayıt')}
                           </span>
                           {biz.verified === false && (
                             <a
@@ -1348,7 +1348,7 @@ export default function DiscoveryList() {
                               className="badge"
                               style={{ fontSize: 10, background: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.3)', textDecoration: 'none' }}
                             >
-                              🔎 Google'da doğrula
+                              Google'da Doğrula
                             </a>
                           )}
                           {biz.sector && (
@@ -1359,7 +1359,7 @@ export default function DiscoveryList() {
                         </div>
 
                         <div className="text-xs" style={{ color: '#94a3b8', marginTop: 4, lineHeight: 1.5 }}>
-                          📍 {biz.address || `${biz.district || ''} ${biz.city || ''}`}
+                          {biz.address || `${biz.district || ''} ${biz.city || ''}`}
                         </div>
 
                         {biz.phone && (
@@ -1445,7 +1445,7 @@ export default function DiscoveryList() {
         <div className="modal-overlay">
           <div className="modal-content glass-card animate-in" style={{ maxWidth: 550 }}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🏛️ Yeni Kamu / Belediye İhalesi Kaydet</h3>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>Yeni Kamu / Belediye İhalesi Kaydet</h3>
               <button className="btn-icon" onClick={() => setShowTenderModal(false)}><FiX size={18} /></button>
             </div>
             <form onSubmit={handleCreateTender} className="flex flex-col gap-3">
@@ -1519,7 +1519,7 @@ export default function DiscoveryList() {
         <div className="modal-overlay">
           <div className="modal-content glass-card animate-in" style={{ maxWidth: 500 }}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🛠️ Üst Yapıcıdan Gelen Müşteri Talebi</h3>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>Üst Yapıcıdan Gelen Müşteri Talebi</h3>
               <button className="btn-icon" onClick={() => setShowReferralModal(false)}><FiX size={18} /></button>
             </div>
             <form onSubmit={handleCreateReferral} className="flex flex-col gap-3">
@@ -1582,7 +1582,7 @@ export default function DiscoveryList() {
         <div className="modal-overlay">
           <div className="modal-content glass-card animate-in" style={{ maxWidth: 500 }}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>🛠️ Yeni Üst Yapıcı (Kasacı) Ekle</h3>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--text-heading)' }}>Yeni Üst Yapıcı (Kasacı) Ekle</h3>
               <button className="btn-icon" onClick={() => setShowBbModal(false)}><FiX size={18} /></button>
             </div>
             <form onSubmit={handleCreateBodybuilder} className="flex flex-col gap-3">

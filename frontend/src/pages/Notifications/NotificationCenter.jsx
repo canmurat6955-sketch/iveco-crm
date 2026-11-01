@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
 import { useNavigate } from 'react-router-dom';
+import { FiBriefcase, FiStar, FiPhoneCall, FiFolder, FiSettings, FiBell, FiCheckCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function NotificationCenter() {
@@ -33,9 +34,21 @@ export default function NotificationCenter() {
     }
   };
 
-  const TYPE_ICONS = {
-    new_company: '🏢', high_potential: '⭐',
-    follow_up: '📞', campaign_expiry: '📁', system: '⚙️',
+  const renderTypeIcon = (type) => {
+    switch (type) {
+      case 'new_company':
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiBriefcase size={16} /></div>;
+      case 'high_potential':
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiStar size={16} /></div>;
+      case 'follow_up':
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiPhoneCall size={16} /></div>;
+      case 'campaign_expiry':
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(139, 92, 246, 0.15)', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiFolder size={16} /></div>;
+      case 'system':
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(100, 116, 139, 0.15)', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiSettings size={16} /></div>;
+      default:
+        return <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><FiBell size={16} /></div>;
+    }
   };
 
   return (
@@ -45,7 +58,9 @@ export default function NotificationCenter() {
           <button className={`btn btn-sm ${!unreadOnly ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUnreadOnly(false)}>Tümü</button>
           <button className={`btn btn-sm ${unreadOnly ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setUnreadOnly(true)}>Okunmamış</button>
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={markAllRead}>✓ Tümünü Okundu İşaretle</button>
+        <button className="btn btn-secondary btn-sm" onClick={markAllRead} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <FiCheckCircle size={14} /> Tümünü Okundu İşaretle
+        </button>
       </div>
 
       <div className="card" style={{ padding: 0 }}>
@@ -55,8 +70,11 @@ export default function NotificationCenter() {
               padding: '1rem 1.5rem',
               borderBottom: '1px solid var(--border-color)',
               background: n.is_read ? 'transparent' : 'rgba(43, 125, 233, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12
             }}>
-            <span style={{ fontSize: '1.5rem' }}>{TYPE_ICONS[n.notification_type] || '🔔'}</span>
+            {renderTypeIcon(n.notification_type)}
             <div className="list-item-content">
               <div className="list-item-title" style={{ fontWeight: n.is_read ? 400 : 700 }}>{n.title}</div>
               <div className="text-sm" style={{ color: 'var(--text-secondary)', whiteSpace: 'pre-line', marginTop: 4 }}>{n.message}</div>

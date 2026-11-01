@@ -110,7 +110,7 @@ export default function FieldAssistantHero({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, letterSpacing: '0.5px', color: '#f8fafc' }}>
-                  ⚡ SAHA SATIŞ ASİSTANI
+                  SAHA SATIŞ YÖNETİMİ & TİCARİ İSTİHBARAT
                 </h2>
                 <span 
                   style={{
@@ -168,7 +168,7 @@ export default function FieldAssistantHero({
                 outline: 'none'
               }}
             >
-              <option value="Tümü" style={{ background: '#0f172a', color: '#f8fafc' }}>🌍 Tüm Bölge (9 İl)</option>
+              <option value="Tümü" style={{ background: '#0f172a', color: '#f8fafc' }}>Tüm Bölge (9 İl)</option>
               {TARGET_CITIES.map(c => (
                 <option key={c} value={c} style={{ background: '#0f172a', color: '#f8fafc' }}>{c}</option>
               ))}
@@ -195,7 +195,7 @@ export default function FieldAssistantHero({
           <input
             type="text"
             className="form-control"
-            placeholder={isMobile ? "🔎 Firma, sektör veya model ara..." : "🔎 Ne aramak istiyorsunuz? (Örn: 'Samsun akaryakıt firmalarını bul', 'Hafriyatçıları listele', 'Çorum S-Way')..."}
+            placeholder={isMobile ? "Firma, sektör veya model ara..." : "Sektör, firma adı veya araç modeli yazın (Örn: Samsun hafriyat firmaları, Daily 35S16, S-Way)..."}
             value={promptQuery}
             onChange={(e) => setPromptQuery(e.target.value)}
             style={{
@@ -244,12 +244,12 @@ export default function FieldAssistantHero({
           }}
         >
           {[
-            { label: '🚜 Hafriyat', keyword: 'Hafriyat' },
-            { label: '⛽ Akaryakıt', keyword: 'Akaryakıt' },
-            { label: '❄️ Frigo / Gıda', keyword: 'Gıda' },
-            { label: '🚛 Lojistik', keyword: 'Lojistik' },
-            { label: '🌾 Tarım & Yem', keyword: 'Tarım' },
-            { label: '🏛️ Belediye', keyword: 'Belediye' },
+            { label: 'Hafriyat & İnşaat', keyword: 'Hafriyat' },
+            { label: 'Akaryakıt Dağıtım', keyword: 'Akaryakıt' },
+            { label: 'Frigo & Gıda Lojistiği', keyword: 'Gıda' },
+            { label: 'Lojistik & Nakliyat', keyword: 'Lojistik' },
+            { label: 'Tarım & Yem Sanayi', keyword: 'Tarım' },
+            { label: 'Kamu & Belediye', keyword: 'Belediye' },
           ].map(chip => (
             <button
               key={chip.keyword}

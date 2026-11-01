@@ -111,7 +111,7 @@ export default function Sidebar() {
             title="Müşterilerinize göndereceğiniz fiyat, kasa, kredi ve LinkedIn SSS portalını aç & test et"
           >
             <span className="nav-icon" style={{ color: '#38bdf8' }}><FiEye size={18} /></span>
-            🌟 Müşteri Portalı & SSS
+            Müşteri Portalı & SSS
           </a>
         </div>
 
