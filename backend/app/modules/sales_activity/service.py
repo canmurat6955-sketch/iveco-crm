@@ -843,6 +843,94 @@ class SalesActivityService:
             self.db.rollback()
             return {"status": "error", "detail": str(e)}
 
+    def ingest_lead_webhook(self, payload: dict) -> dict:
+        """
+        Meta Lead Ads, Google Ads veya web formundan gelen potansiyel müşteri talebini
+        otomatik olarak ayrıştırıp CRM Pipeline aşamasına (Lead) kaydeder ve bildirim üretir.
+        """
+        company_name = payload.get("company_name") or payload.get("company") or payload.get("business_name")
+        full_name = payload.get("full_name") or payload.get("name") or payload.get("authorized_person") or "İlgili Yetkili"
+        phone = payload.get("phone") or payload.get("phone_number") or payload.get("mobile")
+        city = payload.get("city") or payload.get("il") or "Samsun"
+        district = payload.get("district") or payload.get("ilce") or ""
+        vehicle_interest = payload.get("vehicle_interest") or payload.get("model") or payload.get("vehicle") or "IVECO Daily"
+        notes = payload.get("notes") or payload.get("message") or payload.get("talepler") or "Web / Meta Kampanya Formu Talebi"
+
+        if not phone and not company_name:
+            raise HTTPException(status_code=400, detail="Telefon veya firma adı gereklidir")
+
+        if not company_name:
+            company_name = f"{full_name} (Bireysel / Filo Talebi)"
+
+        from app.modules.crm.models import Customer
+        from app.modules.notifications.models import Notification
+
+        norm_phone = normalize_phone(phone) if phone else None
+        
+        # Mükerrer kontrolü
+        existing_cust = None
+        if norm_phone:
+            existing_cust = self.db.query(Customer).filter(
+                Customer.phone.ilike(f"%{norm_phone[-10:]}%")
+            ).first()
+        
+        if not existing_cust and company_name:
+            existing_cust = self.db.query(Customer).filter(
+                Customer.company_name.ilike(company_name.strip())
+            ).first()
+
+        now = datetime.now(timezone.utc)
+
+        if existing_cust:
+            existing_cust.pipeline_stage = "lead"
+            existing_cust.pipeline_note = f"Yeni Kampanya Talebi: {vehicle_interest} ({notes[:120]})"
+            existing_cust.updated_at = now
+            self.db.commit()
+            cust_id = existing_cust.id
+            is_new = False
+        else:
+            new_cust = Customer(
+                company_name=company_name,
+                phone=phone,
+                city=city,
+                district=district,
+                pipeline_stage="lead",
+                pipeline_note=f"Meta/Web Talebi: {vehicle_interest} ({notes[:120]})",
+                segment=vehicle_interest,
+                potential_score=75,
+                sector="Taşımacılık / Lojistik",
+                created_at=now,
+                updated_at=now
+            )
+            self.db.add(new_cust)
+            self.db.commit()
+            self.db.refresh(new_cust)
+            cust_id = new_cust.id
+            is_new = True
+
+        # Satış ekibine anlık yüksek öncelikli bildirim
+        notif = Notification(
+            user_id=1,
+            title="🔥 Yeni Talep Geldi (Meta / Web Form)!",
+            message=f"{company_name} ({city}) firması {vehicle_interest} için teklif talep etti. Tel: {phone}",
+            notification_type="lead_created",
+            related_entity_type="customer",
+            related_entity_id=cust_id,
+            is_read=False,
+            sent_at=now,
+        )
+        self.db.add(notif)
+        self.db.commit()
+
+        return {
+            "status": "success",
+            "is_new": is_new,
+            "customer_id": cust_id,
+            "company_name": company_name,
+            "pipeline_stage": "lead",
+            "message": "Talep başarıyla satış boru hattına (Pipeline) eklendi."
+        }
+
     # ── UNIFIED COMMUNICATIONS TIMELINE ────────────────────────────────
 
     def get_communications_timeline(self, customer_id: int, limit: int = 50) -> List[CommunicationsTimelineItem]:

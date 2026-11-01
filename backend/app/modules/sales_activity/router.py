@@ -236,6 +236,18 @@ def receive_meta_webhook(
     return SalesActivityService(db).handle_meta_webhook(payload)
 
 
+@router.post("/webhooks/incoming-lead")
+def ingest_incoming_lead(
+    payload: dict,
+    db: Session = Depends(get_db),
+):
+    """
+    Meta Lead Ads, Web Sitesi, Zapier veya Google formlarından gelen talepleri
+    anında CRM Pipeline 'Lead' aşamasına kaydeder ve satış ekibine bildirim oluşturur.
+    """
+    return SalesActivityService(db).ingest_lead_webhook(payload)
+
+
 @router.post("/whatsapp/send")
 def send_whatsapp_message(
     data: WhatsAppSendRequest,
