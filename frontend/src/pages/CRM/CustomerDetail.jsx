@@ -17,7 +17,8 @@ import {
   FiTruck, FiLayers, FiMessageSquare, FiCalendar, FiPlus, FiClock, 
   FiCheckCircle, FiStar, FiUser, FiEdit2, FiSave, FiX, FiTrash2, 
   FiUsers, FiFileText, FiBell, FiAlertCircle, FiCheck, FiRefreshCw,
-  FiCamera, FiNavigation, FiRepeat, FiShare2, FiCopy
+  FiCamera, FiNavigation, FiRepeat, FiShare2, FiCopy, FiExternalLink,
+  FiTrendingUp, FiArchive, FiTarget, FiPhoneCall
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
 
@@ -575,20 +576,20 @@ export default function CustomerDetail() {
                                     customer.pipeline_stage === 'proposal' ? 'negotiation' : 'won';
                   try {
                     await crmApi.updateCustomer(id, { pipeline_stage: nextStage });
-                    toast.success(`Pipeline güncellendi: ${nextStage.toUpperCase()} 🎯`);
+                    toast.success(`Pipeline aşaması güncellendi: ${nextStage.toUpperCase()}`);
                     crmApi.getCustomer(id).then(r => setCustomer(r.data));
                   } catch { toast.error('Güncellenemedi'); }
                 }}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: customer.pipeline_stage ? 'rgba(245, 158, 11, 0.15)' : 'rgba(99, 102, 241, 0.15)',
-                  color: customer.pipeline_stage ? '#fbbf24' : '#a5b4fc',
-                  border: `1px solid ${customer.pipeline_stage ? 'rgba(245, 158, 11, 0.4)' : 'rgba(99, 102, 241, 0.4)'}`,
+                  background: customer.pipeline_stage ? 'rgba(217, 119, 6, 0.15)' : 'rgba(0, 75, 147, 0.2)',
+                  color: customer.pipeline_stage ? '#fbbf24' : '#38bdf8',
+                  border: `1px solid ${customer.pipeline_stage ? 'rgba(217, 119, 6, 0.4)' : 'rgba(0, 75, 147, 0.4)'}`,
                   fontWeight: 700
                 }}
-                title="Tıklayarak Pipeline aşamasını güncelleyebilirsiniz"
+                title="Tıklayarak Pipeline aşamasını ilerletebilirsiniz"
               >
-                🎯 {customer.pipeline_stage ? `Pipeline: ${customer.pipeline_stage.toUpperCase()}` : '+ Pipeline\'a Ekle'}
+                <FiLayers size={14} /> {customer.pipeline_stage ? `Aşama: ${customer.pipeline_stage.toUpperCase()}` : '+ Pipeline\'a Ekle'}
               </button>
 
               {customer.phone && (
@@ -599,12 +600,12 @@ export default function CustomerDetail() {
                   className="btn btn-sm"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#10b981', color: '#fff', textDecoration: 'none' }}
                 >
-                  <FiPhone size={15} /> Ara
+                  <FiPhone size={14} /> Ara
                 </a>
               )}
 
               <button className="btn btn-success btn-sm" onClick={() => setShowWhatsAppModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25d366', borderColor: '#25d366' }}>
-                <FiMessageSquare size={15} /> WhatsApp
+                <FiMessageSquare size={14} /> WhatsApp
               </button>
 
               <button
@@ -614,15 +615,15 @@ export default function CustomerDetail() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  background: 'linear-gradient(135deg, #10b981 0%, #0284c7 100%)',
+                  background: '#004B93',
                   color: '#fff',
-                  border: 'none',
-                  fontWeight: 800,
-                  boxShadow: '0 2px 10px rgba(16, 185, 129, 0.4)'
+                  border: '1px solid #0284c7',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(0, 75, 147, 0.4)'
                 }}
-                title="Bu müşteri için 1-tıkla WhatsApp veya PDF teklif sihirbazını aç"
+                title="Bu müşteri için resmi proforma teklifi hazırla"
               >
-                <FiFileText size={15} /> ⚡ 1-Tıkla Teklif / Proforma
+                <FiFileText size={14} /> Proforma Düzenle
               </button>
 
               <button
@@ -632,15 +633,14 @@ export default function CustomerDetail() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 700,
-                  boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)'
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid #334155',
+                  fontWeight: 600
                 }}
                 title="Şasi, kasa boyutları ve istiap hesaplayıcısını bu müşteri için aç"
               >
-                <FiTruck size={15} /> 🎯 Şasi & Kasa Seçici
+                <FiTruck size={14} /> Şasi & Kasa Seçici
               </button>
 
               <button
@@ -650,15 +650,14 @@ export default function CustomerDetail() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 700,
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#10b981',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  fontWeight: 700
                 }}
                 title="Müşteriye resmi kampanya ve teklif tanıtım mesajı gönder"
               >
-                <FiMessageSquare size={14} /> 💬 WhatsApp Mesajı
+                <FiMessageSquare size={14} /> Teklif Mesajı
               </button>
 
               <button
@@ -668,9 +667,9 @@ export default function CustomerDetail() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 5,
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.05)',
                   color: '#cbd5e1',
-                  border: '1px solid rgba(255, 255, 255, 0.15)'
+                  border: '1px solid #334155'
                 }}
                 title="Müşteriye özel bağlantıyı panoya kopyala"
               >
@@ -680,19 +679,19 @@ export default function CustomerDetail() {
               <button
                 className="btn btn-sm"
                 onClick={() => { setAttachmentCategory('fleet_photo'); setShowAttachments(true); }}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.4)' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}
                 title="Müşteri ve filo araçlarının fotoğrafını çek veya yükle"
               >
-                <FiCamera size={15} /> 📸 Fotoğraf ({attachments.length})
+                <FiCamera size={14} /> Fotoğraf ({attachments.length})
               </button>
 
               <button
                 className="btn btn-sm"
                 onClick={() => setShowTradeIn(true)}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.4)' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(217, 119, 6, 0.12)', color: '#fbbf24', border: '1px solid rgba(217, 119, 6, 0.3)' }}
                 title="Takas ve 2. el ekspertiz değerlendirmeleri"
               >
-                <FiRepeat size={15} /> 🔄 Takas ({tradeIns.length})
+                <FiRepeat size={14} /> Takas ({tradeIns.length})
               </button>
 
               <a
@@ -704,17 +703,17 @@ export default function CustomerDetail() {
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-sm"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(139, 92, 246, 0.15)', color: '#c084fc', border: '1px solid rgba(139, 92, 246, 0.4)', textDecoration: 'none' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(139, 92, 246, 0.12)', color: '#c084fc', border: '1px solid rgba(139, 92, 246, 0.3)', textDecoration: 'none' }}
                 title="Haritalar ile yol tarifi başlat"
               >
-                <FiNavigation size={15} /> 📍 Yol Tarifi
+                <FiNavigation size={14} /> Yol Tarifi
               </a>
 
               <button className="btn btn-sm" onClick={handleDelete}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent', border: '1px solid #ef4444', color: '#ef4444' }}
                 onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ef4444'; }}>
-                <FiTrash2 size={15} /> Sil
+                <FiTrash2 size={14} /> Sil
               </button>
             </div>
           </div>
@@ -722,31 +721,34 @@ export default function CustomerDetail() {
           {/* Pipeline Stage */}
           <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
             {[
-              { key: 'lead', label: '🎯 Lead', color: '#6366f1' },
-              { key: 'contact', label: '📞 Görüşme', color: '#3b82f6' },
-              { key: 'proposal', label: '📋 Teklif', color: '#f59e0b' },
-              { key: 'negotiation', label: '🤝 Pazarlık', color: '#f97316' },
-              { key: 'won', label: '✅ Kazanıldı', color: '#10b981' },
-              { key: 'lost', label: '❌ Kaybedildi', color: '#ef4444' },
+              { key: 'lead', label: 'Lead', color: '#38bdf8', icon: FiTarget },
+              { key: 'contact', label: 'İlk Temas', color: '#004B93', icon: FiPhoneCall },
+              { key: 'proposal', label: 'Teklif', color: '#d97706', icon: FiFileText },
+              { key: 'negotiation', label: 'Pazarlık', color: '#ea580c', icon: FiTrendingUp },
+              { key: 'won', label: 'Kazanıldı', color: '#059669', icon: FiCheckCircle },
+              { key: 'lost', label: 'Kaybedildi', color: '#64748b', icon: FiArchive },
             ].map(s => {
               const active = (customer.pipeline_stage || 'lead') === s.key;
+              const StageIcon = s.icon;
               return (
                 <button key={s.key} onClick={async () => {
                   try {
                     await crmApi.updateCustomer(id, { pipeline_stage: s.key });
                     setCustomer(prev => ({ ...prev, pipeline_stage: s.key }));
-                    toast.success(`Pipeline: ${s.label}`);
-                  } catch { toast.error('Hata'); }
+                    toast.success(`Aşama: ${s.label}`);
+                  } catch { toast.error('Aşama güncellenemedi'); }
                 }}
                   style={{
-                    padding: '6px 14px', borderRadius: 20, fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
-                    border: `2px solid ${s.color}`, transition: 'all 0.2s',
+                    padding: '5px 12px', borderRadius: 6, fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
+                    border: `1px solid ${s.color}`, transition: 'all 0.15s',
                     background: active ? s.color : 'transparent',
                     color: active ? '#fff' : s.color,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5
                   }}
-                  onMouseEnter={e => { if (!active) { e.currentTarget.style.background = `${s.color}20`; }}}
-                  onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; }}}
                 >
+                  <StageIcon size={12} />
                   {s.label}
                 </button>
               );
@@ -1339,6 +1341,159 @@ export default function CustomerDetail() {
               <button className="btn btn-secondary btn-sm" onClick={() => setShowCallModal(true)}>+ Telefon Görüşmesi Ekle</button>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowWhatsAppModal(true)}>+ WhatsApp İletisi Gönder</button>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── RESMİ PROFORMA & TEKLİF GEÇMİŞİ (HUBSPOT TAKİP ENTEGRASYONLU) ── */}
+      <div className="card mt-6">
+        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FiFileText size={18} style={{ color: '#38bdf8' }} />
+            <h3 className="card-title" style={{ margin: 0 }}>Resmi Teklif & Proforma Dosyaları</h3>
+            <span className="badge" style={{ background: '#004B93', color: '#fff', fontSize: '0.74rem', fontWeight: 800 }}>
+              {proformas.length} Teklif
+            </span>
+          </div>
+
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => navigate(`/proforma/quick?customer_id=${customer.id}`)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, background: '#004B93', borderColor: '#0284c7' }}
+          >
+            <FiPlus size={14} /> Yeni Proforma Düzenle
+          </button>
+        </div>
+
+        {proformas.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {proformas.map(p => {
+              const isViewed = p.tracking && p.tracking.view_count > 0;
+              const trackingUrl = p.tracking ? `${getPublicOrigin()}/p/${p.tracking.token}` : null;
+
+              return (
+                <div 
+                  key={p.id}
+                  style={{
+                    background: '#131b2e',
+                    border: '1px solid #1e293b',
+                    borderRadius: 10,
+                    padding: '12px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  {/* Sol Taraf: Model & Numara */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#38bdf8', fontSize: '0.88rem' }}>
+                        {p.invoice_number}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>•</span>
+                      <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                        {p.date}
+                      </span>
+                      {isViewed ? (
+                        <span style={{
+                          fontSize: '0.68rem',
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          fontWeight: 800,
+                          background: 'rgba(5, 150, 105, 0.15)',
+                          color: '#34d399',
+                          border: '1px solid rgba(16, 185, 129, 0.35)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4
+                        }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                          {p.tracking.view_count} Kez İncelendi
+                        </span>
+                      ) : (
+                        <span style={{
+                          fontSize: '0.68rem',
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          fontWeight: 600,
+                          background: 'rgba(100, 116, 139, 0.15)',
+                          color: '#94a3b8',
+                          border: '1px solid #334155'
+                        }}>
+                          Henüz Açılmadı
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#f8fafc', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <FiTruck size={14} style={{ color: '#0284c7' }} /> {p.vehicle_model}
+                    </div>
+
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>
+                      Anahtar Teslim: <strong style={{ color: '#34d399' }}>{Number(p.grand_total).toLocaleString('tr-TR')} TL</strong>
+                      {p.color && ` • Renk: ${p.color}`}
+                    </div>
+                  </div>
+
+                  {/* Sağ Taraf: Eylemler */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => navigate(`/proformas/${p.id}`)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '0.78rem' }}
+                    >
+                      <FiExternalLink size={13} /> Detay & PDF
+                    </button>
+
+                    {trackingUrl && (
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        onClick={() => {
+                          const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
+                          const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
+                          const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv adına hazırladığımız ${p.invoice_number} referans numaralı ${p.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantıdan canlı olarak inceleyebilirsiniz:\n\n🔗 ${trackingUrl}\n\nTeklif detayları ve teknik veriler bağlantıda yer almaktadır.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+                          const wp = recipientPhone
+                            ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(msg)}`
+                            : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                          window.open(wp, '_blank');
+                          toast.success('WhatsApp açıldı! Müşteri linki incelediğinde canlı bildirim alacaksınız.');
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          background: 'rgba(5, 150, 105, 0.15)',
+                          color: '#10b981',
+                          border: '1px solid rgba(16, 185, 129, 0.35)',
+                          cursor: 'pointer'
+                        }}
+                        title="Akıllı Takip Linkini WhatsApp'tan Gönder"
+                      >
+                        <FiShare2 size={13} /> Akıllı WhatsApp Linki
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state" style={{ padding: '2rem 1rem' }}>
+            <p>Bu müşteriye henüz kayıtlı resmi proforma veya teklif verilmedi.</p>
+            <button
+              className="btn btn-secondary btn-sm mt-3"
+              onClick={() => navigate(`/proforma/quick?customer_id=${customer.id}`)}
+            >
+              + İlk Proforma Faturasını Oluştur
+            </button>
           </div>
         )}
       </div>
