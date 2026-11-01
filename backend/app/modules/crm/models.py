@@ -158,6 +158,7 @@ class ProformaInvoice(Base):
     # Relationships
     customer = relationship("Customer", back_populates="proformas")
     creator = relationship("User", foreign_keys=[created_by_id])
+    tracking = relationship("ProposalTracking", uselist=False, back_populates="proforma", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<ProformaInvoice {self.invoice_number} for Customer#{self.customer_id}>"
@@ -309,7 +310,7 @@ class ProposalTracking(Base):
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
-    proforma = relationship("ProformaInvoice")
+    proforma = relationship("ProformaInvoice", back_populates="tracking")
     customer = relationship("Customer")
     creator = relationship("User")
     view_events = relationship("ProposalViewEvent", back_populates="tracking", cascade="all, delete-orphan")

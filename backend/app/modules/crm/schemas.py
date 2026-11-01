@@ -253,6 +253,17 @@ class ProformaUpdate(BaseModel):
     date: Optional[dt_date] = None
 
 
+class ProposalTrackingInfo(BaseModel):
+    id: int
+    token: str
+    short_code: str
+    view_count: int = 0
+    last_viewed_at: Optional[datetime] = None
+    created_at: datetime
+    
+    model_config = {"from_attributes": True}
+
+
 class ProformaResponse(BaseModel):
     id: int
     customer_id: int
@@ -282,6 +293,8 @@ class ProformaResponse(BaseModel):
     delivery_place: Optional[str] = None
     payment_terms: Optional[str] = None
     notes: Optional[str] = None
+    
+    tracking: Optional[ProposalTrackingInfo] = None
     
     created_at: datetime
     updated_at: datetime

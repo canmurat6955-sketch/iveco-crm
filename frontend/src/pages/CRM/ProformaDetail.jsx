@@ -2,9 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileText } from 'react-icons/fi';
+import { 
+  FiArrowLeft, FiPrinter, FiTrash2, FiMessageCircle, FiDownload, FiFileText,
+  FiEye, FiCopy, FiExternalLink, FiShare2, FiCheck, FiClock, FiShield
+} from 'react-icons/fi';
 import html2pdf from 'html2pdf.js';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 // Standart A4 Genişliği - PDF kenar payı, sıfır kırpılma ve mobil ekran uyumu için daraltılmış (630px)
 const SHEET_BASE_WIDTH = 630;
@@ -16,6 +20,8 @@ export default function ProformaDetail() {
   const [proforma, setProforma] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [trackingInfo, setTrackingInfo] = useState(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Mobil Görünüm Sığdırma & Zoom State'leri
   const [isFitToScreen, setIsFitToScreen] = useState(true);
@@ -28,6 +34,13 @@ export default function ProformaDetail() {
     crmApi.getProforma(id)
       .then(res => {
         setProforma(res.data);
+        if (res.data.tracking) {
+          setTrackingInfo(res.data.tracking);
+        } else {
+          crmApi.getProformaTrackingLink(id)
+            .then(tRes => setTrackingInfo(tRes.data))
+            .catch(() => {});
+        }
         return crmApi.getCustomer(res.data.customer_id);
       })
       .then(res => {
@@ -229,6 +242,37 @@ export default function ProformaDetail() {
     }
   };
 
+  const handleShareSmartTrackingWhatsApp = () => {
+    if (!trackingInfo?.token) {
+      toast.error('Akıllı takip bağlantısı hazırlanıyor...');
+      return;
+    }
+    const origin = getPublicOrigin();
+    const trackingUrl = `${origin}/p/${trackingInfo.token}`;
+    
+    const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
+    const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
+
+    const shareText = `Sayın Yetkili (${customer?.company_name || 'Değerli Müşterimiz'}),\n\nIVECO ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} referans numaralı ${proforma.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantıdan canlı olarak inceleyebilirsiniz:\n\n🔗 ${trackingUrl}\n\nTeklif detayları, teknik donanım ve ödeme planı bağlantıda yer almaktadır.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+
+    const wpUrl = recipientPhone
+      ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+
+    window.open(wpUrl, '_blank');
+    toast.success('WhatsApp açıldı! Müşteri linki açtığında canlı bildirim alacaksınız.');
+  };
+
+  const handleCopyTrackingLink = () => {
+    if (!trackingInfo?.token) return;
+    const origin = getPublicOrigin();
+    const trackingUrl = `${origin}/p/${trackingInfo.token}`;
+    navigator.clipboard.writeText(trackingUrl);
+    setCopiedLink(true);
+    toast.success('Akıllı takip bağlantısı panoya kopyalandı!');
+    setTimeout(() => setCopiedLink(false), 2500);
+  };
+
   const handleDelete = async () => {
     if (!confirm('Bu proforma faturayı silmek istediğinize emin misiniz?')) return;
     try {
@@ -403,6 +447,158 @@ export default function ProformaDetail() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ── HUBSPOT TİPİ CANLI TEKLİF TAKİP & ANALİTİK PANELİ ── */}
+      <div className="no-print" style={{
+        background: '#0f172a',
+        border: '1px solid #1e293b',
+        borderRadius: 12,
+        padding: '12px 18px',
+        marginBottom: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 12,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+      }}>
+        {/* Sol Taraf: Durum ve İnceleme Sayacı */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{
+            width: 38,
+            height: 38,
+            borderRadius: 8,
+            background: trackingInfo?.view_count > 0 ? 'rgba(5, 150, 105, 0.15)' : 'rgba(56, 189, 248, 0.12)',
+            border: `1px solid ${trackingInfo?.view_count > 0 ? 'rgba(16, 185, 129, 0.4)' : 'rgba(56, 189, 248, 0.3)'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: trackingInfo?.view_count > 0 ? '#10b981' : '#38bdf8'
+          }}>
+            <FiEye size={18} />
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '0.02em' }}>
+                CANLI TEKLİF AÇILMA TAKİBİ (HUBSPOT ENGINE)
+              </span>
+              {trackingInfo?.view_count > 0 ? (
+                <span style={{
+                  fontSize: '0.7rem',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  fontWeight: 800,
+                  background: 'rgba(5, 150, 105, 0.2)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                  {trackingInfo.view_count} Kez İncelendi
+                </span>
+              ) : (
+                <span style={{
+                  fontSize: '0.7rem',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  fontWeight: 600,
+                  background: 'rgba(100, 116, 139, 0.15)',
+                  color: '#94a3b8',
+                  border: '1px solid #334155'
+                }}>
+                  Henüz Açılmadı
+                </span>
+              )}
+            </div>
+
+            <div style={{ fontSize: '0.73rem', color: '#94a3b8', marginTop: 2 }}>
+              {trackingInfo?.view_count > 0 ? (
+                <span>
+                  Son Görüntülenme: <strong style={{ color: '#cbd5e1' }}>{new Date(trackingInfo.last_viewed_at).toLocaleString('tr-TR')}</strong> • Müşteri teklifi her açtığında sistem bildirim üretir.
+                </span>
+              ) : (
+                <span>
+                  Müşteriye özel şifreli takip linki oluşturuldu. Link tıklandığı an size canlı bildirim düşer.
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sağ Taraf: Hızlı Aksiyonlar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={handleShareSmartTrackingWhatsApp}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 14px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              borderRadius: 6,
+              cursor: 'pointer',
+              background: '#004B93',
+              border: '1px solid #0284c7',
+              color: '#ffffff',
+              boxShadow: '0 2px 8px rgba(0, 75, 147, 0.3)'
+            }}
+            title="Müşteriye Takip Linkini WhatsApp'tan Gönder"
+          >
+            <FiShare2 size={13} /> Akıllı Linki WhatsApp'ta Paylaş
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCopyTrackingLink}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 12px',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              borderRadius: 6,
+              cursor: 'pointer',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              color: copiedLink ? '#34d399' : '#cbd5e1'
+            }}
+            title="Takip Bağlantısını Kopyala"
+          >
+            {copiedLink ? <FiCheck size={13} /> : <FiCopy size={13} />}
+            <span>{copiedLink ? 'Kopyalandı!' : 'Linki Kopyala'}</span>
+          </button>
+
+          {trackingInfo?.token && (
+            <a
+              href={`${getPublicOrigin()}/p/${trackingInfo.token}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '7px 10px',
+                fontSize: '0.76rem',
+                fontWeight: 600,
+                borderRadius: 6,
+                background: 'transparent',
+                border: '1px solid #334155',
+                color: '#94a3b8',
+                textDecoration: 'none'
+              }}
+              title="Müşteri Görünümü Önizleme"
+            >
+              <FiExternalLink size={13} /> Önizle
+            </a>
+          )}
+        </div>
       </div>
 
       {/* ── MOBİL BİLGİLENDİRME ÇUBUĞU (ÖNİZLEME MODU) ── */}

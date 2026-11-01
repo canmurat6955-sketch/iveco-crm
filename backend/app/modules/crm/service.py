@@ -770,12 +770,45 @@ class CRMService:
         self.db.add(db_proforma)
         self.db.commit()
         self.db.refresh(db_proforma)
+
+        # HubSpot tipi akıllı takip bağlantısı oluştur
+        tracking_token = secrets.token_urlsafe(16)
+        short_code = f"p-{db_proforma.id}-{secrets.token_hex(3)}"
+        tracking = ProposalTracking(
+            proforma_id=db_proforma.id,
+            customer_id=customer_id,
+            created_by_id=user_id,
+            token=tracking_token,
+            short_code=short_code,
+            view_count=0
+        )
+        self.db.add(tracking)
+        self.db.commit()
+        self.db.refresh(db_proforma)
+
         return db_proforma
 
     def get_proforma(self, proforma_id: int) -> ProformaInvoice:
         proforma = self.db.query(ProformaInvoice).filter(ProformaInvoice.id == proforma_id).first()
         if not proforma:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proforma fatura bulunamadı")
+        
+        # Eğer geçmişten kalan bir proformada takip token'ı yoksa anında üret
+        if not proforma.tracking:
+            tracking_token = secrets.token_urlsafe(16)
+            short_code = f"p-{proforma.id}-{secrets.token_hex(3)}"
+            tracking = ProposalTracking(
+                proforma_id=proforma.id,
+                customer_id=proforma.customer_id,
+                created_by_id=proforma.created_by_id or 1,
+                token=tracking_token,
+                short_code=short_code,
+                view_count=0
+            )
+            self.db.add(tracking)
+            self.db.commit()
+            self.db.refresh(proforma)
+
         return proforma
 
     def list_customer_proformas(self, customer_id: int) -> List[ProformaInvoice]:
