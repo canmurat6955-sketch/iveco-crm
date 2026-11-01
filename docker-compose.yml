@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: iveco_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: iveco_user
+      POSTGRES_PASSWORD: iveco_password_2026
+      POSTGRES_DB: iveco_crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iveco_backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://iveco_user:iveco_password_2026@postgres:5432/iveco_crm
+      SECRET_KEY: iveco-crm-secret-key-enterprise-production
+      DEBUG: "false"
+      CORS_ORIGINS: "http://localhost:5173,https://*.vercel.app,https://*.railway.app"
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
+  uploads_data:

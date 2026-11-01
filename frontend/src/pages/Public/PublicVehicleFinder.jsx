@@ -663,13 +663,13 @@ export default function PublicVehicleFinder() {
 
   const tabFromUrl = searchParams.get('tab');
   const path = location.pathname;
-  let initialTab = 'secici';
+  let initialTab = 'fiyatlar';
   if (tabFromUrl) {
     initialTab = tabFromUrl;
   } else if (path === '/fiyat-listesi' || path === '/arac-fiyatlari') {
     initialTab = 'fiyatlar';
-  } else if (path === '/ust-yapi') {
-    initialTab = 'ust-yapi';
+  } else if (path === '/arac-secici' || path === '/filo-hesaplayici' || path === '/ozel-teklif') {
+    initialTab = 'secici';
   } else if (path === '/krediler' || path === '/iveco-finansman') {
     initialTab = 'krediler';
   } else if (path === '/sss' || path === '/sorular') {
@@ -1355,30 +1355,29 @@ export default function PublicVehicleFinder() {
       return;
     }
     const clientGreeting = (customerCompany || customerName)
-      ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO Akıllı Şasi, Kasa ve Finansman Seçici üzerinden inceleme yaptım.\n\n`
-      : `Merhaba Can Murat Bey, paylaştığınız IVECO Akıllı Şasi, Kasa ve Kredi Seçici üzerinden inceleme yaptım.\n\n`;
+      ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`
+      : `Merhaba Can Murat Bey, paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`;
 
     const priceText = matched.isTway
-      ? `🏷️ *Fiyatlandırma:* T-Way Şantiye & Damper Özel Fiyatı (Can Murat'a Danışılacak)\n`
+      ? `*Fiyatlandırma:* T-Way Şantiye & Ağır Hizmet Özel Fiyatı\n`
       : matched.currency === 'EUR'
-        ? `🏷️ *Fiyat Aralığı:* ${matched.displayPrice} (${matched.modelsDetail || 'Euro Dövizli'})\n`
+        ? `*Fiyat Aralığı:* ${matched.displayPrice} (${matched.modelsDetail || 'Euro Dövizli'})\n`
         : matched.cashPriceText
-          ? `🏷️ *Kampanyalı Fiyat:* ${matched.campaignPriceText}\n🎁 *Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
+          ? `*Kampanyalı Fiyat:* ${matched.campaignPriceText}\n*Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
           : '';
 
     const campaignText = activeCampaign
-      ? `💳 *Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
-        `💰 *Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
-      : `💳 *Finansman Tercihi:* ${currentBankMeta.name} (Resmi IVECO Finansman Desteği)\n\n`;
+      ? `*Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
+        `*Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
+      : `*Finansman Tercihi:* ${currentBankMeta.name} (Resmi Bayi Finansman Desteği)\n\n`;
 
     const msg = (
       clientGreeting +
-      `🚛 *Tavsiye Edilen Model:* ${matched.modelTitle}\n` +
-      `📐 *Önerilen Kasa Boyutları:* ${matched.dims.length} × ${matched.dims.width} × ${matched.dims.height} (${matched.dims.volume})\n` +
-      `⚖️ *Yük İhtiyacım:* ${payloadKg} kg Net Yük | Kantar Durumu: ${matched.kantarTitle}\n` +
+      `*İncelenen Şasi Modeli:* ${matched.modelTitle}\n` +
+      `*Taşıma Kapasitesi:* ${payloadKg} kg Net Yük | ${matched.kantarTitle}\n` +
       priceText +
       campaignText +
-      `Bu aracın hazır şasi stok durumu ve resmi teklifi hakkında görüşmek istiyorum.`
+      `Bu aracın hazır stok teslim durumu ve resmi proforma teklifi hakkında detaylı bilgi almak istiyorum.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -2065,10 +2064,10 @@ IVECO ERC Samsun Otomotiv
         </div>
 
         <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.3, margin: '0 0 6px' }}>
-          İşinize En Uygun IVECO Şasisini, Kasa Ölçüsünü ve Kredi Planını Belirleyin
+          IVECO 2026 Model Şasi Kataloğu, Fiyat Listesi & Finansman Portalı
         </h1>
         <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0 }}>
-          Taşıyacağınız tonaj ve kasa hacmini seçin; sistemimiz kantar sınırına en uygun şasiyi, kasa ebatlarını ve <strong>resmi banka kredi kampanyalarını (%0 Faiz, TEB Cetelem, Kuveyt Türk vb.)</strong> anında hesaplasın.
+          Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyatlarını, yasal istiap kapasitelerini ve <strong>anlaşmalı banka resmi sübvansiyonlu kredi kampanyalarını</strong> inceleyebilirsiniz.
         </p>
 
         {/* Can Murat Onay Temsilci Rozeti (Satış Sorumlusu) & Hızlı İletişim Butonları */}
@@ -2304,11 +2303,10 @@ IVECO ERC Samsun Otomotiv
         boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
       }}>
         {[
-          { id: 'secici', label: 'Şasi Konfigüratörü & Kredi Planı', badge: null },
-          { id: 'fiyatlar', label: '2026 Model Fiyat Kataloğu', badge: 'Kampanyalı' },
-          { id: 'ust-yapi', label: 'Üst Yapı & Kasa Rehberi', badge: 'TSE Onaylı' },
-          { id: 'krediler', label: 'Ticari Finansman & Kredi', badge: '%0 Faiz' },
-          { id: 'sss', label: 'Sıkça Sorulan Sorular (SSS)', badge: 'Teknik Bilgi' }
+          { id: 'fiyatlar', label: '2026 Model Şasi Fiyat Listesi', badge: 'Kampanyalı' },
+          { id: 'secici', label: 'Şasi & Taşıma Kapasitesi (İstiap)', badge: null },
+          { id: 'krediler', label: 'Banka Finansman & Kredi Planı', badge: '%0 Faiz' },
+          { id: 'sss', label: 'Sıkça Sorulan Sorular & Danışman', badge: 'ERC Samsun' }
         ].map((tab) => {
           const isActive = activeMainTab === tab.id;
           return (

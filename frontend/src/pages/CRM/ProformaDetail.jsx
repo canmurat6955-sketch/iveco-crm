@@ -253,7 +253,7 @@ export default function ProformaDetail() {
     const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
     const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
 
-    const shareText = `Sayın Yetkili (${customer?.company_name || 'Değerli Müşterimiz'}),\n\nIVECO ERC Samsun Otomotiv adına hazırladığımız ${proforma.invoice_number} referans numaralı ${proforma.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantıdan canlı olarak inceleyebilirsiniz:\n\n🔗 ${trackingUrl}\n\nTeklif detayları, teknik donanım ve ödeme planı bağlantıda yer almaktadır.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+    const shareText = `Sayın Yetkili (${customer?.company_name || 'Değerli Müşterimiz'}),\n\nIVECO ERC Samsun Otomotiv adına firmanız için hazırlanan ${proforma.invoice_number} referans numaralı ${proforma.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantı üzerinden inceleyebilirsiniz:\n\n${trackingUrl}\n\nTeklif içeriğinde anahtar teslim bedel, net peşin alım indirimi, teknik şasi verileri ve resmi banka kredi ödeme planı yer almaktadır.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
 
     const wpUrl = recipientPhone
       ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`

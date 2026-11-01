@@ -1203,20 +1203,20 @@ export default function IntentRadar() {
               color: '#e2e8f0',
               whiteSpace: 'pre-wrap'
             }}>
-{`🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲
+{`IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı
 
-Tonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.
+Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:
 
-👇 Aşağıdaki linke tıklayarak hemen hesaplayın:
-👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay
+https://iveco-crm.vercel.app/fiyat-listesi?ref=muratonay
 
-IVECO ERC Samsun Otomotiv • Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31`}
+IVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.
+Can Murat ONAY - 0544 622 59 31`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 İŞİNİZE EN UYGUN IVECO'YU VE %0 FAİZLİ KREDİ PLANINIZI 30 SANİYEDE HESAPLAYIN! 📲\n\nTonaj ve kasa ihtiyacınızı seçin; sistemimiz en verimli şasiyi ve anlaşmalı bankaların (TEB Cetelem, Kuveyt Türk vb.) %0 faizli resmi taksit tablosunu anında özetlesin.\n\n👇 Aşağıdaki linke tıklayarak hemen hesaplayın:\n👉 https://iveco-crm.vercel.app/ozel-teklif?ref=muratonay\n\nIVECO ERC Samsun Otomotiv • Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31`;
+                  const text = `IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı\n\nDaily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\nhttps://iveco-crm.vercel.app/fiyat-listesi?ref=muratonay\n\nIVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.\nCan Murat ONAY - 0544 622 59 31`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

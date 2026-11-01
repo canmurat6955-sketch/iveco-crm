@@ -1356,14 +1356,36 @@ export default function CustomerDetail() {
             </span>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => navigate(`/proforma/quick?customer_id=${customer.id}`)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, background: '#004B93', borderColor: '#0284c7' }}
-          >
-            <FiPlus size={14} /> Yeni Proforma Düzenle
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
+                const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
+                const catalogUrl = `${getPublicOrigin()}/fiyat-listesi?company=${encodeURIComponent(customer.company_name || '')}&phone=${cleanPhone}&ref=muratonay`;
+                const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv bünyesindeki 2026 model Daily, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyat listesini ve anlaşmalı banka kredi olanaklarını aşağıdaki resmi portalımızdan inceleyebilirsiniz:\n\n${catalogUrl}\n\nİhtiyacınız olan şasi modeli, hazır stok teslim süreleri ve özel filo iskontoları için dilediğiniz an iletişime geçebilirsiniz.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
+                const wp = recipientPhone
+                  ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(msg)}`
+                  : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+                window.open(wp, '_blank');
+                toast.success('WhatsApp açıldı! Müşteriye 2026 Fiyat & Şasi Kataloğu iletiliyor.');
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600, borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
+              title="Müşteriye 2026 Model Fiyat ve Şasi Kataloğu Linkini WhatsApp'tan Gönder"
+            >
+              <FiShare2 size={13} /> 2026 Fiyat Kataloğu Gönder
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => navigate(`/proforma/quick?customer_id=${customer.id}`)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, background: '#004B93', borderColor: '#0284c7' }}
+            >
+              <FiPlus size={14} /> Yeni Proforma Düzenle
+            </button>
+          </div>
         </div>
 
         {proformas.length > 0 ? (
@@ -1456,8 +1478,7 @@ export default function CustomerDetail() {
                         className="btn btn-sm"
                         onClick={() => {
                           const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
-                          const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
-                          const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv adına hazırladığımız ${p.invoice_number} referans numaralı ${p.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantıdan canlı olarak inceleyebilirsiniz:\n\n🔗 ${trackingUrl}\n\nTeklif detayları ve teknik veriler bağlantıda yer almaktadır.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
+                          const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv adına firmanız için hazırlanan ${p.invoice_number} referans numaralı ${p.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantı üzerinden canlı olarak inceleyebilirsiniz:\n\n${trackingUrl}\n\nTeklif içeriğinde anahtar teslim bedel, net peşin alım indirimi, teknik şasi verileri ve resmi banka kredi ödeme planı yer almaktadır.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
                           const wp = recipientPhone
                             ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(msg)}`
                             : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;

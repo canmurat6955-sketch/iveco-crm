@@ -14,20 +14,20 @@ import toast from 'react-hot-toast';
 import { getPublicOrigin } from '../../utils/publicUrl';
 
 const PIPELINE_STAGES = [
-  { key: 'lead', label: 'Lead', color: '#818cf8', emoji: '🎯' },
-  { key: 'contact', label: 'İlk Görüşme', color: '#38bdf8', emoji: '📞' },
-  { key: 'proposal', label: 'Teklif', color: '#fbbf24', emoji: '📋' },
-  { key: 'negotiation', label: 'Pazarlık', color: '#fb923c', emoji: '🤝' },
-  { key: 'won', label: 'Kazanıldı', color: '#34d399', emoji: '✅' },
+  { key: 'lead', label: 'Lead', color: '#818cf8' },
+  { key: 'contact', label: 'İlk Görüşme', color: '#38bdf8' },
+  { key: 'proposal', label: 'Teklif', color: '#fbbf24' },
+  { key: 'negotiation', label: 'Pazarlık', color: '#fb923c' },
+  { key: 'won', label: 'Kazanıldı', color: '#34d399' },
 ];
 
 const STAGE_LABELS = {
-  lead: '🎯 Lead Adayı',
-  contact: '📞 İlk Görüşme',
-  proposal: '📋 Teklif Verildi',
-  negotiation: '🤝 Pazarlık Aşaması',
-  won: '✅ Kazanıldı (Satış)',
-  lost: '❌ Kaybedildi'
+  lead: 'Lead Adayı',
+  contact: 'İlk Görüşme',
+  proposal: 'Teklif Verildi',
+  negotiation: 'Pazarlık Aşaması',
+  won: 'Kazanıldı (Satış)',
+  lost: 'Kaybedildi'
 };
 
 const IVECO_MODELS = [
@@ -233,18 +233,20 @@ export default function WhatsAppActionModal({
       setStatus('follow_up');
       setMessage(`Ben IVECO ERC Otomotiv Satış Sorumlusu ${salesRepName}. Daha önce paylaşmış olduğumuz ${vText} kampanyamız hakkındaki değerlendirmenizi öğrenmek istedim. Düşünürseniz detayları ve araç özelliklerini görüşmekten memnuniyet duyarım.`);
       setInternalNote('Önceki teklif sonrası takip mesajı gönderildi.');
-    } else if (type === 'arac_secici') {
+    } else if (type === 'arac_secici' || type === 'sasi_katalog') {
       setStatus('sent');
       setPipelineStage('proposal');
       const comp = customerForm.company_name || customer.company_name || '';
       const greeting = comp ? `Sayın ${comp} Yetkilisi,\n\n` : 'Sayın Yetkili,\n\n';
+      const catalogUrl = `${getPublicOrigin()}/fiyat-listesi?company=${encodeURIComponent(comp)}&ref=muratonay`;
       setMessage(
         `${greeting}Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
-        `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO şasimiz, özel kasa ebatları, yasal istiap kapasiteleri ve resmi banka sübvansiyonlu faiz/kredi kampanyası koşullarımız hazırlanmıştır.\n\n` +
-        `Firmanıza özel resmi bayi proforma teklifimiz, stok teslim durumları ve avantajlı fiyatlarımız hakkında bilgi almak için bu mesajı yanıtlamanız yeterlidir.\n\n` +
-        `İyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`
+        `Taşımacılık operasyonunuza uygun 2026 model IVECO şasilerimizin güncel bayi fiyat listesi, resmi banka sübvansiyonlu kredi kampanyaları ve teknik istiap verileri aşağıdaki resmi portalımızda yer almaktadır:\n\n` +
+        `${catalogUrl}\n\n` +
+        `Firmanıza özel resmi bayi proforma teklifimiz ve hazır şasi teslim durumları hakkında bilgi almak için dilediğiniz an iletişime geçebilirsiniz.\n\n` +
+        `Bilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`
       );
-      setInternalNote('Müşteriye şasi, kasa ve finansman teklif bilgilendirmesi iletildi.');
+      setInternalNote('Müşteriye 2026 şasi fiyat listesi ve finansman teklif bilgilendirmesi iletildi.');
     }
   };
 
