@@ -27,6 +27,7 @@ import {
   FiShield,
   FiActivity
 } from 'react-icons/fi';
+import { getPublicOrigin } from '../../utils/publicUrl';
 
 export default function IntentRadar() {
   const navigate = useNavigate();
@@ -164,7 +165,7 @@ export default function IntentRadar() {
   const handleGenerateLink = () => {
     const slug = generatorModel.toLowerCase().replace(/[^a-z0-9]/g, '-');
     const compSlug = generatorCompany.trim() ? encodeURIComponent(generatorCompany.trim().replace(/\s+/g, '_')) : 'kampanya_ziyaretci';
-    const link = `https://iveco-crm.vercel.app/campaigns/${slug}?utm_source=whatsapp&utm_medium=smart_link&camp=${generatorCampaign}&ref=muratonay&cust=${compSlug}`;
+    const link = `${getPublicOrigin()}/campaigns/${slug}?utm_source=whatsapp&utm_medium=smart_link&camp=${generatorCampaign}&ref=muratonay&cust=${compSlug}`;
     setGeneratedLink(link);
     setCopiedLink(false);
   };
@@ -1068,7 +1069,7 @@ export default function IntentRadar() {
                 fontFamily: 'monospace',
                 lineHeight: 1.4
               }}>
-                {generatedLink || 'https://iveco-crm.vercel.app/campaigns/daily-35c16'}
+                {generatedLink || `${getPublicOrigin()}/campaigns/daily-35c16`}
               </div>
             </div>
 
@@ -1207,7 +1208,7 @@ export default function IntentRadar() {
 
 Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:
 
-https://iveco-crm.vercel.app/fiyat-listesi?ref=muratonay
+${getPublicOrigin()}/fiyat-listesi?ref=muratonay
 
 IVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.
 Can Murat ONAY - 0544 622 59 31`}
@@ -1216,7 +1217,7 @@ Can Murat ONAY - 0544 622 59 31`}
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı\n\nDaily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\nhttps://iveco-crm.vercel.app/fiyat-listesi?ref=muratonay\n\nIVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.\nCan Murat ONAY - 0544 622 59 31`;
+                  const text = `IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı\n\nDaily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n${getPublicOrigin()}/fiyat-listesi?ref=muratonay\n\nIVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.\nCan Murat ONAY - 0544 622 59 31`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');
