@@ -1,5 +1,5 @@
-// Müşteriye gönderilen tüm linkler için resmi kök adres.
-export const PUBLIC_ORIGIN = 'https://teklif.ercotomotiv.com';
+// Müşteriye gönderilen tüm bağımsız linkler için canlı adres
+export const PUBLIC_ORIGIN = 'https://iveco-crm.vercel.app';
 
 const isPrivateHost = (host) =>
   !host ||
