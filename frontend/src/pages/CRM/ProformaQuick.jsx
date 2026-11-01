@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { crmApi, scannerApi } from '../../api/client';
+import { crmApi, scannerApi, vehiclesApi } from '../../api/client';
 import toast from 'react-hot-toast';
 import { FiUploadCloud, FiFileText, FiMic, FiMicOff, FiCheckCircle, FiEdit } from 'react-icons/fi';
 
@@ -145,7 +145,7 @@ export default function ProformaQuick() {
 
   // Authenticated CRM users fetch live pricing with internal dealer cost
   useEffect(() => {
-    crmApi.get('/vehicles/pricing-catalog').then(res => {
+    vehiclesApi.getPricingCatalog().then(res => {
       if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
         const mapped = res.data.map(v => ({
           ...v,

@@ -185,6 +185,8 @@ export const workbenchApi = {
 
 // ── CRM API ─────────────────────────────────────────────────────
 export const crmApi = {
+  get: (url, config) => api.get(url, config),
+  post: (url, data, config) => api.post(url, data, config),
   getCustomers: (params) => api.get('/crm/customers', { params }),
   getMapMarkers: () => api.get('/crm/customers/map-markers'),
   searchRouteAlong: (params) => api.get('/crm/route-search', { params }),
