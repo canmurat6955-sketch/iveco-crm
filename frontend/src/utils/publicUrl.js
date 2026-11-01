@@ -1,5 +1,5 @@
-// Müşteriye gönderilen tüm bağımsız linkler için canlı adres
-export const PUBLIC_ORIGIN = 'https://iveco-crm.vercel.app';
+// Müşteriye gönderilen tüm bağımsız linkler için canlı resmi katalog adresi
+export const PUBLIC_ORIGIN = 'https://iveco-fiyat-listesi.vercel.app';
 
 const isPrivateHost = (host) =>
   !host ||
