@@ -62,11 +62,11 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
     <div style={{ color: '#f8fafc' }}>
       {/* Tab Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.7) 100%)',
+        background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%)',
         border: '1px solid rgba(56, 189, 248, 0.35)',
         borderRadius: '16px',
         padding: '18px 20px',
-        marginBottom: '20px',
+        marginBottom: '16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -75,13 +75,13 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       }}>
         <div>
           <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            RESMİ 2026 MODEL FİYAT MATRİSİ
+            RESMİ 2026 MODEL FİYAT MATRİSİ & ŞASİ TAHSİSİ
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
-            IVECO Sıfır Kilometre Araç Fiyat Listesi
+            IVECO Sıfır Kilometre Şasi Fiyat Listesi
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            Tüm modellerde şeffaf resmi liste fiyatları ve kampanyalı peşin alım indirimleri uygulanmıştır.
+            Tüm modellerde şeffaf resmi liste fiyatları, fabrika kota tahsisi ve peşin alım indirimleri uygulanmıştır.
           </p>
         </div>
         <div style={{
@@ -93,6 +93,58 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
         }}>
           <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>💎 PEŞİN ALIM AVANTAJI</div>
           <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kamyonette 190.000 TL İndirim</div>
+        </div>
+      </div>
+
+      {/* Yasal İstiap & Kantar Güvencesi Banner */}
+      <div style={{
+        background: 'rgba(15, 23, 42, 0.75)',
+        border: '1px solid rgba(16, 185, 129, 0.3)',
+        borderRadius: '12px',
+        padding: '12px 16px',
+        marginBottom: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '10px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#10b981',
+            fontSize: '18px'
+          }}>
+            🛡️
+          </div>
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
+              %100 Yasal İstiap ve Karayolları Kantar Uyumu Güvencesi
+            </div>
+            <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+              Daily 35 serisi B sınıfı otomobil ehliyetiyle kullanılabilir, şehir içi saat yasaklarından ve takograftan muaftır.
+            </div>
+          </div>
+        </div>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          background: 'rgba(56, 189, 248, 0.12)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          borderRadius: '8px',
+          padding: '6px 12px',
+          fontSize: '0.72rem',
+          color: '#38bdf8',
+          fontWeight: 700
+        }}>
+          <span>🟢</span> 2026 Kota Tahsisinden Hızlı Teslim
         </div>
       </div>
 
@@ -221,11 +273,33 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   {vehicle.model}
                 </h3>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '10px' }}>
                   <div>⚙️ <strong>Vites:</strong> {vehicle.transmission || 'Manuel'}</div>
                   <div>🐎 <strong>Motor:</strong> {vehicle.engine || '-'}</div>
                   <div>⚡ <strong>Güç:</strong> {vehicle.power ? vehicle.power.split('(')[1]?.replace(')', '') || vehicle.power : '-'}</div>
                   <div>📏 <strong>Dingil:</strong> {vehicle.wheelbase ? `${vehicle.wheelbase} mm` : '-'}</div>
+                </div>
+
+                {/* Stock Quota & Legal Payload Indicator */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'rgba(2, 132, 199, 0.08)',
+                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  borderRadius: '8px',
+                  padding: '5px 8px',
+                  marginBottom: '12px',
+                  fontSize: '0.67rem'
+                }}>
+                  <span style={{ color: '#38bdf8', fontWeight: 700 }}>
+                    🟢 2026 Kota: Hazır Teslim Şasi
+                  </span>
+                  {vehicle.segment === 'Daily 35' && (
+                    <span style={{ color: '#10b981', fontWeight: 700 }}>
+                      🛡️ B Ehliyet / Kantar Uyumu
+                    </span>
+                  )}
                 </div>
               </div>
 

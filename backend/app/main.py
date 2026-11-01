@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
     import app.modules.notifications.models
     import app.modules.vehicles.models
     import app.modules.contacts.models
+    import app.modules.whatsapp.models
     create_all_tables()
     _seed_initial_data()
     os.makedirs(settings.FILE_STORAGE_PATH, exist_ok=True)
@@ -71,6 +72,7 @@ from app.modules.scanner.router import router as scanner_router
 from app.modules.vehicles.router import router as vehicles_router
 from app.modules.contacts.router import router as contacts_router
 from app.modules.workbench.router import router as workbench_router
+from app.modules.whatsapp.router import router as whatsapp_router
 
 app.include_router(auth_router)
 app.include_router(crm_router)
@@ -84,6 +86,7 @@ app.include_router(scanner_router)
 app.include_router(vehicles_router)
 app.include_router(contacts_router)
 app.include_router(workbench_router)
+app.include_router(whatsapp_router)
 
 # Yanıtları sıkıştır (mobil veri ve hız için)
 app.add_middleware(GZipMiddleware, minimum_size=1000)

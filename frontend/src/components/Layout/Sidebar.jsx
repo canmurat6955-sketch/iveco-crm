@@ -1,12 +1,14 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { notificationsApi } from '../../api/client';
-import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget, FiEye, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, FiFileText, FiTruck, FiBookOpen, FiPhoneCall, FiCamera, FiTarget, FiEye, FiLogOut, FiMessageSquare } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import WhatsAppIntegrationModal from '../CRM/WhatsAppIntegrationModal';
 
 export default function Sidebar() {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   useEffect(() => {
     notificationsApi.getUnreadCount()
@@ -97,7 +99,7 @@ export default function Sidebar() {
             Araç Yönetimi
           </NavLink>
           <a
-            href="/musteri?preview=true"
+            href="/fiyat-listesi?preview=true"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"
@@ -108,11 +110,31 @@ export default function Sidebar() {
               fontWeight: 700,
               marginTop: '6px'
             }}
-            title="Müşterilerinize göndereceğiniz fiyat, kasa, kredi ve LinkedIn SSS portalını aç & test et"
+            title="Müşterilerinize göndereceğiniz 2026 fiyat listesi ve kredi portalını aç & test et"
           >
             <span className="nav-icon" style={{ color: '#38bdf8' }}><FiEye size={18} /></span>
-            Müşteri Portalı & SSS
+            Müşteri Portalı (Canlı)
           </a>
+
+          <button
+            type="button"
+            onClick={() => setIsWhatsAppModalOpen(true)}
+            className="nav-item"
+            style={{
+              background: 'linear-gradient(135deg, rgba(37, 211, 102, 0.12) 0%, rgba(18, 140, 126, 0.2) 100%)',
+              color: '#4ade80',
+              border: '1px solid rgba(34, 197, 94, 0.35)',
+              fontWeight: 700,
+              marginTop: '6px',
+              width: '100%',
+              textAlign: 'left',
+              cursor: 'pointer'
+            }}
+            title="Telefonunuzu QR kod ile bağlayarak canlı teklif takibi ve otomatik bildirimleri yönetin"
+          >
+            <span className="nav-icon" style={{ color: '#22c55e' }}><FiMessageSquare size={18} /></span>
+            WhatsApp Bağlantısı
+          </button>
         </div>
 
 
@@ -164,6 +186,11 @@ export default function Sidebar() {
           <span>Çıkış</span>
         </button>
       </div>
+
+      <WhatsAppIntegrationModal
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+      />
     </aside>
   );
 }

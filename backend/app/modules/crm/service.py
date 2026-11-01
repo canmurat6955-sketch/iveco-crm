@@ -1300,6 +1300,19 @@ class CRMService:
         self.db.add(notif)
         self.db.commit()
 
+        # WhatsApp üzerinden Can Murat Onay'a anlık istihbarat bildirimi gönder
+        try:
+            from app.modules.whatsapp.service import WhatsAppService
+            wa_service = WhatsAppService(self.db)
+            wa_service.notify_rep_proposal_viewed(
+                company_name=company_label,
+                vehicle_model=proforma.vehicle_model or "IVECO Şasi",
+                token=token,
+                city=customer.city if customer else None,
+            )
+        except Exception:
+            pass
+
         return {
             "invoice_number": proforma.invoice_number,
             "date": proforma.date.isoformat() if proforma.date else None,

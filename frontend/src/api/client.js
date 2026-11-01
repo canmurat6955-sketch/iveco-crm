@@ -493,6 +493,13 @@ export const vehiclesApi = {
   matchChassis: (data) => api.post('/vehicles/match-chassis', data),
 };
 
-
-
-
+// ── WhatsApp Integration API (Seviye 3 Entegrasyon) ──────────────
+export const whatsappApi = {
+  getStatus: () => api.get('/whatsapp/status'),
+  generateQr: () => api.post('/whatsapp/qr'),
+  confirmPairing: (data) => api.post('/whatsapp/confirm', data || {}),
+  disconnect: () => api.post('/whatsapp/disconnect'),
+  sendMessage: (data) => api.post('/whatsapp/send', data),
+  sendTestMessage: () => api.post('/whatsapp/test'),
+  updateSettings: (data) => api.post('/whatsapp/settings', data),
+};
