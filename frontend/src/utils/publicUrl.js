@@ -1,7 +1,5 @@
-// Müşteriye gönderilen tüm linkler için herkese açık kök adres.
-// Uygulama bilgisayarda (localhost) veya ofis ağında (10.x / 192.168.x) açıkken üretilen
-// linkler müşterinin telefonunda AÇILMAZ; bu yüzden o durumlarda canlı adres kullanılır.
-export const PUBLIC_ORIGIN = 'https://iveco-crm.vercel.app';
+// Müşteriye gönderilen tüm linkler için resmi kök adres.
+export const PUBLIC_ORIGIN = 'https://teklif.ercotomotiv.com';
 
 const isPrivateHost = (host) =>
   !host ||
