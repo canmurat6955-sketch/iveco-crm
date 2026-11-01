@@ -1,5 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FiHome, FiUsers, FiMapPin, FiMap, FiMoreHorizontal, FiLogOut } from 'react-icons/fi';
+import {
+  FiHome, FiUsers, FiMapPin, FiMap, FiMoreHorizontal, FiLogOut,
+  FiFileText, FiBarChart2, FiTruck, FiTarget, FiCamera,
+  FiNavigation, FiCompass, FiPhoneCall, FiMic, FiBookOpen,
+  FiActivity, FiBell
+} from 'react-icons/fi';
 import { useState } from 'react';
 import NearbyRadarModal from '../CRM/NearbyRadarModal';
 import VoiceDebriefModal from '../VoiceDebrief/VoiceDebriefModal';
@@ -13,7 +18,6 @@ export default function BottomNav({ onVisitStart }) {
   const [showVoiceDebrief, setShowVoiceDebrief] = useState(false);
   const [showTco, setShowTco] = useState(false);
   const [showBodybuilder, setShowBodybuilder] = useState(false);
-
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -60,8 +64,8 @@ export default function BottomNav({ onVisitStart }) {
 
               <div className="more-menu-header-bar">
                 <div>
-                  <span className="more-menu-title">📱 Saha Hızlı Menüsü</span>
-                  <span className="more-menu-sub">Tüm araçlar & kısayollar</span>
+                  <span className="more-menu-title">Saha Operasyon Menüsü</span>
+                  <span className="more-menu-sub">Hızlı araçlar, teklif ve saha kısayolları</span>
                 </div>
                 <button 
                   type="button" 
@@ -74,14 +78,16 @@ export default function BottomNav({ onVisitStart }) {
               </div>
 
               {/* 1. KATEGORİ: TEKLİF & SATIŞ */}
-              <div className="more-menu-section-label">⚡ TEKLİF & FİNANSMAN</div>
+              <div className="more-menu-section-label">TEKLİF & FİNANSMAN</div>
               <div className="more-menu-grid">
                 <button 
                   type="button"
                   className="more-menu-card highlight" 
                   onClick={() => { navigate('/proforma/quick'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">📄 1-Tıkla Proforma</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiFileText size={15} color="#38bdf8" /> 1-Tıkla Proforma
+                  </span>
                   <span className="more-menu-card-sub">WhatsApp & PDF teklif</span>
                 </button>
 
@@ -90,7 +96,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { setShowTco(true); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">📊 TCO Kıyaslama</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiBarChart2 size={15} color="#10b981" /> TCO Kıyaslama
+                  </span>
                   <span className="more-menu-card-sub">50.000 km tasarruf</span>
                 </button>
 
@@ -99,7 +107,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { setShowBodybuilder(true); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🏗️ Şasi & Üst Yapı</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiTruck size={15} color="#f59e0b" /> Şasi & Üst Yapı
+                  </span>
                   <span className="more-menu-card-sub">İstiap & kasa seçici</span>
                 </button>
 
@@ -108,20 +118,24 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/vehicles/management'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🚛 Araç Kataloğu</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiTruck size={15} color="#60a5fa" /> Araç Kataloğu
+                  </span>
                   <span className="more-menu-card-sub">Fabrika stok & talep</span>
                 </button>
               </div>
 
               {/* 2. KATEGORİ: SAHA & KEŞİF */}
-              <div className="more-menu-section-label">🛰️ SAHA & KEŞİF OPERASYONU</div>
+              <div className="more-menu-section-label">SAHA & KEŞİF OPERASYONU</div>
               <div className="more-menu-grid">
                 <button 
                   type="button"
                   className="more-menu-card" 
                   onClick={() => { setShowRadar(true); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🛰️ GPS Radarı</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiTarget size={15} color="#06b6d4" /> GPS Radarı
+                  </span>
                   <span className="more-menu-card-sub">5 km'deki müşteriler</span>
                 </button>
 
@@ -130,7 +144,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/scan-card'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🎴 Kartvizit Tara</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiCamera size={15} color="#ec4899" /> Kartvizit Tara
+                  </span>
                   <span className="more-menu-card-sub">Kamera ile OCR</span>
                 </button>
 
@@ -139,7 +155,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/routes'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🚗 Saha Rotası</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiNavigation size={15} color="#10b981" /> Saha Rotası
+                  </span>
                   <span className="more-menu-card-sub">Güzergah & randevu</span>
                 </button>
 
@@ -148,20 +166,24 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/discovery'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🧭 Firma Keşfi</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiCompass size={15} color="#a855f7" /> Firma Keşfi
+                  </span>
                   <span className="more-menu-card-sub">Yeni potansiyel bul</span>
                 </button>
               </div>
 
               {/* 3. KATEGORİ: MÜŞTERİ & İLETİŞİM */}
-              <div className="more-menu-section-label">💼 MÜŞTERİ & İLETİŞİM</div>
+              <div className="more-menu-section-label">MÜŞTERİ & İLETİŞİM</div>
               <div className="more-menu-grid">
                 <button 
                   type="button"
                   className="more-menu-card" 
                   onClick={() => { navigate('/workbench'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">📞 Çalışma Masası</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiPhoneCall size={15} color="#38bdf8" /> Çalışma Masası
+                  </span>
                   <span className="more-menu-card-sub">Bugün aranacaklar</span>
                 </button>
 
@@ -170,8 +192,10 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { setShowVoiceDebrief(true); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">🎙️ Sesli Satış Notu</span>
-                  <span className="more-menu-card-sub">Araç içi AI debrief</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiMic size={15} color="#0066FF" /> Sesli Satış Notu
+                  </span>
+                  <span className="more-menu-card-sub">Sözlü debrief kaydet</span>
                 </button>
 
                 <button 
@@ -179,7 +203,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/contacts'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">📇 Kişiler Rehberi</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiBookOpen size={15} color="#f59e0b" /> Kişiler Rehberi
+                  </span>
                   <span className="more-menu-card-sub">Yetkili listesi</span>
                 </button>
 
@@ -188,7 +214,9 @@ export default function BottomNav({ onVisitStart }) {
                   className="more-menu-card" 
                   onClick={() => { navigate('/sales'); setShowMoreMenu(false); }}
                 >
-                  <span className="more-menu-card-title">📈 Satış Takip</span>
+                  <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiActivity size={15} color="#10b981" /> Satış Takip
+                  </span>
                   <span className="more-menu-card-sub">Fırsatlar & pipeline</span>
                 </button>
               </div>
@@ -202,7 +230,9 @@ export default function BottomNav({ onVisitStart }) {
                   onClick={() => { navigate('/notifications'); setShowMoreMenu(false); }}
                   style={{ flex: 1, minHeight: 44, padding: '8px 12px' }}
                 >
-                  <span className="more-menu-card-title" style={{ fontSize: '0.75rem' }}>🔔 Bildirimler</span>
+                  <span className="more-menu-card-title" style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                    <FiBell size={14} color="#38bdf8" /> Bildirimler
+                  </span>
                 </button>
 
                 <button 
@@ -211,7 +241,7 @@ export default function BottomNav({ onVisitStart }) {
                   onClick={handleLogout} 
                   style={{ flex: 1, minHeight: 44, padding: '8px 12px', color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)' }}
                 >
-                  <span className="more-menu-card-title" style={{ color: '#f87171', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span className="more-menu-card-title" style={{ color: '#f87171', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
                     <FiLogOut size={14} /> Çıkış Yap
                   </span>
                 </button>

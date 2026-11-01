@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { FiSearch, FiBell, FiZap, FiLogOut } from 'react-icons/fi';
+import { FiSearch, FiMic, FiBarChart2, FiTruck, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import VehicleAISearchModal from '../Search/VehicleAISearchModal';
 import VoiceDebriefModal from '../VoiceDebrief/VoiceDebriefModal';
@@ -38,13 +38,38 @@ export default function Header() {
 
   const getTitle = () => {
     if (location.pathname.match(/^\/customers\/\d+$/)) return 'Müşteri Detayı';
-    return PAGE_TITLES[location.pathname] || 'Iveco CRM';
+    return PAGE_TITLES[location.pathname] || 'Iveco Enterprise CRM';
   };
 
   return (
     <>
       <header className="header">
-        <h2 className="header-title">{getTitle()}</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <h2 className="header-title">{getTitle()}</h2>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(56, 189, 248, 0.08)',
+            border: '1px solid rgba(56, 189, 248, 0.2)',
+            borderRadius: '20px',
+            padding: '2px 10px',
+            fontSize: '11px',
+            fontWeight: 700,
+            color: '#38bdf8',
+            letterSpacing: '0.4px'
+          }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              boxShadow: '0 0 8px #10b981'
+            }} />
+            ERC CANLI SİSTEM
+          </div>
+        </div>
+
         <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           
           {/* Quick Field Tools Buttons */}
@@ -53,13 +78,18 @@ export default function Header() {
             onClick={() => setShowVoiceDebrief(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-              color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '20px',
-              fontSize: '12px', fontWeight: '700', cursor: 'pointer', boxShadow: '0 2px 6px rgba(2, 132, 199, 0.3)'
+              background: 'rgba(0, 102, 255, 0.12)',
+              color: '#60a5fa',
+              border: '1px solid rgba(0, 102, 255, 0.35)',
+              padding: '6px 12px', borderRadius: '8px',
+              fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+              transition: 'all 0.15s ease'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0, 102, 255, 0.22)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0, 102, 255, 0.12)'; }}
             title="Sözlü konuşarak müşteri notu, takas ve takip tarihi ekle"
           >
-            <span>🎙️</span>
+            <FiMic size={14} color="#38bdf8" />
             <span>Sesli Not</span>
           </button>
 
@@ -68,13 +98,19 @@ export default function Header() {
             onClick={() => setShowTco(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0',
-              padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', cursor: 'pointer'
+              background: 'rgba(16, 185, 129, 0.1)',
+              color: '#34d399',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              padding: '6px 12px', borderRadius: '8px',
+              fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+              transition: 'all 0.15s ease'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'; }}
             title="50.000 km bakım ve yakıt tasarrufu hesaplayıcı"
           >
-            <span>📊</span>
-            <span>TCO Kıyasla</span>
+            <FiBarChart2 size={14} color="#10b981" />
+            <span>TCO Kıyaslama</span>
           </button>
 
           <button
@@ -82,36 +118,56 @@ export default function Header() {
             onClick={() => setShowBodybuilder(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a',
-              padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', cursor: 'pointer'
+              background: 'rgba(245, 158, 11, 0.1)',
+              color: '#fbbf24',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              padding: '6px 12px', borderRadius: '8px',
+              fontSize: '12px', fontWeight: '600', cursor: 'pointer',
+              transition: 'all 0.15s ease'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(245, 158, 11, 0.2)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)'; }}
             title="Palet / İstiap tonajına göre şasi ve üst yapıcı eşleştir"
           >
-            <span>🏗️</span>
-            <span>Üst Yapı</span>
+            <FiTruck size={14} color="#f59e0b" />
+            <span>Şasi & Üst Yapı</span>
           </button>
 
           <div
             onClick={() => setShowAiSearch(true)}
             className="flex items-center gap-2"
             style={{
-              background: 'var(--bg-input)', padding: '6px 14px', borderRadius: 20,
-              border: '1px solid rgba(59, 130, 246, 0.4)', cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              background: 'var(--bg-input)',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              border: '1px solid var(--border-color)',
+              cursor: 'pointer',
+              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.4)',
+              transition: 'all 0.15s ease'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
           >
-            <FiZap color="#38bdf8" size={14} />
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-              AI Araç Arama...
+            <FiSearch color="#38bdf8" size={13} />
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 500 }}>
+              Model, Şasi veya Müşteri Ara...
             </span>
+            <kbd style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '4px',
+              padding: '1px 5px',
+              fontSize: '10px',
+              color: '#94a3b8'
+            }}>⌘K</kbd>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '6px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-heading)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '8px' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-heading)', fontVariantNumeric: 'tabular-nums' }}>
               {time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
             </span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              {time.toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+              {time.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' })}
             </span>
           </div>
 
@@ -124,15 +180,19 @@ export default function Header() {
             }}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: 'rgba(239, 68, 68, 0.1)', color: '#f87171',
+              background: 'rgba(239, 68, 68, 0.08)',
+              color: '#f87171',
               border: '1px solid rgba(239, 68, 68, 0.25)',
-              padding: '6px 12px', borderRadius: '20px',
-              fontSize: '12px', fontWeight: '700', cursor: 'pointer',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
               marginLeft: '6px',
               transition: 'all 0.15s ease'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.22)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'; }}
             title="Sistemden Güvenli Çıkış Yap"
           >
             <FiLogOut size={13} />
