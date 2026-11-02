@@ -1,21 +1,43 @@
 // IVECO Ekim 2026 Resmi Banka Kampanyaları & Yüksek Tutarlı Finansman Matrisi
-// Kaynak: LM_EKİM 2026 KAMPANYALARI_14102026.xlsx ve HEAVY_EYLÜL KAMPANYASI.xlsx
+// Kaynak: LM_EKİM 2026 KAMPANYALARI_14102026.xlsx ve LM_EYLÜL KAMPANYA 2.xlsx
 // DİKKAT: Bayi katkı payı (destek tutarı / reel komisyon) müşteri gizliliği gereği bu dosyada YER ALMAZ.
 // Yalnızca müşterinin görebileceği: Kredi Tutarı, Vade, Müşteri Faiz Oranı, Aylık Taksit ve Toplam Ödeme bilgileri bulunur.
 
 export const AMOUNT_TIERS = [
-  { id: 'all', label: 'Tüm Tutarlar', range: 'Tüm Seçenekler', icon: '📋', min: 0, max: 99999999 },
-  { id: 'zero_interest', label: '💎 %0 Faiz', range: '800K - 1M TL', icon: '💎', min: 400000, max: 1000000 },
-  { id: 'high_credit', label: '🚀 Yüksek Kredi', range: '1.2M - 2.5M TL', icon: '🚀', min: 1100000, max: 2500000 },
-  { id: 'fleet', label: '🏢 Kamyon & Filo', range: '2.6M - 6M TL', icon: '🏢', min: 2600000, max: 10000000 }
+  {
+    "id": "all",
+    "label": "Tüm Tutarlar",
+    "range": "Tüm Seçenekler",
+    "icon": "📋",
+    "min": 0,
+    "max": 99999999
+  },
+  {
+    "id": "zero_interest",
+    "label": "💎 %0 Faiz",
+    "range": "800K - 1M TL",
+    "icon": "💎",
+    "min": 400000,
+    "max": 1000000
+  },
+  {
+    "id": "high_credit",
+    "label": "🚀 Yüksek Kredi",
+    "range": "1.2M - 2.5M TL",
+    "icon": "🚀",
+    "min": 1100000,
+    "max": 2500000
+  },
+  {
+    "id": "fleet",
+    "label": "🏢 Kamyon & Filo",
+    "range": "2.6M - 6M TL",
+    "icon": "🏢",
+    "min": 2600000,
+    "max": 10000000
+  }
 ];
 
-/**
- * Araç segmentine göre dinamik ve doğru tutar kategorilerini döndürür:
- * - daily35: Max 2.000.000 TL (Daily 35 Kamyonet & Van)
- * - daily70 / eurocargo: Max 4.000.000 TL (72C / Daily 70 & Eurocargo)
- * - heavy: Max 6.000.000 TL (S-Way & T-Way Ağır Vasıta & Çekici)
- */
 export function getAmountTiersForCategory(category = 'daily35') {
   if (category === 'daily35') {
     return [
@@ -68,12 +90,12 @@ export const BANK_LIST = [
     "id": "garanti",
     "name": "Garanti BBVA",
     "shortName": "Garanti BBVA",
-    "badge": "%0 Faiz & %0.99",
+    "badge": "%0 Faiz & %1.07",
     "color": "#22c55e",
     "bg": "rgba(34, 197, 94, 0.15)",
     "border": "rgba(74, 222, 128, 0.4)",
     "icon": "🍀",
-    "description": "2.500.000 TL'ye kadar özel %0.99 faizli ve 60 aya varan ticari finansman"
+    "description": "1.000.000 TL için %1.07 ve 2.000.000 TL için %2.54 avantajlı ticari finansman"
   },
   {
     "id": "is_bankasi",
@@ -796,61 +818,133 @@ export const BANK_CAMPAIGNS = {
         "tag": "SIFIR FAİZ"
       },
       {
-        "id": "garanti_35_1000_12_099",
-        "title": "1.000.000 TL — 12 Ay (%0.99 Kampanya)",
+        "id": "garanti_35_900_9",
+        "title": "900.000 TL — 9 Ay (%0 Faiz)",
+        "principal": 900000,
+        "term": 9,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 100000,
+        "total": 900000,
+        "highlight": true,
+        "tag": "9 AY SIFIR FAİZ"
+      },
+      {
+        "id": "garanti_35_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%1.07 Faiz)",
         "principal": 1000000,
         "term": 12,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 89071,
-        "total": 1068852,
+        "rateLabel": "%1.07",
+        "rate": 1.07,
+        "monthly": 89521,
+        "total": 1074252,
         "highlight": true,
-        "tag": "ÖZEL %0.99"
+        "tag": "ÖZEL %1.07 ORAN"
       },
       {
-        "id": "garanti_35_1000_24_099",
-        "title": "1.000.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_35_1000_24",
+        "title": "1.000.000 TL — 24 Ay (%1.83 Faiz)",
         "principal": 1000000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 47295,
-        "total": 1135080,
-        "tag": "ÖZEL %0.99 2 YIL"
+        "rateLabel": "%1.83",
+        "rate": 1.83,
+        "monthly": 52391,
+        "total": 1257384,
+        "tag": "2 YIL VADE"
       },
       {
-        "id": "garanti_35_1500_24_099",
-        "title": "1.500.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_35_1000_36",
+        "title": "1.000.000 TL — 36 Ay (%2.18 Faiz)",
+        "principal": 1000000,
+        "term": 36,
+        "rateLabel": "%2.18",
+        "rate": 2.18,
+        "monthly": 41106,
+        "total": 1479816
+      },
+      {
+        "id": "garanti_35_1200_12",
+        "title": "1.200.000 TL — 12 Ay (%1.50 Faiz)",
+        "principal": 1200000,
+        "term": 12,
+        "rateLabel": "%1.50",
+        "rate": 1.5,
+        "monthly": 110543,
+        "total": 1326516
+      },
+      {
+        "id": "garanti_35_1200_24",
+        "title": "1.200.000 TL — 24 Ay (%2.07 Faiz)",
+        "principal": 1200000,
+        "term": 24,
+        "rateLabel": "%2.07",
+        "rate": 2.07,
+        "monthly": 64688,
+        "total": 1552512
+      },
+      {
+        "id": "garanti_35_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.93 Faiz)",
+        "principal": 1500000,
+        "term": 12,
+        "rateLabel": "%1.93",
+        "rate": 1.93,
+        "monthly": 142078,
+        "total": 1704936
+      },
+      {
+        "id": "garanti_35_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%2.31 Faiz)",
         "principal": 1500000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 70943,
-        "total": 1702632,
+        "rateLabel": "%2.31",
+        "rate": 2.31,
+        "monthly": 83135,
+        "total": 1995240,
         "highlight": true,
-        "tag": "1.5M %0.99"
+        "tag": "1.5 MİLYON TL"
       },
       {
-        "id": "garanti_35_1500_36_099",
-        "title": "1.500.000 TL — 36 Ay (%0.99 Kampanya)",
+        "id": "garanti_35_1500_36",
+        "title": "1.500.000 TL — 36 Ay (%2.53 Faiz)",
         "principal": 1500000,
         "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 50162,
-        "total": 1805832
+        "rateLabel": "%2.53",
+        "rate": 2.53,
+        "monthly": 65215,
+        "total": 2347740
+      },
+      {
+        "id": "garanti_35_2000_12",
+        "title": "2.000.000 TL — 12 Ay (%2.35 Faiz)",
+        "principal": 2000000,
+        "term": 12,
+        "rateLabel": "%2.35",
+        "rate": 2.35,
+        "monthly": 194639,
+        "total": 2335668
       },
       {
         "id": "garanti_35_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%1.94 Ticari)",
+        "title": "2.000.000 TL — 24 Ay (%2.54 Faiz)",
         "principal": 2000000,
         "term": 24,
-        "rateLabel": "%1.94",
-        "rate": 1.94,
-        "monthly": 104523,
-        "total": 2508552,
+        "rateLabel": "%2.54",
+        "rate": 2.54,
+        "monthly": 113881,
+        "total": 2733144,
         "highlight": true,
-        "tag": "2 MİLYON TL"
+        "tag": "2 MİLYON TAVAN"
+      },
+      {
+        "id": "garanti_35_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%2.70 Faiz)",
+        "principal": 2000000,
+        "term": 36,
+        "rateLabel": "%2.70",
+        "rate": 2.7,
+        "monthly": 89326,
+        "total": 3215736
       }
     ],
     "daily70": [
@@ -867,125 +961,120 @@ export const BANK_CAMPAIGNS = {
         "tag": "12 AY SIFIR FAİZ"
       },
       {
-        "id": "garanti_70_1000_24_099",
-        "title": "1.000.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_1000_24",
+        "title": "1.000.000 TL — 24 Ay (%1.24 Faiz)",
         "principal": 1000000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 47295,
-        "total": 1135080,
-        "tag": "%0.99 2 YIL"
+        "rateLabel": "%1.24",
+        "rate": 1.24,
+        "monthly": 48780,
+        "total": 1170720
       },
       {
-        "id": "garanti_70_1500_12_099",
-        "title": "1.500.000 TL — 12 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.25 Faiz)",
         "principal": 1500000,
         "term": 12,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 133606,
-        "total": 1603272,
-        "tag": "1.5M %0.99"
+        "rateLabel": "%1.25",
+        "rate": 1.25,
+        "monthly": 135879,
+        "total": 1630548
       },
       {
-        "id": "garanti_70_1500_24_099",
-        "title": "1.500.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%1.93 Faiz)",
         "principal": 1500000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 70943,
-        "total": 1702632,
+        "rateLabel": "%1.93",
+        "rate": 1.93,
+        "monthly": 79519,
+        "total": 1908456,
         "highlight": true,
-        "tag": "1.5M 24 AY"
+        "tag": "1.5M AVANTAJLI"
       },
       {
-        "id": "garanti_70_1500_36_099",
-        "title": "1.500.000 TL — 36 Ay (%0.99 Kampanya)",
-        "principal": 1500000,
-        "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 50162,
-        "total": 1805832
-      },
-      {
-        "id": "garanti_70_2000_12_099",
-        "title": "2.000.000 TL — 12 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_2000_12",
+        "title": "2.000.000 TL — 12 Ay (%1.85 Faiz)",
         "principal": 2000000,
         "term": 12,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 178141,
-        "total": 2137692,
+        "rateLabel": "%1.85",
+        "rate": 1.85,
+        "monthly": 188436,
+        "total": 2261232
+      },
+      {
+        "id": "garanti_70_2000_24",
+        "title": "2.000.000 TL — 24 Ay (%2.26 Faiz)",
+        "principal": 2000000,
+        "term": 24,
+        "rateLabel": "%2.26",
+        "rate": 2.26,
+        "monthly": 110263,
+        "total": 2646312,
+        "highlight": true,
         "tag": "2 MİLYON TL"
       },
       {
-        "id": "garanti_70_2000_24_099",
-        "title": "2.000.000 TL — 24 Ay (%0.99 Kampanya)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 94590,
-        "total": 2270160,
-        "highlight": true,
-        "tag": "2M %0.99 2 YIL"
-      },
-      {
-        "id": "garanti_70_2000_36_099",
-        "title": "2.000.000 TL — 36 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%2.50 Faiz)",
         "principal": 2000000,
         "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 66882,
-        "total": 2407752
+        "rateLabel": "%2.50",
+        "rate": 2.5,
+        "monthly": 86497,
+        "total": 3113892
       },
       {
-        "id": "garanti_70_2500_24_099",
-        "title": "2.500.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_70_2500_24",
+        "title": "2.500.000 TL — 24 Ay (%2.46 Faiz)",
         "principal": 2500000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 118238,
-        "total": 2837712,
-        "highlight": true,
-        "tag": "2.5M MAKSİMUM"
-      },
-      {
-        "id": "garanti_70_2500_36_099",
-        "title": "2.500.000 TL — 36 Ay (%0.99 Kampanya)",
-        "principal": 2500000,
-        "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 83603,
-        "total": 3009708
+        "rateLabel": "%2.46",
+        "rate": 2.46,
+        "monthly": 141009,
+        "total": 3384216
       },
       {
         "id": "garanti_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.35 Ticari)",
+        "title": "3.000.000 TL — 24 Ay (%2.59 Faiz)",
         "principal": 3000000,
         "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 168900,
-        "total": 4053600,
+        "rateLabel": "%2.59",
+        "rate": 2.59,
+        "monthly": 171756,
+        "total": 4122144,
         "tag": "3 MİLYON TL"
       },
       {
+        "id": "garanti_70_3000_36",
+        "title": "3.000.000 TL — 36 Ay (%2.73 Faiz)",
+        "principal": 3000000,
+        "term": 36,
+        "rateLabel": "%2.73",
+        "rate": 2.73,
+        "monthly": 134719,
+        "total": 4850084
+      },
+      {
+        "id": "garanti_70_4000_24",
+        "title": "4.000.000 TL — 24 Ay (%2.75 Faiz)",
+        "principal": 4000000,
+        "term": 24,
+        "rateLabel": "%2.75",
+        "rate": 2.75,
+        "monthly": 233251,
+        "total": 5598024,
+        "tag": "4 MİLYON TL TAVAN"
+      },
+      {
         "id": "garanti_70_4000_36",
-        "title": "4.000.000 TL — 36 Ay (%2.55 Ticari)",
+        "title": "4.000.000 TL — 36 Ay (%2.85 Faiz)",
         "principal": 4000000,
         "term": 36,
-        "rateLabel": "%2.55",
-        "rate": 2.55,
-        "monthly": 179400,
-        "total": 6458400,
-        "tag": "4 MİLYON TL FİLO"
+        "rateLabel": "%2.85",
+        "rate": 2.85,
+        "monthly": 182941,
+        "total": 6585876
       }
     ],
     "eurocargo": [
@@ -1002,58 +1091,48 @@ export const BANK_CAMPAIGNS = {
         "tag": "SIFIR FAİZ"
       },
       {
-        "id": "garanti_ec_1500_24_099",
-        "title": "1.500.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_ec_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%1.93 Faiz)",
         "principal": 1500000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 70943,
-        "total": 1702632
+        "rateLabel": "%1.93",
+        "rate": 1.93,
+        "monthly": 79519,
+        "total": 1908456
       },
       {
-        "id": "garanti_ec_2000_24_099",
-        "title": "2.000.000 TL — 24 Ay (%0.99 Kampanya)",
+        "id": "garanti_ec_2000_24",
+        "title": "2.000.000 TL — 24 Ay (%2.26 Faiz)",
         "principal": 2000000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 94590,
-        "total": 2270160,
+        "rateLabel": "%2.26",
+        "rate": 2.26,
+        "monthly": 110263,
+        "total": 2646312,
         "highlight": true,
-        "tag": "2M %0.99"
+        "tag": "2 MİLYON TL"
       },
       {
-        "id": "garanti_ec_2000_36_099",
-        "title": "2.000.000 TL — 36 Ay (%0.99 Kampanya)",
-        "principal": 2000000,
-        "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 66882,
-        "total": 2407752
-      },
-      {
-        "id": "garanti_ec_2500_24_099",
-        "title": "2.500.000 TL — 24 Ay (%0.99 Kampanya)",
-        "principal": 2500000,
+        "id": "garanti_ec_3000_24",
+        "title": "3.000.000 TL — 24 Ay (%2.59 Faiz)",
+        "principal": 3000000,
         "term": 24,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 118238,
-        "total": 2837712,
-        "highlight": true,
-        "tag": "2.5M %0.99"
+        "rateLabel": "%2.59",
+        "rate": 2.59,
+        "monthly": 171756,
+        "total": 4122144,
+        "tag": "3 MİLYON TL"
       },
       {
-        "id": "garanti_ec_2500_36_099",
-        "title": "2.500.000 TL — 36 Ay (%0.99 Kampanya)",
-        "principal": 2500000,
+        "id": "garanti_ec_4000_36",
+        "title": "4.000.000 TL — 36 Ay (%2.85 Faiz)",
+        "principal": 4000000,
         "term": 36,
-        "rateLabel": "%0.99",
-        "rate": 0.99,
-        "monthly": 83603,
-        "total": 3009708
+        "rateLabel": "%2.85",
+        "rate": 2.85,
+        "monthly": 182941,
+        "total": 6585876,
+        "tag": "4 MİLYON TL TAVAN"
       }
     ]
   },
@@ -1831,15 +1910,7 @@ export const BANK_CAMPAIGNS = {
   }
 };
 
-/**
- * Verilen araç serisi, banka ve isteğe bağlı tutar aralığı filtresine göre kampanyaları döndürür.
- * Segment tavan limitleri kesinlikle uygulanır:
- * - Daily 35: Maksimum 2.000.000 TL
- * - 72C (Daily 70) & Eurocargo: Maksimum 4.000.000 TL
- * - S-Way & T-Way (Ağır Vasıta): Maksimum 6.000.000 TL
- */
 export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'teb_cetelem', tierId = 'all') {
-  // Normalize model key
   let category = 'daily35';
   const lower = (modelKey || '').toLowerCase();
   if (lower.includes('70') || lower.includes('72')) {
@@ -1852,7 +1923,6 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
     category = 'daily35';
   }
 
-  // Müşteri hiçbiri/diğer seçtiyse otomatik TEB Cetelem'e bağla
   const effectiveBankId = bankId === 'diger_yok' ? 'teb_cetelem' : (bankId || 'teb_cetelem');
   const bankData = BANK_CAMPAIGNS[effectiveBankId] || BANK_CAMPAIGNS.teb_cetelem;
   let campaigns = [];
@@ -1873,10 +1943,6 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
     campaigns = bankData[category] || bankData.daily35 || [];
   }
 
-  // Segment bazlı kesin tavan limit uygulaması (Kullanıcı Kuralı):
-  // 1. Daily (Daily 35): Maksimum 2.000.000 TL
-  // 2. 72C (Daily 70) & Eurocargo: Maksimum 4.000.000 TL
-  // 3. S-Way & T-Way (Ağır Vasıta): Maksimum 6.000.000 TL
   let maxLimit = 2000000;
   if (category === 'heavy') {
     maxLimit = 6000000;
@@ -1887,7 +1953,6 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
   }
   campaigns = campaigns.filter(c => (c.principal || 0) <= maxLimit);
 
-  // Tutar Filtresi uygulama
   if (tierId && tierId !== 'all') {
     const categoryTiers = getAmountTiersForCategory(category);
     const tier = categoryTiers.find(t => t.id === tierId) || AMOUNT_TIERS.find(t => t.id === tierId);
