@@ -20,7 +20,7 @@ const BODY_STRUCTURE_LIST = [
     recommendedChassis: [
       { name: 'Daily 35S16 (3750 mm)', note: 'Hafif yük, şehir içi dar sokak soğuk dağıtım (B Ehliyet)' },
       { name: 'Daily 35C16 (3750/4100 mm Çift Teker)', note: 'Ağır gıda, karkas et ve süt ürünleri için yüksek taşıma mukavemeti' },
-      { name: 'Daily 72C18 (4750/5100 mm)', note: '4.5 Ton net yük, 10-12 palet kapasitesi, şehirlerarası dağıtım' },
+      { name: 'Daily 72C16 (4750/5100 mm)', note: '4.5 Ton net yük, 10-12 palet kapasitesi, şehirlerarası dağıtım' },
       { name: 'Eurocargo ML 120E / 160E', note: '14-16 palet, havalı süspansiyon, süpermarket zincir lojistiği' }
     ],
     features: [
@@ -75,7 +75,7 @@ const BODY_STRUCTURE_LIST = [
     recommendedChassis: [
       { name: 'Daily 35S16 (3750/4100 mm)', note: 'Kargo ve e-ticaret, B sınıfı ehliyet, şehir içi serbest' },
       { name: 'Daily 35C16 (4100 mm Çift Teker)', note: 'Mobilya ve ağır koli dağıtımında yüksek mukavemet' },
-      { name: 'Daily 72C18 (5100 mm)', note: 'Dev hacim, 6.20 m kasa boyu, paletli mobilya sevkiyatı' },
+      { name: 'Daily 72C16 (5100 mm)', note: 'Dev hacim, 6.20 m kasa boyu, paletli mobilya sevkiyatı' },
       { name: 'Eurocargo ML 150E / 160E', note: '18 palet kapasitesi, 7.80 m kasa, tekstil ve zincir dağıtım' }
     ],
     features: [
@@ -102,7 +102,7 @@ const BODY_STRUCTURE_LIST = [
     },
     recommendedChassis: [
       { name: 'Daily 35C16 (4100 mm)', note: 'Şehir içi paletli içecek ve market sevkiyatı' },
-      { name: 'Daily 72C18 (4750/5100 mm)', note: '10-12 Euro Palet, paletli un ve yem dağıtımı' },
+      { name: 'Daily 72C16 (4750/5100 mm)', note: '10-12 Euro Palet, paletli un ve yem dağıtımı' },
       { name: 'Eurocargo ML 160 E 32P (5670 mm)', note: '18-20 Palet, havalı süspansiyon, 11 ton net yük' },
       { name: 'Eurocargo 10 Teker (6x2)', note: '22 Palet, 8.40 m dev kasa, 16 ton net taşıma' }
     ],
@@ -131,7 +131,7 @@ const BODY_STRUCTURE_LIST = [
     recommendedChassis: [
       { name: 'Daily 35S16 (3450/3750 mm)', note: 'Nalbur, hırdavat ve hafif inşaat malzemesi (B Ehliyet)' },
       { name: 'Daily 35C16 (3750/4100 mm Çift Teker)', note: 'Demir, çimento, seramik gibi ağır yükler' },
-      { name: 'Daily 72C18 (4350/4750 mm)', note: '4.8 Ton net taşıma, 5.50 metre boy profil demir' },
+      { name: 'Daily 72C16 (4350/4750 mm)', note: '4.8 Ton net taşıma, 5.50 metre boy profil demir' },
       { name: 'Eurocargo 120E / 150E / 160E', note: 'Ağır inşaat, kereste ve tarımsal çuval sevkiyatı' }
     ],
     features: [
@@ -158,7 +158,7 @@ const BODY_STRUCTURE_LIST = [
     },
     recommendedChassis: [
       { name: 'Daily 35C16 (4100 mm Çift Teker)', note: 'Şehir içi kıvrak kurtarıcı, B ehliyet, 1 binek araç taşıma' },
-      { name: 'Daily 72C18 (4750/5100 mm)', note: 'Gözlüklü çift araç taşıma, SUV ve minibüs kurtarma gücü' },
+      { name: 'Daily 72C16 (4750/5100 mm)', note: 'Gözlüklü çift araç taşıma, SUV ve minibüs kurtarma gücü' },
       { name: 'Eurocargo 100E / 120E', note: 'Ağır ticari, minibüs ve uzun yol filo araç taşımacılığı' }
     ],
     features: [

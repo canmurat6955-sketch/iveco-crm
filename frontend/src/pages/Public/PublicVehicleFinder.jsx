@@ -36,6 +36,7 @@ import PricingCatalogTab from './components/PricingCatalogTab';
 import BodyStructureTab from './components/BodyStructureTab';
 import LoanFinanceTab from './components/LoanFinanceTab';
 import FaqLinkedInTab from './components/FaqLinkedInTab';
+import TcoCompetitorTab from './components/TcoCompetitorTab';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
@@ -270,9 +271,9 @@ const VEHICLE_CATALOG = [
     key: 'truck_72c',
     category: 'kamyon',
     categoryLabel: '🚚 Kamyon (C)',
-    title: 'Daily 72C18 Şasi Kamyon',
-    fullTitle: 'IVECO Daily 72C18 Şasi Kamyon (3750 / 4350 / 4750 mm)',
-    modelTitle: 'IVECO Daily 72C18 Şasi Kamyon (3750 / 4350 / 4750 mm)',
+    title: 'Daily 72C16 Şasi Kamyon',
+    fullTitle: 'IVECO Daily 72C16 Şasi Kamyon (3750 / 4350 / 4750 mm)',
+    modelTitle: 'IVECO Daily 72C16 Şasi Kamyon (3750 / 4350 / 4750 mm)',
     series: 'Daily 72C',
     wheelbase: '3750 - 4750 mm',
     payloadKg: 4800,
@@ -675,6 +676,8 @@ export default function PublicVehicleFinder() {
     initialTab = 'krediler';
   } else if (path === '/sss' || path === '/sorular') {
     initialTab = 'sss';
+  } else if (path === '/tco' || path === '/karsilastirma' || path === '/rakip-analizi') {
+    initialTab = 'tco';
   }
 
   const [activeMainTab, setActiveMainTab] = useState(initialTab);
@@ -861,7 +864,7 @@ export default function PublicVehicleFinder() {
           if (item.key !== 'truck_72c' && item.payloadKg >= 3000) {
             multiRecs.push({
               key: 'truck_72c',
-              title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+              title: 'Daily 72C16 Şasi Kamyon (7.970 kg Kantar)',
               badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
               reason: 'Resmi kantar tescili ile 4.8 ton net yük taşımak ve 6.20 metreye kadar kasa koymak isteyenler için sınıfının lideri.',
               icon: '🚚'
@@ -1164,7 +1167,7 @@ export default function PublicVehicleFinder() {
         multiRecommendations: [
           {
             key: 'truck_72c',
-            title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+            title: 'Daily 72C16 Şasi Kamyon (7.970 kg Kantar)',
             badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
             reason: 'Daily şasi hafifliği ve esnekliği ile 4.8 ton net yük taşıma avantajı.',
             icon: '🚚'
@@ -1232,7 +1235,7 @@ export default function PublicVehicleFinder() {
           },
           {
             key: 'truck_72c',
-            title: 'Daily 72C18 Şasi Kamyon (7.970 kg Kantar)',
+            title: 'Daily 72C16 Şasi Kamyon (7.970 kg Kantar)',
             badge: '7.970 kg Kantar • 4.8 Ton Net Yük',
             reason: 'Resmi kantar tescilli daha yüksek tonaj ve 6.20 metreye varan kasa boyu arayanlara.',
             icon: '🚚'
@@ -2311,6 +2314,7 @@ IVECO ERC Samsun Otomotiv
         {[
           { id: 'fiyatlar', label: '2026 Model Şasi Fiyat Listesi', badge: 'Kampanyalı' },
           { id: 'secici', label: 'Şasi & Taşıma Kapasitesi (İstiap)', badge: null },
+          { id: 'tco', label: 'TCO & Rakip Karşılaştırma', badge: 'M. & F. Analizi' },
           { id: 'krediler', label: 'Banka Finansman & Kredi Planı', badge: '%0 Faiz' },
           { id: 'sss', label: 'Sıkça Sorulan Sorular & Danışman', badge: 'ERC Samsun' }
         ].map((tab) => {
@@ -2398,6 +2402,16 @@ IVECO ERC Samsun Otomotiv
       {activeMainTab === 'sss' && (
         <div style={{ maxWidth: '980px', margin: '0 auto 30px' }}>
           <FaqLinkedInTab
+            onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            salesRep={SALES_REP}
+          />
+        </div>
+      )}
+
+      {/* ── SEKME 6: TCO & RAKİP KARŞILAŞTIRMA (M. & F. VERİLERİ) ── */}
+      {activeMainTab === 'tco' && (
+        <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
+          <TcoCompetitorTab
             onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
             salesRep={SALES_REP}
           />

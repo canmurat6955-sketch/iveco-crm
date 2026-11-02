@@ -72,6 +72,9 @@ export default function App() {
               <Route path="/krediler" element={page(PublicVehicleFinder)} />
               <Route path="/sorular" element={page(PublicVehicleFinder)} />
               <Route path="/sss" element={page(PublicVehicleFinder)} />
+              <Route path="/tco" element={page(PublicVehicleFinder)} />
+              <Route path="/karsilastirma" element={page(PublicVehicleFinder)} />
+              <Route path="/rakip-analizi" element={page(PublicVehicleFinder)} />
               <Route path="/filo-hesaplayici" element={page(PublicVehicleFinder)} />
               <Route path="/akilli-kasa" element={page(PublicVehicleFinder)} />
               <Route path="/iveco-finansman" element={page(PublicVehicleFinder)} />
