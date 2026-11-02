@@ -555,10 +555,8 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3800,
     tonnage: '26000 KG (Kantar) / 41000 KG (GVW)',
     year: '2026',
-    eurPrice: 148000,
-    campaignPrice: 148000,
-    cashDiscount: 0,
-    cashPrice: 148000,
+    isCustomPrice: true,
+    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Can Murat Onay'a Danışınız",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
@@ -575,10 +573,8 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 3800,
     tonnage: '26000 KG (Kantar) / 41000 KG (GVW)',
     year: '2026',
-    eurPrice: 142000,
-    campaignPrice: 142000,
-    cashDiscount: 0,
-    cashPrice: 142000,
+    isCustomPrice: true,
+    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Can Murat Onay'a Danışınız",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
@@ -595,10 +591,8 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4350,
     tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
     year: '2026',
-    eurPrice: 162000,
-    campaignPrice: 162000,
-    cashDiscount: 0,
-    cashPrice: 162000,
+    isCustomPrice: true,
+    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Can Murat Onay'a Danışınız",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
@@ -615,10 +609,8 @@ export const IVECO_PRICING_CATALOG = [
     wheelbase: 4350,
     tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
     year: '2026',
-    eurPrice: 155000,
-    campaignPrice: 155000,
-    cashDiscount: 0,
-    cashPrice: 155000,
+    isCustomPrice: true,
+    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Can Murat Onay'a Danışınız",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
@@ -640,7 +632,15 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
   let basePrice = 0;
   let discount = 0;
   let finalPrice = 0;
-  let currency = vehicle.currency || 'TRY';
+  if (vehicle.isCustomPrice || vehicle.segment === 'T-Way') {
+    return {
+      currency: 'EUR',
+      isCustomPrice: true,
+      customPricePrompt: "Özel Proje & Filo Fiyatı İçin Can Murat Onay'a Danışınız",
+      basePrice: null,
+      finalPrice: null
+    };
+  }
 
   if (currency === 'EUR') {
     // S-Way Çekici

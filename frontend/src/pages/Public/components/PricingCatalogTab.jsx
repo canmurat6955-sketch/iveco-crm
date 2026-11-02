@@ -58,6 +58,11 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
   const handleVehicleQuote = (vehicle) => {
     if (onDirectWhatsApp) {
+      if (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) {
+        const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat) için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
+        onDirectWhatsApp(msg);
+        return;
+      }
       const priceText = vehicle.currency === 'EUR'
         ? `€${(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV (Euro)`
         : (vehicle.cashPrice ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin` : 'Özel Proje Fiyatı');
@@ -298,6 +303,18 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   }}>
                     {vehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
                   </span>
+                ) : (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? (
+                  <span style={{
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    background: 'rgba(245, 158, 11, 0.2)',
+                    color: '#fbbf24',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(245, 158, 11, 0.4)'
+                  }}>
+                    ⭐ Özel Proje & Filo Fiyatı
+                  </span>
                 ) : vehicle.currency === 'EUR' ? (
                   <span style={{
                     fontSize: '0.66rem',
@@ -367,7 +384,25 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 padding: '10px 12px',
                 marginBottom: '12px'
               }}>
-                {vehicle.currency === 'EUR' ? (
+                {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? (
+                  <div style={{
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.28)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontSize: '0.68rem', color: '#fbbf24', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>
+                      ⭐ PROJEYE ÖZEL ŞANTİYE FİYATLANDIRMASI
+                    </div>
+                    <div style={{ fontSize: '1.02rem', fontWeight: 900, color: '#fef08a', marginBottom: '3px' }}>
+                      Can Murat Onay'a Danışınız
+                    </div>
+                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', lineHeight: 1.35 }}>
+                      T-Way ağır şantiye ve hafriyat araçlarımız şasi boyutu, damper hacmi ve filo kotasına göre şahsen fiyatlandırılmaktadır.
+                    </div>
+                  </div>
+                ) : vehicle.currency === 'EUR' ? (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
                       <span>Resmi Liste Fiyatı:</span>
@@ -375,10 +410,10 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#38bdf8', marginBottom: '6px' }}>
                       <span>Finansman & Teslimat:</span>
-                      <span>Özel Proje & Filo Kotası</span>
+                      <span>İhracatçı Euro Kredisi & Filo Kotası</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
-                      <span style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 700 }}>PROJE FİYATI:</span>
+                      <span style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 700 }}>EURO PROJE FİYATI:</span>
                       <span style={{ fontSize: '1.08rem', color: '#38bdf8', fontWeight: 800 }}>
                         €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}
                       </span>
@@ -436,21 +471,21 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   type="button"
                   onClick={() => handleVehicleQuote(vehicle)}
                   style={{
-                    background: '#22c55e',
-                    color: '#fff',
+                    background: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#f59e0b' : '#22c55e',
+                    color: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#000' : '#fff',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '8px 12px',
                     fontSize: '0.74rem',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}
-                  title="WhatsApp'tan Teklif Al"
+                  title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Can Murat'tan Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
                 >
-                  <FiMessageSquare size={13} /> Teklif Al
+                  <FiMessageSquare size={13} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat Al' : 'Teklif Al'}
                 </button>
               </div>
             </div>
