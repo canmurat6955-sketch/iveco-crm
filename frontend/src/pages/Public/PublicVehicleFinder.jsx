@@ -2990,75 +2990,6 @@ IVECO ERC Samsun Otomotiv
               </div>
             </div>
 
-            {/* 💡 ÇOKLU ÖNERİ & ALTERNATİF ARAÇLAR */}
-            {matched.multiRecommendations && matched.multiRecommendations.length > 0 && (
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.75)',
-                border: '1px solid rgba(245, 158, 11, 0.35)',
-                borderRadius: '12px',
-                padding: '12px 14px',
-                marginBottom: '18px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    💡 {matched.payloadKg <= 5000 ? 'ÇOKLU ÖNERİ (3.5 Ton Alternatifler):' : 'ÇOKLU ÖNERİ (Alternatif Modeller & Şasiler):'}
-                  </span>
-                  <span style={{ fontSize: '0.66rem', color: '#94a3b8' }}>İncelemek için tıkla</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
-                  {matched.multiRecommendations.map(alt => (
-                    <div
-                      key={alt.key}
-                      onClick={() => handleSelectVehicle(alt.key)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '10px',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        transition: 'background 0.15s ease'
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                          <span style={{ fontSize: '1.1rem' }}>{alt.icon || '🚛'}</span>
-                          <strong style={{ fontSize: '0.82rem', color: '#f8fafc' }}>{alt.title}</strong>
-                        </div>
-                        <div style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 700, marginBottom: '4px' }}>
-                          {alt.badge}
-                        </div>
-                        <div style={{ fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.35, marginBottom: '8px' }}>
-                          {alt.reason}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectVehicle(alt.key);
-                        }}
-                        style={{
-                          width: '100%',
-                          background: 'rgba(56, 189, 248, 0.15)',
-                          color: '#38bdf8',
-                          border: '1px solid rgba(56, 189, 248, 0.35)',
-                          borderRadius: '6px',
-                          padding: '6px 8px',
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Bu Aracı Seç & Kredisini Gör →
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* İLERLEME BUTONU */}
             <button
@@ -3112,51 +3043,6 @@ IVECO ERC Samsun Otomotiv
               </button>
             </div>
 
-            {/* Adım 2 İçi Çoklu Öneri ve Hızlı Model Değiştirici */}
-            {matched.multiRecommendations && matched.multiRecommendations.length > 0 && (
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.8)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                borderRadius: '12px',
-                padding: '10px 14px',
-                marginBottom: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '8px'
-              }}>
-                <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700 }}>
-                  💡 {matched.payloadKg <= 5000 ? '3.5 Ton Diğer Alternatifler:' : 'Diğer Alternatif Modeller & Şasiler:'}
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {matched.multiRecommendations.map(alt => (
-                    <button
-                      key={alt.key}
-                      type="button"
-                      onClick={() => handleSelectVehicle(alt.key)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(56, 189, 248, 0.3)',
-                        color: '#f8fafc',
-                        borderRadius: '16px',
-                        padding: '4px 10px',
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span>{alt.icon || '🚛'}</span>
-                      <span>{alt.title.split('(')[0]}</span>
-                      <span style={{ color: '#10b981', fontSize: '0.65rem' }}>→ Kredisini Gör</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Eşleşen Araç Kartı */}
             <div style={{

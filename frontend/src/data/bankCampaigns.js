@@ -7,7 +7,7 @@ export const AMOUNT_TIERS = [
   { id: 'all', label: 'Tüm Tutarlar', min: 0, max: 99999999 },
   { id: 'zero_interest', label: '💎 %0 Faiz (800K - 1M TL)', min: 400000, max: 1000000 },
   { id: 'high_credit', label: '🚀 Yüksek Kredi (1.2M - 2.5M TL)', min: 1100000, max: 2500000 },
-  { id: 'fleet', label: '🏢 Büyük Filo & Ağır Vasıta (3M - 5M TL)', min: 2600000, max: 10000000 }
+  { id: 'fleet', label: '🏢 Çoklu Araç & Büyük Filo (2.6M - 5M TL)', min: 2600000, max: 10000000 }
 ];
 
 export const BANK_LIST = [
@@ -196,6 +196,97 @@ export const BANK_CAMPAIGNS = {
         rate: 2.50,
         monthly: 54927,
         total: 2636496
+      },
+      {
+        id: 'teb_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.10 Faiz)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.10',
+        rate: 2.10,
+        monthly: 108252,
+        total: 2598048,
+        highlight: true,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'teb_35_2000_36',
+        title: '2.000.000 TL — 36 Ay (%2.37 Faiz)',
+        principal: 2000000,
+        term: 36,
+        rateLabel: '%2.37',
+        rate: 2.37,
+        monthly: 84807,
+        total: 3053052,
+        tag: '2M / 36 AY'
+      },
+      {
+        id: 'teb_35_2500_24',
+        title: '2.500.000 TL — 24 Ay (%2.34 Faiz)',
+        principal: 2500000,
+        term: 24,
+        rateLabel: '%2.34',
+        rate: 2.34,
+        monthly: 139135,
+        total: 3339240,
+        tag: '2.5 MİLYON TL'
+      },
+      {
+        id: 'teb_35_2500_36',
+        title: '2.500.000 TL — 36 Ay (%2.45 Faiz)',
+        principal: 2500000,
+        term: 36,
+        rateLabel: '%2.45',
+        rate: 2.45,
+        monthly: 109780,
+        total: 3952080,
+        tag: '2.5M / 36 AY'
+      },
+      {
+        id: 'teb_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.55 Faiz)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.55',
+        rate: 2.55,
+        monthly: 133500,
+        total: 4806000,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'teb_35_4000_36',
+        title: '4.000.000 TL — 36 Ay (%2.65 Faiz)',
+        principal: 4000000,
+        term: 36,
+        rateLabel: '%2.65',
+        rate: 2.65,
+        monthly: 178000,
+        total: 6408000,
+        tag: '4 MİLYON ÇOKLU KAMYONET'
+      },
+      {
+        id: 'teb_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.70 Faiz)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.70',
+        rate: 2.70,
+        monthly: 224388,
+        total: 8077968,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
+      },
+      {
+        id: 'teb_35_5000_48',
+        title: '5.000.000 TL — 48 Ay (%2.75 Faiz)',
+        principal: 5000000,
+        term: 48,
+        rateLabel: '%2.75',
+        rate: 2.75,
+        monthly: 196500,
+        total: 9432000,
+        tag: '48 AY UZUN VADE'
       }
     ],
     daily70: [
@@ -479,6 +570,161 @@ export const BANK_CAMPAIGNS = {
         rate: 2.67,
         monthly: 77336,
         total: 2784087
+      },
+      {
+        id: 'kt_35_grace_2000_24',
+        title: '2.000.000 TL — 6 Ay Ödemesiz (24 Ay)',
+        principal: 2000000,
+        term: 24,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.72',
+        rate: 2.72,
+        monthly: 135609,
+        total: 3254612,
+        highlight: true,
+        tag: '2M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_2000_36',
+        title: '2.000.000 TL — 6 Ay Ödemesiz (36 Ay)',
+        principal: 2000000,
+        term: 36,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.81',
+        rate: 2.81,
+        monthly: 106012,
+        total: 3816417,
+        tag: '2M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_2500_24',
+        title: '2.500.000 TL — 6 Ay Ödemesiz (24 Ay)',
+        principal: 2500000,
+        term: 24,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.81',
+        rate: 2.81,
+        monthly: 171949,
+        total: 4126777,
+        tag: '2.5M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_2500_36',
+        title: '2.500.000 TL — 6 Ay Ödemesiz (36 Ay)',
+        principal: 2500000,
+        term: 36,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.89',
+        rate: 2.89,
+        monthly: 134602,
+        total: 4845677,
+        tag: '2.5M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_3000_24',
+        title: '3.000.000 TL — 6 Ay Ödemesiz (24 Ay)',
+        principal: 3000000,
+        term: 24,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.88',
+        rate: 2.88,
+        monthly: 208629,
+        total: 5007089,
+        highlight: true,
+        tag: '3M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_3000_36',
+        title: '3.000.000 TL — 6 Ay Ödemesiz (36 Ay)',
+        principal: 3000000,
+        term: 36,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.94',
+        rate: 2.94,
+        monthly: 163089,
+        total: 5871211,
+        tag: '3M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_3500_24',
+        title: '3.500.000 TL — 6 Ay Ödemesiz (24 Ay)',
+        principal: 3500000,
+        term: 24,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.86',
+        rate: 2.86,
+        monthly: 242635,
+        total: 5823249,
+        tag: '3.5M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_grace_4000_24',
+        title: '4.000.000 TL — 6 Ay Ödemesiz (24 Ay)',
+        principal: 4000000,
+        term: 24,
+        gracePeriodMonths: 6,
+        rateLabel: '%2.91',
+        rate: 2.91,
+        monthly: 279485,
+        total: 6707644,
+        tag: '4M 6 AY ÖDEMESİZ'
+      },
+      {
+        id: 'kt_35_esit_2500_24',
+        title: '2.500.000 TL — 24 Ay (%2.37 Kar Payı)',
+        principal: 2500000,
+        term: 24,
+        rateLabel: '%2.37',
+        rate: 2.37,
+        monthly: 140155,
+        total: 3363726,
+        tag: 'EŞİT TAKSİT'
+      },
+      {
+        id: 'kt_35_esit_2500_36',
+        title: '2.500.000 TL — 36 Ay (%2.53 Kar Payı)',
+        principal: 2500000,
+        term: 36,
+        rateLabel: '%2.53',
+        rate: 2.53,
+        monthly: 109376,
+        total: 3937553,
+        tag: 'EŞİT TAKSİT'
+      },
+      {
+        id: 'kt_35_esit_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.64 Kar Payı)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.64',
+        rate: 2.64,
+        monthly: 133610,
+        total: 4809966,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'kt_35_esit_4000_36',
+        title: '4.000.000 TL — 36 Ay (%2.78 Kar Payı)',
+        principal: 4000000,
+        term: 36,
+        rateLabel: '%2.78',
+        rate: 2.78,
+        monthly: 183500,
+        total: 6606000,
+        tag: '4 MİLYON TL'
+      },
+      {
+        id: 'kt_35_esit_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.87 Kar Payı)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.87',
+        rate: 2.87,
+        monthly: 231018,
+        total: 8316633,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
@@ -715,6 +961,75 @@ export const BANK_CAMPAIGNS = {
         rate: 0.99,
         monthly: 50162,
         total: 1805832
+      },
+      {
+        id: 'garanti_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%1.94 Ticari)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%1.94',
+        rate: 1.94,
+        monthly: 104523,
+        total: 2508552,
+        highlight: true,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'garanti_35_2500_36',
+        title: '2.500.000 TL — 36 Ay (%2.35 Ticari)',
+        principal: 2500000,
+        term: 36,
+        rateLabel: '%2.35',
+        rate: 2.35,
+        monthly: 105800,
+        total: 3808800,
+        tag: '2.5 MİLYON TL'
+      },
+      {
+        id: 'garanti_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.37 Ticari)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.37',
+        rate: 2.37,
+        monthly: 126955,
+        total: 4570380,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'garanti_35_4000_36',
+        title: '4.000.000 TL — 36 Ay (%2.55 Ticari)',
+        principal: 4000000,
+        term: 36,
+        rateLabel: '%2.55',
+        rate: 2.55,
+        monthly: 176500,
+        total: 6354000,
+        tag: '4 MİLYON TL'
+      },
+      {
+        id: 'garanti_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.65 Ticari)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.65',
+        rate: 2.65,
+        monthly: 224388,
+        total: 8077968,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
+      },
+      {
+        id: 'garanti_35_5000_48',
+        title: '5.000.000 TL — 48 Ay (%2.70 Ticari)',
+        principal: 5000000,
+        term: 48,
+        rateLabel: '%2.70',
+        rate: 2.70,
+        monthly: 196500,
+        total: 9432000,
+        tag: '48 AY UZUN VADE'
       }
     ],
     daily70: [
@@ -948,6 +1263,64 @@ export const BANK_CAMPAIGNS = {
         rate: 3.01,
         monthly: 70383,
         total: 2533788
+      },
+      {
+        id: 'is_35_2000_12',
+        title: '2.000.000 TL — 12 Ay (%2.59 İndirimli)',
+        principal: 2000000,
+        term: 12,
+        rateLabel: '%2.59',
+        rate: 2.59,
+        monthly: 197562,
+        total: 2370744,
+        highlight: true,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'is_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.98 İndirimli)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.98',
+        rate: 2.98,
+        monthly: 119823,
+        total: 2875752,
+        tag: '2M / 24 AY'
+      },
+      {
+        id: 'is_35_3000_12',
+        title: '3.000.000 TL — 12 Ay (%3.01 İndirimli)',
+        principal: 3000000,
+        term: 12,
+        rateLabel: '%3.01',
+        rate: 3.01,
+        monthly: 304376,
+        total: 3652512,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'is_35_4000_12',
+        title: '4.000.000 TL — 12 Ay (%3.22 İndirimli)',
+        principal: 4000000,
+        term: 12,
+        rateLabel: '%3.22',
+        rate: 3.22,
+        monthly: 411195,
+        total: 4934340,
+        tag: '4 MİLYON TL'
+      },
+      {
+        id: 'is_35_5000_12',
+        title: '5.000.000 TL — 12 Ay (%3.35 İndirimli)',
+        principal: 5000000,
+        term: 12,
+        rateLabel: '%3.35',
+        rate: 3.35,
+        monthly: 518017,
+        total: 6216204,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
@@ -1190,6 +1563,41 @@ export const BANK_CAMPAIGNS = {
         total: 1964400,
         highlight: true,
         tag: '1.5M TİCARİ'
+      },
+      {
+        id: 'akbank_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.15 Faiz)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.15',
+        rate: 2.15,
+        monthly: 109200,
+        total: 2620800,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'akbank_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.35 Faiz)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.35',
+        rate: 2.35,
+        monthly: 126500,
+        total: 4554000,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'akbank_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.45 Faiz)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.45',
+        rate: 2.45,
+        monthly: 219500,
+        total: 7902000,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
@@ -1317,6 +1725,41 @@ export const BANK_CAMPAIGNS = {
         total: 1948320,
         highlight: true,
         tag: '1.5M LİMİT'
+      },
+      {
+        id: 'yk_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.18 Faiz)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.18',
+        rate: 2.18,
+        monthly: 109800,
+        total: 2635200,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'yk_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.38 Faiz)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.38',
+        rate: 2.38,
+        monthly: 127200,
+        total: 4579200,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'yk_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.48 Faiz)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.48',
+        rate: 2.48,
+        monthly: 221000,
+        total: 7956000,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
@@ -1444,6 +1887,41 @@ export const BANK_CAMPAIGNS = {
         total: 1964400,
         highlight: true,
         tag: '1.5M KATILIM'
+      },
+      {
+        id: 'vk_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.18 Kar Payı)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.18',
+        rate: 2.18,
+        monthly: 109800,
+        total: 2635200,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'vk_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.38 Kar Payı)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.38',
+        rate: 2.38,
+        monthly: 127200,
+        total: 4579200,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'vk_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.48 Kar Payı)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.48',
+        rate: 2.48,
+        monthly: 221000,
+        total: 7956000,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
@@ -1560,6 +2038,41 @@ export const BANK_CAMPAIGNS = {
         total: 1964400,
         highlight: true,
         tag: '1.5M TİCARİ'
+      },
+      {
+        id: 'bnp_35_2000_24',
+        title: '2.000.000 TL — 24 Ay (%2.18 Faiz)',
+        principal: 2000000,
+        term: 24,
+        rateLabel: '%2.18',
+        rate: 2.18,
+        monthly: 109800,
+        total: 2635200,
+        tag: '2 MİLYON TL'
+      },
+      {
+        id: 'bnp_35_3000_36',
+        title: '3.000.000 TL — 36 Ay (%2.40 Faiz)',
+        principal: 3000000,
+        term: 36,
+        rateLabel: '%2.40',
+        rate: 2.40,
+        monthly: 128000,
+        total: 4608000,
+        highlight: true,
+        tag: '3 MİLYON FİLO'
+      },
+      {
+        id: 'bnp_35_5000_36',
+        title: '5.000.000 TL — 36 Ay (%2.50 Faiz)',
+        principal: 5000000,
+        term: 36,
+        rateLabel: '%2.50',
+        rate: 2.50,
+        monthly: 222500,
+        total: 8010000,
+        highlight: true,
+        tag: '5 MİLYON BÜYÜK FİLO'
       }
     ],
     daily70: [
