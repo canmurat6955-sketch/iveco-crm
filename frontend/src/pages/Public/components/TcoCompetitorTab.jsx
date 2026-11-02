@@ -571,9 +571,9 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO Daily
                     </th>
                     <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip F.</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip Fiat</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip Renault</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip Opel</th>
+                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip Ft.</th>
+                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip R.</th>
+                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip O.</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -724,7 +724,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                   Filo Yöneticileri İçin 3 Parça Tamponun Gerçek TCO Etkisi
                 </div>
                 <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                  Şehir içi yoğun dağıtımda araçların en sık hasar alan parçası ön tampon köşeleridir. <strong>Rakip F.</strong> ve <strong>Renault</strong> modellerinde tampon yekpare (tek parça) olduğu için en küçük sürtmede dahi tüm tampon sökülüp komple değiştirilmekte veya boyanmaktadır. <strong>IVECO Daily'de ise 3 parçalı modüler tasarım</strong> sayesinde yalnızca hasarlı olan köşe parça dakikalar içinde cıvatayla sökülüp çok düşük maliyetle yenilenir. Bu fark, 5 yıllık filo kullanımında binlerce lira doğrudan kasko muafiyeti ve parça tasarrufu sağlar.
+                  Şehir içi yoğun dağıtımda araçların en sık hasar alan parçası ön tampon köşeleridir. <strong>Rakip F.</strong> ve <strong>Rakip R.</strong> modellerinde tampon yekpare (tek parça) olduğu için en küçük sürtmede dahi tüm tampon sökülüp komple değiştirilmekte veya boyanmaktadır. <strong>IVECO Daily'de ise 3 parçalı modüler tasarım</strong> sayesinde yalnızca hasarlı olan köşe parça dakikalar içinde cıvatayla sökülüp çok düşük maliyetle yenilenir. Bu fark, 5 yıllık filo kullanımında binlerce lira doğrudan kasko muafiyeti ve parça tasarrufu sağlar.
                 </p>
               </div>
             </div>
@@ -795,7 +795,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                 </ul>
               </div>
 
-              {/* Fransız & Diğer Rakipler */}
+              {/* Rakip R. (Fransız Grubu) */}
               <div style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(148, 163, 184, 0.3)',
@@ -804,7 +804,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#e2e8f0' }}>
-                    Renault & Fransız Rakipler
+                    Rakip R. Saha Geri Bildirimleri
                   </span>
                   <span style={{ fontSize: '0.66rem', fontWeight: 800, background: 'rgba(148, 163, 184, 0.2)', color: '#94a3b8', padding: '2px 8px', borderRadius: '4px' }}>
                     Mukavemet & Değer Kaybı
@@ -812,7 +812,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                 </div>
                 <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.55 }}>
                   <li><strong>Monokok Şasi Yetersizliği:</strong> Kamyon şasisi yerine sac kafes kullandıkları için ağır yük, frigorifik kasa ve damper uygulamalarında şasi burulması.</li>
-                  <li><strong>İkinci Elde Hızlı Değer Kaybı:</strong> IVECO ve Alman rakiplerine göre 3-5 yıl sonrasında ikinci el değerini koruyamaması ve yüksek amortisman kaybı.</li>
+                  <li><strong>İkinci Elde Hızlı Değer Kaybı:</strong> IVECO ve diğer piyasa rakiplerine göre 3-5 yıl sonrasında ikinci el değerini koruyamaması ve yüksek amortisman kaybı.</li>
                   <li><strong>Yetkili Üst Yapı Çözümlerinin Kısıtlılığı:</strong> Fabrika çıkışı karoseri hazırlık soketlerinin ve PTO (yavru şanzıman) çıkışlarının yetersizliği.</li>
                 </ul>
               </div>
