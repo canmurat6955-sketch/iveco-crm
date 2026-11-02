@@ -6,7 +6,7 @@ const CATEGORIES = [
   { id: 'all', label: 'Tüm Araçlar' },
   { id: 'daily35_chassis', label: 'Daily 35 Şasi (B Ehliyet)' },
   { id: 'daily35_van', label: 'Daily 35 Panelvan' },
-  { id: 'daily70', label: 'Daily 70 Kamyon (7 Ton)' },
+  { id: 'daily70', label: 'Daily 70C / 72C (7 Ton Kamyon)' },
   { id: 'eurocargo', label: 'Eurocargo Kamyon (10-18 Ton)' },
   { id: 'sway', label: 'S-Way Çekici' },
   { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10-12 Teker)' }
@@ -25,7 +25,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       } else if (selectedCategory === 'daily35_van') {
         if (v.segment !== 'Daily 35' || !v.category.includes('Panelvan')) return false;
       } else if (selectedCategory === 'daily70') {
-        if (v.segment !== 'Daily 70') return false;
+        if (v.segment !== 'Daily 70 C' && v.segment !== 'Daily 70' && !v.segment.includes('70') && !v.segment.includes('72')) return false;
       } else if (selectedCategory === 'eurocargo') {
         if (v.segment !== 'Eurocargo') return false;
       } else if (selectedCategory === 'sway') {
@@ -92,21 +92,27 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               ? '🛣️ S-WAY ÇEKİCİ GRUBU RESMİ EURO MATRİSİ'
               : selectedCategory === 'tway'
                 ? '🚜 T-WAY AĞIR ŞANTİYE & HAFRİYAT MATRİSİ'
-                : 'RESMİ 2026 MODEL FİYAT MATRİSİ & ŞASİ TAHSİSİ'}
+                : selectedCategory === 'daily70'
+                  ? '🚛 DAILY 70C / 72C 7 TON KAMYON & PANELVAN LİSTESİ'
+                  : 'RESMİ 2026 MODEL FİYAT MATRİSİ & ŞASİ TAHSİSİ'}
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
             {selectedCategory === 'sway'
               ? 'IVECO S-Way Ağır Vasıta & Çekici Fiyat Listesi'
               : selectedCategory === 'tway'
                 ? 'IVECO T-Way 10-12 Teker Ağır Şantiye Fiyat Listesi'
-                : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
+                : selectedCategory === 'daily70'
+                  ? 'IVECO Daily 70C / 72C 7 Ton Kamyon & Panelvan Fiyat Listesi'
+                  : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
             {selectedCategory === 'sway'
               ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
               : selectedCategory === 'tway'
                 ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
-                : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
+                : selectedCategory === 'daily70'
+                  ? '7.000 kg ve 7.200 kg azami yüklü ağırlıklı 70C16 şasi kamyon ve 70C18 yüksek hacimli (19.6 m³) panelvan resmi liste fiyatları.'
+                  : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
           </p>
         </div>
         <div style={{
