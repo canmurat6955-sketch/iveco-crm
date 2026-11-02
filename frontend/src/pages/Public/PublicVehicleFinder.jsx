@@ -659,6 +659,7 @@ export default function PublicVehicleFinder() {
   const location = useLocation();
   const isAdminMode = searchParams.get('admin') === 'true';
   const isTestRoute = isAdminMode;
+  const isPreviewMode = isAdminMode || searchParams.get('preview') === 'true';
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const tabFromUrl = searchParams.get('tab');
