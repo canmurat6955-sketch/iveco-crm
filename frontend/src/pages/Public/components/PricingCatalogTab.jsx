@@ -8,7 +8,8 @@ const CATEGORIES = [
   { id: 'daily35_van', label: 'Daily 35 Panelvan' },
   { id: 'daily70', label: 'Daily 70 Kamyon (7 Ton)' },
   { id: 'eurocargo', label: 'Eurocargo Kamyon (10-18 Ton)' },
-  { id: 'sway', label: 'S-Way Çekici' }
+  { id: 'sway', label: 'S-Way Çekici' },
+  { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10-12 Teker)' }
 ];
 
 export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, salesRep }) {
@@ -29,11 +30,15 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
         if (v.segment !== 'Eurocargo') return false;
       } else if (selectedCategory === 'sway') {
         if (v.segment !== 'S-Way') return false;
+      } else if (selectedCategory === 'tway') {
+        if (v.segment !== 'T-Way') return false;
       }
 
       // Double wheel filter
-      if (onlyDoubleWheels && !v.category.toLowerCase().includes('çift teker') && !v.model.toLowerCase().includes(' 35 c')) {
-        return false;
+      if (onlyDoubleWheels) {
+        if (v.segment === 'Daily 35' && !v.category.toLowerCase().includes('çift teker') && !v.model.toLowerCase().includes(' 35 c')) {
+          return false;
+        }
       }
 
       // Search query
@@ -53,7 +58,10 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
   const handleVehicleQuote = (vehicle) => {
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${vehicle.cashPrice ? vehicle.cashPrice.toLocaleString('tr-TR') + ' TL Peşin' : 'Teklif Bekliyor'}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
+      const priceText = vehicle.currency === 'EUR'
+        ? `€${(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV (Euro)`
+        : (vehicle.cashPrice ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin` : 'Özel Proje Fiyatı');
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -300,6 +308,16 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                       🛡️ B Ehliyet / Kantar Uyumu
                     </span>
                   )}
+                  {vehicle.segment === 'T-Way' && (
+                    <span style={{ color: '#f59e0b', fontWeight: 700 }}>
+                      🚜 Ağır Hizmet / Kaya Damperi
+                    </span>
+                  )}
+                  {vehicle.segment === 'S-Way' && (
+                    <span style={{ color: '#38bdf8', fontWeight: 700 }}>
+                      🛣️ Uzun Yol Çekici
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -311,7 +329,24 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 padding: '10px 12px',
                 marginBottom: '12px'
               }}>
-                {vehicle.campaignPrice ? (
+                {vehicle.currency === 'EUR' ? (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
+                      <span>Resmi Liste Fiyatı:</span>
+                      <span style={{ fontWeight: 700, color: '#f8fafc' }}>€{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#38bdf8', marginBottom: '6px' }}>
+                      <span>Finansman & Teslimat:</span>
+                      <span>Özel Proje & Filo Kotası</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
+                      <span style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 700 }}>PROJE FİYATI:</span>
+                      <span style={{ fontSize: '1.08rem', color: '#38bdf8', fontWeight: 800 }}>
+                        €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}
+                      </span>
+                    </div>
+                  </>
+                ) : vehicle.campaignPrice ? (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
                       <span>Kampanyalı Liste:</span>

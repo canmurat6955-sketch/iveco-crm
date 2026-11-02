@@ -708,7 +708,34 @@ export default function PublicVehicleFinder() {
 
   // Doğrudan Araç Seçimi & Sürgü Etkileşim Fonksiyonları
   const handleSelectVehicle = (modelKey) => {
-    const item = VEHICLE_CATALOG.find(v => v.key === modelKey);
+    let item = VEHICLE_CATALOG.find(v => v.key === modelKey);
+    if (!item && typeof modelKey === 'string') {
+      const lower = modelKey.toLowerCase();
+      if (lower.includes('tway') || lower.includes('t-way')) {
+        if (lower.includes('12') && lower.includes('460')) item = VEHICLE_CATALOG.find(v => v.key === 'tway_12teker_460');
+        else if (lower.includes('12')) item = VEHICLE_CATALOG.find(v => v.key === 'tway_12teker_540');
+        else if (lower.includes('460')) item = VEHICLE_CATALOG.find(v => v.key === 'tway_10teker_460');
+        else item = VEHICLE_CATALOG.find(v => v.key === 'tway_10teker_540');
+      } else if (lower.includes('sway') || lower.includes('s-way')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'tractor_sway');
+      } else if (lower.includes('70c') || lower.includes('72c')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'truck_72c');
+      } else if (lower.includes('150e')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'truck_150e');
+      } else if (lower.includes('160e')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'truck_160e');
+      } else if (lower.includes('120e')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'truck_120e');
+      } else if (lower.includes('100e')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'truck_100e');
+      } else if (lower.includes('35c')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35c');
+      } else if (lower.includes('van') || lower.includes('panelvan')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'panelvan_12');
+      } else if (lower.includes('35s')) {
+        item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35s');
+      }
+    }
     if (!item) return;
     setSelectedModelKey(item.key);
     setPayloadKg(item.payloadKg);
