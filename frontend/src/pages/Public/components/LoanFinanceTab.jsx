@@ -13,9 +13,9 @@ const SAMPLE_LOAN_PRESETS = [
   { amount: 800000, label: '800.000 TL (%0 Faiz Kampanyalı)', term: 12, rate: 0.00, monthly: 66667, total: 800000, desc: '12 Ay Sıfır Faiz — Yalnızca Anapara Geri Ödemeli' },
   { amount: 1000000, label: '1.000.000 TL (%0 Faiz Kampanyalı)', term: 12, rate: 0.00, monthly: 83333, total: 1000000, desc: '12 Ay Sıfır Faiz — Yalnızca Anapara Geri Ödemeli' },
   { amount: 1500000, label: '1.500.000 TL (24 Ay Esnek Ticari)', term: 24, rate: 1.99, monthly: 83500, total: 2004000, desc: 'KOBİ Destekli Düşük Ticari Faiz Oranı' },
-  { amount: 2000000, label: '2.000.000 TL (36 Ay Uzun Vade)', term: 36, rate: 2.19, monthly: 81200, total: 2923200, desc: 'Nakit Akışını Rahatlatan 36 Ay Eşit Taksit' },
-  { amount: 3000000, label: '3.000.000 TL (Kuveyt Türk 6 Ay Ödemesiz)', term: 36, rate: 2.29, monthly: 128000, total: 4608000, desc: 'İlk 6 Ay 0 TL Taksit — Araç Çalışsın, Ödeme Sonra Başlasın' },
-  { amount: 5000000, label: '5.000.000 TL (Ağır Vasıta & Filo Özel)', term: 48, rate: 2.39, monthly: 178000, total: 8544000, desc: 'S-Way & T-Way Ağır Vasıta Kurumsal Filo Finansmanı' }
+  { amount: 2000000, label: '2.000.000 TL (Daily 35 Tavan Finansman)', term: 36, rate: 2.19, monthly: 81200, total: 2923200, desc: 'Daily Kamyonet & Van İçin 2.000.000 TL Tavan Finansman' },
+  { amount: 4000000, label: '4.000.000 TL (72C & Eurocargo Tavan)', term: 36, rate: 2.39, monthly: 168000, total: 6048000, desc: '72C ve Eurocargo İçin 4.000.000 TL Tavan Finansman' },
+  { amount: 6000000, label: '6.000.000 TL (S-Way & T-Way Ağır Vasıta)', term: 36, rate: 2.49, monthly: 254000, total: 9144000, desc: 'S-Way Çekici & T-Way Ağır Vasıta 6.000.000 TL Kurumsal Finansman' }
 ];
 
 export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
@@ -119,7 +119,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
             {currencyMode === 'EUR'
               ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Eximbank ve anlaşmalı bankalardan yıllık %4.50 - %6.00 arası düşük faizli Euro kredisi.'
-              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 1.000.000 TL\'ye kadar %0 faiz, 5.000.000 TL\'ye kadar esnek vadeli ticari krediler.'}
+              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 1.000.000 TL\'ye kadar %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
           </p>
         </div>
         <div style={{
@@ -517,10 +517,10 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               </div>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                 {[
-                  { id: 'daily35', label: '🚚 Daily 35 (3.5T Şasi & Van)' },
-                  { id: 'daily70', label: '🚛 Daily 70 (7.2T Şasi Kamyon)' },
-                  { id: 'eurocargo', label: '📦 Eurocargo (10T - 18T Dağıtım)' },
-                  { id: 'heavy', label: '🏗️ S-Way & T-Way (Ağır Vasıta & Çekici)' }
+                  { id: 'daily35', label: '🚚 Daily 35 (Maks 2M TL)' },
+                  { id: 'daily70', label: '🚛 72C / Daily 70 (Maks 4M TL)' },
+                  { id: 'eurocargo', label: '📦 Eurocargo (Maks 4M TL)' },
+                  { id: 'heavy', label: '🏗️ S-Way & T-Way (6M TL Filo)' }
                 ].map(cat => {
                   const isSel = selectedVehicleCategory === cat.id;
                   return (

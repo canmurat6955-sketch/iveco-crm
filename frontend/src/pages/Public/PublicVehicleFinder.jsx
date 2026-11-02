@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { discoveryApi } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
-import { BANK_LIST, AMOUNT_TIERS, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS } from '../../data/bankCampaigns';
+import { BANK_LIST, AMOUNT_TIERS, getAmountTiersForCategory, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS } from '../../data/bankCampaigns';
 import {
   FiTruck,
   FiCheckCircle,
@@ -1312,6 +1312,19 @@ export default function PublicVehicleFinder() {
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
     return getCampaignsForVehicleAndBank(matched.series, selectedBankId, selectedTierId);
   }, [matched.series, selectedBankId, selectedTierId]);
+
+  const categoryTiers = useMemo(() => {
+    return getAmountTiersForCategory(vehicleCategory);
+  }, [vehicleCategory]);
+
+  useEffect(() => {
+    if (selectedTierId && selectedTierId !== 'all') {
+      const exists = categoryTiers.some(t => t.id === selectedTierId);
+      if (!exists) {
+        setSelectedTierId('all');
+      }
+    }
+  }, [categoryTiers, selectedTierId]);
 
   const currentBankMeta = useMemo(() => {
     return BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
@@ -3666,7 +3679,7 @@ IVECO ERC Samsun Otomotiv
                   </span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: '6px' }}>
-                  {AMOUNT_TIERS.map(tier => {
+                  {categoryTiers.map(tier => {
                     const isSelected = selectedTierId === tier.id;
                     return (
                       <button
