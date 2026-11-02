@@ -1687,3 +1687,137 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
     campaigns
   };
 }
+
+// ─────────────────────────────────────────────────────────────
+// İHRACATÇI FİRMALARA ÖZEL EURO (EUR) DÖVİZ KREDİLERİ
+// 32 Sayılı Türk Parasını Koruma Kararı Kapsamında İhracat/Döviz Geliri Olan Firmalara
+// ─────────────────────────────────────────────────────────────
+
+export const EUR_LOAN_PRESETS = [
+  {
+    id: 'eur_50k_24',
+    title: '€50.000 — 24 Ay (%4.99 Yıllık)',
+    principal: 50000,
+    term: 24,
+    rateLabel: '%4.99 Yıllık',
+    rate: 0.415,
+    monthly: 2190,
+    total: 52560,
+    currency: 'EUR',
+    tag: 'PEŞİNAT DESTEK',
+    desc: 'Peşinat sonrası kalan bakiye için ideal düşük faizli Euro kredisi'
+  },
+  {
+    id: 'eur_80k_36',
+    title: '€80.000 — 36 Ay (%5.49 Yıllık)',
+    principal: 80000,
+    term: 36,
+    rateLabel: '%5.49 Yıllık',
+    rate: 0.457,
+    monthly: 2415,
+    total: 86940,
+    currency: 'EUR',
+    tag: 'EN ÇOK TERCİH EDİLEN',
+    desc: 'S-Way 500 için %65 finansman oranı ile en dengeli taksit'
+  },
+  {
+    id: 'eur_100k_36',
+    title: '€100.000 — 36 Ay (%5.49 Yıllık)',
+    principal: 100000,
+    term: 36,
+    rateLabel: '%5.49 Yıllık',
+    rate: 0.457,
+    monthly: 3018,
+    total: 108650,
+    currency: 'EUR',
+    tag: 'FİLO & ÇEKİCİ ÖZEL',
+    desc: 'S-Way & T-Way filoları için geniş kapsamlı Euro finansmanı'
+  },
+  {
+    id: 'eur_120k_48',
+    title: '€120.000 — 48 Ay (%5.99 Yıllık)',
+    principal: 120000,
+    term: 48,
+    rateLabel: '%5.99 Yıllık',
+    rate: 0.499,
+    monthly: 2818,
+    total: 135260,
+    currency: 'EUR',
+    tag: 'TAM FİNANSMAN (48 AY)',
+    desc: 'Sıfır km S-Way çekicinin neredeyse tamamını finanse eden uzun vadeli döviz kredisi'
+  }
+];
+
+export const EUR_PARTNER_BANKS = [
+  {
+    id: 'eximbank',
+    name: 'Türk Eximbank',
+    shortName: 'Türk Eximbank',
+    badge: 'İhracatçı Kredisi',
+    icon: '🌍',
+    color: '#0284c7',
+    bg: 'rgba(2, 132, 199, 0.15)',
+    border: 'rgba(56, 189, 248, 0.4)',
+    desc: 'İhracat taahhütlü lojistik ve taşımacılık firmalarına özel sübvansiyonlu Euro kredisi'
+  },
+  {
+    id: 'teb_cetelem_eur',
+    name: 'TEB Cetelem / BNP Paribas',
+    shortName: 'TEB Cetelem EUR',
+    badge: 'IVECO Resmi Euro Finansman',
+    icon: '🏛️',
+    color: '#10b981',
+    bg: 'rgba(16, 185, 129, 0.15)',
+    border: 'rgba(52, 211, 153, 0.4)',
+    desc: 'IVECO resmi distribütör destekli Euro taşıt finansmanı ve leasing'
+  },
+  {
+    id: 'isbank_garanti_eur',
+    name: 'İş Bankası & Garanti BBVA',
+    shortName: 'Ticari Döviz Masası',
+    badge: 'Uluslararası Nakliye',
+    icon: '🏦',
+    color: '#3b82f6',
+    bg: 'rgba(59, 130, 246, 0.15)',
+    border: 'rgba(96, 165, 250, 0.4)',
+    desc: 'UND ve uluslararası taşımacılık belgesine sahip ihracatçı şirketler için Euro kredisi'
+  },
+  {
+    id: 'kuveyt_turk_eur',
+    name: 'Kuveyt Türk Katılım',
+    shortName: 'Kuveyt Türk EUR',
+    badge: 'Dövizli Murabaha',
+    icon: '🌿',
+    color: '#059669',
+    bg: 'rgba(5, 150, 105, 0.15)',
+    border: 'rgba(52, 211, 153, 0.4)',
+    desc: 'Faizsiz prensiplerle döviz bazlı sabit kar paylı Euro araç finansmanı'
+  }
+];
+
+/**
+ * Dinamik Euro kredi taksit hesaplama (Annuity formülü)
+ * @param {number} principal - Kredi tutarı (EUR)
+ * @param {number} termMonths - Vade (ay: 12, 24, 36, 48)
+ * @param {number} annualRatePct - Yıllık faiz oranı yüzde (örn: 5.49)
+ */
+export function calculateEurLoan(principal, termMonths = 36, annualRatePct = 5.49) {
+  if (!principal || principal <= 0) return null;
+  const monthlyRate = (annualRatePct / 100) / 12;
+  const n = termMonths;
+  let monthly = 0;
+  if (monthlyRate === 0) {
+    monthly = Math.round(principal / n);
+  } else {
+    monthly = Math.round(principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1));
+  }
+  const total = monthly * n;
+  return {
+    principal,
+    term: n,
+    annualRate: annualRatePct,
+    monthly,
+    total,
+    currency: 'EUR'
+  };
+}

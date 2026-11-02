@@ -83,24 +83,50 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       }}>
         <div>
           <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            RESMİ 2026 MODEL FİYAT MATRİSİ & ŞASİ TAHSİSİ
+            {selectedCategory === 'sway' 
+              ? '🛣️ S-WAY ÇEKİCİ GRUBU RESMİ EURO MATRİSİ'
+              : selectedCategory === 'tway'
+                ? '🚜 T-WAY AĞIR ŞANTİYE & HAFRİYAT MATRİSİ'
+                : 'RESMİ 2026 MODEL FİYAT MATRİSİ & ŞASİ TAHSİSİ'}
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
-            IVECO Sıfır Kilometre Şasi Fiyat Listesi
+            {selectedCategory === 'sway'
+              ? 'IVECO S-Way Ağır Vasıta & Çekici Fiyat Listesi'
+              : selectedCategory === 'tway'
+                ? 'IVECO T-Way 10-12 Teker Ağır Şantiye Fiyat Listesi'
+                : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            Tüm modellerde şeffaf resmi liste fiyatları, fabrika kota tahsisi ve peşin alım indirimleri uygulanmıştır.
+            {selectedCategory === 'sway'
+              ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
+              : selectedCategory === 'tway'
+                ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
+                : 'Tüm modellerde şeffaf resmi liste fiyatları, fabrika kota tahsisi ve peşin alım indirimleri uygulanmıştır.'}
           </p>
         </div>
         <div style={{
-          background: 'rgba(34, 197, 94, 0.15)',
-          border: '1px solid rgba(34, 197, 94, 0.4)',
+          background: (selectedCategory === 'sway' || selectedCategory === 'tway') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+          border: (selectedCategory === 'sway' || selectedCategory === 'tway') ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(34, 197, 94, 0.4)',
           borderRadius: '12px',
           padding: '8px 14px',
           textAlign: 'right'
         }}>
-          <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>💎 PEŞİN ALIM AVANTAJI</div>
-          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kamyonette 190.000 TL İndirim</div>
+          {selectedCategory === 'sway' ? (
+            <>
+              <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>💶 EURO BAZLI LİSTE</div>
+              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>İhracatçıya Özel Euro Kredisi</div>
+            </>
+          ) : selectedCategory === 'tway' ? (
+            <>
+              <div style={{ fontSize: '0.70rem', color: '#fbbf24', fontWeight: 700 }}>🚜 AĞIR HAFRİYAT KOTASI</div>
+              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Cursor 13 (540 / 460 BG)</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>💎 PEŞİN ALIM AVANTAJI</div>
+              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kamyonette 190.000 TL İndirim</div>
+            </>
+          )}
         </div>
       </div>
 
@@ -260,7 +286,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 }}>
                   {vehicle.category}
                 </span>
-                {vehicle.cashDiscount ? (
+                {vehicle.cashDiscount && vehicle.currency !== 'EUR' ? (
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
@@ -271,6 +297,18 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     border: '1px solid rgba(34, 197, 94, 0.3)'
                   }}>
                     {vehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
+                  </span>
+                ) : vehicle.currency === 'EUR' ? (
+                  <span style={{
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    background: 'rgba(16, 185, 129, 0.18)',
+                    color: '#34d399',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(16, 185, 129, 0.35)'
+                  }}>
+                    💶 İhracatçı Euro Kredisi Uyumlu
                   </span>
                 ) : null}
               </div>

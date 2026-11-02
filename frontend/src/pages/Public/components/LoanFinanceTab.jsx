@@ -1,6 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { BANK_LIST } from '../../../data/bankCampaigns';
-import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiFileText } from 'react-icons/fi';
+import { 
+  BANK_LIST, 
+  EUR_LOAN_PRESETS, 
+  EUR_PARTNER_BANKS, 
+  calculateEurLoan 
+} from '../../../data/bankCampaigns';
+import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiGlobe } from 'react-icons/fi';
 
 const SAMPLE_LOAN_PRESETS = [
   { amount: 800000, label: '800.000 TL (%0 Faiz Kampanyalı)', term: 12, rate: 0.00, monthly: 66667, total: 800000, desc: '12 Ay Sıfır Faiz — Yalnızca Anapara Geri Ödemeli' },
@@ -12,20 +17,49 @@ const SAMPLE_LOAN_PRESETS = [
 ];
 
 export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
+  // Para Birimi Modu: 'TRY' veya 'EUR'
+  const [currencyMode, setCurrencyMode] = useState('TRY');
+
+  // TL Kredi State'leri
   const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
   const [loanAmount, setLoanAmount] = useState(1000000);
   const [loanTerm, setLoanTerm] = useState(12);
 
+  // EUR Kredi State'leri
+  const [selectedEurBankId, setSelectedEurBankId] = useState('eximbank');
+  const [selectedEurPresetId, setSelectedEurPresetId] = useState('eur_80k_36');
+  const [customEurAmount, setCustomEurAmount] = useState(80000);
+  const [customEurTerm, setCustomEurTerm] = useState(36);
+
   const activeBank = BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
+  const activeEurBank = EUR_PARTNER_BANKS.find(b => b.id === selectedEurBankId) || EUR_PARTNER_BANKS[0];
+  const activeEurPreset = EUR_LOAN_PRESETS.find(p => p.id === selectedEurPresetId) || EUR_LOAN_PRESETS[1];
+
+  const dynamicEurCalc = useMemo(() => {
+    return calculateEurLoan(customEurAmount, customEurTerm, 5.49);
+  }, [customEurAmount, customEurTerm]);
 
   const handleApplyPreset = (preset) => {
     setLoanAmount(preset.amount);
     setLoanTerm(preset.term);
   };
 
-  const handleWhatsAppLoan = (planDesc) => {
+  const handleApplyEurPreset = (preset) => {
+    setSelectedEurPresetId(preset.id);
+    setCustomEurAmount(preset.principal);
+    setCustomEurTerm(preset.term);
+  };
+
+  const handleWhatsAppLoan = () => {
     if (onDirectWhatsApp) {
       const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, IVECO ERC Samsun finansman portalından *${activeBank.name}* için *${loanAmount.toLocaleString('tr-TR')} TL* tutarında *${loanTerm} Ay Vadeli* ticari kredi imkanları ve şirketimize özel ön onay şartları hakkında bilgi almak istiyorum.`;
+      onDirectWhatsApp(msg);
+    }
+  };
+
+  const handleWhatsAppEurLoan = (amount, term, monthly, bankName) => {
+    if (onDirectWhatsApp) {
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, şirketimiz ihracat/döviz gelirine sahip olup (32 Sayılı Karar kapsamında), *${bankName || activeEurBank.name}* üzerinden *€${amount.toLocaleString('tr-TR')}* tutarında *${term} Ay Vadeli* (Aylık Yaklaşık €${monthly.toLocaleString('tr-TR')}) İhracatçı Euro Taşıt Kredisi imkanları hakkında detaylı bilgi ve ön onay talep ediyoruz.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -34,8 +68,10 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
     <div style={{ color: '#f8fafc' }}>
       {/* Tab Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(15, 23, 42, 0.7) 100%)',
-        border: '1px solid rgba(245, 158, 11, 0.35)',
+        background: currencyMode === 'EUR' 
+          ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%)'
+          : 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(15, 23, 42, 0.7) 100%)',
+        border: currencyMode === 'EUR' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.35)',
         borderRadius: '16px',
         padding: '18px 20px',
         marginBottom: '20px',
@@ -46,149 +82,453 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
         gap: '12px'
       }}>
         <div>
-          <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            RESMİ ANLAŞMALI BANKALAR & %0 FAİZ
+          <div style={{ 
+            fontSize: '0.72rem', 
+            color: currencyMode === 'EUR' ? '#34d399' : '#fbbf24', 
+            fontWeight: 800, 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.8px' 
+          }}>
+            {currencyMode === 'EUR' 
+              ? '🇪🇺 İHRACATÇI & ULUSLARARASI NAKLİYEYE ÖZEL DÖVİZ KREDİSİ' 
+              : '🇹🇷 RESMİ ANLAŞMALI BANKALAR & %0 FAİZ'}
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
-            IVECO Ticari Finansman & Kredi Çözümleri
+            {currencyMode === 'EUR' 
+              ? 'S-Way & T-Way İhracatçı Euro (EUR) Kredisi' 
+              : 'IVECO Ticari Finansman & Kredi Çözümleri'}
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            Vergi levhalı işletmelere ve KOBİ'lere özel 1.000.000 TL'ye kadar %0 faiz, 5.000.000 TL'ye kadar esnek vadeli ticari krediler.
+            {currencyMode === 'EUR'
+              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Eximbank ve anlaşmalı bankalardan yıllık %4.50 - %6.00 arası düşük faizli Euro kredisi.'
+              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 1.000.000 TL\'ye kadar %0 faiz, 5.000.000 TL\'ye kadar esnek vadeli ticari krediler.'}
           </p>
         </div>
         <div style={{
-          background: 'rgba(34, 197, 94, 0.15)',
-          border: '1px solid rgba(34, 197, 94, 0.4)',
+          background: currencyMode === 'EUR' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+          border: currencyMode === 'EUR' ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid rgba(34, 197, 94, 0.4)',
           borderRadius: '12px',
           padding: '8px 14px',
           textAlign: 'right'
         }}>
-          <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>⚡ 1 SAATTE ÖN ONAY</div>
-          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kefilsiz & Hızlı Başvuru</div>
+          <div style={{ fontSize: '0.70rem', color: currencyMode === 'EUR' ? '#38bdf8' : '#4ade80', fontWeight: 700 }}>
+            {currencyMode === 'EUR' ? '🛡️ 32 SAYILI KARAR' : '⚡ 1 SAATTE ÖN ONAY'}
+          </div>
+          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>
+            {currencyMode === 'EUR' ? 'Döviz Gelirine Özel Düşük Faiz' : 'Kefilsiz & Hızlı Başvuru'}
+          </div>
         </div>
       </div>
 
-      {/* Partner Banks Grid */}
-      <div style={{ marginBottom: '22px' }}>
-        <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
-          🏛️ ANLAŞMALI RESMİ FİNANSMAN KURUMLARI
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
-          {BANK_LIST.map(bank => {
-            const isSelected = selectedBankId === bank.id;
-            return (
-              <button
-                key={bank.id}
-                type="button"
-                onClick={() => setSelectedBankId(bank.id)}
-                style={{
-                  background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%)' : 'rgba(15, 23, 42, 0.65)',
-                  border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  color: '#fff',
-                  boxShadow: isSelected ? '0 4px 16px rgba(2, 132, 199, 0.35)' : 'none',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
-                  <span style={{
-                    fontSize: '0.66rem',
-                    fontWeight: 800,
-                    background: bank.bg || 'rgba(56, 189, 248, 0.15)',
-                    color: bank.color || '#38bdf8',
-                    padding: '2px 6px',
-                    borderRadius: '6px'
-                  }}>
-                    {bank.badge}
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f8fafc' }}>
-                  {bank.name}
-                </div>
-                <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '4px', lineHeight: 1.3 }}>
-                  {bank.description}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Selected Bank Highlight & Presets */}
+      {/* Currency Switcher: TL vs EUR Toggle */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.9)',
-        border: '1px solid rgba(56, 189, 248, 0.3)',
-        borderRadius: '16px',
-        padding: '20px',
-        marginBottom: '22px'
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '20px',
+        background: 'rgba(15, 23, 42, 0.8)',
+        padding: '6px',
+        borderRadius: '12px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        width: 'fit-content',
+        flexWrap: 'wrap'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '12px' }}>
-          <div>
-            <span style={{ fontSize: '1.4rem', marginRight: '6px' }}>{activeBank.icon}</span>
-            <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>{activeBank.name} Kampanyaları</span>
-            <div style={{ fontSize: '0.76rem', color: '#38bdf8', marginTop: '2px' }}>{activeBank.description}</div>
+        <button
+          type="button"
+          onClick={() => setCurrencyMode('TRY')}
+          style={{
+            background: currencyMode === 'TRY' ? '#0284c7' : 'transparent',
+            color: currencyMode === 'TRY' ? '#fff' : '#94a3b8',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            fontSize: '0.82rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span>🇹🇷</span> TL Ticari Krediler & %0 Faiz
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCurrencyMode('EUR')}
+          style={{
+            background: currencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+            color: currencyMode === 'EUR' ? '#fff' : '#94a3b8',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            fontSize: '0.82rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            transition: 'all 0.2s'
+          }}
+        >
+          <span>💶</span> İhracatçıya Özel Euro (EUR) Kredisi
+          <span style={{ fontSize: '0.66rem', background: '#f59e0b', color: '#000', padding: '1px 6px', borderRadius: '4px', fontWeight: 900 }}>
+            Düşük Faiz
+          </span>
+        </button>
+      </div>
+
+      {/* ======================================================== */}
+      {/* 1. SEÇENEK: İHRACATÇI EURO KREDİLERİ (EUR MODE)          */}
+      {/* ======================================================== */}
+      {currencyMode === 'EUR' ? (
+        <div>
+          {/* Legislative Warning & Benefit Box */}
+          <div style={{
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: '12px',
+            padding: '12px 16px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px'
+          }}>
+            <span style={{ fontSize: '1.4rem' }}>🇪🇺</span>
+            <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+              <strong style={{ color: '#4ade80' }}>İhracatçı Firmalar İçin Euro Kredisi Neden Çok Büyük Avantajdır?</strong><br />
+              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Yıllık %40-50+ seviyesindeki TL faizleri yerine, <strong>yıllık %4.50 - %6.00 gibi çok düşük Euro faiziyle</strong> S-Way Çekici ve T-Way araçlarını finanse edebilir, navlun/ihracat gelirleriyle kur riski yaşamadan ödeyebilirler.
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => handleWhatsAppLoan()}
-            style={{
-              background: '#22c55e',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '8px 16px',
-              fontSize: '0.80rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <FiMessageSquare size={14} /> Bu Banka İçin Kredi Başvurusu Yap
-          </button>
-        </div>
-
-        {/* Popular Loan Options */}
-        <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>
-          💡 EN ÇOK KULLANILAN TİCARİ KREDİ PAKETLERİ
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-          {SAMPLE_LOAN_PRESETS.map((preset, idx) => (
-            <div
-              key={idx}
-              onClick={() => handleApplyPreset(preset)}
-              style={{
-                background: loanAmount === preset.amount ? 'rgba(2, 132, 199, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                border: loanAmount === preset.amount ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '10px',
-                padding: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.15s'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#fff' }}>{preset.label}</span>
-                {preset.rate === 0 && (
-                  <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
-                    %0 FAİZ
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '4px 0' }}>{preset.desc}</div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
-                <span style={{ color: '#cbd5e1' }}>Aylık Taksit: <strong style={{ color: '#4ade80' }}>{preset.monthly.toLocaleString('tr-TR')} TL</strong></span>
-                <span style={{ color: '#94a3b8' }}>Vade: <strong>{preset.term} Ay</strong></span>
-              </div>
+          {/* Euro Partner Financial Institutions */}
+          <div style={{ marginBottom: '22px' }}>
+            <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
+              🏛️ ANLAŞMALI EURO FİNANSMAN KURUMLARI
             </div>
-          ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
+              {EUR_PARTNER_BANKS.map(bank => {
+                const isSelected = selectedEurBankId === bank.id;
+                return (
+                  <button
+                    key={bank.id}
+                    type="button"
+                    onClick={() => setSelectedEurBankId(bank.id)}
+                    style={{
+                      background: isSelected ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%)' : 'rgba(15, 23, 42, 0.65)',
+                      border: isSelected ? '2px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
+                      padding: '12px 14px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: '#fff',
+                      boxShadow: isSelected ? '0 4px 16px rgba(16, 185, 129, 0.35)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
+                      <span style={{
+                        fontSize: '0.66rem',
+                        fontWeight: 800,
+                        background: 'rgba(16, 185, 129, 0.2)',
+                        color: '#4ade80',
+                        padding: '2px 6px',
+                        borderRadius: '6px'
+                      }}>
+                        {bank.badge}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.90rem', fontWeight: 800, color: '#f8fafc' }}>
+                      {bank.name}
+                    </div>
+                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '4px', lineHeight: 1.3 }}>
+                      {bank.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Euro Loan Presets Grid */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.9)',
+            border: '1px solid rgba(16, 185, 129, 0.35)',
+            borderRadius: '16px',
+            padding: '20px',
+            marginBottom: '22px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '12px' }}>
+              <div>
+                <span style={{ fontSize: '1.4rem', marginRight: '6px' }}>{activeEurBank.icon}</span>
+                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>{activeEurBank.name} — İhracatçı Euro Paketleri</span>
+                <div style={{ fontSize: '0.76rem', color: '#4ade80', marginTop: '2px' }}>{activeEurBank.desc}</div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleWhatsAppEurLoan(activeEurPreset.principal, activeEurPreset.term, activeEurPreset.monthly, activeEurBank.name)}
+                style={{
+                  background: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '9px 18px',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiMessageSquare size={14} /> Bu Euro Paketi İçin Ön Başvuru Yap
+              </button>
+            </div>
+
+            {/* Popular Euro Packages */}
+            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '10px', textTransform: 'uppercase' }}>
+              💡 S-WAY & T-WAY İÇİN EN ÇOK KULLANILAN EURO KREDİ PAKETLERİ
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+              {EUR_LOAN_PRESETS.map((preset) => {
+                const isSelected = selectedEurPresetId === preset.id;
+                return (
+                  <div
+                    key={preset.id}
+                    onClick={() => handleApplyEurPreset(preset)}
+                    style={{
+                      background: isSelected ? 'rgba(16, 185, 129, 0.22)' : 'rgba(255, 255, 255, 0.04)',
+                      border: isSelected ? '1.5px solid #10b981' : '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '12px',
+                      padding: '14px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.94rem', fontWeight: 900, color: '#fff' }}>€{preset.principal.toLocaleString('tr-TR')}</span>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#10b981', color: '#fff', padding: '2px 8px', borderRadius: '4px' }}>
+                        {preset.rateLabel}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#fbbf24', margin: '4px 0', fontWeight: 700 }}>
+                      🏷️ {preset.tag}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '8px' }}>
+                      {preset.desc}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '8px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Aylık Taksit: <strong style={{ color: '#4ade80', fontSize: '0.98rem' }}>€{preset.monthly.toLocaleString('tr-TR')}</strong></span>
+                      <span style={{ color: '#94a3b8' }}>Vade: <strong>{preset.term} Ay</strong></span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Custom Euro Loan Calculator */}
+            <div style={{
+              marginTop: '18px',
+              padding: '14px',
+              background: 'rgba(2, 6, 23, 0.7)',
+              borderRadius: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '14px',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#38bdf8' }}>📐 KENDİ EURO KREDİ PLANINIZI HESAPLAYIN:</span>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                    Tutar (€):
+                    <input
+                      type="number"
+                      step="5000"
+                      value={customEurAmount}
+                      onChange={(e) => setCustomEurAmount(Number(e.target.value) || 0)}
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        padding: '4px 8px',
+                        marginLeft: '6px',
+                        width: '100px',
+                        fontWeight: 700
+                      }}
+                    />
+                  </label>
+                  <label style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                    Vade:
+                    <select
+                      value={customEurTerm}
+                      onChange={(e) => setCustomEurTerm(Number(e.target.value))}
+                      style={{
+                        background: '#0f172a',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        padding: '4px 8px',
+                        marginLeft: '6px',
+                        fontWeight: 700
+                      }}
+                    >
+                      <option value={12}>12 Ay</option>
+                      <option value={24}>24 Ay</option>
+                      <option value={36}>36 Ay</option>
+                      <option value={48}>48 Ay</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              {dynamicEurCalc && (
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Hesaplanan Aylık Taksit (%5.49 Yıllık):</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>
+                    €{dynamicEurCalc.monthly.toLocaleString('tr-TR')} <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>/ ay</span>
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                    Toplam Geri Ödeme: €{dynamicEurCalc.total.toLocaleString('tr-TR')}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* ======================================================== */
+        /* 2. SEÇENEK: TL TİCARİ KREDİLER (TRY MODE)                */
+        /* ======================================================== */
+        <div>
+          {/* Partner Banks Grid */}
+          <div style={{ marginBottom: '22px' }}>
+            <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
+              🏛️ ANLAŞMALI RESMİ FİNANSMAN KURUMLARI
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+              {BANK_LIST.map(bank => {
+                const isSelected = selectedBankId === bank.id;
+                return (
+                  <button
+                    key={bank.id}
+                    type="button"
+                    onClick={() => setSelectedBankId(bank.id)}
+                    style={{
+                      background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%)' : 'rgba(15, 23, 42, 0.65)',
+                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '12px',
+                      padding: '12px 14px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: '#fff',
+                      boxShadow: isSelected ? '0 4px 16px rgba(2, 132, 199, 0.35)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
+                      <span style={{
+                        fontSize: '0.66rem',
+                        fontWeight: 800,
+                        background: bank.bg || 'rgba(56, 189, 248, 0.15)',
+                        color: bank.color || '#38bdf8',
+                        padding: '2px 6px',
+                        borderRadius: '6px'
+                      }}>
+                        {bank.badge}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f8fafc' }}>
+                      {bank.name}
+                    </div>
+                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '4px', lineHeight: 1.3 }}>
+                      {bank.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Selected Bank Highlight & Presets */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.9)',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            borderRadius: '16px',
+            padding: '20px',
+            marginBottom: '22px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '12px' }}>
+              <div>
+                <span style={{ fontSize: '1.4rem', marginRight: '6px' }}>{activeBank.icon}</span>
+                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>{activeBank.name} Kampanyaları</span>
+                <div style={{ fontSize: '0.76rem', color: '#38bdf8', marginTop: '2px' }}>{activeBank.description}</div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleWhatsAppLoan()}
+                style={{
+                  background: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '8px 16px',
+                  fontSize: '0.80rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiMessageSquare size={14} /> Bu Banka İçin Kredi Başvurusu Yap
+              </button>
+            </div>
+
+            {/* Popular Loan Options */}
+            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>
+              💡 EN ÇOK KULLANILAN TİCARİ KREDİ PAKETLERİ
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
+              {SAMPLE_LOAN_PRESETS.map((preset, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => handleApplyPreset(preset)}
+                  style={{
+                    background: loanAmount === preset.amount ? 'rgba(2, 132, 199, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                    border: loanAmount === preset.amount ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '10px',
+                    padding: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#fff' }}>{preset.label}</span>
+                    {preset.rate === 0 && (
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
+                        %0 FAİZ
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '4px 0' }}>{preset.desc}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
+                    <span style={{ color: '#cbd5e1' }}>Aylık Taksit: <strong style={{ color: '#4ade80' }}>{preset.monthly.toLocaleString('tr-TR')} TL</strong></span>
+                    <span style={{ color: '#94a3b8' }}>Vade: <strong>{preset.term} Ay</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tax & Business Advantages Guide */}
       <div style={{
@@ -238,6 +578,15 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
             </div>
             <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.45 }}>
               Kuveyt Türk ve Vakıf Katılım anlaşmalarımızla aracınızı hemen teslim alıp işe başlatabilir, ilk 6 ay taksit ödemeden aracın kendi gelirini üretmesini sağlayabilirsiniz.
+            </p>
+          </div>
+
+          <div style={{ background: 'rgba(16, 185, 129, 0.06)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+            <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#34d399', marginBottom: '4px' }}>
+              🇪🇺 5. İhracatçılar İçin Düşük Faizli Euro Kredisi & Kur Koruması
+            </div>
+            <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
+              Döviz kazandırıcı faaliyeti olan lojistik ve ihracat şirketleri, 32 Sayılı Karar kapsamında yıllık %4.50 - %6.00 arası çok düşük Euro faiziyle kredi kullanarak navlun gelirleriyle taksitlerini döviz olarak kur riski olmadan doğrudan ödeyebilir.
             </p>
           </div>
         </div>
