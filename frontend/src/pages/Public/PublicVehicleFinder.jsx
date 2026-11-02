@@ -1595,7 +1595,7 @@ END:VCARD`;
 💼 Sayın Lojistik, Dağıtım ve Filo Yöneticileri;
 IVECO ERC Samsun Otomotiv olarak hazırladığımız dijital müşteri ve bilgi merkezimizde:
 ✅ B Sınıfı Ehliyetle Kullanılan Daily 35 Kamyonetler (Şehir İçi Serbest Dağıtım)
-✅ Kamyonetlerde 190.000 TL Resmi Nakit Alım İndirimi
+✅ Resmi Fabrika Kota Tahsisi ve Ticari Finansman Çözümleri
 ✅ Frigo, Damper, Kapalı Kutu ve Kayar Perde Üst Yapı Kasa Ölçüleri & Palet Kapasiteleri
 ✅ 1.000.000 TL'ye kadar %0 Faiz ve Anlaşmalı Banka Ticari Kredi Simülatörü
 ✅ Şirketler İçin %20 KDV Mahsubu ve 5 Yıllık Amortisman Rehberi

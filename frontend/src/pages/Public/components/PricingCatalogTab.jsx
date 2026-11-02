@@ -106,12 +106,12 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
               : selectedCategory === 'tway'
                 ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
-                : 'Tüm modellerde şeffaf resmi liste fiyatları, fabrika kota tahsisi ve peşin alım indirimleri uygulanmıştır.'}
+                : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
           </p>
         </div>
         <div style={{
-          background: (selectedCategory === 'sway' || selectedCategory === 'tway') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(34, 197, 94, 0.15)',
-          border: (selectedCategory === 'sway' || selectedCategory === 'tway') ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(34, 197, 94, 0.4)',
+          background: (selectedCategory === 'sway' || selectedCategory === 'tway') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+          border: (selectedCategory === 'sway' || selectedCategory === 'tway') ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)',
           borderRadius: '12px',
           padding: '8px 14px',
           textAlign: 'right'
@@ -128,64 +128,66 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
             </>
           ) : (
             <>
-              <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>💎 PEŞİN ALIM AVANTAJI</div>
-              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Kamyonette 190.000 TL İndirim</div>
+              <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>⚡ 2026 KOTA TAHSİSİ</div>
+              <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Fabrika Teslimat Güvencesi</div>
             </>
           )}
         </div>
       </div>
 
-      {/* Yasal İstiap & Kantar Güvencesi Banner */}
-      <div style={{
-        background: 'rgba(15, 23, 42, 0.75)',
-        border: '1px solid rgba(16, 185, 129, 0.3)',
-        borderRadius: '12px',
-        padding: '12px 16px',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '10px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '8px',
-            background: 'rgba(16, 185, 129, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#10b981',
-            fontSize: '18px'
-          }}>
-            🛡️
-          </div>
-          <div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
-              %100 Yasal İstiap ve Karayolları Kantar Uyumu Güvencesi
-            </div>
-            <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-              Daily 35 serisi B sınıfı otomobil ehliyetiyle kullanılabilir, şehir içi saat yasaklarından ve takograftan muaftır.
-            </div>
-          </div>
-        </div>
+      {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
+      {(selectedCategory === 'daily35_chassis' || selectedCategory === 'daily35_van') && (
         <div style={{
-          display: 'inline-flex',
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          borderRadius: '12px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          background: 'rgba(56, 189, 248, 0.12)',
-          border: '1px solid rgba(56, 189, 248, 0.25)',
-          borderRadius: '8px',
-          padding: '6px 12px',
-          fontSize: '0.72rem',
-          color: '#38bdf8',
-          fontWeight: 700
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '10px'
         }}>
-          <span>🟢</span> 2026 Kota Tahsisinden Hızlı Teslim
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'rgba(16, 185, 129, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#10b981',
+              fontSize: '18px'
+            }}>
+              🛡️
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
+                %100 Yasal İstiap ve Karayolları Kantar Uyumu Güvencesi
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                Daily 35 serisi B sınıfı otomobil ehliyetiyle kullanılabilir, şehir içi saat yasaklarından ve takograftan muaftır.
+              </div>
+            </div>
+          </div>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(56, 189, 248, 0.12)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            fontSize: '0.72rem',
+            color: '#38bdf8',
+            fontWeight: 700
+          }}>
+            <span>🟢</span> 2026 Kota Tahsisinden Hızlı Teslim
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Filters & Search */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
