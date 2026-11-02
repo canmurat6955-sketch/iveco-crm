@@ -99,7 +99,7 @@ export default function Sidebar() {
             Araç Yönetimi
           </NavLink>
           <a
-            href="/fiyat-listesi?preview=true"
+            href="/fiyat-listesi"
             target="_blank"
             rel="noopener noreferrer"
             className="nav-item"

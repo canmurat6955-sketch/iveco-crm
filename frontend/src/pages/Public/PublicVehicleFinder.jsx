@@ -657,8 +657,7 @@ export default function PublicVehicleFinder() {
   const modelParam = searchParams.get('model') || searchParams.get('arac') || '';
 
   const location = useLocation();
-  const isTestRoute = location.pathname.includes('/test') || searchParams.get('preview') === 'true' || searchParams.get('test') === 'true' || searchParams.get('demo') === 'true';
-  const isPreviewMode = isTestRoute;
+  const isAdminMode = searchParams.get('admin') === 'true';
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const tabFromUrl = searchParams.get('tab');
@@ -1706,8 +1705,8 @@ IVECO ERC Samsun Otomotiv
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
         
-        {/* Can Murat Onay VIP Test & Canlı Simülasyon Dock'u */}
-        {showTestPanel && (
+        {/* Can Murat Onay VIP Test & Canlı Simülasyon Dock'u (Sadece ?admin=true olduğunda) */}
+        {isAdminMode && showTestPanel && (
           <div style={{
             background: 'linear-gradient(135deg, rgba(24, 24, 27, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
             border: '2px solid rgba(245, 158, 11, 0.8)',
@@ -2178,68 +2177,73 @@ IVECO ERC Samsun Otomotiv
             <FiDownload size={12} /> Rehbere Ekle
           </button>
 
-          {/* 📤 Müşteriye Gönder */}
-          <button
-            type="button"
-            onClick={() => setShowSendModal(true)}
-            style={{
-              background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-              color: '#fff',
-              border: '1px solid #38bdf8',
-              borderRadius: '20px',
-              padding: '4px 12px',
-              fontSize: '0.74rem',
-              fontWeight: 800,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              cursor: 'pointer',
-              boxShadow: '0 0 14px rgba(56, 189, 248, 0.4)'
-            }}
-            title="Müşteriye özel yakışıklı WhatsApp teklif linki ve QR kod hazırla"
-          >
-            <FiShare2 size={13} /> 📤 Müşteriye Gönder
-          </button>
+          {/* Yalnızca Can Murat Onay ?admin=true parametresiyle açtığında görünen dahili araçlar */}
+          {isAdminMode && (
+            <>
+              {/* 📤 Müşteriye Gönder */}
+              <button
+                type="button"
+                onClick={() => setShowSendModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                  color: '#fff',
+                  border: '1px solid #38bdf8',
+                  borderRadius: '20px',
+                  padding: '4px 12px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 14px rgba(56, 189, 248, 0.4)'
+                }}
+                title="Müşteriye özel yakışıklı WhatsApp teklif linki ve QR kod hazırla"
+              >
+                <FiShare2 size={13} /> 📤 Müşteriye Gönder
+              </button>
 
-          <button
-            onClick={handleShareLink}
-            style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              color: '#94a3b8',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '20px',
-              padding: '4px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              cursor: 'pointer'
-            }}
-            title="Sistemin linkini kopyala"
-          >
-            <FiCopy size={12} /> Linki Kopyala
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowTestPanel(prev => !prev)}
-            style={{
-              background: showTestPanel ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
-              color: showTestPanel ? '#0f172a' : '#fbbf24',
-              border: '1px solid rgba(245, 158, 11, 0.45)',
-              borderRadius: '20px',
-              padding: '4px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 800,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              cursor: 'pointer'
-            }}
-            title="Can Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
-          >
-            <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
-          </button>
+              <button
+                onClick={handleShareLink}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#94a3b8',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '20px',
+                  padding: '4px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}
+                title="Sistemin linkini kopyala"
+              >
+                <FiCopy size={12} /> Linki Kopyala
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTestPanel(prev => !prev)}
+                style={{
+                  background: showTestPanel ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
+                  color: showTestPanel ? '#0f172a' : '#fbbf24',
+                  border: '1px solid rgba(245, 158, 11, 0.45)',
+                  borderRadius: '20px',
+                  padding: '4px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}
+                title="Can Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
+              >
+                <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
