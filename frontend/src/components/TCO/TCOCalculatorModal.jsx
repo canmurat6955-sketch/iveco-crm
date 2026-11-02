@@ -12,19 +12,20 @@ export default function TCOCalculatorModal({ isOpen, onClose, customerName = '',
   const totalKm = useMemo(() => annualKm * years, [annualKm, years]);
 
   // Calculations based on Vehicle Segment
+  // Calculations based on Vehicle Segment
   const metrics = useMemo(() => {
     if (segment === 'daily') {
-      // IVECO Daily vs Ford Transit vs Mercedes Sprinter
+      // IVECO Daily vs Rakip F. vs Rakip M.
       const ivecoServices = Math.floor(totalKm / 50000);
       const fordServices = Math.floor(totalKm / 20000);
       const mercServices = Math.floor(totalKm / 30000);
 
-      // Maintenance costs (including timing belt for Transit)
+      // Maintenance & repair costs (including wet timing belt for F. and 3-piece modular bumper savings)
       const ivecoMaint = ivecoServices * 14500;
-      const fordMaint = (fordServices * 12000) + (totalKm >= 90000 ? 38000 : 0); // Triger kayış seti
-      const mercMaint = mercServices * 22000;
+      const fordMaint = (fordServices * 12000) + (totalKm >= 90000 ? 38000 : 0) + 15000; // Islak triger + tek parça tampon hasar farkı
+      const mercMaint = (mercServices * 22000) + 18000; // Yüksek parça/işçilik farkı
 
-      // Fuel consumption (L/100km): IVECO 10.0L vs Ford 11.8L vs Merc 11.2L
+      // Fuel consumption (L/100km): IVECO 10.0L vs Rakip F. 11.8L vs Rakip M. 11.2L
       const ivecoFuel = (totalKm / 100) * 10.0 * fuelPrice;
       const fordFuel = (totalKm / 100) * 11.8 * fuelPrice;
       const mercFuel = (totalKm / 100) * 11.2 * fuelPrice;
@@ -42,32 +43,39 @@ export default function TCOCalculatorModal({ isOpen, onClose, customerName = '',
       const savingsVsMerc = mercTotal - ivecoTotal;
 
       return {
-        vehicleName: 'IVECO Daily 35C / 70C (3.0L Heavy Duty)',
+        vehicleName: 'IVECO Daily 35C / 72C (3.0L Heavy Duty)',
         ivecoServices, fordServices, mercServices,
         ivecoMaint, fordMaint, mercMaint,
         ivecoFuel, fordFuel, mercFuel,
         ivecoDown, fordDown, mercDown,
         ivecoTotal, fordTotal, mercTotal,
         savingsVsFord, savingsVsMerc,
-        competitor1: 'Ford Transit 350L (2.0L)',
-        competitor2: 'Mercedes Sprinter (2.0L)',
+        competitor1: 'Rakip F. (2.0L)',
+        competitor2: 'Rakip M. (2.0L)',
         ivecoInterval: '50.000 km',
         comp1Interval: '20.000 km',
         comp2Interval: '30.000 km',
+        keyHighlights: [
+          '3 Parça Modüler Tampon (Rakip F. tek parça masrafına karşı düşük hasar TCO)',
+          'Zincirli FPT Triger Sistemi (Rakip F. ıslak triger riskine karşı sıfır masraf)',
+          'ZF Hi-Matic 8 İleri Tork Konvertör (Baskı-balata yok, debriyaj maliyeti sıfır)',
+          'C-Profil Kamyon Şasisi (Ağır yükte esnemez, kantarda çökmez)'
+        ]
       };
     } else {
-      // IVECO Eurocargo vs Mercedes Atego vs Ford Cargo
-      const ivecoServices = Math.floor(totalKm / 60000);
-      const mercServices = Math.floor(totalKm / 40000);
-      const fordServices = Math.floor(totalKm / 35000);
+      // IVECO Eurocargo (MLC 150 E 21) vs Rakip M. (1518) vs Rakip F. Cargo (PTC 2026 MDT Verileri)
+      const ivecoServices = Math.floor(totalKm / 40000); // Resmi PTC verisi: 40.000 km
+      const mercServices = Math.floor(totalKm / 20000);  // Resmi PTC verisi: 20.000 km
+      const fordServices = Math.floor(totalKm / 25000);
 
-      const ivecoMaint = ivecoServices * 28000;
-      const mercMaint = mercServices * 38000;
-      const fordMaint = fordServices * 32000;
+      // Bakım ve Şanzıman Maliyeti (Eurocargo'da baskı-balata YOKTUR; Rakip M.'de robotize debriyaj balata değişimi ~65.000 TL)
+      const ivecoMaint = ivecoServices * 24000;
+      const mercMaint = (mercServices * 34000) + (totalKm >= 90000 ? 65000 : 0); // M. robotize debriyaj balatası yenileme
+      const fordMaint = (fordServices * 30000) + (totalKm >= 90000 ? 55000 : 0);
 
-      // Fuel consumption: Eurocargo 22L/100km vs Atego 24L vs Cargo 25L
-      const ivecoFuel = (totalKm / 100) * 22.0 * fuelPrice;
-      const mercFuel = (totalKm / 100) * 24.0 * fuelPrice;
+      // Yakıt tüketimi: Eurocargo 4.5L 210 HP (21.5L/100km) vs Rakip M. 5.1L 177 HP (23.8L) vs Rakip F. (25.0L)
+      const ivecoFuel = (totalKm / 100) * 21.5 * fuelPrice;
+      const mercFuel = (totalKm / 100) * 23.8 * fuelPrice;
       const fordFuel = (totalKm / 100) * 25.0 * fuelPrice;
 
       const ivecoDown = ivecoServices * (downtimeCostPerDay * 1.5);
@@ -82,18 +90,24 @@ export default function TCOCalculatorModal({ isOpen, onClose, customerName = '',
       const savingsVsFord = fordTotal - ivecoTotal;
 
       return {
-        vehicleName: 'IVECO Eurocargo (160E / 180E)',
+        vehicleName: 'IVECO Eurocargo MLC 150 E 21 (210 HP)',
         ivecoServices, fordServices, mercServices,
         ivecoMaint, fordMaint, mercMaint,
         ivecoFuel, fordFuel, mercFuel,
         ivecoDown, fordDown, mercDown,
         ivecoTotal, fordTotal, mercTotal,
         savingsVsFord, savingsVsMerc,
-        competitor1: 'Ford Cargo 1833',
-        competitor2: 'Mercedes-Benz Atego 1518',
-        ivecoInterval: '60.000 km',
-        comp1Interval: '35.000 km',
-        comp2Interval: '40.000 km',
+        competitor1: 'Rakip F. Cargo',
+        competitor2: 'Rakip M. 1518 (Atego)',
+        ivecoInterval: '40.000 km',
+        comp1Interval: '25.000 km',
+        comp2Interval: '20.000 km',
+        keyHighlights: [
+          '8 İleri Full Otomatik Şanzıman (Baskı balata yok! Rakip M. balata değişim masrafı sıfır)',
+          '40.000 km Bakım Aralığı (Rakip M. 20.000 km - Yarı yarıya daha az servis ziyareti)',
+          '+163 kg Daha Yüksek Net Yük (10.481 kg kantar istiap haddi)',
+          '88 cm Daha Dar Dönüş Çapı (14.72 m ile üstün şehir içi manevra)'
+        ]
       };
     }
   }, [segment, totalKm, fuelPrice, downtimeCostPerDay]);
@@ -101,20 +115,21 @@ export default function TCOCalculatorModal({ isOpen, onClose, customerName = '',
   // Formatted WhatsApp pitch text
   const whatsappPitch = useMemo(() => {
     const greeting = customerName ? `Sayın ${customerName} Yetkilisi,` : 'Sayın Yetkili,';
+    const highlights = (metrics.keyHighlights || []).map(h => `• ${h}`).join('\n');
     return `${greeting}
 
-IVECO ERC Otomotiv olarak filonuz için hazırladığımız ${years} Yıllık (${totalKm.toLocaleString('tr-TR')} km) Toplam Sahip Olma Maliyeti (TCO) Karşılaştırmamız:
+IVECO ERC Samsun Otomotiv olarak filonuz için hazırladığımız ${years} Yıllık (${totalKm.toLocaleString('tr-TR')} km) Toplam Sahip Olma Maliyeti (TCO) Karşılaştırmamız:
 
 🚛 ${metrics.vehicleName} Avantajı:
-• Bakım Aralığı: ${metrics.ivecoInterval} (Rakiplerde 20.000-30.000 km)
-• Toplam Servis Sayısı: Sadece ${metrics.ivecoServices} Bakım (${metrics.competitor1}'ta ${metrics.fordServices} bakım!)
-• Zincirli Triger Sistemi: Masrafsız ve ömür boyu bakım gerektirmez.
+• Bakım Aralığı: ${metrics.ivecoInterval} (Rakiplerde ${metrics.comp2Interval})
+• Toplam Servis Sayısı: Sadece ${metrics.ivecoServices} Bakım (${metrics.competitor2}'de ${metrics.mercServices} bakım!)
+${highlights}
 
-📊 3 Yıllık Net Filo Tasarrufunuz:
-💰 ${metrics.competitor1}'a Göre Tasarruf: ${Math.round(metrics.savingsVsFord).toLocaleString('tr-TR')} TL
-💰 ${metrics.competitor2}'e Göre Tasarruf: ${Math.round(metrics.savingsVsMerc).toLocaleString('tr-TR')} TL
+📊 ${years} Yıllık Net Filo Tasarrufunuz:
+💰 ${metrics.competitor1}'a Göre Net Tasarruf: ${Math.round(metrics.savingsVsFord).toLocaleString('tr-TR')} TL
+💰 ${metrics.competitor2}'e Göre Net Tasarruf: ${Math.round(metrics.savingsVsMerc).toLocaleString('tr-TR')} TL
 
-IVECO Daily yüksek torklu 3.0L motoru ve uzatılmış bakım periyoduyla ilk alım fiyat farkını ilk yılda amorti eder. 
+IVECO, yüksek torklu FPT motoru, uzatılmış bakım periyodu ve şanzıman verimliliğiyle ilk alım fiyat farkını ilk yılda amorti eder.
 
 Detaylı filo maliyet raporumuzu ve takas teklifimizi görüşmekten memnuniyet duyarım.
 IVECO ERC Samsun Otomotiv - Can Murat Onay (0544 622 59 31)`;
@@ -181,7 +196,7 @@ IVECO ERC Samsun Otomotiv - Can Murat Onay (0544 622 59 31)`;
                   background: segment === 'daily' ? '#059669' : '#e2e8f0', color: segment === 'daily' ? '#fff' : '#475569'
                 }}
               >
-                🚚 Hafif Ticari: IVECO Daily vs Transit & Sprinter
+                🚚 Hafif Ticari: IVECO Daily vs Rakip F. & M.
               </button>
               <button
                 type="button"
@@ -191,7 +206,7 @@ IVECO ERC Samsun Otomotiv - Can Murat Onay (0544 622 59 31)`;
                   background: segment === 'eurocargo' ? '#059669' : '#e2e8f0', color: segment === 'eurocargo' ? '#fff' : '#475569'
                 }}
               >
-                🚛 Orta Ticari: IVECO Eurocargo vs Atego & Cargo
+                🚛 Orta Ticari: IVECO Eurocargo vs Rakip M. & F.
               </button>
             </div>
 
@@ -336,6 +351,51 @@ IVECO ERC Samsun Otomotiv - Can Murat Onay (0544 622 59 31)`;
                   <td style={{ padding: '12px 14px', color: '#dc2626', fontSize: '13px' }}>{Math.round(metrics.fordTotal).toLocaleString('tr-TR')} TL</td>
                   <td style={{ padding: '12px 14px', color: '#dc2626', fontSize: '13px' }}>{Math.round(metrics.mercTotal).toLocaleString('tr-TR')} TL</td>
                 </tr>
+
+                {/* Ek Teknik Karşılaştırma Satırları (Daily MY26 & PTC 2026 MDT) */}
+                {segment === 'daily' ? (
+                  <>
+                    <tr style={{ borderTop: '2px solid #e2e8f0', background: '#f0fdf4' }}>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Ön Tampon Yapısı</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>3 Parça Modüler (Düşük Hasar TCO)</td>
+                      <td style={{ padding: '10px 14px', color: '#dc2626' }}>Tek Parça (Yüksek Değişim Masrafı)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>Standart</td>
+                    </tr>
+                    <tr style={{ background: '#fafafa' }}>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Triger Sistemi</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>Zincirli FPT (Masrafsız, Ömür Boyu)</td>
+                      <td style={{ padding: '10px 14px', color: '#dc2626' }}>Islak Triger Kayışı (Yağ İçi Hassas)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>Zincirli</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Şanzıman Teknolojisi</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>ZF 8 İleri Tork Konvertör (Baskı-Balata Yok)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>10 İleri Otomatik</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>9 İleri Otomatik</td>
+                    </tr>
+                  </>
+                ) : (
+                  <>
+                    <tr style={{ borderTop: '2px solid #e2e8f0', background: '#f0fdf4' }}>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Şanzıman Tipi</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>8 İleri Full Otomatik ZF (Balata Yok)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>Manuel / Robotize</td>
+                      <td style={{ padding: '10px 14px', color: '#dc2626' }}>6 İleri Robotize (Balata Aşınır)</td>
+                    </tr>
+                    <tr style={{ background: '#fafafa' }}>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Dönüş Çapı (Manevra)</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>14.72 m (88 cm Daha Dar Dönüş)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>16.10 m</td>
+                      <td style={{ padding: '10px 14px', color: '#dc2626' }}>15.60 m</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '10px 14px', fontWeight: '700', color: '#166534' }}>Net Yük (İstiap Haddi)</td>
+                      <td style={{ padding: '10px 14px', color: '#059669', fontWeight: '800' }}>10.481 kg (+163 kg Avantaj)</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>10.100 kg</td>
+                      <td style={{ padding: '10px 14px', color: '#475569' }}>10.318 kg</td>
+                    </tr>
+                  </>
+                )}
               </tbody>
             </table>
           </div>
