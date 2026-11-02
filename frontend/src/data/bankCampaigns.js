@@ -1661,8 +1661,8 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
     category = 'daily70';
   } else if (lower.includes('eurocargo') || lower.includes('ml') || lower.includes('100e') || lower.includes('120e') || lower.includes('150e') || lower.includes('160e') || lower.includes('180e')) {
     category = 'eurocargo';
-  } else if (lower.includes('çekici') || lower.includes('s-way') || lower.includes('sway') || lower.includes('t-way') || lower.includes('tway') || lower.includes('hafriyat') || lower.includes('damper')) {
-    category = 'eurocargo';
+  } else if (lower.includes('çekici') || lower.includes('s-way') || lower.includes('sway') || lower.includes('t-way') || lower.includes('tway') || lower.includes('hafriyat') || lower.includes('damper') || lower.includes('heavy') || lower.includes('ağır')) {
+    category = 'heavy';
   } else {
     category = 'daily35';
   }
@@ -1670,8 +1670,22 @@ export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'te
   // Müşteri hiçbiri/diğer seçtiyse otomatik TEB Cetelem'e bağla
   const effectiveBankId = bankId === 'diger_yok' ? 'teb_cetelem' : (bankId || 'teb_cetelem');
   const bankData = BANK_CAMPAIGNS[effectiveBankId] || BANK_CAMPAIGNS.teb_cetelem;
-
-  let campaigns = bankData[category] || bankData.daily35 || [];
+  let campaigns = [];
+  if (category === 'heavy') {
+    const heavyBank = HEAVY_CAMPAIGNS[effectiveBankId];
+    if (heavyBank) {
+      campaigns = [
+        ...(heavyBank.sifirFaizTL || []),
+        ...(heavyBank.odemesiz6AyTL || []),
+        ...(heavyBank.esitTaksitTL || [])
+      ];
+    }
+    if (campaigns.length === 0) {
+      campaigns = bankData.eurocargo || bankData.daily70 || [];
+    }
+  } else {
+    campaigns = bankData[category] || bankData.daily35 || [];
+  }
 
   // Tutar Filtresi uygulama
   if (tierId && tierId !== 'all') {
@@ -1821,3 +1835,166 @@ export function calculateEurLoan(principal, termMonths = 36, annualRatePct = 5.4
     currency: 'EUR'
   };
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// S-WAY & T-WAY AĞIR TİCARİ VE ÇEKİCİ KAMPANYALARI
+// Kaynak: HEAVY_EYLÜL KAMPANYASI.xlsx
+// DİKKAT: Bayi katkı payları gizlidir; yalnızca müşteri finansman parametreleri yer alır.
+// ─────────────────────────────────────────────────────────────
+export const HEAVY_CAMPAIGNS = {
+  kuveyt_turk: {
+    name: 'Kuveyt Türk Katılım',
+    badge: 'Katılım & 6 Ay Ödemesiz & %0 Faiz',
+    esitTaksitTL: [
+      { id: 'kt_h_2500_6', title: '2.500.000 TL — 6 Ay (%0.66 Kar Payı)', principal: 2500000, term: 6, rate: 0.66, rateLabel: '%0.66', monthly: 427026, total: 2562156, tag: 'HIZLI ÖDEME' },
+      { id: 'kt_h_2500_12', title: '2.500.000 TL — 12 Ay (%1.88 Kar Payı)', principal: 2500000, term: 12, rate: 1.88, rateLabel: '%1.88', monthly: 236428, total: 2837137, tag: 'AVANTAJLI' },
+      { id: 'kt_h_2500_24', title: '2.500.000 TL — 24 Ay (%2.37 Kar Payı)', principal: 2500000, term: 24, rate: 2.37, rateLabel: '%2.37', monthly: 140155, total: 3363726 },
+      { id: 'kt_h_2500_36', title: '2.500.000 TL — 36 Ay (%2.53 Kar Payı)', principal: 2500000, term: 36, rate: 2.53, rateLabel: '%2.53', monthly: 109376, total: 3937553 },
+      { id: 'kt_h_2500_48', title: '2.500.000 TL — 48 Ay (%2.61 Kar Payı)', principal: 2500000, term: 48, rate: 2.61, rateLabel: '%2.61', monthly: 94988, total: 4559401 },
+      { id: 'kt_h_3000_12', title: '3.000.000 TL — 12 Ay (%2.16 Kar Payı)', principal: 3000000, term: 12, rate: 2.16, rateLabel: '%2.16', monthly: 288935, total: 3467219 },
+      { id: 'kt_h_3000_24', title: '3.000.000 TL — 24 Ay (%2.53 Kar Payı)', principal: 3000000, term: 24, rate: 2.53, rateLabel: '%2.53', monthly: 171365, total: 4112757 },
+      { id: 'kt_h_3000_36', title: '3.000.000 TL — 36 Ay (%2.64 Kar Payı)', principal: 3000000, term: 36, rate: 2.64, rateLabel: '%2.64', monthly: 133610, total: 4809966 },
+      { id: 'kt_h_4500_12', title: '4.500.000 TL — 12 Ay (%2.63 Kar Payı)', principal: 4500000, term: 12, rate: 2.63, rateLabel: '%2.63', monthly: 446720, total: 5360639 },
+      { id: 'kt_h_4500_24', title: '4.500.000 TL — 24 Ay (%2.79 Kar Payı)', principal: 4500000, term: 24, rate: 2.79, rateLabel: '%2.79', monthly: 264897, total: 6357539 },
+      { id: 'kt_h_4500_36', title: '4.500.000 TL — 36 Ay (%2.83 Kar Payı)', principal: 4500000, term: 36, rate: 2.83, rateLabel: '%2.83', monthly: 206601, total: 7437652 },
+      { id: 'kt_h_5000_12', title: '5.000.000 TL — 12 Ay (%2.72 Kar Payı)', principal: 5000000, term: 12, rate: 2.72, rateLabel: '%2.72', monthly: 499216, total: 5990593 },
+      { id: 'kt_h_5000_24', title: '5.000.000 TL — 24 Ay (%2.84 Kar Payı)', principal: 5000000, term: 24, rate: 2.84, rateLabel: '%2.84', monthly: 296024, total: 7104576, tag: 'FİLO TERCİHİ' },
+      { id: 'kt_h_5000_36', title: '5.000.000 TL — 36 Ay (%2.87 Kar Payı)', principal: 5000000, term: 36, rate: 2.87, rateLabel: '%2.87', monthly: 231018, total: 8316633 }
+    ],
+    odemesiz6AyTL: [
+      { id: 'kt_h_odm_2500_24', title: '2.500.000 TL — 6 Ay Ödemesiz + 24 Ay', principal: 2500000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 2.57, rateLabel: '%2.57', monthly: 165486, total: 3971668, desc: 'İlk 6 Ay 0 TL Taksit + 24 Eşit Taksit' },
+      { id: 'kt_h_odm_2500_36', title: '2.500.000 TL — 6 Ay Ödemesiz + 36 Ay', principal: 2500000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 2.70, rateLabel: '%2.70', monthly: 129665, total: 4667938, desc: 'İlk 6 Ay 0 TL Taksit + 36 Eşit Taksit' },
+      { id: 'kt_h_odm_3000_24', title: '3.000.000 TL — 6 Ay Ödemesiz + 24 Ay', principal: 3000000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 2.69, rateLabel: '%2.69', monthly: 202443, total: 4858623, desc: 'İlk 6 Ay 0 TL Taksit + 24 Eşit Taksit' },
+      { id: 'kt_h_odm_3000_36', title: '3.000.000 TL — 6 Ay Ödemesiz + 36 Ay', principal: 3000000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 2.79, rateLabel: '%2.79', monthly: 158393, total: 5702149, desc: 'İlk 6 Ay 0 TL Taksit + 36 Eşit Taksit' },
+      { id: 'kt_h_odm_4500_24', title: '4.500.000 TL — 6 Ay Ödemesiz + 24 Ay', principal: 4500000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 2.88, rateLabel: '%2.88', monthly: 312943, total: 7510633, desc: 'İlk 6 Ay 0 TL Taksit + 24 Eşit Taksit' },
+      { id: 'kt_h_odm_4500_36', title: '4.500.000 TL — 6 Ay Ödemesiz + 36 Ay', principal: 4500000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 2.95, rateLabel: '%2.95', monthly: 245105, total: 8823781, desc: 'İlk 6 Ay 0 TL Taksit + 36 Eşit Taksit' },
+      { id: 'kt_h_odm_5000_24', title: '5.000.000 TL — 6 Ay Ödemesiz + 24 Ay', principal: 5000000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 2.92, rateLabel: '%2.92', monthly: 349905, total: 8397712, desc: 'İlk 6 Ay 0 TL Taksit + 24 Eşit Taksit' },
+      { id: 'kt_h_odm_5000_36', title: '5.000.000 TL — 6 Ay Ödemesiz + 36 Ay', principal: 5000000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 2.98, rateLabel: '%2.98', monthly: 273912, total: 9860844, desc: 'İlk 6 Ay 0 TL Taksit + 36 Eşit Taksit' }
+    ],
+    sifirFaizTL: [
+      { id: 'kt_h_zero_4500_24', title: '4.500.000 TL — 24 Ay (%0 Faiz)', principal: 4500000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 187500, total: 4500000, tag: 'SIFIR FAİZ' },
+      { id: 'kt_h_zero_4500_30', title: '4.500.000 TL — 30 Ay (%0 Faiz)', principal: 4500000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 150000, total: 4500000, tag: 'SIFIR FAİZ' },
+      { id: 'kt_h_zero_4500_36', title: '4.500.000 TL — 36 Ay (%0 Faiz)', principal: 4500000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 125000, total: 4500000, tag: 'SIFIR FAİZ' },
+      { id: 'kt_h_zero_5000_24', title: '5.000.000 TL — 24 Ay (%0 Faiz)', principal: 5000000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 208333, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'kt_h_zero_5000_30', title: '5.000.000 TL — 30 Ay (%0 Faiz)', principal: 5000000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 166667, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'kt_h_zero_5000_36', title: '5.000.000 TL — 36 Ay (%0 Faiz)', principal: 5000000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 138889, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'kt_h_zero_odm_4500_24', title: '4.500.000 TL — 6 Ay Ödemesiz + 24 Ay (%0 Faiz)', principal: 4500000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 187500, total: 4500000, desc: '6 Ay Ödemesiz + 24 Ay Sıfır Faiz' },
+      { id: 'kt_h_zero_odm_4500_36', title: '4.500.000 TL — 6 Ay Ödemesiz + 36 Ay (%0 Faiz)', principal: 4500000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0, rateLabel: '%0 Faiz', monthly: 125000, total: 4500000, desc: '6 Ay Ödemesiz + 36 Ay Sıfır Faiz' },
+      { id: 'kt_h_zero_odm_5000_24', title: '5.000.000 TL — 6 Ay Ödemesiz + 24 Ay (%0 Faiz)', principal: 5000000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 208333, total: 5000000, desc: '6 Ay Ödemesiz + 24 Ay Sıfır Faiz' },
+      { id: 'kt_h_zero_odm_5000_36', title: '5.000.000 TL — 6 Ay Ödemesiz + 36 Ay (%0 Faiz)', principal: 5000000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0, rateLabel: '%0 Faiz', monthly: 138889, total: 5000000, desc: '6 Ay Ödemesiz + 36 Ay Sıfır Faiz' }
+    ],
+    esitTaksitEUR: [
+      { id: 'kt_h_eur_80k_9', title: '€80.000 — 9 Ay (%0 Faiz)', principal: 80000, term: 9, rate: 0, rateLabel: '%0 Faiz', monthly: 8889, total: 80000, currency: 'EUR', tag: '%0 FAİZ' },
+      { id: 'kt_h_eur_80k_12', title: '€80.000 — 12 Ay (%0 Faiz)', principal: 80000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 6667, total: 80000, currency: 'EUR', tag: '%0 FAİZ' },
+      { id: 'kt_h_eur_80k_18', title: '€80.000 — 18 Ay (%0 Faiz)', principal: 80000, term: 18, rate: 0, rateLabel: '%0 Faiz', monthly: 4444, total: 80000, currency: 'EUR', tag: '%0 FAİZ' },
+      { id: 'kt_h_eur_80k_24', title: '€80.000 — 24 Ay (%0 Faiz)', principal: 80000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 3333, total: 80000, currency: 'EUR', tag: '%0 FAİZ (24 AY)' },
+      { id: 'kt_h_eur_80k_36', title: '€80.000 — 36 Ay (%0.20/ay)', principal: 80000, term: 36, rate: 0.20, rateLabel: '%0.20/ay', monthly: 2311, total: 83194, currency: 'EUR' },
+      { id: 'kt_h_eur_80k_48', title: '€80.000 — 48 Ay (%0.28/ay)', principal: 80000, term: 48, rate: 0.28, rateLabel: '%0.28/ay', monthly: 1791, total: 85985, currency: 'EUR' },
+      { id: 'kt_h_eur_90k_12', title: '€90.000 — 12 Ay (%0 Faiz)', principal: 90000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 7500, total: 90000, currency: 'EUR', tag: '%0 FAİZ' },
+      { id: 'kt_h_eur_90k_24', title: '€90.000 — 24 Ay (%0.06/ay)', principal: 90000, term: 24, rate: 0.06, rateLabel: '%0.06/ay', monthly: 3780, total: 90721, currency: 'EUR' },
+      { id: 'kt_h_eur_90k_36', title: '€90.000 — 36 Ay (%0.24/ay)', principal: 90000, term: 36, rate: 0.24, rateLabel: '%0.24/ay', monthly: 2620, total: 94323, currency: 'EUR' },
+      { id: 'kt_h_eur_100k_12', title: '€100.000 — 12 Ay (%0 Faiz)', principal: 100000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 8333, total: 100000, currency: 'EUR', tag: '%0 FAİZ' },
+      { id: 'kt_h_eur_100k_24', title: '€100.000 — 24 Ay (%0.10/ay)', principal: 100000, term: 24, rate: 0.10, rateLabel: '%0.10/ay', monthly: 4222, total: 101337, currency: 'EUR' },
+      { id: 'kt_h_eur_100k_36', title: '€100.000 — 36 Ay (%0.27/ay)', principal: 100000, term: 36, rate: 0.27, rateLabel: '%0.27/ay', monthly: 2928, total: 105413, currency: 'EUR' }
+    ],
+    odemesiz6AyEUR: [
+      { id: 'kt_h_eur_odm_80k_18', title: '€80.000 — 6 Ay Ödemesiz + 18 Ay', principal: 80000, gracePeriod: 6, term: 18, totalTerm: 24, rate: 0.14, rateLabel: '%0.14/ay', monthly: 4548, total: 81863, currency: 'EUR', desc: '6 Ay Ödemesiz + 18 Taksit' },
+      { id: 'kt_h_eur_odm_80k_24', title: '€80.000 — 6 Ay Ödemesiz + 24 Ay', principal: 80000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 0.20, rateLabel: '%0.20/ay', monthly: 3467, total: 83198, currency: 'EUR', desc: '6 Ay Ödemesiz + 24 Taksit' },
+      { id: 'kt_h_eur_odm_80k_36', title: '€80.000 — 6 Ay Ödemesiz + 36 Ay', principal: 80000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0.28, rateLabel: '%0.28/ay', monthly: 2389, total: 86001, currency: 'EUR', desc: '6 Ay Ödemesiz + 36 Taksit' },
+      { id: 'kt_h_eur_odm_100k_18', title: '€100.000 — 6 Ay Ödemesiz + 18 Ay', principal: 100000, gracePeriod: 6, term: 18, totalTerm: 24, rate: 0.22, rateLabel: '%0.22/ay', monthly: 5760, total: 103674, currency: 'EUR', desc: '6 Ay Ödemesiz + 18 Taksit' },
+      { id: 'kt_h_eur_odm_100k_24', title: '€100.000 — 6 Ay Ödemesiz + 24 Ay', principal: 100000, gracePeriod: 6, term: 24, totalTerm: 30, rate: 0.27, rateLabel: '%0.27/ay', monthly: 4393, total: 105421, currency: 'EUR', desc: '6 Ay Ödemesiz + 24 Taksit' },
+      { id: 'kt_h_eur_odm_100k_36', title: '€100.000 — 6 Ay Ödemesiz + 36 Ay', principal: 100000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0.33, rateLabel: '%0.33/ay', monthly: 3024, total: 108881, currency: 'EUR', desc: '6 Ay Ödemesiz + 36 Taksit' }
+    ]
+  },
+  garanti: {
+    name: 'Garanti BBVA',
+    badge: '12 Ay %0 Faiz & 5M Filo',
+    esitTaksitTL: [
+      { id: 'gb_h_1000_12', title: '1.000.000 TL — 12 Ay (%0 Faiz)', principal: 1000000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 83333, total: 1000000, tag: '%0 FAİZ' },
+      { id: 'gb_h_1000_24', title: '1.000.000 TL — 24 Ay (%0.82)', principal: 1000000, term: 24, rate: 0.82, rateLabel: '%0.82', monthly: 46288, total: 1110913 },
+      { id: 'gb_h_1000_36', title: '1.000.000 TL — 36 Ay (%1.46)', principal: 1000000, term: 36, rate: 1.46, rateLabel: '%1.46', monthly: 36333, total: 1307981 },
+      { id: 'gb_h_1100_12', title: '1.100.000 TL — 12 Ay (%0 Faiz)', principal: 1100000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 91667, total: 1100000, tag: '%0 FAİZ' },
+      { id: 'gb_h_1200_12', title: '1.200.000 TL — 12 Ay (%0.01)', principal: 1200000, term: 12, rate: 0.01, rateLabel: '%0.01', monthly: 100073, total: 1200878 },
+      { id: 'gb_h_2000_24', title: '2.000.000 TL — 24 Ay (%1.94)', principal: 2000000, term: 24, rate: 1.94, rateLabel: '%1.94', monthly: 104523, total: 2508552 },
+      { id: 'gb_h_3000_36', title: '3.000.000 TL — 36 Ay (%2.37)', principal: 3000000, term: 36, rate: 2.37, rateLabel: '%2.37', monthly: 126955, total: 4570380 },
+      { id: 'gb_h_5000_36', title: '5.000.000 TL — 36 Ay (%2.65)', principal: 5000000, term: 36, rate: 2.65, rateLabel: '%2.65', monthly: 224388, total: 8077968, tag: 'FİLO ÖZEL' }
+    ],
+    sifirFaiz6AyOdemesizTL: [
+      { id: 'gb_h_zero_odm_4500_36', title: '4.500.000 TL — 6 Ay Ödemesiz + 36 Ay (%0 Faiz)', principal: 4500000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0, rateLabel: '%0 Faiz', monthly: 125000, total: 4500000, desc: '6 Ay Ödemesiz + 36 Ay Sıfır Faiz' },
+      { id: 'gb_h_zero_odm_5000_36', title: '5.000.000 TL — 6 Ay Ödemesiz + 36 Ay (%0 Faiz)', principal: 5000000, gracePeriod: 6, term: 36, totalTerm: 42, rate: 0, rateLabel: '%0 Faiz', monthly: 138889, total: 5000000, desc: '6 Ay Ödemesiz + 36 Ay Sıfır Faiz' }
+    ],
+    esitTaksitEUR: [
+      { id: 'gb_h_eur_100k_24', title: '€100.000 — 24 Ay (%0.15/ay)', principal: 100000, term: 24, rate: 0.15, rateLabel: '%0.15/ay', monthly: 4251, total: 102024, currency: 'EUR' },
+      { id: 'gb_h_eur_100k_36', title: '€100.000 — 36 Ay (%0.29/ay)', principal: 100000, term: 36, rate: 0.29, rateLabel: '%0.29/ay', monthly: 2942, total: 105912, currency: 'EUR' },
+      { id: 'gb_h_eur_100k_48', title: '€100.000 — 48 Ay (%0.38/ay)', principal: 100000, term: 48, rate: 0.38, rateLabel: '%0.38/ay', monthly: 2294, total: 110112, currency: 'EUR' },
+      { id: 'gb_h_eur_100k_60', title: '€100.000 — 60 Ay (%0.43/ay)', principal: 100000, term: 60, rate: 0.43, rateLabel: '%0.43/ay', monthly: 1907, total: 114420, currency: 'EUR' }
+    ],
+    sifirFaizEUR: [
+      { id: 'gb_h_eur_zero_90k_36', title: '€90.000 — 36 Ay (%0 Faiz)', principal: 90000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 2500, total: 90000, currency: 'EUR', tag: '%0 FAİZ (36 AY)' },
+      { id: 'gb_h_eur_zero_100k_36', title: '€100.000 — 36 Ay (%0 Faiz)', principal: 100000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 2778, total: 100000, currency: 'EUR', tag: '%0 FAİZ (36 AY)' }
+    ]
+  },
+  teb_cetelem: {
+    name: 'TEB & TEB Cetelem',
+    badge: 'Yetkili Finansman & 5M %0 Faiz',
+    esitTaksitTL: [
+      { id: 'teb_h_1000_12', title: '1.000.000 TL — 12 Ay (%0 Faiz)', principal: 1000000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 83339, total: 1000068, tag: '%0 FAİZ' },
+      { id: 'teb_h_1000_24', title: '1.000.000 TL — 24 Ay (%0.85 Faiz)', principal: 1000000, term: 24, rate: 0.85, rateLabel: '%0.85', monthly: 46497, total: 1115928 },
+      { id: 'teb_h_1000_36', title: '1.000.000 TL — 36 Ay (%1.48 Faiz)', principal: 1000000, term: 36, rate: 1.48, rateLabel: '%1.48', monthly: 36447, total: 1312092 },
+      { id: 'teb_h_1500_12', title: '1.500.000 TL — 12 Ay (%0.68 Faiz)', principal: 1500000, term: 12, rate: 0.68, rateLabel: '%0.68', monthly: 130877, total: 1570524 },
+      { id: 'teb_h_2000_24', title: '2.000.000 TL — 24 Ay (%2.10 Faiz)', principal: 2000000, term: 24, rate: 2.10, rateLabel: '%2.10', monthly: 108252, total: 2598048 },
+      { id: 'teb_h_2500_36', title: '2.500.000 TL — 36 Ay (%2.45 Faiz)', principal: 2500000, term: 36, rate: 2.45, rateLabel: '%2.45', monthly: 109780, total: 3952080 }
+    ],
+    sifirFaizTL: [
+      { id: 'teb_h_zero_4500_24', title: '4.500.000 TL — 24 Ay (%0 Faiz)', principal: 4500000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 187525, total: 4500000, tag: '4.5M %0 FAİZ FİLO' },
+      { id: 'teb_h_zero_5000_24', title: '5.000.000 TL — 24 Ay (%0 Faiz)', principal: 5000000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 208333, total: 5000000, tag: '5M %0 FAİZ FİLO' },
+      { id: 'teb_h_zero_4500_30', title: '4.500.000 TL — 30 Ay (%0 Faiz)', principal: 4500000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 150000, total: 4500000, tag: '4.5M %0 FAİZ' },
+      { id: 'teb_h_zero_5000_30', title: '5.000.000 TL — 30 Ay (%0 Faiz)', principal: 5000000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 166667, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'teb_h_zero_4500_36', title: '4.500.000 TL — 36 Ay (%0 Faiz)', principal: 4500000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 125000, total: 4500000, tag: '36 AY %0 FAİZ' },
+      { id: 'teb_h_zero_5000_36', title: '5.000.000 TL — 36 Ay (%0 Faiz)', principal: 5000000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 138889, total: 5000000, tag: '36 AY %0 FAİZ' },
+      { id: 'teb_h_zero_4500_48', title: '4.500.000 TL — 48 Ay (%0 Faiz)', principal: 4500000, term: 48, rate: 0, rateLabel: '%0 Faiz', monthly: 93750, total: 4500000, tag: '48 AY %0 FAİZ' },
+      { id: 'teb_h_zero_5000_48', title: '5.000.000 TL — 48 Ay (%0 Faiz)', principal: 5000000, term: 48, rate: 0, rateLabel: '%0 Faiz', monthly: 104167, total: 5000000, tag: '48 AY %0 FAİZ' }
+    ]
+  },
+  bnp_paribas: {
+    name: 'BNP Paribas',
+    badge: 'Ağır Ticari & Euro %0 Faiz',
+    esitTaksitTL: [
+      { id: 'bnp_h_2000_12', title: '2.000.000 TL — 12 Ay (%1.15 Faiz)', principal: 2000000, term: 12, rate: 1.15, rateLabel: '%1.15', monthly: 175307, total: 2103684 },
+      { id: 'bnp_h_2000_24', title: '2.000.000 TL — 24 Ay (%1.85 Faiz)', principal: 2000000, term: 24, rate: 1.85, rateLabel: '%1.85', monthly: 105115, total: 2522760 },
+      { id: 'bnp_h_2000_36', title: '2.000.000 TL — 36 Ay (%2.15 Faiz)', principal: 2000000, term: 36, rate: 2.15, rateLabel: '%2.15', monthly: 82927, total: 2985372 },
+      { id: 'bnp_h_3000_12', title: '3.000.000 TL — 12 Ay (%1.45 Faiz)', principal: 3000000, term: 12, rate: 1.45, rateLabel: '%1.45', monthly: 275455, total: 3305460 },
+      { id: 'bnp_h_5000_24', title: '5.000.000 TL — 24 Ay (%2.45 Faiz)', principal: 5000000, term: 24, rate: 2.45, rateLabel: '%2.45', monthly: 285280, total: 6846720 },
+      { id: 'bnp_h_5000_36', title: '5.000.000 TL — 36 Ay (%2.65 Faiz)', principal: 5000000, term: 36, rate: 2.65, rateLabel: '%2.65', monthly: 225066, total: 8102376 }
+    ],
+    sifirFaizTL: [
+      { id: 'bnp_h_zero_5000_24', title: '5.000.000 TL — 24 Ay (%0 Faiz)', principal: 5000000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 208333, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'bnp_h_zero_5000_30', title: '5.000.000 TL — 30 Ay (%0 Faiz)', principal: 5000000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 166667, total: 5000000, tag: '5M %0 FAİZ' },
+      { id: 'bnp_h_zero_5000_36', title: '5.000.000 TL — 36 Ay (%0 Faiz)', principal: 5000000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 138889, total: 5000000, tag: '5M %0 FAİZ' }
+    ],
+    sifirFaizEUR: [
+      { id: 'bnp_h_eur_zero_90k_24', title: '€90.000 — 24 Ay (%0 Faiz)', principal: 90000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 3750, total: 90000, currency: 'EUR', tag: '24 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_90k_30', title: '€90.000 — 30 Ay (%0 Faiz)', principal: 90000, term: 30, rate: 0, rateLabel: '%0 Faiz', monthly: 3000, total: 90000, currency: 'EUR', tag: '30 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_90k_36', title: '€90.000 — 36 Ay (%0 Faiz)', principal: 90000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 2500, total: 90000, currency: 'EUR', tag: '36 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_90k_48', title: '€90.000 — 48 Ay (%0 Faiz)', principal: 90000, term: 48, rate: 0, rateLabel: '%0 Faiz', monthly: 1875, total: 90000, currency: 'EUR', tag: '48 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_100k_24', title: '€100.000 — 24 Ay (%0 Faiz)', principal: 100000, term: 24, rate: 0, rateLabel: '%0 Faiz', monthly: 4167, total: 100000, currency: 'EUR', tag: '24 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_100k_36', title: '€100.000 — 36 Ay (%0 Faiz)', principal: 100000, term: 36, rate: 0, rateLabel: '%0 Faiz', monthly: 2778, total: 100000, currency: 'EUR', tag: '36 AY %0 FAİZ' },
+      { id: 'bnp_h_eur_zero_100k_48', title: '€100.000 — 48 Ay (%0 Faiz)', principal: 100000, term: 48, rate: 0, rateLabel: '%0 Faiz', monthly: 2083, total: 100000, currency: 'EUR', tag: '48 AY %0 FAİZ' }
+    ]
+  },
+  akbank: {
+    name: 'Akbank',
+    badge: '1M %0 Faiz & 60 Ay Esnek',
+    esitTaksitTL: [
+      { id: 'akb_h_1000_6', title: '1.000.000 TL — 6 Ay (%0 Faiz)', principal: 1000000, term: 6, rate: 0, rateLabel: '%0 Faiz', monthly: 166667, total: 1000000, tag: '6 AY %0 FAİZ' },
+      { id: 'akb_h_1000_9', title: '1.000.000 TL — 9 Ay (%0 Faiz)', principal: 1000000, term: 9, rate: 0, rateLabel: '%0 Faiz', monthly: 111111, total: 1000000, tag: '9 AY %0 FAİZ' },
+      { id: 'akb_h_1000_12', title: '1.000.000 TL — 12 Ay (%0 Faiz)', principal: 1000000, term: 12, rate: 0, rateLabel: '%0 Faiz', monthly: 83333, total: 1000000, tag: '12 AY %0 FAİZ' },
+      { id: 'akb_h_1000_18', title: '1.000.000 TL — 18 Ay (%0.67 Faiz)', principal: 1000000, term: 18, rate: 0.67, rateLabel: '%0.67', monthly: 59342, total: 1068156 },
+      { id: 'akb_h_1000_24', title: '1.000.000 TL — 24 Ay (%1.23 Faiz)', principal: 1000000, term: 24, rate: 1.23, rateLabel: '%1.23', monthly: 48724, total: 1169376 },
+      { id: 'akb_h_1000_36', title: '1.000.000 TL — 36 Ay (%1.90 Faiz)', principal: 1000000, term: 36, rate: 1.90, rateLabel: '%1.90', monthly: 39201, total: 1411236 },
+      { id: 'akb_h_1000_48', title: '1.000.000 TL — 48 Ay (%2.19 Faiz)', principal: 1000000, term: 48, rate: 2.19, rateLabel: '%2.19', monthly: 34620, total: 1661760 },
+      { id: 'akb_h_1000_60', title: '1.000.000 TL — 60 Ay (%2.29 Faiz)', principal: 1000000, term: 60, rate: 2.29, rateLabel: '%2.29', monthly: 31653, total: 1899180 }
+    ]
+  }
+};

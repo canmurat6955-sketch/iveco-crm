@@ -3,7 +3,9 @@ import {
   BANK_LIST, 
   EUR_LOAN_PRESETS, 
   EUR_PARTNER_BANKS, 
-  calculateEurLoan 
+  calculateEurLoan,
+  getCampaignsForVehicleAndBank,
+  HEAVY_CAMPAIGNS
 } from '../../../data/bankCampaigns';
 import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiGlobe } from 'react-icons/fi';
 
@@ -25,6 +27,10 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
   const [loanAmount, setLoanAmount] = useState(1000000);
   const [loanTerm, setLoanTerm] = useState(12);
 
+  // Araç Sınıfı & Kampanya Tipi Filtreleri (Excel Entegrasyonu)
+  const [selectedVehicleCategory, setSelectedVehicleCategory] = useState('daily35');
+  const [campaignTypeFilter, setCampaignTypeFilter] = useState('all'); // 'all', 'zero', 'grace'
+
   // EUR Kredi State'leri
   const [selectedEurBankId, setSelectedEurBankId] = useState('eximbank');
   const [selectedEurPresetId, setSelectedEurPresetId] = useState('eur_80k_36');
@@ -38,6 +44,18 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
   const dynamicEurCalc = useMemo(() => {
     return calculateEurLoan(customEurAmount, customEurTerm, 5.49);
   }, [customEurAmount, customEurTerm]);
+
+  // Seçili banka ve araç grubuna ait resmi Excel kampanyaları
+  const realCampaigns = useMemo(() => {
+    const res = getCampaignsForVehicleAndBank(selectedVehicleCategory, selectedBankId);
+    let list = res.campaigns || [];
+    if (campaignTypeFilter === 'zero') {
+      list = list.filter(c => c.rate === 0);
+    } else if (campaignTypeFilter === 'grace') {
+      list = list.filter(c => c.gracePeriodMonths || c.gracePeriod || (c.title && c.title.toLowerCase().includes('ödemesiz')) || (c.desc && c.desc.toLowerCase().includes('ödemesiz')));
+    }
+    return list;
+  }, [selectedVehicleCategory, selectedBankId, campaignTypeFilter]);
 
   const handleApplyPreset = (preset) => {
     setLoanAmount(preset.amount);
@@ -492,9 +510,177 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               </button>
             </div>
 
+            {/* Vehicle Segment & Campaign Type Filters */}
+            <div style={{ marginBottom: '18px' }}>
+              <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🎯 ARAÇ SEGMENTİ SEÇİN:</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                {[
+                  { id: 'daily35', label: '🚚 Daily 35 (3.5T Şasi & Van)' },
+                  { id: 'daily70', label: '🚛 Daily 70 (7.2T Şasi Kamyon)' },
+                  { id: 'eurocargo', label: '📦 Eurocargo (10T - 18T Dağıtım)' },
+                  { id: 'heavy', label: '🏗️ S-Way & T-Way (Ağır Vasıta & Çekici)' }
+                ].map(cat => {
+                  const isSel = selectedVehicleCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedVehicleCategory(cat.id)}
+                      style={{
+                        background: isSel ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255, 255, 255, 0.05)',
+                        border: isSel ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                        color: isSel ? '#fff' : '#cbd5e1',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s'
+                      }}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Campaign Type Pills */}
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'all', label: 'Tüm Kampanyalar' },
+                  { id: 'zero', label: '💎 Sadece %0 Faizli Paketler' },
+                  { id: 'grace', label: '⏳ 6 Ay Ödemesiz Paketler' }
+                ].map(f => {
+                  const isSel = campaignTypeFilter === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setCampaignTypeFilter(f.id)}
+                      style={{
+                        background: isSel ? 'rgba(34, 197, 94, 0.25)' : 'transparent',
+                        border: isSel ? '1px solid #22c55e' : '1px solid rgba(255, 255, 255, 0.08)',
+                        color: isSel ? '#4ade80' : '#94a3b8',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.70rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Real Bank Campaigns List from Excel */}
+            {realCampaigns && realCampaigns.length > 0 && (
+              <div style={{ marginBottom: '22px' }}>
+                <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 800, marginBottom: '8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span>📋 {activeBank.name} RESMİ KAMPANYA PAKETLERİ ({realCampaigns.length} SEÇENEK)</span>
+                  <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 600 }}>Tüm rakamlar resmi banka tablolarından alınmıştır</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+                  {realCampaigns.slice(0, 12).map((camp, idx) => {
+                    const isZero = camp.rate === 0;
+                    const isGrace = camp.gracePeriodMonths || camp.gracePeriod || (camp.title && camp.title.includes('Ödemesiz'));
+                    return (
+                      <div
+                        key={camp.id || idx}
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%)',
+                          border: isZero ? '1px solid rgba(16, 185, 129, 0.4)' : (isGrace ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'),
+                          borderRadius: '12px',
+                          padding: '12px 14px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          gap: '8px'
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
+                              {camp.title || `${(camp.principal || 0).toLocaleString('tr-TR')} TL — ${camp.term} Ay`}
+                            </span>
+                            {camp.tag && (
+                              <span style={{
+                                fontSize: '0.64rem',
+                                fontWeight: 800,
+                                background: isZero ? '#10b981' : (isGrace ? '#f59e0b' : '#0284c7'),
+                                color: isZero || !isGrace ? '#fff' : '#000',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                {camp.tag}
+                              </span>
+                            )}
+                          </div>
+                          {camp.desc && (
+                            <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginBottom: '6px' }}>{camp.desc}</div>
+                          )}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', background: 'rgba(2, 6, 23, 0.5)', padding: '8px', borderRadius: '8px', fontSize: '0.72rem' }}>
+                            <div>
+                              <div style={{ color: '#64748b' }}>Kredi Tutarı:</div>
+                              <strong style={{ color: '#fff' }}>{(camp.principal || 0).toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                            <div>
+                              <div style={{ color: '#64748b' }}>Faiz / Kar Payı:</div>
+                              <strong style={{ color: isZero ? '#4ade80' : '#38bdf8' }}>{camp.rateLabel || `%${camp.rate}`}</strong>
+                            </div>
+                            <div>
+                              <div style={{ color: '#64748b' }}>Aylık Taksit:</div>
+                              <strong style={{ color: '#4ade80', fontSize: '0.84rem' }}>{(camp.monthly || 0).toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                            <div>
+                              <div style={{ color: '#64748b' }}>Toplam Ödeme:</div>
+                              <strong style={{ color: '#cbd5e1' }}>{(camp.total || (camp.monthly * camp.term) || 0).toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onDirectWhatsApp) {
+                              const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, IVECO portalından *${activeBank.name}* bünyesindeki *${camp.title || (camp.principal + ' TL')}* kampanyası (Aylık ${(camp.monthly || 0).toLocaleString('tr-TR')} TL) için ön onay ve başvuru şartlarını öğrenmek istiyorum.`;
+                              onDirectWhatsApp(msg);
+                            }
+                          }}
+                          style={{
+                            background: 'rgba(34, 197, 94, 0.15)',
+                            border: '1px solid rgba(34, 197, 94, 0.35)',
+                            color: '#4ade80',
+                            borderRadius: '8px',
+                            padding: '6px 10px',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px',
+                            width: '100%',
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          <FiMessageSquare size={13} /> Bu Paketle WhatsApp'tan Başvur
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Popular Loan Options */}
             <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>
-              💡 EN ÇOK KULLANILAN TİCARİ KREDİ PAKETLERİ
+              💡 EN ÇOK KULLANILAN HIZLI TİCARİ KREDİ PAKETLERİ
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
               {SAMPLE_LOAN_PRESETS.map((preset, idx) => (
