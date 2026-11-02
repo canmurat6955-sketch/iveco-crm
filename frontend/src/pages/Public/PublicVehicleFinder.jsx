@@ -658,6 +658,7 @@ export default function PublicVehicleFinder() {
 
   const location = useLocation();
   const isAdminMode = searchParams.get('admin') === 'true';
+  const isTestRoute = isAdminMode;
   const isVipCustomer = Boolean(customerIdParam || companyParam || nameParam || phoneParam);
 
   const tabFromUrl = searchParams.get('tab');
@@ -751,7 +752,7 @@ export default function PublicVehicleFinder() {
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
   // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Can Murat Onay)
-  const [showTestPanel, setShowTestPanel] = useState(isTestRoute);
+  const [showTestPanel, setShowTestPanel] = useState(false);
   const [testGenCompany, setTestGenCompany] = useState(companyParam || 'Öz Karadeniz Lojistik Ltd.');
   const [testGenPhone, setTestGenPhone] = useState(phoneParam || SALES_REP.phoneDisplay);
   const [testSimulationResult, setTestSimulationResult] = useState(null);
