@@ -157,8 +157,8 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
       {(selectedCategory === 'daily35_chassis' || selectedCategory === 'daily35_van') && (
         <div style={{
-          background: 'rgba(15, 23, 42, 0.75)',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
+          background: 'rgba(30, 52, 86, 0.85)',
+          border: '1px solid rgba(16, 185, 129, 0.35)',
           borderRadius: '12px',
           padding: isMobileView ? '10px 12px' : '12px 16px',
           marginBottom: isMobileView ? '12px' : '20px',
@@ -184,11 +184,11 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               🛡️
             </div>
             <div>
-              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#f8fafc' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#ffffff' }}>
                 B Ehliyet & Kantar Uyumu (Daily 35)
               </div>
               {!isMobileView && (
-                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                <div style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
                   Daily 35 serisi B sınıfı otomobil ehliyetiyle kullanılabilir, şehir içi saat yasaklarından ve takograftan muaftır.
                 </div>
               )}
@@ -199,12 +199,12 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(56, 189, 248, 0.12)',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
+              background: 'rgba(56, 189, 248, 0.14)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
               borderRadius: '8px',
               padding: '6px 12px',
               fontSize: '0.72rem',
-              color: '#38bdf8',
+              color: '#7dd3fc',
               fontWeight: 700
             }}>
               <span>🟢</span> 2026 Kota Tahsisinden Hızlı Teslim
@@ -232,9 +232,9 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               onClick={() => setSelectedCategory(cat.id)}
               style={{
                 gridColumn: (isMobileView && cat.id === 'all') ? 'span 3' : undefined,
-                background: selectedCategory === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(15, 23, 42, 0.8)',
-                color: selectedCategory === cat.id ? '#fff' : '#cbd5e1',
-                border: selectedCategory === cat.id ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
+                background: selectedCategory === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(33, 55, 90, 0.88)',
+                color: selectedCategory === cat.id ? '#fff' : '#f1f5f9',
+                border: selectedCategory === cat.id ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.28)',
                 borderRadius: isMobileView ? '10px' : '20px',
                 padding: isMobileView ? '9px 6px' : '6px 14px',
                 fontSize: isMobileView ? '0.78rem' : '0.78rem',
@@ -253,7 +253,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
         {/* Search Bar & Checkbox */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: isMobileView ? '170px' : '220px' }}>
-            <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
               type="text"
               value={searchQuery}
@@ -262,8 +262,8 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               style={{
                 width: '100%',
                 padding: isMobileView ? '11px 12px 11px 34px' : '10px 12px 10px 36px',
-                background: 'rgba(15, 23, 42, 0.75)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(33, 55, 90, 0.85)',
+                border: '1px solid rgba(148, 163, 184, 0.32)',
                 borderRadius: '10px',
                 color: '#fff',
                 fontSize: isMobileView ? '0.85rem' : '0.82rem',
@@ -276,13 +276,13 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            background: onlyDoubleWheels ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-            border: onlyDoubleWheels ? '1px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.1)',
+            background: onlyDoubleWheels ? 'rgba(245, 158, 11, 0.22)' : 'rgba(33, 55, 90, 0.85)',
+            border: onlyDoubleWheels ? '1px solid #f59e0b' : '1px solid rgba(148, 163, 184, 0.28)',
             borderRadius: '10px',
             padding: isMobileView ? '10px 12px' : '8px 14px',
             cursor: 'pointer',
             fontSize: isMobileView ? '0.78rem' : '0.78rem',
-            color: onlyDoubleWheels ? '#fbbf24' : '#94a3b8',
+            color: onlyDoubleWheels ? '#fbbf24' : '#e2e8f0',
             fontWeight: 700,
             whiteSpace: 'nowrap'
           }}>
@@ -305,8 +305,9 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
             <div
               key={vehicle.id}
               style={{
-                background: 'rgba(15, 23, 42, 0.88)',
-                border: '1.5px solid rgba(255, 255, 255, 0.14)',
+                background: 'linear-gradient(165deg, rgba(33, 55, 90, 0.94) 0%, rgba(24, 41, 68, 0.94) 100%)',
+                border: '1.5px solid rgba(125, 211, 252, 0.26)',
+                boxShadow: '0 8px 24px rgba(8, 15, 30, 0.25)',
                 borderRadius: '14px',
                 padding: isMobileView ? '16px' : '16px',
                 display: 'flex',
@@ -321,11 +322,11 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 <span style={{
                   fontSize: '0.68rem',
                   fontWeight: 800,
-                  background: 'rgba(2, 132, 199, 0.2)',
-                  color: '#38bdf8',
+                  background: 'rgba(2, 132, 199, 0.25)',
+                  color: '#7dd3fc',
                   padding: '3px 8px',
                   borderRadius: '6px',
-                  border: '1px solid rgba(56, 189, 248, 0.3)'
+                  border: '1px solid rgba(56, 189, 248, 0.38)'
                 }}>
                   {vehicle.category}
                 </span>
@@ -333,11 +334,11 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
-                    background: 'rgba(34, 197, 94, 0.15)',
+                    background: 'rgba(34, 197, 94, 0.18)',
                     color: '#4ade80',
                     padding: '3px 8px',
                     borderRadius: '6px',
-                    border: '1px solid rgba(34, 197, 94, 0.3)'
+                    border: '1px solid rgba(34, 197, 94, 0.35)'
                   }}>
                     {vehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
                   </span>
@@ -371,7 +372,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               {/* Title, Sticker & Specs */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
-                  <h3 style={{ fontSize: isMobileView ? '1.06rem' : '0.98rem', fontWeight: 800, color: '#f8fafc', margin: 0, lineHeight: 1.3, flex: 1 }}>
+                  <h3 style={{ fontSize: isMobileView ? '1.06rem' : '0.98rem', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.3, flex: 1 }}>
                     {vehicle.model}
                   </h3>
                   {sticker && (
@@ -381,8 +382,8 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                         height: isMobileView ? '54px' : '50px',
                         borderRadius: '10px',
                         background: '#ffffff',
-                        border: '2px solid rgba(56, 189, 248, 0.55)',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
+                        border: '2px solid rgba(56, 189, 248, 0.65)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
                         overflow: 'hidden',
                         flexShrink: 0,
                         display: 'flex',
@@ -409,7 +410,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: isMobileView ? '0.78rem' : '0.72rem', color: '#cbd5e1', marginBottom: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: isMobileView ? '0.78rem' : '0.72rem', color: '#e2e8f0', marginBottom: '8px' }}>
                   <div>⚙️ <strong>Vites:</strong> {vehicle.transmission || 'Manuel'}</div>
                   <div>🐎 <strong>Motor:</strong> {vehicle.engine || '-'}</div>
                   <div>⚡ <strong>Güç:</strong> {vehicle.power ? vehicle.power.split('(')[1]?.replace(')', '') || vehicle.power : '-'}</div>
@@ -422,17 +423,17 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    background: 'rgba(16, 185, 129, 0.12)',
-                    border: '1px solid rgba(16, 185, 129, 0.35)',
+                    background: 'rgba(16, 185, 129, 0.14)',
+                    border: '1px solid rgba(16, 185, 129, 0.38)',
                     borderRadius: '8px',
                     padding: isMobileView ? '7px 10px' : '5px 8px',
                     marginBottom: '10px',
                     fontSize: isMobileView ? '0.78rem' : '0.71rem'
                   }}>
-                    <span style={{ color: '#94a3b8', fontWeight: 700 }}>
+                    <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
                       📦 Uyumlu Kasa Boyu:
                     </span>
-                    <strong style={{ color: '#34d399', fontWeight: 900 }}>
+                    <strong style={{ color: '#4ade80', fontWeight: 900 }}>
                       {vehicle.bodyLength}
                     </strong>
                   </div>
@@ -444,28 +445,28 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    background: 'rgba(2, 132, 199, 0.08)',
-                    border: '1px solid rgba(56, 189, 248, 0.18)',
+                    background: 'rgba(2, 132, 199, 0.12)',
+                    border: '1px solid rgba(56, 189, 248, 0.25)',
                     borderRadius: '8px',
                     padding: '5px 8px',
                     marginBottom: '12px',
                     fontSize: '0.67rem'
                   }}>
-                    <span style={{ color: '#38bdf8', fontWeight: 700 }}>
+                    <span style={{ color: '#7dd3fc', fontWeight: 700 }}>
                       🟢 2026 Kota: Hazır Teslim Şasi
                     </span>
                     {vehicle.segment === 'Daily 35' && (
-                      <span style={{ color: '#10b981', fontWeight: 700 }}>
+                      <span style={{ color: '#34d399', fontWeight: 700 }}>
                         🛡️ B Ehliyet / Kantar Uyumu
                       </span>
                     )}
                     {vehicle.segment === 'T-Way' && (
-                      <span style={{ color: '#f59e0b', fontWeight: 700 }}>
+                      <span style={{ color: '#fbbf24', fontWeight: 700 }}>
                         🚜 Ağır Hizmet / Kaya Damperi
                       </span>
                     )}
                     {vehicle.segment === 'S-Way' && (
-                      <span style={{ color: '#38bdf8', fontWeight: 700 }}>
+                      <span style={{ color: '#7dd3fc', fontWeight: 700 }}>
                         🛣️ Uzun Yol Çekici
                       </span>
                     )}
@@ -475,16 +476,16 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
               {/* Pricing Box */}
               <div style={{
-                background: 'rgba(2, 6, 23, 0.65)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'rgba(16, 30, 54, 0.65)',
+                border: '1px solid rgba(148, 163, 184, 0.22)',
                 borderRadius: '10px',
                 padding: isMobileView ? '12px 14px' : '10px 12px',
                 marginBottom: '12px'
               }}>
                 {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? (
                   <div style={{
-                    background: 'rgba(245, 158, 11, 0.08)',
-                    border: '1px solid rgba(245, 158, 11, 0.28)',
+                    background: 'rgba(245, 158, 11, 0.1)',
+                    border: '1px solid rgba(245, 158, 11, 0.32)',
                     borderRadius: '8px',
                     padding: '10px 12px',
                     textAlign: 'center'
@@ -495,22 +496,22 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     <div style={{ fontSize: isMobileView ? '1.08rem' : '1.02rem', fontWeight: 900, color: '#fef08a', marginBottom: '3px' }}>
                       Can Murat Onay'a Danışınız
                     </div>
-                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', lineHeight: 1.35 }}>
+                    <div style={{ fontSize: '0.70rem', color: '#cbd5e1', lineHeight: 1.35 }}>
                       T-Way ağır şantiye ve hafriyat araçlarımız şasi boyutu, damper hacmi ve filo kotasına göre şahsen fiyatlandırılmaktadır.
                     </div>
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
                       <span>Resmi Liste Fiyatı:</span>
-                      <span style={{ fontWeight: 700, color: '#f8fafc' }}>€{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV</span>
+                      <span style={{ fontWeight: 700, color: '#ffffff' }}>€{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.74rem', color: '#38bdf8', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.74rem', color: '#7dd3fc', marginBottom: '6px' }}>
                       <span>Finansman & Teslimat:</span>
                       <span>Euro Kredisi & Filo Kotası</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
-                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#38bdf8', fontWeight: 800 }}>EURO PROJE FİYATI:</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
+                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#7dd3fc', fontWeight: 800 }}>EURO PROJE FİYATI:</span>
                       <span style={{ fontSize: isMobileView ? '1.22rem' : '1.08rem', color: '#38bdf8', fontWeight: 900 }}>
                         €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}
                       </span>
@@ -518,15 +519,15 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   </>
                 ) : vehicle.campaignPrice ? (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#94a3b8', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
                       <span>Kampanyalı Liste:</span>
                       <span style={{ textDecoration: 'line-through' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#f59e0b', marginBottom: '6px', fontWeight: 700 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#fbbf24', marginBottom: '6px', fontWeight: 700 }}>
                       <span>Peşin İndirimi:</span>
                       <span>-{vehicle.cashDiscount.toLocaleString('tr-TR')} TL</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
                       <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#4ade80', fontWeight: 800 }}>NET PEŞİN FİYAT:</span>
                       <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
                         {vehicle.cashPrice.toLocaleString('tr-TR')} TL
@@ -534,7 +535,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     </div>
                   </>
                 ) : (
-                  <div style={{ textAlign: 'center', color: '#38bdf8', fontWeight: 700, fontSize: '0.85rem' }}>
+                  <div style={{ textAlign: 'center', color: '#7dd3fc', fontWeight: 700, fontSize: '0.85rem' }}>
                     Özel Teklif & Döviz Kuru İçin Danışınız
                   </div>
                 )}

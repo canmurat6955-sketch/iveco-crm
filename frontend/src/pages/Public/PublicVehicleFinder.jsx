@@ -1808,8 +1808,8 @@ IVECO ERC Samsun Otomotiv
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #080b16 0%, #0d1224 100%)',
-      color: '#e2e8f0',
+      background: 'radial-gradient(ellipse at 50% 0%, #233d63 0%, #192d4b 48%, #13233b 100%)',
+      color: '#f1f5f9',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: '16px 12px 60px'
     }}>
@@ -2167,13 +2167,14 @@ IVECO ERC Samsun Otomotiv
               </div>
             )}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(2, 44, 88, 0.45) 100%)',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: 'linear-gradient(135deg, rgba(30, 52, 86, 0.94) 0%, rgba(18, 48, 89, 0.88) 100%)',
+              border: '1px solid rgba(56, 189, 248, 0.42)',
               borderRadius: '14px',
               padding: '10px 12px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px'
+              gap: '8px',
+              boxShadow: '0 6px 20px rgba(8, 15, 30, 0.25)'
             }}>
               {/* Üst Satır: IVECO Logosu + Can Murat Onay Bilgisi */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
@@ -2195,10 +2196,10 @@ IVECO ERC Samsun Otomotiv
                     {SALES_REP.initials}
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
                       {SALES_REP.name}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700, marginTop: '1px' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#7dd3fc', fontWeight: 700, marginTop: '1px' }}>
                       IVECO ERC Samsun · {SALES_REP.phoneDisplay}
                     </div>
                   </div>
@@ -2259,8 +2260,8 @@ IVECO ERC Samsun Otomotiv
               display: 'inline-flex',
               alignItems: 'center',
               gap: '12px',
-              background: 'rgba(15, 23, 42, 0.85)',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: 'rgba(30, 52, 86, 0.88)',
+              border: '1px solid rgba(56, 189, 248, 0.42)',
               padding: '8px 18px',
               borderRadius: '35px',
               marginBottom: '14px',
@@ -2286,10 +2287,10 @@ IVECO ERC Samsun Otomotiv
               </span>
             </div>
 
-            <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.3, margin: '0 0 6px' }}>
+            <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.3, margin: '0 0 6px' }}>
               IVECO 2026 Model Şasi Kataloğu, Fiyat Listesi & Finansman Portalı
             </h1>
-            <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0 }}>
               Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyatlarını, yasal istiap kapasitelerini ve <strong>anlaşmalı banka resmi sübvansiyonlu kredi kampanyalarını</strong> inceleyebilirsiniz.
             </p>
 
@@ -2298,8 +2299,8 @@ IVECO ERC Samsun Otomotiv
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              background: 'rgba(15, 23, 42, 0.85)',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: 'rgba(30, 52, 86, 0.88)',
+              border: '1px solid rgba(56, 189, 248, 0.42)',
               borderRadius: '25px',
               padding: '6px 16px',
               marginTop: '12px',
@@ -2525,10 +2526,10 @@ IVECO ERC Samsun Otomotiv
             display: 'grid',
             gridTemplateColumns: '1.15fr 1fr 0.85fr 0.85fr',
             gap: '5px',
-            background: 'rgba(15, 23, 42, 0.9)',
+            background: 'rgba(28, 48, 80, 0.92)',
             padding: '5px',
             borderRadius: '14px',
-            border: '1px solid rgba(255, 255, 255, 0.12)'
+            border: '1px solid rgba(125, 211, 252, 0.28)'
           }}>
             {[
               { id: 'fiyatlar', label: 'Fiyat Listesi' },
@@ -2543,7 +2544,7 @@ IVECO ERC Samsun Otomotiv
                   onClick={() => { setActiveMainTab(tab.id); setShowMoreTabsMobile(false); }}
                   style={{
                     background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'transparent',
-                    color: isActive ? '#fff' : '#cbd5e1',
+                    color: isActive ? '#fff' : '#e2e8f0',
                     border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
                     borderRadius: '10px',
                     padding: '10px 4px',
@@ -2562,8 +2563,8 @@ IVECO ERC Samsun Otomotiv
               onClick={() => setShowMoreTabsMobile(prev => !prev)}
               style={{
                 background: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-                color: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? '#38bdf8' : '#94a3b8',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? '#38bdf8' : '#cbd5e1',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
                 borderRadius: '10px',
                 padding: '10px 4px',
                 fontSize: '0.78rem',
@@ -2578,8 +2579,8 @@ IVECO ERC Samsun Otomotiv
           {showMoreTabsMobile && (
             <div style={{
               marginTop: '6px',
-              background: 'rgba(15, 23, 42, 0.96)',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
+              background: 'rgba(28, 48, 80, 0.96)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
               borderRadius: '12px',
               padding: '6px',
               display: 'flex',
@@ -2597,7 +2598,7 @@ IVECO ERC Samsun Otomotiv
                   onClick={() => { setActiveMainTab(sub.id); setShowMoreTabsMobile(false); }}
                   style={{
                     background: activeMainTab === sub.id ? 'rgba(2, 132, 199, 0.25)' : 'transparent',
-                    color: activeMainTab === sub.id ? '#38bdf8' : '#e2e8f0',
+                    color: activeMainTab === sub.id ? '#38bdf8' : '#f1f5f9',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '10px 12px',
@@ -2621,11 +2622,11 @@ IVECO ERC Samsun Otomotiv
           flexWrap: 'wrap',
           gap: '8px',
           justifyContent: 'center',
-          background: 'rgba(15, 23, 42, 0.75)',
+          background: 'rgba(28, 48, 80, 0.85)',
           padding: '6px',
           borderRadius: '30px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+          border: '1px solid rgba(125, 211, 252, 0.25)',
+          boxShadow: '0 4px 20px rgba(8, 15, 30, 0.25)'
         }}>
           {[
             { id: 'fiyatlar', label: '2026 Model Şasi Fiyat Listesi', badge: 'Kampanyalı' },
@@ -2642,7 +2643,7 @@ IVECO ERC Samsun Otomotiv
                 onClick={() => setActiveMainTab(tab.id)}
                 style={{
                   background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'transparent',
-                  color: isActive ? '#fff' : '#94a3b8',
+                  color: isActive ? '#fff' : '#e2e8f0',
                   border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
                   borderRadius: '25px',
                   padding: '8px 16px',
@@ -2661,8 +2662,8 @@ IVECO ERC Samsun Otomotiv
                   <span style={{
                     fontSize: '0.62rem',
                     fontWeight: 800,
-                    background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(56, 189, 248, 0.15)',
-                    color: isActive ? '#fff' : '#38bdf8',
+                    background: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(56, 189, 248, 0.18)',
+                    color: isActive ? '#fff' : '#7dd3fc',
                     padding: '2px 6px',
                     borderRadius: '10px'
                   }}>
@@ -2756,8 +2757,8 @@ IVECO ERC Samsun Otomotiv
               cursor: 'pointer',
               padding: isMobileView ? '10px 12px' : '8px 18px',
               borderRadius: isMobileView ? '12px' : '24px',
-              background: step === s.num ? 'rgba(0, 75, 147, 0.55)' : 'rgba(15, 23, 42, 0.6)',
-              border: step === s.num ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+              background: step === s.num ? 'rgba(2, 132, 199, 0.45)' : 'rgba(28, 48, 80, 0.78)',
+              border: step === s.num ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
               transition: 'all 0.2s ease'
             }}
           >
@@ -2765,7 +2766,7 @@ IVECO ERC Samsun Otomotiv
               width: isMobileView ? '24px' : '26px',
               height: isMobileView ? '24px' : '26px',
               borderRadius: '50%',
-              background: step === s.num ? '#0284c7' : step > s.num ? '#10b981' : '#1e293b',
+              background: step === s.num ? '#0284c7' : step > s.num ? '#10b981' : '#334155',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
@@ -2775,7 +2776,7 @@ IVECO ERC Samsun Otomotiv
             }}>
               {step > s.num ? <FiCheck size={14} /> : s.num}
             </div>
-            <span style={{ fontSize: isMobileView ? '0.84rem' : '0.84rem', color: step === s.num ? '#fff' : '#94a3b8', fontWeight: step === s.num ? 800 : 600 }}>
+            <span style={{ fontSize: isMobileView ? '0.84rem' : '0.84rem', color: step === s.num ? '#fff' : '#cbd5e1', fontWeight: step === s.num ? 800 : 600 }}>
               {s.label}
             </span>
           </div>
@@ -2786,11 +2787,11 @@ IVECO ERC Samsun Otomotiv
       <div style={{
         maxWidth: '680px',
         margin: '0 auto',
-        background: 'rgba(17, 24, 51, 0.85)',
-        border: '1px solid rgba(99, 179, 237, 0.2)',
+        background: 'rgba(26, 44, 74, 0.88)',
+        border: '1px solid rgba(125, 211, 252, 0.28)',
         borderRadius: '16px',
         padding: isMobileView ? '14px 12px' : '22px 20px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+        boxShadow: '0 8px 32px rgba(8, 15, 30, 0.32)',
         backdropFilter: 'blur(8px)'
       }}>
 
@@ -2798,11 +2799,11 @@ IVECO ERC Samsun Otomotiv
         {step === 1 && (
           <div>
             <div style={{ marginBottom: isMobileView ? '10px' : '14px' }}>
-              <h2 style={{ fontSize: isMobileView ? '1.1rem' : '1.2rem', fontWeight: 800, margin: '0 0 2px', color: '#f8fafc' }}>
+              <h2 style={{ fontSize: isMobileView ? '1.1rem' : '1.2rem', fontWeight: 800, margin: '0 0 2px', color: '#ffffff' }}>
                 1. IVECO Aracınızı Seçin
               </h2>
               {!isMobileView && (
-                <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
+                <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
                   İster doğrudan araç listesinden model seçin, ister taşıyacağınız yük ağırlığı ve kasa hacmine göre aratın:
                 </p>
               )}
@@ -2817,10 +2818,10 @@ IVECO ERC Samsun Otomotiv
                   flex: 1,
                   padding: isMobileView ? '13px 10px' : '10px 14px',
                   borderRadius: '12px',
-                  background: selectorMode === 'catalog' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.05)',
-                  color: selectorMode === 'catalog' ? '#fff' : '#94a3b8',
+                  background: selectorMode === 'catalog' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.08)',
+                  color: selectorMode === 'catalog' ? '#fff' : '#cbd5e1',
                   border: '1px solid',
-                  borderColor: selectorMode === 'catalog' ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                  borderColor: selectorMode === 'catalog' ? '#38bdf8' : 'rgba(255, 255, 255, 0.16)',
                   fontWeight: 800,
                   fontSize: isMobileView ? '0.88rem' : '0.82rem',
                   cursor: 'pointer',
@@ -2840,10 +2841,10 @@ IVECO ERC Samsun Otomotiv
                   flex: 1,
                   padding: isMobileView ? '13px 10px' : '10px 14px',
                   borderRadius: '12px',
-                  background: selectorMode === 'slider' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.05)',
-                  color: selectorMode === 'slider' ? '#fff' : '#94a3b8',
+                  background: selectorMode === 'slider' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.08)',
+                  color: selectorMode === 'slider' ? '#fff' : '#cbd5e1',
                   border: '1px solid',
-                  borderColor: selectorMode === 'slider' ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
+                  borderColor: selectorMode === 'slider' ? '#38bdf8' : 'rgba(255, 255, 255, 0.16)',
                   fontWeight: 800,
                   fontSize: isMobileView ? '0.88rem' : '0.82rem',
                   cursor: 'pointer',
@@ -2886,10 +2887,10 @@ IVECO ERC Samsun Otomotiv
                       type="button"
                       onClick={() => setSelectedCategoryTab(cat.id)}
                       style={{
-                        background: selectedCategoryTab === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.06)',
-                        color: selectedCategoryTab === cat.id ? '#fff' : '#cbd5e1',
+                        background: selectedCategoryTab === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.85)',
+                        color: selectedCategoryTab === cat.id ? '#fff' : '#e2e8f0',
                         border: '1.5px solid',
-                        borderColor: selectedCategoryTab === cat.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.12)',
+                        borderColor: selectedCategoryTab === cat.id ? '#38bdf8' : 'rgba(148, 163, 184, 0.28)',
                         borderRadius: isMobileView ? '10px' : '22px',
                         padding: isMobileView ? '9px 6px' : '5px 12px',
                         fontSize: isMobileView ? '0.77rem' : '0.74rem',
@@ -2921,8 +2922,10 @@ IVECO ERC Samsun Otomotiv
                         key={v.key}
                         onClick={() => handleSelectVehicle(v.key)}
                         style={{
-                          background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)' : 'rgba(15, 23, 42, 0.78)',
-                          border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
+                          background: isSelected
+                            ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(28, 48, 82, 0.96) 100%)'
+                            : 'linear-gradient(165deg, rgba(35, 58, 94, 0.92) 0%, rgba(25, 43, 72, 0.92) 100%)',
+                          border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(125, 211, 252, 0.24)',
                           borderRadius: '14px',
                           padding: isMobileView ? '16px' : '12px',
                           cursor: 'pointer',
@@ -2930,12 +2933,12 @@ IVECO ERC Samsun Otomotiv
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
-                          boxShadow: isSelected ? '0 0 18px rgba(56, 189, 248, 0.3)' : 'none'
+                          boxShadow: isSelected ? '0 0 18px rgba(56, 189, 248, 0.3)' : '0 4px 14px rgba(8, 15, 30, 0.22)'
                         }}
                       >
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                            <span style={{ fontSize: isMobileView ? '0.76rem' : '0.68rem', color: '#94a3b8', fontWeight: 700 }}>
+                            <span style={{ fontSize: isMobileView ? '0.76rem' : '0.68rem', color: '#cbd5e1', fontWeight: 700 }}>
                               {v.categoryLabel}
                             </span>
                             {isSelected ? (
@@ -2943,7 +2946,7 @@ IVECO ERC Samsun Otomotiv
                                 <FiCheck size={12} /> SEÇİLİ
                               </span>
                             ) : (
-                              <span style={{ fontSize: isMobileView ? '0.72rem' : '0.66rem', color: v.kantarStatus === 'exempt' ? '#38bdf8' : '#10b981', fontWeight: 700 }}>
+                              <span style={{ fontSize: isMobileView ? '0.72rem' : '0.66rem', color: v.kantarStatus === 'exempt' ? '#7dd3fc' : '#34d399', fontWeight: 700 }}>
                                 {v.kantarStatus === 'exempt' ? 'B Ehliyet / 3.5 Ton' : 'Kantar Tescilli (C)'}
                               </span>
                             )}
@@ -2951,10 +2954,10 @@ IVECO ERC Samsun Otomotiv
 
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <h4 style={{ margin: '0 0 4px', fontSize: isMobileView ? '1.06rem' : '0.92rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.25 }}>
+                              <h4 style={{ margin: '0 0 4px', fontSize: isMobileView ? '1.06rem' : '0.92rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
                                 {v.title}
                               </h4>
-                              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
+                              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.7rem', color: '#7dd3fc', fontWeight: 600 }}>
                                 {v.badge}
                               </div>
                             </div>
@@ -2987,18 +2990,18 @@ IVECO ERC Samsun Otomotiv
                             )}
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '8px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(15, 28, 50, 0.55)', border: '1px solid rgba(148, 163, 184, 0.16)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '8px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
                             <div>
-                              <span style={{ color: '#64748b', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>NET YÜK</span>
+                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>NET YÜK</span>
                               <strong style={{ color: '#fff', fontSize: isMobileView ? '0.88rem' : undefined }}>{(v.payloadKg / 1000).toFixed(1)} Ton</strong>
                             </div>
                             <div>
-                              <span style={{ color: '#64748b', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>HACİM</span>
-                              <strong style={{ color: '#10b981', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.volumeM3} m³</strong>
+                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>HACİM</span>
+                              <strong style={{ color: '#34d399', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.volumeM3} m³</strong>
                             </div>
                             <div>
-                              <span style={{ color: '#64748b', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>EHLİYET</span>
-                              <strong style={{ color: '#e2e8f0', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.license.split(' ')[0]}</strong>
+                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>EHLİYET</span>
+                              <strong style={{ color: '#f1f5f9', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.license.split(' ')[0]}</strong>
                             </div>
                           </div>
 
