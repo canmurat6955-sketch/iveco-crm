@@ -2523,20 +2523,23 @@ IVECO ERC Samsun Otomotiv
 
       {/* ── MÜŞTERİ MODÜLÜ ANA SEKMELERİ (TABS) ── */}
       {isMobileView ? (
-        <div style={{ maxWidth: '680px', margin: '0 auto 12px' }}>
+        <div style={{ maxWidth: '680px', margin: '0 auto 14px' }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1.15fr 1fr 0.85fr 0.85fr',
-            gap: '5px',
-            background: 'rgba(28, 48, 80, 0.92)',
-            padding: '5px',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '6px',
+            background: 'rgba(24, 42, 72, 0.95)',
+            padding: '6px',
             borderRadius: '14px',
-            border: '1px solid rgba(125, 211, 252, 0.28)'
+            border: '1px solid rgba(125, 211, 252, 0.3)'
           }}>
             {[
-              { id: 'fiyatlar', label: 'Fiyat Listesi' },
-              { id: 'secici', label: 'Araç Seç' },
-              { id: 'krediler', label: 'Kredi' },
+              { id: 'fiyatlar', label: '🏷️ Fiyat Listesi' },
+              { id: 'krediler', label: '💳 Kredi & %0 Faiz' },
+              { id: 'tco', label: '⚔️ Neden IVECO?' },
+              { id: 'secici', label: '🚛 Araç & Tonaj Seç' },
+              { id: 'ust-yapi', label: '🏗️ Üst Yapı Rehberi' },
+              { id: 'sss', label: '❓ Merak Edilenler' }
             ].map((tab) => {
               const isActive = activeMainTab === tab.id;
               return (
@@ -2545,80 +2548,27 @@ IVECO ERC Samsun Otomotiv
                   type="button"
                   onClick={() => { setActiveMainTab(tab.id); setShowMoreTabsMobile(false); }}
                   style={{
-                    background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'transparent',
-                    color: isActive ? '#fff' : '#e2e8f0',
-                    border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
+                    background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(15, 28, 50, 0.65)',
+                    color: isActive ? '#ffffff' : '#f1f5f9',
+                    border: isActive ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.22)',
                     borderRadius: '10px',
                     padding: '10px 4px',
-                    fontSize: '0.8rem',
+                    fontSize: '0.76rem',
                     fontWeight: isActive ? 800 : 700,
                     whiteSpace: 'nowrap',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: isActive ? '0 3px 10px rgba(2, 132, 199, 0.35)' : 'none'
                   }}
                 >
                   {tab.label}
                 </button>
               );
             })}
-            <button
-              type="button"
-              onClick={() => setShowMoreTabsMobile(prev => !prev)}
-              style={{
-                background: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-                color: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? '#38bdf8' : '#cbd5e1',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
-                borderRadius: '10px',
-                padding: '10px 4px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                whiteSpace: 'nowrap',
-                cursor: 'pointer'
-              }}
-            >
-              Diğer ▾
-            </button>
           </div>
-          {showMoreTabsMobile && (
-            <div style={{
-              marginTop: '6px',
-              background: 'rgba(28, 48, 80, 0.96)',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
-              borderRadius: '12px',
-              padding: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}>
-              {[
-                { id: 'tco', label: '📊 TCO & Rakip Karşılaştırma' },
-                { id: 'sss', label: '❓ Sıkça Sorulan Sorular & Danışman' },
-                { id: 'ust-yapi', label: '🏗️ Üst Yapı & Kasa Rehberi' }
-              ].map(sub => (
-                <button
-                  key={sub.id}
-                  type="button"
-                  onClick={() => { setActiveMainTab(sub.id); setShowMoreTabsMobile(false); }}
-                  style={{
-                    background: activeMainTab === sub.id ? 'rgba(2, 132, 199, 0.25)' : 'transparent',
-                    color: activeMainTab === sub.id ? '#38bdf8' : '#f1f5f9',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px 12px',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    textAlign: 'left',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       ) : (
         <div style={{
-          maxWidth: '880px',
+          maxWidth: '980px',
           margin: '0 auto 20px',
           display: 'flex',
           flexWrap: 'wrap',
@@ -2631,11 +2581,12 @@ IVECO ERC Samsun Otomotiv
           boxShadow: '0 4px 20px rgba(8, 15, 30, 0.25)'
         }}>
           {[
-            { id: 'fiyatlar', label: '2026 Model Şasi Fiyat Listesi', badge: 'Kampanyalı' },
-            { id: 'secici', label: 'Şasi & Taşıma Kapasitesi (İstiap)', badge: null },
-            { id: 'tco', label: 'TCO & Rakip Karşılaştırma', badge: 'M. & F. Analizi' },
+            { id: 'fiyatlar', label: '2026 Şasi Fiyat Listesi', badge: 'Kampanyalı' },
             { id: 'krediler', label: 'Banka Finansman & Kredi Planı', badge: '%0 Faiz' },
-            { id: 'sss', label: 'Sıkça Sorulan Sorular & Danışman', badge: 'ERC Samsun' }
+            { id: 'tco', label: 'Neden IVECO? (TCO & Rakip Analizi)', badge: 'M. & F. Kıyaslama' },
+            { id: 'secici', label: 'Şasi & Taşıma Kapasitesi (İstiap)', badge: null },
+            { id: 'ust-yapi', label: 'Üst Yapı & Kasa Rehberi', badge: null },
+            { id: 'sss', label: 'Sıkça Sorulanlar & Danışman', badge: 'ERC Samsun' }
           ].map((tab) => {
             const isActive = activeMainTab === tab.id;
             return (
@@ -2648,8 +2599,8 @@ IVECO ERC Samsun Otomotiv
                   color: isActive ? '#fff' : '#e2e8f0',
                   border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
                   borderRadius: '25px',
-                  padding: '8px 16px',
-                  fontSize: '0.80rem',
+                  padding: '8px 15px',
+                  fontSize: '0.79rem',
                   fontWeight: isActive ? 800 : 600,
                   cursor: 'pointer',
                   display: 'inline-flex',

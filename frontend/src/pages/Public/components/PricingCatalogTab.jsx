@@ -16,6 +16,9 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyDoubleWheels, setOnlyDoubleWheels] = useState(false);
+  const [showTradeInBox, setShowTradeInBox] = useState(false);
+  const [tradeInVehicleText, setTradeInVehicleText] = useState('');
+  const [tradeInTargetModel, setTradeInTargetModel] = useState('Daily 35C16 Çift Teker');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
 
   useEffect(() => {
@@ -80,6 +83,21 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
     }
   };
 
+  const handleVehicleTradeIn = (vehicle) => {
+    if (onDirectWhatsApp) {
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, mevcut ticari aracımı takasa vererek (peşinata saydırıp kalan tutarı kredilendirerek) sıfır *${vehicle.model}* almak istiyorum. Takas ekspertiz ve ödeme planı için görüşebilir miyiz?`;
+      onDirectWhatsApp(msg);
+    }
+  };
+
+  const handleGeneralTradeInSubmit = () => {
+    if (onDirectWhatsApp) {
+      const currentCar = tradeInVehicleText.trim() ? `*${tradeInVehicleText.trim()}*` : 'mevcut ticari aracımı';
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, elimdeki ${currentCar} takasa verip peşinata saydırarak sıfır *IVECO ${tradeInTargetModel}* almak istiyorum. Takas değerleme ve kredi farkı için bilgi alabilir miyim?`;
+      onDirectWhatsApp(msg);
+    }
+  };
+
   return (
     <div style={{ color: '#f8fafc' }}>
       {/* Tab Banner (Mobilde yalnızca özel bir kategori seçildiğinde gösterilir, tüm araçlarda tekrar etmez) */}
@@ -116,14 +134,14 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
             </h2>
             {!isMobileView && (
-              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0' }}>
+              <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: '4px 0 0' }}>
                 {selectedCategory === 'sway'
                   ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
                   : selectedCategory === 'tway'
                     ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
                     : selectedCategory === 'daily70'
                       ? '7.000 kg ve 7.200 kg azami yüklü ağırlıklı 70C16 şasi kamyon ve 70C18 yüksek hacimli (19.6 m³) panelvan resmi liste fiyatları.'
-                      : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
+                      : 'Tüm modellerde şeffaf resmi liste fiyatları, KDV vergi kalkanı ve takas desteği uygulanmıştır.'}
               </p>
             )}
           </div>
@@ -155,6 +173,121 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
           )}
         </div>
       )}
+
+      {/* 🔄 TAKAS ARACIMI PEŞİNATA SAYDIR HIZLI BARI */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(28, 48, 80, 0.92) 100%)',
+        border: '1px solid rgba(245, 158, 11, 0.45)',
+        borderRadius: '12px',
+        padding: isMobileView ? '10px 12px' : '12px 16px',
+        marginBottom: isMobileView ? '12px' : '16px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '10px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '220px' }}>
+            <span style={{ fontSize: isMobileView ? '1.3rem' : '1.5rem' }}>🔄</span>
+            <div>
+              <div style={{ fontSize: isMobileView ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#fde68a' }}>
+                Eski Ticari Aracınızı Takasa Verip Peşinat Saydırın!
+              </div>
+              <div style={{ fontSize: isMobileView ? '0.72rem' : '0.76rem', color: '#e2e8f0' }}>
+                Markası ne olursa olsun (Transit, Sprinter, Atego, Isuzu, Master vb.) aracınızı değerinde sayıp kalanına kredi çıkarıyoruz.
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowTradeInBox(prev => !prev)}
+            style={{
+              background: showTradeInBox ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: showTradeInBox ? '#fff' : '#0f172a',
+              border: 'none',
+              borderRadius: '8px',
+              padding: isMobileView ? '8px 12px' : '8px 14px',
+              fontSize: '0.76rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {showTradeInBox ? '✕ Kapat' : '🔄 Aracımı Peşinata Saydır'}
+          </button>
+        </div>
+
+        {showTradeInBox && (
+          <div style={{
+            marginTop: '12px',
+            paddingTop: '12px',
+            borderTop: '1px dashed rgba(245, 158, 11, 0.35)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            alignItems: 'center'
+          }}>
+            <input
+              type="text"
+              value={tradeInVehicleText}
+              onChange={(e) => setTradeInVehicleText(e.target.value)}
+              placeholder="Mevcut aracınız (Örn: 2020 Ford Transit 350ED / 2018 Atego...)"
+              style={{
+                flex: '2 1 220px',
+                padding: '9px 12px',
+                background: 'rgba(15, 28, 50, 0.85)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+                outline: 'none'
+              }}
+            />
+            <select
+              value={tradeInTargetModel}
+              onChange={(e) => setTradeInTargetModel(e.target.value)}
+              style={{
+                flex: '1 1 180px',
+                padding: '9px 12px',
+                background: 'rgba(15, 28, 50, 0.9)',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+                outline: 'none'
+              }}
+            >
+              <option value="Daily 35C16 Çift Teker">Hedef: Daily 35C16 Çift Teker</option>
+              <option value="Daily 35S16 Tek Teker / Panelvan">Hedef: Daily 35S16 / Panelvan</option>
+              <option value="Daily 72C18 (7 Ton Kamyon)">Hedef: Daily 72C18 (7 Ton)</option>
+              <option value="Eurocargo 100E / 150E / 160E">Hedef: Eurocargo Kamyon</option>
+              <option value="S-Way Çekici / T-Way Hafriyat">Hedef: S-Way / T-Way</option>
+            </select>
+            <button
+              type="button"
+              onClick={handleGeneralTradeInSubmit}
+              style={{
+                background: '#22c55e',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '9px 16px',
+                fontSize: '0.8rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FiMessageSquare size={14} /> WhatsApp'tan Takas Teklifi Al
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
       {(selectedCategory === 'daily35_chassis' || selectedCategory === 'daily35_van') && (
@@ -303,6 +436,9 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '16px' }}>
         {filteredVehicles.map(vehicle => {
           const sticker = getVehicleSticker(vehicle);
+          const effectiveTlPrice = vehicle.cashPrice || vehicle.campaignPrice || 0;
+          const vatShieldTl = effectiveTlPrice > 0 ? Math.round(effectiveTlPrice - (effectiveTlPrice / 1.20)) : 0;
+
           return (
             <div
               key={vehicle.id}
@@ -488,7 +624,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 )}
               </div>
 
-              {/* Pricing Box */}
+              {/* Pricing Box + Automatic KDV Shield */}
               <div style={{
                 background: 'rgba(16, 30, 54, 0.65)',
                 border: '1px solid rgba(148, 163, 184, 0.22)',
@@ -511,7 +647,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                       Can Murat Onay'a Danışınız
                     </div>
                     <div style={{ fontSize: '0.70rem', color: '#cbd5e1', lineHeight: 1.35 }}>
-                      T-Way ağır şantiye ve hafriyat araçlarımız şasi boyutu, damper hacmi ve filo kotasına göre şahsen fiyatlandırılmaktadır.
+                      T-Way ağır şantiye araçlarımız damper/mikser tipi, takas ve filo kotasına göre özel fiyatlandırılmaktadır.
                     </div>
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
@@ -530,12 +666,26 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                         €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}
                       </span>
                     </div>
+                    <div style={{
+                      marginTop: '6px',
+                      paddingTop: '6px',
+                      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                      fontSize: '0.68rem',
+                      color: '#fcd34d',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <span>🧾 Vergi Kalkanı:</span>
+                      <span>%20 KDV İndirimi + 5 Yıl Amortisman</span>
+                    </div>
                   </>
                 ) : vehicle.campaignPrice ? (
                   vehicle.cashDiscount > 0 ? (
                     <>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
-                        <span>Kampanyalı Liste:</span>
+                        <span>Kampanyalı (KDV Dahil):</span>
                         <span style={{ textDecoration: 'line-through' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#fbbf24', marginBottom: '6px', fontWeight: 700 }}>
@@ -543,16 +693,32 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                         <span>-{vehicle.cashDiscount.toLocaleString('tr-TR')} TL</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
-                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#4ade80', fontWeight: 800 }}>NET PEŞİN FİYAT:</span>
+                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#4ade80', fontWeight: 800 }}>NET PEŞİN (KDV Dahil):</span>
                         <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
                           {vehicle.cashPrice.toLocaleString('tr-TR')} TL
                         </span>
                       </div>
+                      {vatShieldTl > 0 && (
+                        <div style={{
+                          marginTop: '6px',
+                          paddingTop: '6px',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                          fontSize: isMobileView ? '0.72rem' : '0.68rem',
+                          color: '#fcd34d',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <span>🧾 Vergi Avantajı (KDV):</span>
+                          <span>~{vatShieldTl.toLocaleString('tr-TR')} TL Vergiden Düşülür</span>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
-                        <span>Kredili Kampanya Fiyatı:</span>
+                        <span>Kredili Liste (KDV Dahil):</span>
                         <span style={{ fontWeight: 700, color: '#ffffff' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.73rem', color: '#94a3b8', marginBottom: '6px', fontWeight: 600 }}>
@@ -560,11 +726,27 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                         <span>Bulunmamaktadır</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
-                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#38bdf8', fontWeight: 800 }}>KREDİLİ / NET FİYAT:</span>
+                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#38bdf8', fontWeight: 800 }}>KREDİLİ / NET (KDV Dahil):</span>
                         <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
                           {vehicle.cashPrice.toLocaleString('tr-TR')} TL
                         </span>
                       </div>
+                      {vatShieldTl > 0 && (
+                        <div style={{
+                          marginTop: '6px',
+                          paddingTop: '6px',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                          fontSize: isMobileView ? '0.72rem' : '0.68rem',
+                          color: '#fcd34d',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <span>🧾 Vergi Avantajı (KDV):</span>
+                          <span>~{vatShieldTl.toLocaleString('tr-TR')} TL Vergiden Düşülür</span>
+                        </div>
+                      )}
                     </>
                   )
                 ) : (
@@ -575,7 +757,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
                 <button
                   type="button"
                   onClick={() => onSelectVehicle && onSelectVehicle(vehicle)}
@@ -585,17 +767,41 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     color: '#fff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: isMobileView ? '12px 10px' : '8px 10px',
-                    fontSize: isMobileView ? '0.84rem' : '0.74rem',
+                    padding: isMobileView ? '11px 8px' : '8px 8px',
+                    fontSize: isMobileView ? '0.8rem' : '0.72rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <FiTruck size={isMobileView ? 15 : 13} /> Kredi Hesapla
+                  <FiTruck size={isMobileView ? 14 : 12} /> Kredi Planı
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleVehicleTradeIn(vehicle)}
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.18)',
+                    color: '#fde68a',
+                    border: '1px solid rgba(245, 158, 11, 0.45)',
+                    borderRadius: '10px',
+                    padding: isMobileView ? '11px 9px' : '8px 9px',
+                    fontSize: isMobileView ? '0.78rem' : '0.71rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
+                  }}
+                  title="Mevcut aracımı takasa verip peşinata saydır"
+                >
+                  🔄 Takaslı Al
                 </button>
 
                 <button
@@ -606,17 +812,18 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     color: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#000' : '#fff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: isMobileView ? '12px 14px' : '8px 12px',
-                    fontSize: isMobileView ? '0.84rem' : '0.74rem',
+                    padding: isMobileView ? '11px 10px' : '8px 10px',
+                    fontSize: isMobileView ? '0.8rem' : '0.72rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
                   }}
                   title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Can Murat'tan Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
                 >
-                  <FiMessageSquare size={isMobileView ? 15 : 13} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat Al' : 'Teklif Al'}
+                  <FiMessageSquare size={isMobileView ? 14 : 12} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
                 </button>
               </div>
             </div>

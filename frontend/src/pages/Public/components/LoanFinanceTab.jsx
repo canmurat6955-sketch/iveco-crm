@@ -527,11 +527,11 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               </div>
 
               {/* Campaign Type Pills */}
-              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                 {[
-                  { id: 'all', label: 'Tüm Kampanyalar' },
+                  { id: 'all', label: '📋 Tüm Kampanyalar' },
                   { id: 'zero', label: '💎 Sadece %0 Faizli Paketler' },
-                  { id: 'grace', label: '⏳ 6 Ay Ödemesiz Paketler' }
+                  { id: 'grace', label: '⏳ Şimdi Al, 6 Ay Sonra Öde (Ödemesiz Dönem)' }
                 ].map(f => {
                   const isSel = campaignTypeFilter === f.id;
                   return (
@@ -540,13 +540,13 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                       type="button"
                       onClick={() => setCampaignTypeFilter(f.id)}
                       style={{
-                        background: isSel ? 'rgba(34, 197, 94, 0.25)' : 'rgba(35, 58, 94, 0.7)',
-                        border: isSel ? '1px solid #22c55e' : '1px solid rgba(148, 163, 184, 0.22)',
-                        color: isSel ? '#4ade80' : '#cbd5e1',
-                        padding: '4px 10px',
-                        borderRadius: '6px',
-                        fontSize: '0.70rem',
-                        fontWeight: 700,
+                        background: isSel ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'rgba(35, 58, 94, 0.85)',
+                        border: isSel ? '1.5px solid #4ade80' : '1px solid rgba(148, 163, 184, 0.28)',
+                        color: '#ffffff',
+                        padding: '7px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
                         cursor: 'pointer'
                       }}
                     >
@@ -554,6 +554,45 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                     </button>
                   );
                 })}
+              </div>
+
+              {/* Takas Peşinat Destek Kutusu */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(15, 28, 50, 0.85) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px'
+              }}>
+                <div style={{ fontSize: '0.76rem', color: '#fde68a', fontWeight: 700 }}>
+                  🔄 <strong>Nakit Peşinatınız Yok mu?</strong> Mevcut ticari aracınızı (Transit, Sprinter, Atego, Isuzu vb.) peşinat sayıp kalan tutara kredi kullandırıyoruz.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onDirectWhatsApp) {
+                      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, mevcut ticari aracımı takasa vererek peşinat saydırmak ve kalan tutar için *${activeBank.name}* üzerinden ticari kredi kullanmak istiyorum. Bilgi alabilir miyim?`;
+                      onDirectWhatsApp(msg);
+                    }
+                  }}
+                  style={{
+                    background: '#f59e0b',
+                    color: '#0f172a',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '0.74rem',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  🔄 Takas + Kredi İste
+                </button>
               </div>
             </div>
 
