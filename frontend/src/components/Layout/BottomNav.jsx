@@ -99,7 +99,7 @@ export default function BottomNav({ onVisitStart }) {
                   <span className="more-menu-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <FiBarChart2 size={15} color="#10b981" /> TCO Kıyaslama
                   </span>
-                  <span className="more-menu-card-sub">50.000 km tasarruf</span>
+                  <span className="more-menu-card-sub">Yakıt & bakım analizi</span>
                 </button>
 
                 <button 

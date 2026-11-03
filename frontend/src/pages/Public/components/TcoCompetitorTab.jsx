@@ -5,7 +5,7 @@ import {
 } from 'react-icons/fi';
 
 export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
-  const [activeSubTab, setActiveSubTab] = useState('eurocargo_15t');
+  const [activeSubTab, setActiveSubTab] = useState('daily_my26');
 
   const handleConsultantQuote = (topic) => {
     if (onDirectWhatsApp) {
@@ -32,13 +32,13 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       }}>
         <div>
           <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            RESMİ TEKNİK VERİLER & TOPLAM SAHİP OLMA MALİYETİ (TCO)
+            RESMİ KATALOG VERİLERİ & TOPLAM SAHİP OLMA MALİYETİ (TCO)
           </div>
           <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '4px 0 3px', color: '#fff' }}>
             Neden IVECO? Rakip Karşılaştırma & TCO Analizi
           </h2>
-          <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, maxWidth: '650px', lineHeight: 1.45 }}>
-            Araç satın alma bedeli buzdağının sadece görünen kısmıdır. Bakım aralıkları, şanzıman balata masrafı, modüler parça tamiri ve yasal istiap kapasitesiyle IVECO'nun sunduğu somut maliyet avantajlarını inceleyin.
+          <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, maxWidth: '680px', lineHeight: 1.45 }}>
+            Araç satın alma bedeli buzdağının sadece görünen kısmıdır. Resmi bakım periyotları, çelik zincirli motor ömrü, tork konvertörlü ZF şanzıman, 3 parçalı modüler tampon ve yasal istiap kapasitesiyle IVECO'nun sunduğu gerçek maliyet avantajlarını inceleyin.
           </p>
         </div>
         <div style={{
@@ -49,7 +49,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
           textAlign: 'right'
         }}>
           <div style={{ fontSize: '0.70rem', color: '#4ade80', fontWeight: 700 }}>📉 5 YILLIK TCO AVANTAJI</div>
-          <div style={{ fontSize: '0.92rem', color: '#fff', fontWeight: 800 }}>%35'e Varan İşletme Tasarrufu</div>
+          <div style={{ fontSize: '0.92rem', color: '#fff', fontWeight: 800 }}>Doğrulanmış Resmi Verilerle Tasarruf</div>
         </div>
       </div>
 
@@ -65,9 +65,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         {[
-          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs M.)', icon: '🚛' },
-          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs 10T Rakip)', icon: '🚚' },
           { id: 'daily_my26', label: 'Hafif Ticari (Daily MY26 vs F. & Rakipler)', icon: '🚐' },
+          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs M. 1518)', icon: '🚛' },
+          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs 10T Rakip)', icon: '🚚' },
+          { id: 'sway_heavy', label: 'Çekici & Ağır Vasıta (S-Way vs F-MAX & Actros)', icon: '🛣️' },
           { id: 'market_feedback', label: 'Piyasa & Kullanıcı Geri Dönüşleri', icon: '💬' }
         ].map((sub) => {
           const isActive = activeSubTab === sub.id;
@@ -77,9 +78,9 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               type="button"
               onClick={() => setActiveSubTab(sub.id)}
               style={{
-                flex: '1 1 200px',
+                flex: '1 1 180px',
                 background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'transparent',
-                color: isActive ? '#fff' : '#94a3b8',
+                color: isActive ? '#fff' : '#cbd5e1',
                 border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
                 borderRadius: '20px',
                 padding: '8px 14px',
@@ -107,33 +108,33 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⚙️ ŞANZIMAN & BASKI-BALATA</div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>8 İleri Tam Otomatik</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                Baskı balata <strong>YOKTUR</strong>. M.'nin robotize şanzımanındaki gibi balata aşınması, debriyaj ısınması ve 60.000 TL+ değişim maliyeti sıfırdır.
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>ZF 8AP Tam Otomatik</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Tork konvertörlüdür, kuru kavrama baskı-balata <strong>YOKTUR</strong>. Rakip M.'nin 6 ileri PowerShift robotize şanzımanındaki gibi balata aşınması ve 65.000 TL+ değişim maliyeti sıfırdır.
               </p>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>⚖️ NET YÜK KAPASİTESİ</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>+163 kg Daha Fazla İstiap</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.519 kg boş ağırlığı ile rakip M.'den 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Eurocargo 4.519 kg boş ağırlığı ile rakip M. 1518'den (4.682 kg) 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
               </p>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🔄 ŞEHİR İÇİ MANEVRA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>88 cm Daha Dar Dönüş</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
                 Daha uzun dingil mesafesine (4.185 mm) sahip olmasına rağmen 14.72 m dönüş çapı ile M.'den (15.60 m) dar sokaklarda çok daha kıvraktır.
               </p>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '12px', padding: '14px' }}>
-              <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🐎 MOTOR GÜCÜ & MENZİL</div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>210 HP & 200 L Depo</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.5L 210 HP güç üretirken M. 5.1L 177 HP kalır. +80 Litre daha büyük yakıt deposu ile uzun yolda sefer bölünmez.
+              <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🐎 HI-SCR (EGR'SİZ) & 210 HP</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>210 HP • 750 Nm • 40.000 km Bakım</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Eurocargo 4.5L Tector 5 motor 210 HP üretirken M. 5.1L 177 HP'de kalır. EGR valfi içermeyen HI-SCR teknolojisi ile kurum tıkanması yaşatmaz.
               </p>
             </div>
           </div>
@@ -158,7 +159,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG VERİLERİ (PTC 2026 MDT)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  15T Eurocargo MLC 150 E 21 vs 15T Rakip M. (1518 / 42)
+                  15T Eurocargo MLC 150 E 21 vs 15T Rakip M. (Atego 1518 / 42)
                 </h3>
               </div>
               <button
@@ -202,16 +203,30 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                   {[
                     {
                       feature: 'Şanzıman Tipi',
-                      iveco: 'Full Otomatik (8 İleri ZF Tork Konvertörlü)',
-                      competitor: 'Otomatikleştirilmiş / Robotize (6 İleri)',
-                      advantage: 'Baskı balata yok! Balata aşınması ve 60.000 TL+ değişim maliyeti sıfır.',
+                      iveco: 'Full Otomatik (8 İleri ZF 8AP Tork Konvertörlü)',
+                      competitor: 'Otomatikleştirilmiş / Robotize (6 İleri PowerShift 3)',
+                      advantage: 'Kuru kavrama baskı-balata yok! Balata aşınması ve 65.000 TL+ değişim maliyeti sıfır.',
                       highlight: true
                     },
                     {
-                      feature: 'Motor Gücü & Hacmi',
-                      iveco: '210 HP • 4.5 Litre FPT Motor',
-                      competitor: '177 HP • 5.1 Litre Motor',
-                      advantage: '+33 HP daha güçlü. Düşük hacim sayesinde %8-12 yakıt tasarrufu.',
+                      feature: 'Motor Gücü, Tork & Hacim',
+                      iveco: '210 HP • 750 Nm Tork • 4.5L FPT Tector 5',
+                      competitor: '177 HP • 750 Nm Tork • 5.1L OM934',
+                      advantage: '+33 HP daha yüksek beygir gücü. Düşük motor hacmiyle %8-12 yakıt tasarrufu.',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Emisyon Teknolojisi (EGR / DPF)',
+                      iveco: 'HI-SCR (EGR Valfi Yok - Saf SCR Sistemi)',
+                      competitor: 'EGR + SCR + DPF',
+                      advantage: 'EGR olmadığı için motora kurum dönmez; şehir içi dağıtımda DPF tıkanması ve rejenerasyon duruşu yaşanmaz.',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Periyodik Bakım Aralığı',
+                      iveco: '40.000 km / 1 Yıl (800 Saat)',
+                      competitor: '30.000 - 40.000 km (Ağır Hizmette 20.000-30.000 km)',
+                      advantage: 'Uzun bakım periyodu ve M. Servis A/B faturalarına kıyasla %35 daha ekonomik yetkili servis maliyeti.',
                       highlight: true
                     },
                     {
@@ -271,18 +286,11 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       highlight: false
                     },
                     {
-                      feature: 'Dijital Kadran Boyutu',
-                      iveco: '10 inç Tam Renkli Dijital Kadran',
-                      competitor: '5 inç Küçük Ekran',
-                      advantage: 'Binek otomobil konforu, tüm telematik ve filo verileri göz önünde.',
+                      feature: 'Dijital Kadran & Multimedya',
+                      iveco: '10" Tam Renkli Dijital Kadran + 7" Multimedya',
+                      competitor: '5" Küçük Ekran / Opsiyonel Radyo',
+                      advantage: 'Standart Apple CarPlay & Android Auto, tüm telematik ve filo verileri göz önünde.',
                       highlight: true
-                    },
-                    {
-                      feature: 'Bilgi-Eğlence Sistemi',
-                      iveco: '7 inç Multimedya Ekranı Standart',
-                      competitor: 'Yok / Basit Radyo',
-                      advantage: 'Apple CarPlay & Android Auto ile rota ve navigasyon entegrasyonu.',
-                      highlight: false
                     }
                   ].map((row, idx) => (
                     <tr
@@ -322,24 +330,24 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 PERİYODİK BAKIM ARALIĞI</div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>40.000 km Bakım Aralığı</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                Rakip araçlar her 20.000 km'de servise girmek zorundayken, Eurocargo 40.000 km veya 800 saatte bir servise girer. <strong>Bakım maliyetleri yarı yarıya düşer!</strong>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>40.000 km vs 20.000 km</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                10T rakip kamyonlar (NPR 10 vb.) her 20.000 km'de servise girmek zorundayken, Eurocargo 40.000 km veya 800 saatte bir servise girer. <strong>Servis ziyareti yarı yarıya düşer!</strong>
               </p>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⚡ TORK & ÇEKİŞ GÜCÜ</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>680 Nm Tork (+170 Nm Fark)</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
-                Rakibin 510 Nm torkuna karşılık Eurocargo 680 Nm tork üretir. Yüklüyken dik rampalarda bayılmaz, motor zorlanmadığı için çok daha az yakar.
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Rakibin 5.2L motordan ürettiği 510 Nm torka karşılık Eurocargo 4.5L FPT motorla 680 Nm tork üretir. Yüklüyken dik rampalarda bayılmaz ve daha az yakar.
               </p>
             </div>
 
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🎯 DİFERANSİYEL & OTOYOL SEYRİ</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>3.73 Seri Arka Aks Oranı</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
                 Rakibin 4.78 oranına kıyasla Eurocargo seri diferansiyeli sayesinde 90 km/s hızda düşük devirde akar, motor bağırmaz, yakıt tasarrufu sağlar.
               </p>
             </div>
@@ -347,7 +355,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🔄 KIVRAKLIK & DÖNÜŞ ÇAPI</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>1.07 Metre Daha Dar Dönüş</div>
-              <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
                 Eurocargo 14.20 m duvardan duvara dönüş çapı ile dar sokak aralarında rakip kamyonların geri manevra yapmak zorunda kaldığı yerlerden tek hamlede döner.
               </p>
             </div>
@@ -373,7 +381,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG VERİLERİ (PTC 2026 MDT)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  10T Eurocargo MLC 100 E 19 vs 10T Rakip Kamyon
+                  10T Eurocargo MLC 100 E 19 vs 10T Rakip Kamyon (NPR 10 Sınıfı)
                 </h3>
               </div>
               <button
@@ -406,7 +414,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO Eurocargo MLC 100 E 19
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
-                      10T Rakip Kamyon
+                      10T Rakip Kamyon (NPR 10)
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
                       TCO & İşletme Avantajı
@@ -416,24 +424,31 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                 <tbody>
                   {[
                     {
-                      feature: 'Bakım Periyodu',
+                      feature: 'Periyodik Bakım Aralığı',
                       iveco: '40.000 km veya 800 Saat',
-                      competitor: '20.000 km',
-                      advantage: '%50 daha az servis ziyareti. Servis ve iş kaybı maliyetleri yarı yarıya!',
+                      competitor: '20.000 km / 1 Yıl',
+                      advantage: '%50 daha az servis ziyareti. Servis ve iş kaybı maliyetleri yarı yarıya düşer!',
                       highlight: true
                     },
                     {
                       feature: 'Maksimum Tork',
-                      iveco: '680 Nm Tork',
-                      competitor: '510 Nm Tork',
-                      advantage: '+170 Nm tork avantajı. Yokuşta bayılmaz, motor zorlanmadan az yakar.',
+                      iveco: '680 Nm Tork (1.250 - 1.900 d/d)',
+                      competitor: '510 Nm Tork (1.600 - 2.600 d/d)',
+                      advantage: '+170 Nm tork avantajı ve çok daha alt devirde gelen çekiş gücü ile düşük yakıt.',
                       highlight: true
                     },
                     {
-                      feature: 'Motor Hacmi & Güç',
-                      iveco: '4.500 cc • 190 HP (Opsiyonel 210 HP)',
-                      competitor: '5.193 cc • 190 HP',
-                      advantage: 'Daha düşük hacimle aynı güç ve +170 Nm daha fazla tork. Düşük yakıt.',
+                      feature: 'Motor Hacmi, Güç & Emisyon',
+                      iveco: '4.485 cc • 190 HP • HI-SCR (EGR Yok)',
+                      competitor: '5.193 cc • 190 PS • EGR + DPD',
+                      advantage: 'Daha düşük hacimle +170 Nm fazla tork; EGR olmadığı için DPD/DPF kurum tıkanması yok.',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Şanzıman Seçeneği',
+                      iveco: 'ZF 8AP 8 İleri Tork Konvertörlü Tam Otomatik / 6 İleri',
+                      competitor: '6 İleri Manuel veya Robotize (Kuru Kavrama)',
+                      advantage: 'Tam otomatik versiyonda baskı-balata bitme ve debriyaj ısınma sorunu yaşanmaz.',
                       highlight: true
                     },
                     {
@@ -468,22 +483,15 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       feature: 'Kabin Yüksekliği & Hacim',
                       iveco: '2.553 mm Yükseklik (2.16 m Genişlik)',
                       competitor: '2.275 mm Yükseklik (2.04 m Genişlik)',
-                      advantage: '+28 cm yüksek tavan ile kabin içinde rahat ayakta durabilme imkanı.',
+                      advantage: '+28 cm yüksek tavan ile kabin içinde rahat hareket alanı ve gerçek kamyon konforu.',
                       highlight: false
                     },
                     {
-                      feature: 'Geri Görüş Kamerası',
+                      feature: 'Geri Görüş Kamerası & Hız Sabitleyici',
                       iveco: 'Standart Donanım',
                       competitor: 'Opsiyonel / Yok',
-                      advantage: 'Geri yanaşma kazalarını ve tampon hasarını sıfıra indirme güvencesi.',
+                      advantage: 'Geri yanaşma kazalarını önler, uzun yolda yakıtı optimize eder.',
                       highlight: true
-                    },
-                    {
-                      feature: 'Hız Sabitleyici (Cruise Control)',
-                      iveco: 'Standart Donanım',
-                      competitor: 'Opsiyonel / Yok',
-                      advantage: 'Uzun yolda sürücü yorgunluğunu azaltır, yakıtı optimize eder.',
-                      highlight: false
                     },
                     {
                       feature: 'Dijital Kadran & Ekran',
@@ -526,6 +534,41 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       {/* ── BÖLÜM 3: DAILY MY26 VS RAKİP F. & DİĞERLERİ ── */}
       {activeSubTab === 'daily_my26' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Highlight Cards for Daily MY26 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 RESMİ BAKIM ARALIĞI</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>25.000 km / 1 Yıl Periyot</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Hem IVECO Daily'de hem tüm rakiplerde (Rakip F., M., Ft., R.) resmi bakım aralığı <strong>25.000 km / 1 Yıl</strong>'dır. Daily, ekonomik filtre/servis faturası ve sıfır sürpriz arıza ile TCO'da öne geçer.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⛓️ ÇELİK ZİNCİRLİ FPT MOTOR</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>2.3L (400 Nm) & 3.0L (430 Nm)</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Çift sıra çelik zincirli FPT motor triger değişimi gerektirmez. Rakip F. 2.0L EcoBlue motorlardaki <strong>yağ içi ıslak triger kayışı (wet belt)</strong> kopma riski ve ağır revizyon masrafı yoktur.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(168, 85, 247, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>⚙️ ZF 8 İLERİ HI-MATIC OTOMATİK</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>Tork Konvertörlü Tam Otomatik</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Kuru kavrama baskı-balata yoktur. Dur-kalk şehir içi dağıtımda ve dik rampalarda debriyaj ısınması veya balata bitme masrafı sıfırdır.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🛡️ 3 PARÇA TAMPON & C-ŞASİ</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>3.5T - 7.2T Kamyon Şasisi</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Gerçek C-kesit kamyon şasisi ağır yükte esnemez. 3 parçalı modüler ön tampon sayesinde köşe darbesinde komple tampon yerine sadece ilgili köşe düşük maliyetle değişir.
+              </p>
+            </div>
+          </div>
+
           {/* Daily Design & TCO Comparison Grid */}
           <div style={{
             background: 'rgba(15, 28, 50, 0.9)',
@@ -535,7 +578,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
               <div>
-                <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ EĞİTİM & REKABET VERİLERİ (DAILY MY26)</span>
+                <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG & REKABET VERİLERİ (DAILY MY26)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>
                   Daily MY26 Hafif Ticari Segment Rekabet Analizi
                 </h3>
@@ -561,7 +604,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               </button>
             </div>
 
-            {/* Matrix Table from Daily Eğitim Slides 15-18 */}
+            {/* Matrix Table */}
             <div style={{ overflowX: 'auto', marginBottom: '20px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'center' }}>
                 <thead>
@@ -570,76 +613,94 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     <th style={{ padding: '12px 14px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.16)', width: '15%' }}>
                       IVECO Daily
                     </th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip F.</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip Ft.</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip R.</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip O.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip F. (Transit)</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip M. (Sprinter)</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip Ft. (Ducato)</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip R. (Master)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
                     {
+                      name: 'Periyodik Bakım Aralığı & Birim Maliyet',
+                      desc: 'Tüm hafif ticari rakiplerde resmi bakım periyodu 25.000 km / 1 Yıl olarak eşittir',
+                      iveco: { status: 'check', text: '25.000 km / 1 Yıl (Ekonomik)' },
+                      f: { status: 'opt', text: '25.000 km / 1 Yıl' },
+                      m: { status: 'opt', text: '25.000 km (Pahalı Servis A/B)' },
+                      fiat: { status: 'opt', text: '25.000 km / 1 Yıl' },
+                      renault: { status: 'opt', text: '25.000 km / 1 Yıl' }
+                    },
+                    {
+                      name: 'Motor Hacmi, Güç & Tork',
+                      desc: 'Yüksek hacimli endüstriyel blok ile rampada bayılmayan yüksek tork ve uzun motor ömrü',
+                      iveco: { status: 'check', text: '2.3L (156 HP/400 Nm) & 3.0L (180 HP/430 Nm)' },
+                      f: { status: 'opt', text: '2.0L EcoBlue (165-170 HP / 390 Nm)' },
+                      m: { status: 'opt', text: '2.0L OM654 (170 HP / 400 Nm)' },
+                      fiat: { status: 'opt', text: '2.2L (140-180 HP / 380 Nm)' },
+                      renault: { status: 'opt', text: '2.0L / 2.3L (150-170 HP)' }
+                    },
+                    {
+                      name: 'Triger Sistemi (Motor Güvenliği)',
+                      desc: 'Çift sıra çelik zincirli FPT motor vs Yağ içinde çalışan hassas ıslak triger kayışı',
+                      iveco: { status: 'check', text: 'Çelik Zincirli FPT (Ömür Boyu)' },
+                      f: { status: 'cross', text: 'Yağ İçi Islak Kayış (Wet Belt)' },
+                      m: { status: 'check', text: 'Zincirli' },
+                      fiat: { status: 'cross', text: 'Triger Kayışlı' },
+                      renault: { status: 'check', text: 'Zincirli' }
+                    },
+                    {
+                      name: 'C-Profil Gerçek Kamyon Şasisi (3.5T - 7.2T)',
+                      desc: 'Ağır tonajda bükülmeyen, kantar yüküne ve özel üstyapıya dayanıklı merdiven şasi',
+                      iveco: { status: 'check', text: 'C-Kesit Kamyon Şasi' },
+                      f: { status: 'cross', text: 'Monokok / Entegre Sac Gövde' },
+                      m: { status: 'cross', text: 'Entegre Kutu Profil Gövde' },
+                      fiat: { status: 'cross', text: 'Monokok Sac (Önden Çekiş)' },
+                      renault: { status: 'cross', text: 'Monokok Sac' }
+                    },
+                    {
+                      name: 'ZF 8 İleri Tork Konvertörlü Otomatik (Hi-Matic)',
+                      desc: 'Baskı balata yok, debriyaj maliyeti sıfır, 200 ms altında sarsıntısız geçiş',
+                      iveco: { status: 'check', text: '8 İleri ZF Tork Konvertör' },
+                      f: { status: 'opt', text: '10 İleri Otomatik' },
+                      m: { status: 'opt', text: '9 İleri 9G-TRONIC' },
+                      fiat: { status: 'opt', text: '8/9 İleri Otomatik' },
+                      renault: { status: 'opt', text: '9 İleri / Robotize' }
+                    },
+                    {
                       name: '3 Parça Modüler Ön Tampon',
-                      desc: 'Hasar durumunda düşük maliyet ve kolay parça değişimi',
+                      desc: 'Köşe çarpmalarında komple tampon yerine sadece hasarlı parçanın değişimi (%65 tasarruf)',
                       iveco: { status: 'check', text: '3 Parça Modüler' },
-                      f: { status: 'cross', text: 'Tek Parça' },
+                      f: { status: 'cross', text: 'Tek Parça Yekpare' },
+                      m: { status: 'cross', text: 'Tek Parça Yekpare' },
                       fiat: { status: 'check', text: '3 Parça' },
-                      renault: { status: 'cross', text: 'Tek Parça' },
-                      opel: { status: 'check', text: '3 Parça' }
+                      renault: { status: 'cross', text: 'Tek Parça' }
                     },
                     {
                       name: 'Viraj Aydınlatmalı Ön Sis Farları',
                       desc: 'Standart donanımda kavşak ve viraj içi gece aydınlatması',
                       iveco: { status: 'check', text: 'STANDART' },
                       f: { status: 'opt', text: 'Opsiyonel (Ek Ücret)' },
-                      fiat: { status: 'cross', text: 'Yok' },
-                      renault: { status: 'opt', text: 'Opsiyonel' },
-                      opel: { status: 'opt', text: 'Opsiyonel' }
+                      m: { status: 'opt', text: 'Opsiyonel (Ek Ücret)' },
+                      fiat: { status: 'cross', text: 'Yok / Opsiyonel' },
+                      renault: { status: 'opt', text: 'Opsiyonel' }
                     },
                     {
-                      name: '270° Açılan Arka Kapılar',
-                      desc: 'Dar alanlarda ergonomik yükleme, rampa yanaşmasında sıfır hasar',
+                      name: '270° Açılan Arka Kapılar & Yük Gözlem Camı',
+                      desc: 'Dar alanlarda ergonomik rampa yanaşması ve kabinden yük bölmesini izleme imkanı',
                       iveco: { status: 'check', text: 'STANDART' },
-                      f: { status: 'check', text: 'Mevcut' },
+                      f: { status: 'opt', text: 'Kapı Mevcut / Cam Yok' },
+                      m: { status: 'opt', text: 'Opsiyonel (Ek Ücret)' },
                       fiat: { status: 'opt', text: 'Opsiyonel (Ek Ücret)' },
-                      renault: { status: 'opt', text: 'Opsiyonel (Ek Ücret)' },
-                      opel: { status: 'check', text: 'Mevcut' }
-                    },
-                    {
-                      name: 'Yük Bölmesi Gözlem Camı',
-                      desc: 'Kabinden inmeden yük kompartmanını anlık izleme imkanı',
-                      iveco: { status: 'check', text: 'STANDART' },
-                      f: { status: 'cross', text: 'Yok' },
-                      fiat: { status: 'cross', text: 'Yok' },
-                      renault: { status: 'opt', text: 'Opsiyonel' },
-                      opel: { status: 'cross', text: 'Yok' }
-                    },
-                    {
-                      name: 'ZF 8 İleri Tork Konvertörlü Otomatik (Hi-Matic)',
-                      desc: 'Baskı balata yok, debriyaj maliyeti sıfır, pazarın %70 tercihi',
-                      iveco: { status: 'check', text: '8 İleri ZF Tork Konvertör' },
-                      f: { status: 'opt', text: '10 İleri Otomatik' },
-                      fiat: { status: 'opt', text: '9 İleri Otomatik' },
-                      renault: { status: 'cross', text: 'Robotize / EDC' },
-                      opel: { status: 'opt', text: '8 İleri' }
-                    },
-                    {
-                      name: 'C-Profil Gerçek Kamyon Şasisi',
-                      desc: 'Ağır tonajda bükülmeyen, kantar yüküne dayanıklı merdiven şasi',
-                      iveco: { status: 'check', text: 'C-Kesit Kamyon Şasi' },
-                      f: { status: 'cross', text: 'Monokok / Sac Gövde' },
-                      fiat: { status: 'cross', text: 'Monokok Sac' },
-                      renault: { status: 'cross', text: 'Monokok Sac' },
-                      opel: { status: 'cross', text: 'Monokok Sac' }
+                      renault: { status: 'opt', text: 'Opsiyonel' }
                     },
                     {
                       name: 'Hi-Adaptive Akıllı Hafızalı Koltuklar',
-                      desc: 'Vücut şeklini alan sünger, kaza anında kamçı etkisini -%15 azaltır',
+                      desc: 'Vücut şeklini alan visco sünger, kaza anında boyun kamçı etkisini -%15 azaltır',
                       iveco: { status: 'check', text: 'STANDART' },
                       f: { status: 'cross', text: 'Standart Sünger' },
+                      m: { status: 'cross', text: 'Standart Sünger' },
                       fiat: { status: 'cross', text: 'Standart Sünger' },
-                      renault: { status: 'cross', text: 'Standart Sünger' },
-                      opel: { status: 'cross', text: 'Standart Sünger' }
+                      renault: { status: 'cross', text: 'Standart Sünger' }
                     }
                   ].map((row, idx) => (
                     <tr
@@ -651,54 +712,54 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     >
                       <td style={{ padding: '12px 14px', textAlign: 'left' }}>
                         <div style={{ fontWeight: 800, color: '#f8fafc' }}>{row.name}</div>
-                        <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '2px' }}>{row.desc}</div>
+                        <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>{row.desc}</div>
                       </td>
 
                       {/* IVECO */}
                       <td style={{ padding: '12px 14px', background: 'rgba(2, 132, 199, 0.12)' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#38bdf8', fontWeight: 800 }}>
-                          <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>✓</span>
+                          <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', flexShrink: 0 }}>✓</span>
                           <span>{row.iveco.text}</span>
                         </div>
                       </td>
 
                       {/* F. */}
                       <td style={{ padding: '12px 14px' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.f.status === 'cross' ? '#ef4444' : (row.f.status === 'opt' ? '#f59e0b' : '#4ade80'), fontWeight: 600 }}>
-                          {row.f.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✕</span>}
-                          {row.f.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>○</span>}
-                          {row.f.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✓</span>}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.f.status === 'cross' ? '#f87171' : (row.f.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
+                          {row.f.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
+                          {row.f.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>○</span>}
+                          {row.f.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✓</span>}
                           <span>{row.f.text}</span>
+                        </div>
+                      </td>
+
+                      {/* M. */}
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.m.status === 'cross' ? '#f87171' : (row.m.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
+                          {row.m.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
+                          {row.m.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>○</span>}
+                          {row.m.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✓</span>}
+                          <span>{row.m.text}</span>
                         </div>
                       </td>
 
                       {/* FIAT */}
                       <td style={{ padding: '12px 14px' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.fiat.status === 'cross' ? '#ef4444' : (row.fiat.status === 'opt' ? '#f59e0b' : '#4ade80'), fontWeight: 600 }}>
-                          {row.fiat.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✕</span>}
-                          {row.fiat.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>○</span>}
-                          {row.fiat.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✓</span>}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.fiat.status === 'cross' ? '#f87171' : (row.fiat.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
+                          {row.fiat.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
+                          {row.fiat.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>○</span>}
+                          {row.fiat.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✓</span>}
                           <span>{row.fiat.text}</span>
                         </div>
                       </td>
 
                       {/* RENAULT */}
                       <td style={{ padding: '12px 14px' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.renault.status === 'cross' ? '#ef4444' : (row.renault.status === 'opt' ? '#f59e0b' : '#4ade80'), fontWeight: 600 }}>
-                          {row.renault.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✕</span>}
-                          {row.renault.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>○</span>}
-                          {row.renault.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✓</span>}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.renault.status === 'cross' ? '#f87171' : (row.renault.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
+                          {row.renault.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
+                          {row.renault.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>○</span>}
+                          {row.renault.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✓</span>}
                           <span>{row.renault.text}</span>
-                        </div>
-                      </td>
-
-                      {/* OPEL */}
-                      <td style={{ padding: '12px 14px' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.opel.status === 'cross' ? '#ef4444' : (row.opel.status === 'opt' ? '#f59e0b' : '#4ade80'), fontWeight: 600 }}>
-                          {row.opel.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✕</span>}
-                          {row.opel.status === 'opt' && <span style={{ background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>○</span>}
-                          {row.opel.status === 'check' && <span style={{ background: '#10b981', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>✓</span>}
-                          <span>{row.opel.text}</span>
                         </div>
                       </td>
                     </tr>
@@ -707,7 +768,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               </table>
             </div>
 
-            {/* Deep Dive: Tampon TCO Analizi */}
+            {/* Deep Dive: Tampon & Triger TCO Analizi */}
             <div style={{
               background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)',
               border: '1px solid rgba(245, 158, 11, 0.35)',
@@ -721,12 +782,172 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '2rem' }}>💡</div>
               <div style={{ flex: 1, minWidth: '280px' }}>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#fbbf24', marginBottom: '3px' }}>
-                  Filo Yöneticileri İçin 3 Parça Tamponun Gerçek TCO Etkisi
+                  Filo Yöneticileri İçin 25.000 km Bakım, Çelik Zincir ve 3 Parça Tamponun Gerçek TCO Etkisi
                 </div>
                 <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                  Şehir içi yoğun dağıtımda araçların en sık hasar alan parçası ön tampon köşeleridir. <strong>Rakip F.</strong> ve <strong>Rakip R.</strong> modellerinde tampon yekpare (tek parça) olduğu için en küçük sürtmede dahi tüm tampon sökülüp komple değiştirilmekte veya boyanmaktadır. <strong>IVECO Daily'de ise 3 parçalı modüler tasarım</strong> sayesinde yalnızca hasarlı olan köşe parça dakikalar içinde cıvatayla sökülüp çok düşük maliyetle yenilenir. Bu fark, 5 yıllık filo kullanımında binlerce lira doğrudan kasko muafiyeti ve parça tasarrufu sağlar.
+                  Hafif ticari araç segmentinde hem IVECO Daily hem de rakipler (Rakip F., Rakip M., Rakip Ft., Rakip R.) yılda bir veya <strong>25.000 km'de bir periyodik bakıma</strong> girer. Ancak TCO farkını yaratan 3 ana unsur vardır: <strong>(1)</strong> Rakip F.'nin 2.0L motorundaki yağ içi ıslak triger kayışı (wet belt) ağır revizyon maliyeti doğururken, Daily'nin <strong>çelik zincirli 2.3L ve 3.0L FPT motorları</strong> triger değişimi istemez. <strong>(2)</strong> Rakip M.'nin yetkili servis A/B bakım faturaları çok yüksekken Daily yetkili servis bakımı ekonomiktir. <strong>(3)</strong> Köşe sürtmelerinde rakiplerde yekpare tampon komple değişirken, Daily'de <strong>3 parçalı modüler tamponun</strong> sadece ilgili köşesi dakikalar içinde düşük maliyetle yenilenir.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── BÖLÜM 4: ÇEKİCİ & AĞIR VASITA (S-WAY VS F-MAX & ACTROS) ── */}
+      {activeSubTab === 'sway_heavy' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Highlight Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>🔥 HI-SCR (EGR'SİZ MOTOR)</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>EGR Valfi & Soğutucusu Yok</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                S-Way 12.9L Cursor 13 motor egzoz gazını silindire geri basmaz. Rakip F-MAX ve Actros'ta görülen EGR valfi/soğutucusu arızası ve kurum birikimi S-Way'de sıfırdır.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>⛽ YAKIT & AERODİNAMİK</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>100 km'de 1.5 - 2.0 L Tasarruf</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Düşük sürtünmeli kabin aerodinamiği, 12 ileri ZF HI-TRONIX şanzıman ve saf yanma teknolojisiyle uluslararası uzun yolda yılda yüz binlerce TL mazot tasarrufu sağlar.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🔧 BAKIM PERİYODU</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>60.000 - 80.000 km Bakım</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                Türkiye uzun yol koşullarında tüm ağır vasıta çekicilerde olduğu gibi 60.000 - 80.000 km periyodik bakım aralığına ve çok daha ekonomik filtre/parça maliyetine sahiptir.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(168, 85, 247, 0.35)', borderRadius: '12px', padding: '14px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🐎 GÜÇ & TORK SEÇENEKLERİ</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>490 / 530 / 570 / 580 HP</div>
+              <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
+                2.500 Nm'den 2.800 Nm'ye uzanan devasa tork bandı ve yüksek güçlü motor/retarder kombinasyonuyla ağır tonajlı rampalarda vites düşürmeden tırmanır.
+              </p>
+            </div>
+          </div>
+
+          {/* S-Way Comparison Table */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.9)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '14px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              padding: '14px 18px',
+              background: 'rgba(2, 132, 199, 0.15)',
+              borderBottom: '1px solid rgba(56, 189, 248, 0.2)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '10px'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>AĞIR VASITA ÇEKİCİ SEGMENTİ DOĞRULANMIŞ VERİLER</span>
+                <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+                  IVECO S-Way (AS440S500 / 530) vs Rakip F. (F-MAX 500) vs Rakip M. (Actros 1848 / 1851)
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleConsultantQuote('IVECO S-Way Çekici Filo TCO Analizi')}
+                style={{
+                  background: '#22c55e',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '6px 14px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiMessageSquare size={13} /> S-Way Teklifi Al
+              </button>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(15, 28, 50, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.16)' }}>
+                    <th style={{ padding: '12px 16px', color: '#f1f5f9', fontWeight: 800, width: '20%' }}>Özellik / Parametre</th>
+                    <th style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, width: '28%', background: 'rgba(2, 132, 199, 0.16)' }}>
+                      IVECO S-Way (Cursor 13)
+                    </th>
+                    <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
+                      Rakip F. (F-MAX 500)
+                    </th>
+                    <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
+                      Rakip M. (Actros 1848 / 1851)
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      feature: 'Motor Hacmi, Güç & Tork',
+                      iveco: '12.9L Cursor 13 • 490 / 530 / 580 HP (2.500 - 2.800 Nm)',
+                      fmax: '12.7L Ecotorq • 500 PS (2.500 Nm)',
+                      actros: '12.8L OM471 • 476 - 510 PS (2.300 - 2.500 Nm)',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Emisyon & Yanma Teknolojisi',
+                      iveco: 'HI-SCR (EGR Valfi Yok - %100 Temiz Hava Yanması)',
+                      fmax: 'EGR + SCR + DPF',
+                      actros: 'EGR + SCR + DPF',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Şanzıman Sistemi',
+                      iveco: '12 İleri ZF HI-TRONIX Otomatikleştirilmiş',
+                      fmax: '16 İleri Ecotorq / ZF Otomatikleştirilmiş',
+                      actros: '12 İleri PowerShift 3 Otomatikleştirilmiş',
+                      highlight: false
+                    },
+                    {
+                      feature: 'Periyodik Bakım Aralığı (TR)',
+                      iveco: '60.000 - 80.000 km / 1 Yıl (Ekonomik Parça)',
+                      fmax: '60.000 - 80.000 km / 1 Yıl',
+                      actros: '60.000 - 80.000 km / 1 Yıl (Yüksek Servis Maliyeti)',
+                      highlight: true
+                    },
+                    {
+                      feature: 'Ön Tampon & Gövde Onarımı',
+                      iveco: 'Çok Parçalı Modüler Tampon (Bölgesel Değişim)',
+                      fmax: 'Yüksek Maliyetli Ön Gövde Parçaları',
+                      actros: 'Yüksek Yetkili Servis Hasar Faturası',
+                      highlight: true
+                    }
+                  ].map((row, idx) => (
+                    <tr
+                      key={idx}
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: row.highlight ? 'rgba(2, 132, 199, 0.08)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.03)' : 'transparent')
+                      }}
+                    >
+                      <td style={{ padding: '12px 16px', color: '#f8fafc', fontWeight: 700 }}>{row.feature}</td>
+                      <td style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.1)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                          <FiCheck color="#38bdf8" /> {row.iveco}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 600 }}>{row.fmax}</td>
+                      <td style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 600 }}>{row.actros}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

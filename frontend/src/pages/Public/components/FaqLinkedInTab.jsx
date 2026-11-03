@@ -55,8 +55,8 @@ const FAQ_ITEMS = [
     id: 'motor_omru_yakit',
     category: 'teknik',
     categoryLabel: 'Teknik & Motor',
-    question: 'IVECO\'nun motor gücü, yakıt tüketimi ve servis maliyetleri diğer markalara göre nasıldır?',
-    answer: 'IVECO motorları, hafif ve ağır ticari araç segmentinde dayanıklılık standardını belirleyen FPT (Fiat Powertrain Technologies) tarafından üretilir:\n\n• F1A (2.3 Litre): 156 Beygir gücü ve 380 Nm tork üretir. Şehir içi dağıtımda sınıfının en düşük yakıt tüketim değerlerine (100 km\'de ortalama 8.5 - 9.8 litre) sahiptir.\n• F1C (3.0 Litre): 160 Beygir ve 400 Nm tork. Ağır hizmet C-profil şasi ile 3.0 litrelik zincirli motor ömrü 1.000.000 km üzerinde sorunsuz çalışacak şekilde tasarlanmıştır.\n• Bakım Aralıkları: 20.000 - 40.000 km periyodik bakım aralığı sayesinde rakiplerine göre işletme ve servis maliyetlerinde %25\'e varan tasarruf sağlar.'
+    question: 'IVECO\'nun motor gücü, yakıt tüketimi ve servis bakım aralıkları diğer markalara göre nasıldır?',
+    answer: 'IVECO motorları, hafif ve ağır ticari araç segmentinde dayanıklılık standardını belirleyen FPT (Fiat Powertrain Technologies) tarafından üretilir:\n\n• F1A (2.3 Litre - Daily 35S/35C): 156 HP güç ve 400 Nm tork üretir. Çift sıra çelik zincirli triger sistemine sahiptir; bazı rakiplerdeki yağ içi ıslak triger kayışı (wet belt) gibi erken kopma veya ağır revizyon masrafı çıkarmaz.\n• F1C (3.0 Litre - Daily 70C/72C): 180 HP güç ve 430 Nm tork (üst versiyonda 207 HP / 470 Nm) üretir. Ağır hizmet C-profil şasi ve çelik zincirli motor bloğu ile 1.000.000 km üzerinde sorunsuz çalışacak şekilde tasarlanmıştır.\n• Resmi Periyodik Bakım Aralıkları: Daily hafif ticari serisinde 25.000 km / 1 Yıl (rakiplerle aynı km periyodunda, ancak çok daha ekonomik yetkili servis faturasıyla), Eurocargo orta ağır kamyon serisinde 40.000 km / 1 Yıl (10T rakiplerin 20.000 km periyodunun 2 katı), S-Way çekici serisinde ise 60.000 - 80.000 km bakım aralığı sunar.'
   },
   {
     id: 'himatic_otomatik',

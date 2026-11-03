@@ -107,7 +107,7 @@ export default function Header() {
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'; }}
-            title="50.000 km bakım ve yakıt tasarrufu hesaplayıcı"
+            title="Resmi Bakım (25.000 / 40.000 / 60.000 km), Yakıt ve TCO Kıyaslama Hesaplayıcı"
           >
             <FiBarChart2 size={14} color="#10b981" />
             <span>TCO Kıyaslama</span>
