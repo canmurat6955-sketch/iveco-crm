@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, AreaChart, Area, CartesianGrid } from 'recharts';
 
 const CHART_COLORS = ['#2b7de9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316', '#14b8a6', '#6366f1'];
-const SEGMENT_COLORS = { A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#64748b' };
-const POTENTIAL_COLORS = { very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#64748b' };
+const SEGMENT_COLORS = { A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#cbd5e1' };
+const POTENTIAL_COLORS = { very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#cbd5e1' };
 const POTENTIAL_LABELS = { very_high: 'Çok Yüksek', high: 'Yüksek', medium: 'Orta', low: 'Düşük', Belirlenmedi: 'Belirlenmedi' };
 
 const CustomTooltip = ({ active, payload }) => {
@@ -75,7 +75,7 @@ export function PipelineFunnel({ data }) {
     { key: 'follow_up', label: 'Takip', color: '#06b6d4' },
     { key: 'hot_lead', label: 'Sıcak', color: '#ef4444' },
     { key: 'converted', label: 'Kazanıldı', color: '#10b981' },
-    { key: 'lost', label: 'Kayıp', color: '#64748b' },
+    { key: 'lost', label: 'Kayıp', color: '#cbd5e1' },
   ];
   const maxVal = Math.max(...steps.map(s => data[s.key] || 0), 1);
   return (
@@ -98,7 +98,7 @@ export function PipelineFunnel({ data }) {
 
 export function SegmentChart({ data }) {
   if (!data?.length) return null;
-  const mapped = data.map(d => ({ ...d, fill: SEGMENT_COLORS[d.name] || '#64748b' }));
+  const mapped = data.map(d => ({ ...d, fill: SEGMENT_COLORS[d.name] || '#cbd5e1' }));
   return (
     <ResponsiveContainer width="100%" height={180}>
       <PieChart>

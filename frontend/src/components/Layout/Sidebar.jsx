@@ -38,8 +38,8 @@ export default function Sidebar() {
           <img src="/logo-erc-samsun-white.png" alt="ERC Samsun" style={{ height: '24px', objectFit: 'contain' }} />
         </div>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8', letterSpacing: '0.5px' }}>MÜŞTERİ İSTİHBARAT</div>
-          <div style={{ fontSize: '0.64rem', color: '#94a3b8', letterSpacing: '1px', textTransform: 'uppercase' }}>Yetkili Satıcı & Servis</div>
+          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#7dd3fc', letterSpacing: '0.5px' }}>MÜŞTERİ İSTİHBARAT</div>
+          <div style={{ fontSize: '0.66rem', color: '#e2e8f0', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase' }}>Yetkili Satıcı & Servis</div>
         </div>
       </div>
 

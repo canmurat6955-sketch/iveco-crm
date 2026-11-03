@@ -38,7 +38,7 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
       high: { label: 'Yüksek İlgi', color: '#f97316' },
       medium: { label: 'Orta İlgi', color: '#f59e0b' },
       low: { label: 'Düşük İlgi', color: '#3b82f6' },
-      very_low: { label: 'Çok Düşük', color: '#64748b' }
+      very_low: { label: 'Çok Düşük', color: '#cbd5e1' }
     };
     const item = map[level] || { label: level, color: '#94a3b8' };
     return (
@@ -160,7 +160,7 @@ export default function StockMatchModal({ stockId, onClose, onCustomerSelect }) 
                   <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#cbd5e1' }}>
                     Adet: {item.estimated_quantity}
                   </span>
-                  <span style={{ color: '#64748b' }}>
+                  <span style={{ color: '#cbd5e1' }}>
                     Danışman: {item.assigned_sales_rep}
                   </span>
                 </div>

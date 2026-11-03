@@ -243,7 +243,7 @@ export default function BodyStructureTab({ onSelectBody, onDirectWhatsApp, sales
             <div style={{ fontSize: '0.84rem', fontWeight: 800, color: selectedBodyId === b.id ? '#fff' : '#f8fafc', lineHeight: 1.2 }}>
               {b.title.split('(')[0]}
             </div>
-            <div style={{ fontSize: '0.68rem', color: selectedBodyId === b.id ? '#bae6fd' : '#64748b', marginTop: '3px' }}>
+            <div style={{ fontSize: '0.68rem', color: selectedBodyId === b.id ? '#bae6fd' : '#cbd5e1', fontWeight: 600, marginTop: '3px' }}>
               {b.badge}
             </div>
           </button>

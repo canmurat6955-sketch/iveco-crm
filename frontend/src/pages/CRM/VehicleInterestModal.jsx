@@ -4,7 +4,7 @@ import { FiX, FiCheck, FiTruck, FiZap, FiInfo, FiTag } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const INTEREST_LEVELS = [
-  { value: 'very_low', label: 'Çok Düşük', color: '#64748b' },
+  { value: 'very_low', label: 'Çok Düşük', color: '#cbd5e1' },
   { value: 'low', label: 'Düşük', color: '#3b82f6' },
   { value: 'medium', label: 'Orta', color: '#f59e0b' },
   { value: 'high', label: 'Yüksek', color: '#f97316' },
@@ -231,7 +231,7 @@ export default function VehicleInterestModal({ customerId, existingInterest = nu
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 4 }}>
                 <FiZap size={13} /> Hızlı Model Kodu Çözümleyici (Opsiyonel)
               </span>
-              <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Örn: 35C16 3750, 16m3, 150E21 5175</span>
+              <span style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Örn: 35C16 3750, 16m3, 150E21 5175</span>
             </div>
             <input
               type="text"

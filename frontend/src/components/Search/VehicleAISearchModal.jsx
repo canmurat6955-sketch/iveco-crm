@@ -102,7 +102,7 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={() => setQuery('')}
-                  style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', paddingRight: 12 }}
+                  style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', paddingRight: 12 }}
                 >
                   <FiX size={16} />
                 </button>
@@ -120,7 +120,7 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
 
           {/* Quick Example Chips */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
-            <span style={{ fontSize: '0.72rem', color: '#64748b', alignSelf: 'center' }}>Örnek Sorgular:</span>
+            <span style={{ fontSize: '0.72rem', color: '#cbd5e1', alignSelf: 'center' }}>Örnek Sorgular:</span>
             {EXAMPLE_QUERIES.slice(0, 5).map((ex, i) => (
               <button
                 key={i}
@@ -281,7 +281,7 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
                       </span>
                     )}
                     {c.last_contact_date && (
-                      <span style={{ color: '#64748b' }}>
+                      <span style={{ color: '#cbd5e1' }}>
                         Son Temas: {new Date(c.last_contact_date).toLocaleDateString('tr-TR')}
                       </span>
                     )}
@@ -293,10 +293,10 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
             <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
               <FiAlertCircle size={32} style={{ color: '#f59e0b', marginBottom: 8 }} />
               <p>Aradığınız kriterlere uyan kayıtlı müşteri bulunamadı.</p>
-              <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Farklı bir tonaj, model kodu veya arama terimi deneyebilirsiniz.</span>
+              <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>Farklı bir tonaj, model kodu veya arama terimi deneyebilirsiniz.</span>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#64748b' }}>
+            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#cbd5e1' }}>
               <FiSearch size={36} style={{ marginBottom: 12, opacity: 0.5 }} />
               <p style={{ margin: 0, fontSize: '0.9rem' }}>Doğal dilde arama yapmak için yukarıdaki arama kutusuna yazın veya örneklerden birini seçin.</p>
             </div>

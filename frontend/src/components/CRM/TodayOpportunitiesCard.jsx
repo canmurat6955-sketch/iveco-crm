@@ -24,11 +24,11 @@ export default function TodayOpportunitiesCard({
   const hotLeadsCount = (opportunities?.counts?.hot_leads ?? 0) + (opportunities?.counts?.stock_matches ?? 0);
 
   const TABS = [
-    { key: 'unvisited_a', label: 'Ziyaretsiz (A)', fullLabel: 'Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: unvisitedACount > 0 ? '#ef4444' : '#64748b' },
-    { key: 'quote_pending', label: 'Teklif Bekleyen', fullLabel: 'Teklif & Proforma Bekleyenler', count: quotePendingCount, color: '#004B93' },
-    { key: 'follow_ups', label: 'Takip Günü', fullLabel: 'Takip Tarihi Gelenler', count: followUpsCount, color: '#f59e0b' },
-    { key: 'new_discoveries', label: 'Yeni Keşifler', fullLabel: 'Yeni Kurulan / Keşifler', count: newDiscoveriesCount, color: '#8b5cf6' },
-    { key: 'hot_leads', label: 'Sıcak / Stok', fullLabel: 'Sıcak Müşteri & Stok Eşleşmesi', count: hotLeadsCount, color: '#10b981' },
+    { key: 'unvisited_a', label: 'Ziyaretsiz (A)', fullLabel: 'Ziyaret Bekleyen (A-Segment)', count: unvisitedACount, color: unvisitedACount > 0 ? '#f87171' : '#cbd5e1' },
+    { key: 'quote_pending', label: 'Teklif Bekleyen', fullLabel: 'Teklif & Proforma Bekleyenler', count: quotePendingCount, color: '#60a5fa' },
+    { key: 'follow_ups', label: 'Takip Günü', fullLabel: 'Takip Tarihi Gelenler', count: followUpsCount, color: '#fbbf24' },
+    { key: 'new_discoveries', label: 'Yeni Keşifler', fullLabel: 'Yeni Kurulan / Keşifler', count: newDiscoveriesCount, color: '#a78bfa' },
+    { key: 'hot_leads', label: 'Sıcak / Stok', fullLabel: 'Sıcak Müşteri & Stok Eşleşmesi', count: hotLeadsCount, color: '#34d399' },
   ];
 
   return (
@@ -44,22 +44,22 @@ export default function TodayOpportunitiesCard({
       {/* Kart Başlığı */}
       <div 
         style={{ 
-          background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85))', 
+          background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.45), rgba(23, 39, 66, 0.9))', 
           padding: isMobile ? '0.75rem 1rem' : '1rem 1.25rem', 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
           flexWrap: 'wrap', 
           gap: 10,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: isMobile ? '0.95rem' : '1.08rem', fontWeight: 800, color: '#f8fafc' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: isMobile ? '0.95rem' : '1.08rem', fontWeight: 800, color: '#ffffff' }}>
             <FiZap style={{ color: '#38bdf8' }} size={isMobile ? 18 : 22} /> BUGÜNÜN SATIŞ FIRSATLARI
           </h3>
           {!isMobile && (
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+            <span style={{ fontSize: '0.8rem', color: '#e2e8f0', fontWeight: 500 }}>
               Ziyaret zamanı, araç ihtiyacı ve teklifleri eşleşen öncelikli aksiyonlar
             </span>
           )}

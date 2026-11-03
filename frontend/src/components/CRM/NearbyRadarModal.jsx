@@ -314,7 +314,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
           overflowX: 'auto',
           scrollbarWidth: 'none'
         }}>
-          <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#64748b', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             MERKEZ:
           </span>
 
@@ -387,7 +387,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
         }}>
           {/* Yarıçap Butonları */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               YARIÇAP:
             </span>
             {RADIUS_OPTIONS.map(opt => {
@@ -418,7 +418,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
 
           {/* Müşteri İçi Hızlı Arama */}
           <div style={{ position: 'relative', minWidth: 160 }}>
-            <FiSearch size={13} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <FiSearch size={13} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
             <input
               type="text"
               placeholder="Listede firma ara..."
@@ -472,7 +472,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
               <p style={{ fontWeight: 600, fontSize: '0.88rem', color: '#f8fafc', margin: '0 0 4px' }}>
                 Müşteri koordinatları taranıyor...
               </p>
-              <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{selectedCity} ve çevresindeki firmalar listeleniyor</span>
+              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>{selectedCity} ve çevresindeki firmalar listeleniyor</span>
             </div>
           ) : filteredCustomers.length === 0 ? (
             <div style={{
@@ -588,7 +588,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.75rem', color: '#94a3b8' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <FiMapPin size={12} style={{ color: '#64748b' }} />
+                          <FiMapPin size={12} style={{ color: '#cbd5e1' }} />
                           {[c.district, c.city].filter(Boolean).join(', ') || 'Samsun'}
                         </span>
                         {c.interested_vehicle && (
@@ -734,7 +734,7 @@ export default function NearbyRadarModal({ isOpen, onClose, onStartVisit }) {
           justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: '0.72rem',
-          color: '#64748b'
+          color: '#cbd5e1'
         }}>
           <span>⚡ IVECO PRIEST OS Saha İstihbarat Radarı</span>
           <span>Haritada görüntülemek için <button type="button" onClick={() => { onClose(); navigate('/map'); }} style={{ color: '#38bdf8', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>Harita Ekranı</button></span>

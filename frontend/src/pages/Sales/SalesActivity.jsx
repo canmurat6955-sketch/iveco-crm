@@ -21,8 +21,8 @@ const STATUS_MAP = {
 };
 
 const PIPELINE_COLORS = {
-  sent: '#3b82f6', replied: '#8b5cf6', offer_given: '#f59e0b',
-  follow_up: '#06b6d4', hot_lead: '#ef4444', converted: '#10b981', lost: '#64748b'
+  sent: '#60a5fa', replied: '#a78bfa', offer_given: '#fbbf24',
+  follow_up: '#38bdf8', hot_lead: '#f87171', converted: '#34d399', lost: '#cbd5e1'
 };
 
 export default function SalesActivityPage() {
@@ -439,7 +439,7 @@ export default function SalesActivityPage() {
                   <tr>
                     <td colSpan={8} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
                       <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Kayıtlı telefon görüşmesi bulunamadı.</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                      <div style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>
                         Yapılan müşteri aramalarını kaydetmek için sağ üstteki <strong>"+ Arama Kaydı Ekle"</strong> butonunu kullanabilirsiniz.
                       </div>
                     </td>
@@ -547,7 +547,7 @@ export default function SalesActivityPage() {
                   <tr>
                     <td colSpan={7} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
                       <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Henüz kayıtlı WhatsApp iletişimi bulunmuyor.</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                      <div style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>
                         Müşteriler veya Kişilerim ekranındaki <strong>"WhatsApp Mesajı"</strong> butonuna tıkladığınızda kayıtlar buraya otomatik düşer.
                       </div>
                     </td>
@@ -621,7 +621,7 @@ export default function SalesActivityPage() {
                   <tr>
                     <td colSpan={6} className="empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
                       <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: 6 }}>Henüz kayıtlı satış aktivitesi bulunmuyor.</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                      <div style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>
                         Müşterilerle yapılan görüşmeleri kaydetmek için sağ üstteki <strong>"+ Yeni Aktivite"</strong> butonunu kullanabilirsiniz.
                       </div>
                     </td>

@@ -722,11 +722,11 @@ export default function CustomerDetail() {
           <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
             {[
               { key: 'lead', label: 'Lead', color: '#38bdf8', icon: FiTarget },
-              { key: 'contact', label: 'İlk Temas', color: '#004B93', icon: FiPhoneCall },
-              { key: 'proposal', label: 'Teklif', color: '#d97706', icon: FiFileText },
-              { key: 'negotiation', label: 'Pazarlık', color: '#ea580c', icon: FiTrendingUp },
-              { key: 'won', label: 'Kazanıldı', color: '#059669', icon: FiCheckCircle },
-              { key: 'lost', label: 'Kaybedildi', color: '#64748b', icon: FiArchive },
+              { key: 'contact', label: 'İlk Temas', color: '#60a5fa', icon: FiPhoneCall },
+              { key: 'proposal', label: 'Teklif', color: '#fbbf24', icon: FiFileText },
+              { key: 'negotiation', label: 'Pazarlık', color: '#fb923c', icon: FiTrendingUp },
+              { key: 'won', label: 'Kazanıldı', color: '#34d399', icon: FiCheckCircle },
+              { key: 'lost', label: 'Kaybedildi', color: '#cbd5e1', icon: FiArchive },
             ].map(s => {
               const active = (customer.pipeline_stage || 'lead') === s.key;
               const StageIcon = s.icon;
@@ -741,8 +741,8 @@ export default function CustomerDetail() {
                   style={{
                     padding: '5px 12px', borderRadius: 6, fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
                     border: `1px solid ${s.color}`, transition: 'all 0.15s',
-                    background: active ? s.color : 'transparent',
-                    color: active ? '#fff' : s.color,
+                    background: active ? s.color : 'rgba(255, 255, 255, 0.05)',
+                    color: active ? '#0f172a' : s.color,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 5
@@ -757,15 +757,15 @@ export default function CustomerDetail() {
 
           {/* Müşteri Segmenti (1-Tıkla Değiştir) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', marginRight: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#e2e8f0', marginRight: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               Segment:
             </span>
             {[
-              { key: 'A', label: '⭐ A-Segment (Öncelikli)', color: '#ef4444' },
-              { key: 'B', label: '🔹 B-Segment (Aktif)', color: '#3b82f6' },
-              { key: 'C', label: '🔸 C-Segment (Standart)', color: '#f59e0b' },
-              { key: 'D', label: '⚪ D-Segment (Düşük)', color: '#94a3b8' },
-              { key: null, label: 'Belirlenmedi', color: '#64748b' }
+              { key: 'A', label: '⭐ A-Segment (Öncelikli)', color: '#f87171' },
+              { key: 'B', label: '🔹 B-Segment (Aktif)', color: '#60a5fa' },
+              { key: 'C', label: '🔸 C-Segment (Standart)', color: '#fbbf24' },
+              { key: 'D', label: '⚪ D-Segment (Düşük)', color: '#e2e8f0' },
+              { key: null, label: 'Belirlenmedi', color: '#cbd5e1' }
             ].map(seg => {
               const active = customer.segment === seg.key || (!customer.segment && seg.key === null);
               return (
@@ -784,11 +784,11 @@ export default function CustomerDetail() {
                     padding: '4px 12px',
                     borderRadius: 16,
                     fontSize: '0.74rem',
-                    fontWeight: active ? 700 : 500,
+                    fontWeight: active ? 800 : 600,
                     cursor: 'pointer',
-                    border: `1.5px solid ${active ? seg.color : 'rgba(255, 255, 255, 0.12)'}`,
-                    background: active ? (seg.key === null ? 'rgba(100, 116, 139, 0.25)' : `${seg.color}25`) : 'transparent',
-                    color: active ? (seg.color === '#ef4444' ? '#f87171' : seg.color === '#64748b' ? '#cbd5e1' : seg.color) : 'var(--text-muted)',
+                    border: `1.5px solid ${active ? seg.color : 'rgba(255, 255, 255, 0.22)'}`,
+                    background: active ? (seg.key === null ? 'rgba(148, 163, 184, 0.28)' : `${seg.color}28`) : 'rgba(255, 255, 255, 0.04)',
+                    color: active ? '#ffffff' : '#e2e8f0',
                     transition: 'all 0.15s ease'
                   }}
                 >

@@ -333,7 +333,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                     onChange={e => setVolumeM3(Number(e.target.value))}
                     style={{ width: '100%', accentColor: '#10b981', marginBottom: 8 }}
                   />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748b' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#cbd5e1' }}>
                     <span>12 m³ (Şehir içi)</span>
                     <span>25 m³ (Standart Kargo)</span>
                     <span>45 m³ (Dev Hacim)</span>
@@ -430,7 +430,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                     }}
                   >
                     <div>{bt.label}</div>
-                    <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Kasa Darası: ~{bt.tare}</span>
+                    <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>Kasa Darası: ~{bt.tare}</span>
                   </button>
                 ))}
               </div>
@@ -519,15 +519,15 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                     </span>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, textAlign: 'center' }}>
                       <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: 8, padding: '6px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>KASA BOYU</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', display: 'block' }}>KASA BOYU</span>
                         <strong style={{ fontSize: '0.88rem', color: '#38bdf8' }}>{dims.length_cm} cm</strong>
                       </div>
                       <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: 8, padding: '6px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>KASA ENİ</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', display: 'block' }}>KASA ENİ</span>
                         <strong style={{ fontSize: '0.88rem', color: '#38bdf8' }}>{dims.width_cm} cm</strong>
                       </div>
                       <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: 8, padding: '6px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>YÜKSEKLİK</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', display: 'block' }}>YÜKSEKLİK</span>
                         <strong style={{ fontSize: '0.88rem', color: '#38bdf8' }}>{dims.height_cm} cm</strong>
                       </div>
                       <div style={{ background: 'rgba(16, 185, 129, 0.1)', borderRadius: 8, padding: '6px 4px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
@@ -586,19 +586,19 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                       fontSize: '0.7rem'
                     }}>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
+                        <span style={{ color: '#cbd5e1', display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
                         <strong style={{ color: '#f8fafc' }}>{scale.unladen_weight_kg} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Kasa Darası:</span>
+                        <span style={{ color: '#cbd5e1', display: 'block' }}>Kasa Darası:</span>
                         <strong style={{ color: '#f8fafc' }}>+{scale.estimated_body_tare_kg} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Yük Ağırlığı:</span>
+                        <span style={{ color: '#cbd5e1', display: 'block' }}>Yük Ağırlığı:</span>
                         <strong style={{ color: '#38bdf8' }}>+{scale.payload_kg} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Kantar Sınırı:</span>
+                        <span style={{ color: '#cbd5e1', display: 'block' }}>Kantar Sınırı:</span>
                         <strong style={{ color: '#10b981' }}>{scale.scale_limit_kg} kg</strong>
                       </div>
                     </div>
@@ -736,7 +736,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
                         >
                           <div>
                             <strong style={{ color: '#f8fafc' }}>IVECO {alt.series} ({alt.wheelbase} mm)</strong>
-                            <span style={{ color: '#64748b', marginLeft: 8 }}>Kasa: {alt.body_length_range} ({alt.volume_range})</span>
+                            <span style={{ color: '#cbd5e1', marginLeft: 8 }}>Kasa: {alt.body_length_range} ({alt.volume_range})</span>
                           </div>
                           <a
                             href={alt.tech_sheet_pdf}
@@ -770,7 +770,7 @@ export default function SmartChassisMatcherModal({ isOpen, onClose, initialPaylo
           justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: '0.72rem',
-          color: '#64748b'
+          color: '#cbd5e1'
         }}>
           <span>⚡ IVECO ERC Otomotiv — Satış Mühendisliği & Şasi Atama Sistemi</span>
           <span>Boş ağırlıklar şoför ve yakıt dahil resmi teknik föy verileridir.</span>

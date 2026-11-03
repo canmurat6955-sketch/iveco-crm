@@ -148,25 +148,26 @@ export default function Header() {
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
           >
-            <FiSearch color="#38bdf8" size={13} />
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 500 }}>
+            <FiSearch color="#38bdf8" size={14} />
+            <span style={{ color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 600 }}>
               Model, Şasi veya Müşteri Ara...
             </span>
             <kbd style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '4px',
               padding: '1px 5px',
               fontSize: '10px',
-              color: '#94a3b8'
+              fontWeight: 700,
+              color: '#f1f5f9'
             }}>⌘K</kbd>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: '8px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-heading)', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff', fontVariantNumeric: 'tabular-nums' }}>
               {time.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
             </span>
-            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600 }}>
               {time.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' })}
             </span>
           </div>

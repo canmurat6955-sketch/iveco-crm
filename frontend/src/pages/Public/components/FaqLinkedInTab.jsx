@@ -177,7 +177,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
         </div>
 
         <div style={{ position: 'relative' }}>
-          <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+          <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }} />
           <input
             type="text"
             value={searchQuery}
@@ -250,8 +250,8 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
                       display: 'inline-block',
                       marginLeft: '8px',
                       fontSize: '0.64rem',
-                      color: '#94a3b8',
-                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#e2e8f0',
+                      background: 'rgba(255, 255, 255, 0.08)',
                       padding: '2px 6px',
                       borderRadius: '4px'
                     }}>
@@ -259,7 +259,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
                     </span>
                   </div>
                 </div>
-                <div style={{ color: isOpen ? '#38bdf8' : '#64748b' }}>
+                <div style={{ color: isOpen ? '#38bdf8' : '#cbd5e1' }}>
                   {isOpen ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
                 </div>
               </div>

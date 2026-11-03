@@ -14,11 +14,11 @@ const TARGET_PROVINCES = [
 
 const STAGES = [
   { key: 'lead', label: 'Potansiyel (Lead)', color: '#38bdf8' },
-  { key: 'contact', label: 'İlk Temas & Ziyaret', color: '#004B93' },
-  { key: 'proposal', label: 'Teklif & Proforma', color: '#d97706' },
-  { key: 'negotiation', label: 'Ticari Pazarlık', color: '#ea580c' },
-  { key: 'won', label: 'Satış / Teslimat', color: '#059669' },
-  { key: 'lost', label: 'Arşiv / İptal', color: '#64748b' },
+  { key: 'contact', label: 'İlk Temas & Ziyaret', color: '#60a5fa' },
+  { key: 'proposal', label: 'Teklif & Proforma', color: '#fbbf24' },
+  { key: 'negotiation', label: 'Ticari Pazarlık', color: '#fb923c' },
+  { key: 'won', label: 'Satış / Teslimat', color: '#34d399' },
+  { key: 'lost', label: 'Arşiv / İptal', color: '#cbd5e1' },
 ];
 
 const ACTIVITY_TYPES = [

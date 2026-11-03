@@ -3229,7 +3229,7 @@ IVECO ERC Samsun Otomotiv
                         onChange={e => handleVolumeChange(Number(e.target.value))}
                         style={{ width: '100%', height: isMobileView ? '10px' : undefined, accentColor: '#10b981', marginBottom: '8px' }}
                       />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.72rem' : '0.68rem', color: '#64748b' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.72rem' : '0.68rem', color: '#cbd5e1' }}>
                         <span>12 m³</span>
                         <span>28 m³</span>
                         <span>45 m³</span>
@@ -3298,7 +3298,7 @@ IVECO ERC Samsun Otomotiv
                       >
                         <div style={{ fontSize: '1.15rem', marginBottom: '2px' }}>{b.icon}</div>
                         <div style={{ fontSize: isMobileView ? '0.84rem' : '0.74rem', fontWeight: 700, color: selectedBody === b.id ? '#fff' : '#cbd5e1' }}>{b.name}</div>
-                        <div style={{ fontSize: isMobileView ? '0.7rem' : '0.64rem', color: '#64748b', marginTop: '2px' }}>{b.tare === 0 ? 'Orijinal Sac Gövde' : `+${b.tare} kg Dara`}</div>
+                        <div style={{ fontSize: isMobileView ? '0.7rem' : '0.64rem', color: '#cbd5e1', marginTop: '2px' }}>{b.tare === 0 ? 'Orijinal Sac Gövde' : `+${b.tare} kg Dara`}</div>
                       </button>
                     ))}
                   </div>
@@ -3571,7 +3571,7 @@ IVECO ERC Samsun Otomotiv
                       <strong style={{ fontSize: '1.25rem', color: '#10b981', fontWeight: 900 }}>{matched.cashPriceText}</strong>
                     </div>
                   </div>
-                  <div style={{ marginTop: '8px', fontSize: '0.62rem', color: '#64748b', textAlign: 'right' }}>
+                  <div style={{ marginTop: '8px', fontSize: '0.62rem', color: '#cbd5e1', textAlign: 'right' }}>
                     * Tavsiye edilen bilgilendirme fiyatıdır; resmi sözleşme ve bayi onayı ile kesinleşir.
                   </div>
                 </div>
@@ -3990,7 +3990,7 @@ IVECO ERC Samsun Otomotiv
                           <strong style={{ color: '#34d399' }}>{activeEurCampaign.rateLabel}</strong>
                         </div>
                       </div>
-                      <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '4px' }}>
+                      <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px' }}>
                         * 32 Sayılı Karar uyarınca döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına özeldir.
                       </div>
                     </div>
@@ -4321,7 +4321,7 @@ IVECO ERC Samsun Otomotiv
 
                   <div style={{
                     fontSize: '0.68rem',
-                    color: '#64748b',
+                    color: '#cbd5e1',
                     lineHeight: 1.35,
                     marginTop: '4px'
                   }}>
@@ -5065,7 +5065,7 @@ IVECO ERC Samsun Otomotiv
                         alt="Müşteri QR Kodu"
                         style={{ width: '160px', height: '160px', display: 'block', margin: '0 auto', borderRadius: '8px' }}
                       />
-                      <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '6px', fontWeight: 600 }}>
+                      <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '6px', fontWeight: 600 }}>
                         {sendCompany || 'VIP Müşteri'} için doğrudan açılır
                       </div>
                     </div>

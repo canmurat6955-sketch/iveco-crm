@@ -21,53 +21,53 @@ const STAGES = [
     label: 'Potansiyel (Lead)', 
     shortLabel: 'Lead', 
     color: '#38bdf8', 
-    accentBg: 'rgba(56, 189, 248, 0.08)',
-    borderColor: 'rgba(56, 189, 248, 0.25)',
+    accentBg: 'rgba(56, 189, 248, 0.16)',
+    borderColor: 'rgba(56, 189, 248, 0.45)',
     icon: FiTarget 
   },
   { 
     key: 'contact', 
     label: 'İlk Temas & Ziyaret', 
     shortLabel: 'İlk Temas', 
-    color: '#004B93', 
-    accentBg: 'rgba(0, 75, 147, 0.12)',
-    borderColor: 'rgba(43, 125, 233, 0.35)',
+    color: '#60a5fa', 
+    accentBg: 'rgba(59, 130, 246, 0.18)',
+    borderColor: 'rgba(96, 165, 250, 0.48)',
     icon: FiPhoneCall 
   },
   { 
     key: 'proposal', 
     label: 'Teklif & Proforma', 
     shortLabel: 'Teklif', 
-    color: '#d97706', 
-    accentBg: 'rgba(217, 119, 6, 0.10)',
-    borderColor: 'rgba(217, 119, 6, 0.35)',
+    color: '#fbbf24', 
+    accentBg: 'rgba(245, 158, 11, 0.16)',
+    borderColor: 'rgba(251, 191, 36, 0.45)',
     icon: FiFileText 
   },
   { 
     key: 'negotiation', 
     label: 'Ticari Pazarlık', 
     shortLabel: 'Pazarlık', 
-    color: '#ea580c', 
-    accentBg: 'rgba(234, 88, 12, 0.10)',
-    borderColor: 'rgba(234, 88, 12, 0.35)',
+    color: '#fb923c', 
+    accentBg: 'rgba(249, 115, 22, 0.16)',
+    borderColor: 'rgba(251, 146, 60, 0.45)',
     icon: FiTrendingUp 
   },
   { 
     key: 'won', 
     label: 'Teslimat & Satış', 
     shortLabel: 'Kazanıldı', 
-    color: '#059669', 
-    accentBg: 'rgba(5, 150, 105, 0.12)',
-    borderColor: 'rgba(16, 185, 129, 0.35)',
+    color: '#34d399', 
+    accentBg: 'rgba(16, 185, 129, 0.16)',
+    borderColor: 'rgba(52, 211, 153, 0.45)',
     icon: FiCheckCircle 
   },
   { 
     key: 'lost', 
     label: 'Arşiv / İptal', 
     shortLabel: 'Kaybedildi', 
-    color: '#64748b', 
-    accentBg: 'rgba(100, 116, 139, 0.08)',
-    borderColor: 'rgba(100, 116, 139, 0.25)',
+    color: '#cbd5e1', 
+    accentBg: 'rgba(148, 163, 184, 0.16)',
+    borderColor: 'rgba(203, 213, 225, 0.38)',
     icon: FiArchive 
   },
 ];
@@ -209,7 +209,7 @@ export default function Pipeline() {
           }}>
             Ticari Araç Satış Hattı (Pipeline)
           </h1>
-          <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.86rem', color: '#e2e8f0', fontWeight: 500 }}>
             Yetki alanı fırsatları, teklif verilen filolar ve teslimat süreçleri takibi
           </p>
         </div>
@@ -225,11 +225,11 @@ export default function Pipeline() {
               alignItems: 'center', 
               gap: 6, 
               padding: '7px 12px', 
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              background: '#1e293b',
-              border: '1px solid #334155',
-              color: '#cbd5e1'
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              background: '#243b61',
+              border: '1px solid rgba(148, 163, 184, 0.35)',
+              color: '#f8fafc'
             }}
             title="Verileri Yenile"
           >
@@ -245,11 +245,11 @@ export default function Pipeline() {
               alignItems: 'center', 
               gap: 6, 
               padding: '7px 14px', 
-              fontSize: '0.8rem', 
-              fontWeight: 600,
-              border: '1px solid #475569',
-              background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
-              color: '#e2e8f0',
+              fontSize: '0.82rem', 
+              fontWeight: 700,
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              background: 'linear-gradient(180deg, #243b61 0%, #1b2d4d 100%)',
+              color: '#ffffff',
               boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
             }}
           >
@@ -266,9 +266,9 @@ export default function Pipeline() {
               gap: 6, 
               padding: '7px 16px', 
               fontSize: '0.82rem', 
-              fontWeight: 700,
-              background: '#004B93',
-              borderColor: '#0284c7',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+              borderColor: '#38bdf8',
               color: '#ffffff',
               boxShadow: '0 2px 8px rgba(0, 75, 147, 0.4)'
             }}
@@ -280,15 +280,15 @@ export default function Pipeline() {
 
       {/* ── KURUMSAL SATIŞ HUNİSİ (EXECUTIVE PIPELINE METRİK ŞERİDİ) ── */}
       <div style={{
-        background: '#0f172a',
-        borderRadius: 10,
-        border: '1px solid #1e293b',
+        background: '#1b2d4d',
+        borderRadius: 12,
+        border: '1px solid rgba(125, 211, 252, 0.25)',
         padding: '12px 16px',
         marginBottom: 16,
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
         gap: 12,
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)'
+        boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
       }}>
         {STAGES.map((s, idx) => {
           const count = getStageCustomers(s.key).length;
@@ -302,12 +302,12 @@ export default function Pipeline() {
                 alignItems: 'center',
                 gap: 10,
                 padding: '6px 10px',
-                borderLeft: idx > 0 ? '1px solid #1e293b' : 'none'
+                borderLeft: idx > 0 ? '1px solid rgba(148, 163, 184, 0.22)' : 'none'
               }}
             >
               <div style={{
-                width: 34,
-                height: 34,
+                width: 36,
+                height: 36,
                 borderRadius: 8,
                 background: s.accentBg,
                 border: `1px solid ${s.borderColor}`,
@@ -317,16 +317,16 @@ export default function Pipeline() {
                 color: s.color,
                 flexShrink: 0
               }}>
-                <IconComp size={16} />
+                <IconComp size={17} />
               </div>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 600 }}>{s.shortLabel}</span>
-                  <span style={{ fontSize: '0.68rem', color: '#64748b' }}>%{percentage}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#f1f5f9', fontWeight: 700 }}>{s.shortLabel}</span>
+                  <span style={{ fontSize: '0.74rem', color: '#7dd3fc', fontWeight: 700 }}>%{percentage}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 1 }}>
-                  <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>{count}</span>
-                  <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Firma</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>{count}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#cbd5e1', fontWeight: 600 }}>Firma</span>
                 </div>
               </div>
             </div>
@@ -336,9 +336,9 @@ export default function Pipeline() {
 
       {/* ── YETKİ ALANI & ARAMA KONSOLU ── */}
       <div style={{
-        background: '#131b2e',
-        borderRadius: 10,
-        border: '1px solid #1e293b',
+        background: '#1b2d4d',
+        borderRadius: 12,
+        border: '1px solid rgba(125, 211, 252, 0.24)',
         padding: '10px 14px',
         marginBottom: '1rem',
         display: 'flex',
@@ -350,28 +350,28 @@ export default function Pipeline() {
         {/* Yetki Alanı Şehir Seçicisi */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <span style={{ 
-            fontSize: '0.76rem', 
-            fontWeight: 700, 
+            fontSize: '0.8rem', 
+            fontWeight: 800, 
             color: '#38bdf8', 
             display: 'inline-flex', 
             alignItems: 'center', 
             gap: 5, 
             marginRight: 4 
           }}>
-            <FiMapPin size={13} /> Yetki Alanı:
+            <FiMapPin size={14} /> Yetki Alanı:
           </span>
           <button
             type="button"
             onClick={() => setCityFilter('target_9')}
             style={{
-              padding: '4px 10px',
-              borderRadius: 6,
-              fontSize: '0.74rem',
+              padding: '5px 11px',
+              borderRadius: 7,
+              fontSize: '0.78rem',
               fontWeight: 700,
               cursor: 'pointer',
-              border: cityFilter === 'target_9' ? '1px solid #0284c7' : '1px solid #334155',
-              background: cityFilter === 'target_9' ? '#004B93' : '#1e293b',
-              color: cityFilter === 'target_9' ? '#ffffff' : '#94a3b8'
+              border: cityFilter === 'target_9' ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.35)',
+              background: cityFilter === 'target_9' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : '#243b61',
+              color: '#ffffff'
             }}
           >
             Hedef 9 İl (Bölge)
@@ -382,14 +382,14 @@ export default function Pipeline() {
               type="button"
               onClick={() => setCityFilter(p)}
               style={{
-                padding: '4px 9px',
-                borderRadius: 6,
-                fontSize: '0.74rem',
-                fontWeight: cityFilter === p ? 700 : 500,
+                padding: '5px 10px',
+                borderRadius: 7,
+                fontSize: '0.78rem',
+                fontWeight: cityFilter === p ? 800 : 600,
                 cursor: 'pointer',
-                border: cityFilter === p ? '1px solid #0284c7' : '1px solid #1e293b',
-                background: cityFilter === p ? '#004B93' : '#0f172a',
-                color: cityFilter === p ? '#ffffff' : '#94a3b8'
+                border: cityFilter === p ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.3)',
+                background: cityFilter === p ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : '#243b61',
+                color: cityFilter === p ? '#ffffff' : '#e2e8f0'
               }}
             >
               {p}
@@ -399,14 +399,14 @@ export default function Pipeline() {
             type="button"
             onClick={() => setCityFilter('all')}
             style={{
-              padding: '4px 9px',
-              borderRadius: 6,
-              fontSize: '0.74rem',
-              fontWeight: cityFilter === 'all' ? 700 : 500,
+              padding: '5px 10px',
+              borderRadius: 7,
+              fontSize: '0.78rem',
+              fontWeight: cityFilter === 'all' ? 800 : 600,
               cursor: 'pointer',
-              border: cityFilter === 'all' ? '1px solid #0284c7' : '1px solid #1e293b',
-              background: cityFilter === 'all' ? '#004B93' : '#0f172a',
-              color: cityFilter === 'all' ? '#ffffff' : '#64748b'
+              border: cityFilter === 'all' ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.3)',
+              background: cityFilter === 'all' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : '#243b61',
+              color: cityFilter === 'all' ? '#ffffff' : '#e2e8f0'
             }}
           >
             Tüm İller
@@ -422,27 +422,28 @@ export default function Pipeline() {
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Firma veya telefon ara..."
               style={{ 
-                padding: '5px 10px 5px 30px', 
-                fontSize: '0.76rem', 
+                padding: '6px 10px 6px 30px', 
+                fontSize: '0.8rem', 
                 width: 220,
-                background: '#0a0f1d',
-                border: '1px solid #334155',
-                borderRadius: 6,
-                color: '#f8fafc'
+                background: '#13223b',
+                border: '1px solid rgba(148, 163, 184, 0.38)',
+                borderRadius: 7,
+                color: '#ffffff',
+                fontWeight: 500
               }}
             />
-            <FiSearch size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <FiSearch size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#7dd3fc' }} />
           </div>
           <button 
             type="submit" 
             style={{ 
-              padding: '5px 12px', 
-              fontSize: '0.76rem', 
-              fontWeight: 600,
-              background: '#1e293b',
-              border: '1px solid #334155',
-              borderRadius: 6,
-              color: '#cbd5e1',
+              padding: '6px 14px', 
+              fontSize: '0.8rem', 
+              fontWeight: 700,
+              background: '#243b61',
+              border: '1px solid rgba(148, 163, 184, 0.38)',
+              borderRadius: 7,
+              color: '#ffffff',
               cursor: 'pointer'
             }}
           >
@@ -453,10 +454,10 @@ export default function Pipeline() {
 
       {/* ── KANBAN PANOSU ── */}
       {loading && customers.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '5rem 2rem', color: '#94a3b8' }}>
+        <div style={{ textAlign: 'center', padding: '5rem 2rem', color: '#e2e8f0' }}>
           <div className="loading-pulse" style={{ margin: '0 auto 14px auto', width: 32, height: 32 }}></div>
-          <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.95rem' }}>Pipeline Verileri Taranıyor...</div>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: 4 }}>Yetki alanı fırsatları ve teklif kayıtları derleniyor.</div>
+          <div style={{ fontWeight: 700, color: '#ffffff', fontSize: '1rem' }}>Pipeline Verileri Taranıyor...</div>
+          <div style={{ fontSize: '0.84rem', color: '#cbd5e1', marginTop: 4 }}>Yetki alanı fırsatları ve teklif kayıtları derleniyor.</div>
         </div>
       ) : (
         <div style={{ 
@@ -476,17 +477,17 @@ export default function Pipeline() {
               <div 
                 key={stage.key} 
                 style={{
-                  background: '#0b1120',
-                  borderRadius: 10,
+                  background: '#172844',
+                  borderRadius: 12,
                   display: 'flex',
                   flexDirection: 'column',
-                  border: '1px solid #1e293b',
-                  minWidth: 220,
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
+                  border: '1px solid rgba(148, 163, 184, 0.25)',
+                  minWidth: 225,
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.22)'
                 }}
               >
                 {/* Kolon Üst Vurgu Çizgisi */}
-                <div style={{ height: 3, background: stage.color, borderTopLeftRadius: 10, borderTopRightRadius: 10 }} />
+                <div style={{ height: 4, background: stage.color, borderTopLeftRadius: 12, borderTopRightRadius: 12 }} />
 
                 {/* Kolon Başlığı */}
                 <div 
@@ -495,19 +496,19 @@ export default function Pipeline() {
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
-                    padding: '10px 12px',
-                    borderBottom: '1px solid #1e293b',
-                    background: '#0f172a',
+                    padding: '11px 12px',
+                    borderBottom: '1px solid rgba(148, 163, 184, 0.22)',
+                    background: '#1e3356',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
-                    <StageIcon size={14} style={{ color: stage.color, flexShrink: 0 }} />
+                    <StageIcon size={15} style={{ color: stage.color, flexShrink: 0 }} />
                     <span style={{ 
-                      fontWeight: 700, 
-                      color: '#f8fafc', 
-                      fontSize: '0.82rem',
+                      fontWeight: 800, 
+                      color: '#ffffff', 
+                      fontSize: '0.86rem',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
@@ -536,22 +537,22 @@ export default function Pipeline() {
                         cursor: 'pointer'
                       }}
                     >
-                      <FiPlus size={14} />
+                      <FiPlus size={15} />
                     </button>
                     <span style={{
                       background: stage.color, 
-                      color: '#ffffff', 
+                      color: stage.key === 'proposal' || stage.key === 'lost' ? '#0f172a' : '#ffffff', 
                       borderRadius: 10, 
-                      padding: '1px 7px',
-                      fontSize: '0.72rem', 
+                      padding: '1px 8px',
+                      fontSize: '0.75rem', 
                       fontWeight: 800,
-                      minWidth: 20,
+                      minWidth: 22,
                       textAlign: 'center'
                     }}>
                       {items.length}
                     </span>
-                    <span style={{ color: '#64748b', display: 'flex', alignItems: 'center' }}>
-                      {collapsed ? <FiChevronDown size={14} /> : <FiChevronUp size={14} />}
+                    <span style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center' }}>
+                      {collapsed ? <FiChevronDown size={15} /> : <FiChevronUp size={15} />}
                     </span>
                   </div>
                 </div>
@@ -571,30 +572,32 @@ export default function Pipeline() {
                     {items.length === 0 && (
                       <div style={{ 
                         textAlign: 'center', 
-                        color: '#64748b', 
+                        color: '#cbd5e1', 
                         padding: '2.5rem 1rem', 
-                        fontSize: '0.76rem',
-                        border: '1px dashed #1e293b',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        border: '1px dashed rgba(148, 163, 184, 0.35)',
                         borderRadius: 8,
-                        background: 'rgba(15, 23, 42, 0.4)',
+                        background: 'rgba(30, 51, 86, 0.45)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         gap: 8
                       }}>
-                        <FiLayers size={22} style={{ color: '#334155' }} />
+                        <FiLayers size={24} style={{ color: '#7dd3fc' }} />
                         <span>Bu aşamada aktif kayıt bulunmuyor</span>
                         <button
                           type="button"
                           onClick={() => { setModalStage(stage.key); setShowOpportunityModal(true); }}
                           style={{
                             marginTop: 4,
-                            padding: '3px 8px',
-                            fontSize: '0.7rem',
+                            padding: '5px 10px',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
                             color: stage.color,
-                            background: 'rgba(255,255,255,0.03)',
+                            background: stage.accentBg,
                             border: `1px solid ${stage.borderColor}`,
-                            borderRadius: 4,
+                            borderRadius: 6,
                             cursor: 'pointer'
                           }}
                         >
@@ -610,34 +613,34 @@ export default function Pipeline() {
                         <div 
                           key={c.id} 
                           style={{
-                            background: '#131b2e', 
-                            borderRadius: 8, 
-                            padding: '11px 12px', 
+                            background: '#21375c', 
+                            borderRadius: 10, 
+                            padding: '12px 13px', 
                             cursor: 'pointer',
-                            border: '1px solid #1e293b', 
+                            border: '1px solid rgba(148, 163, 184, 0.28)', 
                             transition: 'all 0.18s ease-in-out',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.22)',
                             position: 'relative'
                           }}
                           onMouseEnter={e => { 
                             e.currentTarget.style.borderColor = '#38bdf8'; 
                             e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.35)';
                           }}
                           onMouseLeave={e => { 
-                            e.currentTarget.style.borderColor = '#1e293b'; 
+                            e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.28)'; 
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.25)';
+                            e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.22)';
                           }}
                         >
                           {/* Firma Bilgisi */}
                           <div onClick={() => navigate(`/customers/${c.id}`)}>
                             <div style={{ 
-                              fontWeight: 700, 
-                              fontSize: '0.85rem', 
-                              color: '#f8fafc', 
+                              fontWeight: 800, 
+                              fontSize: '0.88rem', 
+                              color: '#ffffff', 
                               lineHeight: 1.35,
-                              marginBottom: 4,
+                              marginBottom: 5,
                               wordBreak: 'break-word'
                             }}>
                               {formattedTitle}
@@ -645,33 +648,35 @@ export default function Pipeline() {
 
                             {/* İlçe/İl & Sektör */}
                             <div style={{ 
-                              fontSize: '0.72rem', 
-                              color: '#94a3b8', 
+                              fontSize: '0.76rem', 
+                              color: '#e2e8f0', 
+                              fontWeight: 600,
                               display: 'flex', 
                               alignItems: 'center', 
-                              gap: 4, 
-                              marginBottom: 6,
+                              gap: 5, 
+                              marginBottom: 7,
                               flexWrap: 'wrap'
                             }}>
-                              <FiMapPin size={11} style={{ color: '#38bdf8', flexShrink: 0 }} />
+                              <FiMapPin size={12} style={{ color: '#38bdf8', flexShrink: 0 }} />
                               <span>{c.city ? `${c.city}${c.district ? ' / ' + c.district : ''}` : 'Bölge Belirtilmemiş'}</span>
-                              <span style={{ color: '#475569' }}>•</span>
-                              <span style={{ color: '#cbd5e1' }}>{c.sector || 'Ticari Taşımacılık'}</span>
+                              <span style={{ color: '#94a3b8' }}>•</span>
+                              <span style={{ color: '#7dd3fc', fontWeight: 700 }}>{c.sector || 'Ticari Taşımacılık'}</span>
                             </div>
 
                             {/* Son Görüşme Notu (Endüstriyel Slate Bloğu) */}
                             {c.pipeline_note && (
                               <div style={{ 
-                                fontSize: '0.72rem', 
-                                color: '#e2e8f0', 
+                                fontSize: '0.76rem', 
+                                color: '#ffffff', 
+                                fontWeight: 500,
                                 marginBottom: 8, 
-                                background: '#0a0f1d', 
-                                padding: '5px 8px', 
-                                borderRadius: '0 5px 5px 0',
-                                borderLeft: '3px solid #f59e0b',
-                                lineHeight: 1.4
+                                background: 'rgba(15, 26, 46, 0.72)', 
+                                padding: '6px 9px', 
+                                borderRadius: '0 6px 6px 0',
+                                borderLeft: '3px solid #fbbf24',
+                                lineHeight: 1.45
                               }}>
-                                <span style={{ color: '#94a3b8', fontSize: '0.64rem', display: 'block', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                <span style={{ color: '#fbbf24', fontSize: '0.67rem', display: 'block', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>
                                   Görüşme Notu
                                 </span>
                                 {c.pipeline_note}
@@ -681,15 +686,15 @@ export default function Pipeline() {
                             {/* İletişim Telefonu */}
                             {c.phone && (
                               <div style={{ 
-                                fontSize: '0.72rem', 
-                                color: '#94a3b8', 
+                                fontSize: '0.78rem', 
+                                color: '#f1f5f9', 
                                 marginBottom: 8, 
                                 display: 'flex', 
                                 alignItems: 'center', 
-                                gap: 5 
+                                gap: 6 
                               }}>
-                                <FiPhone size={11} style={{ color: '#64748b' }} /> 
-                                <span style={{ fontFamily: 'monospace', letterSpacing: '0.02em', color: '#cbd5e1' }}>{c.phone}</span>
+                                <FiPhone size={12} style={{ color: '#38bdf8' }} /> 
+                                <span style={{ fontFamily: 'monospace', letterSpacing: '0.03em', color: '#ffffff', fontWeight: 700 }}>{c.phone}</span>
                               </div>
                             )}
                           </div>
@@ -700,34 +705,34 @@ export default function Pipeline() {
                             justifyContent: 'space-between', 
                             alignItems: 'center', 
                             marginBottom: 10,
-                            paddingTop: 6,
-                            borderTop: '1px solid rgba(148, 163, 184, 0.08)'
+                            paddingTop: 7,
+                            borderTop: '1px solid rgba(148, 163, 184, 0.18)'
                           }}>
                             {/* Araç Segment Rozeti */}
                             <span style={{
-                              fontSize: '0.68rem', 
-                              padding: '2px 7px', 
-                              borderRadius: 4, 
-                              fontWeight: 600,
-                              background: '#0f172a',
-                              color: '#93c5fd',
-                              border: '1px solid #1e293b',
+                              fontSize: '0.72rem', 
+                              padding: '3px 8px', 
+                              borderRadius: 5, 
+                              fontWeight: 700,
+                              background: 'rgba(2, 132, 199, 0.22)',
+                              color: '#bae6fd',
+                              border: '1px solid rgba(56, 189, 248, 0.35)',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: 4
                             }}>
-                              <FiTruck size={10} /> {c.segment || 'IVECO Daily'}
+                              <FiTruck size={11} /> {c.segment || 'IVECO Daily'}
                             </span>
 
                             {/* Öncelik / Skor Rozeti */}
                             <span style={{
-                              fontSize: '0.68rem', 
-                              padding: '2px 7px', 
-                              borderRadius: 4, 
-                              fontWeight: 700,
-                              background: c.potential_score >= 70 ? 'rgba(5, 150, 105, 0.15)' : c.potential_score >= 50 ? 'rgba(217, 119, 6, 0.15)' : 'rgba(100, 116, 139, 0.15)',
-                              color: c.potential_score >= 70 ? '#34d399' : c.potential_score >= 50 ? '#fbbf24' : '#94a3b8',
-                              border: `1px solid ${c.potential_score >= 70 ? 'rgba(5, 150, 105, 0.3)' : c.potential_score >= 50 ? 'rgba(217, 119, 6, 0.3)' : 'rgba(100, 116, 139, 0.2)'}`
+                              fontSize: '0.72rem', 
+                              padding: '3px 8px', 
+                              borderRadius: 5, 
+                              fontWeight: 800,
+                              background: c.potential_score >= 70 ? 'rgba(16, 185, 129, 0.22)' : c.potential_score >= 50 ? 'rgba(245, 158, 11, 0.22)' : 'rgba(148, 163, 184, 0.22)',
+                              color: c.potential_score >= 70 ? '#4ade80' : c.potential_score >= 50 ? '#fde047' : '#e2e8f0',
+                              border: `1px solid ${c.potential_score >= 70 ? 'rgba(52, 211, 153, 0.45)' : c.potential_score >= 50 ? 'rgba(251, 191, 36, 0.45)' : 'rgba(203, 213, 225, 0.35)'}`
                             }}>
                               Skor: {c.potential_score || 0}
                             </span>
@@ -736,7 +741,7 @@ export default function Pipeline() {
                           {/* ── KURUMSAL HIZLI AKSİYON ÇUBUĞU ── */}
                           <div style={{ 
                             display: 'flex', 
-                            gap: 5, 
+                            gap: 6, 
                             alignItems: 'center',
                             flexWrap: 'wrap' 
                           }}>
@@ -746,21 +751,21 @@ export default function Pipeline() {
                                 type="button"
                                 onClick={e => { e.stopPropagation(); handleWhatsApp(c); }}
                                 style={{ 
-                                  fontSize: '0.7rem', 
-                                  padding: '4px 8px', 
-                                  borderRadius: 5, 
-                                  border: '1px solid rgba(16, 185, 129, 0.35)', 
-                                  background: 'rgba(5, 150, 105, 0.12)', 
-                                  color: '#10b981', 
+                                  fontSize: '0.74rem', 
+                                  padding: '5px 9px', 
+                                  borderRadius: 6, 
+                                  border: '1px solid rgba(52, 211, 153, 0.45)', 
+                                  background: 'rgba(16, 185, 129, 0.2)', 
+                                  color: '#4ade80', 
                                   cursor: 'pointer', 
                                   display: 'flex', 
                                   alignItems: 'center', 
                                   gap: 4, 
-                                  fontWeight: 600 
+                                  fontWeight: 700 
                                 }}
                                 title="Müşteriyle WhatsApp Görüşmesi Başlat"
                               >
-                                <FiMessageSquare size={11} /> WhatsApp
+                                <FiMessageSquare size={12} /> WhatsApp
                               </button>
                             )}
 
@@ -775,9 +780,9 @@ export default function Pipeline() {
                                       moveStage(c.id, STAGES[STAGES.findIndex(s => s.key === stage.key) + 1].key); 
                                     }}
                                     style={{ 
-                                      fontSize: '0.7rem', 
-                                      padding: '4px 9px', 
-                                      borderRadius: 5, 
+                                      fontSize: '0.74rem', 
+                                      padding: '5px 10px', 
+                                      borderRadius: 6, 
                                       border: `1px solid ${stage.borderColor}`, 
                                       background: stage.accentBg, 
                                       color: stage.color, 
@@ -785,11 +790,11 @@ export default function Pipeline() {
                                       display: 'flex', 
                                       alignItems: 'center', 
                                       gap: 4,
-                                      fontWeight: 600
+                                      fontWeight: 700
                                     }}
                                     title="Sonraki Satış Aşamasına İlerle"
                                   >
-                                    İlerle <FiArrowRight size={11} />
+                                    İlerle <FiArrowRight size={12} />
                                   </button>
                                 )}
 
@@ -803,17 +808,17 @@ export default function Pipeline() {
                                     }
                                   }}
                                   style={{ 
-                                    fontSize: '0.7rem', 
-                                    padding: '4px 7px', 
-                                    borderRadius: 5, 
-                                    border: '1px solid rgba(100, 116, 139, 0.3)', 
-                                    background: 'rgba(100, 116, 139, 0.1)', 
-                                    color: '#94a3b8', 
+                                    fontSize: '0.74rem', 
+                                    padding: '5px 8px', 
+                                    borderRadius: 6, 
+                                    border: '1px solid rgba(203, 213, 225, 0.35)', 
+                                    background: 'rgba(148, 163, 184, 0.18)', 
+                                    color: '#e2e8f0', 
                                     cursor: 'pointer' 
                                   }}
                                   title="Fırsatı Arşivle / Kaybedildi"
                                 >
-                                  <FiArchive size={11} />
+                                  <FiArchive size={12} />
                                 </button>
                               </>
                             )}
@@ -824,20 +829,20 @@ export default function Pipeline() {
                                 type="button"
                                 onClick={e => { e.stopPropagation(); moveStage(c.id, 'lead'); }}
                                 style={{ 
-                                  fontSize: '0.7rem', 
-                                  padding: '4px 8px', 
-                                  borderRadius: 5, 
-                                  border: '1px solid rgba(56, 189, 248, 0.3)', 
-                                  background: 'rgba(56, 189, 248, 0.1)', 
-                                  color: '#38bdf8', 
+                                  fontSize: '0.74rem', 
+                                  padding: '5px 9px', 
+                                  borderRadius: 6, 
+                                  border: '1px solid rgba(56, 189, 248, 0.45)', 
+                                  background: 'rgba(56, 189, 248, 0.18)', 
+                                  color: '#7dd3fc', 
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: 4,
-                                  fontWeight: 600
+                                  fontWeight: 700
                                 }}
                               >
-                                <FiRotateCcw size={11} /> Yeniden Aç
+                                <FiRotateCcw size={12} /> Yeniden Aç
                               </button>
                             )}
                           </div>

@@ -473,7 +473,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
               {/* Recent Dispatches */}
               {statusData?.recent_messages && statusData.recent_messages.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '0.74rem', color: '#cbd5e1', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
                     Son Otomatik Bildirim Günlüğü
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -524,7 +524,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
           alignItems: 'center',
           justifyContent: 'space-between',
           fontSize: '0.72rem',
-          color: '#64748b'
+          color: '#cbd5e1'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <FiShield size={14} color="#10b981" />
