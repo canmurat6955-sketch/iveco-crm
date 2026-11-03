@@ -171,17 +171,24 @@ export default function ProformaQuick() {
       eurExchangeRate: rate
     });
 
-    const priceVal = pricing.currency === 'EUR' ? pricing.tryEquivalent : pricing.finalPrice;
+    const isCustom = !pricing || pricing.isCustomPrice;
+    const priceVal = isCustom
+      ? null
+      : (pricing.currency === 'EUR' ? pricing.tryEquivalent : pricing.finalPrice);
 
     // Commercial Terms and Notes
     let defaultNotes = '';
     let defaultPayment = '';
 
-    if (pricing.currency === 'EUR') {
-      defaultNotes = `Teklifimiz ${cv.eurPrice.toLocaleString('tr-TR')} EUR bedel üzerinden, ${rate} TL/EUR kuru baz alınarak hazırlanmıştır. Fatura tarihindeki TCMB Döviz Satış Kuru esas alınacaktır. Vergi kanunlarındaki değişiklikler yansıtılacaktır.`;
+    if (isCustom) {
+      defaultNotes = `Bu araç için projeye özel fiyatlandırma uygulanmaktadır. Teklif bedeli satış sorumlusu tarafından belirlenmiştir. Fatura tarihindeki TCMB Döviz Satış Kuru esas alınacaktır. Vergi kanunlarındaki değişiklikler yansıtılacaktır.`;
+      defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile";
+      toast('T-Way özel fiyatlı: lütfen anahtar teslim fiyatı elle girin.', { icon: '✍️' });
+    } else if (pricing.currency === 'EUR') {
+      defaultNotes = `Teklifimiz ${Number(pricing.eurPrice || 0).toLocaleString('tr-TR')} EUR bedel üzerinden, ${rate} TL/EUR kuru baz alınarak hazırlanmıştır. Fatura tarihindeki TCMB Döviz Satış Kuru esas alınacaktır. Vergi kanunlarındaki değişiklikler yansıtılacaktır.`;
       defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Döviz Karşılığı TL)";
     } else if (pType === 'cash') {
-      defaultNotes = `Fiyatlarımız peşin satış koşulları esas alınarak ${pricing.discount.toLocaleString('tr-TR')} TL özel peşin alım indirimi uygulanarak oluşturulmuş olup ödeme nakten ve defaten gerçekleştirilecektir. SUBVANSİYONLU kredi kullandırılamaz. Vergi kanunlarında yapılacak değişiklikler lehde ve aleyhte fiyatlarımıza yansıtılacaktır.`;
+      defaultNotes = `Fiyatlarımız peşin satış koşulları esas alınarak ${Number(pricing.discount || 0).toLocaleString('tr-TR')} TL özel peşin alım indirimi uygulanarak oluşturulmuş olup ödeme nakten ve defaten gerçekleştirilecektir. SUBVANSİYONLU kredi kullandırılamaz. Vergi kanunlarında yapılacak değişiklikler lehde ve aleyhte fiyatlarımıza yansıtılacaktır.`;
       defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Peşin Alım)";
     } else {
       defaultNotes = `Fiyatlarımız IVECO resmi sübvansiyonlu banka kampanyası koşulları esas alınarak oluşturulmuştur. Banka kredi tahsis ve onay şartları geçerlidir. Vergi kanunlarında yapılacak değişiklikler yansıtılacaktır.`;
@@ -194,9 +201,9 @@ export default function ProformaQuick() {
       model_year: cv.year || '2026',
       motor_power: cv.power || prev.motor_power,
       max_weight: cv.tonnage || prev.max_weight,
-      unit_price: priceVal.toString(),
-      otv_rate: cv.otv_rate?.toString() || '4.0',
-      kdv_rate: cv.kdv_rate?.toString() || '20.0',
+      unit_price: priceVal != null && !isNaN(priceVal) ? String(priceVal) : '',
+      otv_rate: (cv.otv_rate ?? cv.otvRate)?.toString() || '4.0',
+      kdv_rate: (cv.kdv_rate ?? cv.kdvRate)?.toString() || '20.0',
       notes: defaultNotes,
       payment_terms: defaultPayment
     }));
@@ -419,11 +426,11 @@ export default function ProformaQuick() {
           hasAutoTransmission,
           eurExchangeRate: eurRate
         });
-        if (pricing.currency === 'EUR') {
+        if (pricing && !pricing.isCustomPrice && pricing.currency === 'EUR') {
           wpMessage += `🚛 *Araç:* ${selectedCatalogVehicle.model}\n` +
-            `💶 *Teklif Bedeli:* ${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} EUR\n` +
-            `🇹🇷 *TL Karşılığı (Kur: ${eurRate}):* ${pricing.tryEquivalent.toLocaleString('tr-TR')} TL\n\n`;
-        } else if (pricing.isCash && pricing.discount > 0) {
+            `💶 *Teklif Bedeli:* ${Number(pricing.eurPrice || 0).toLocaleString('tr-TR')} EUR\n` +
+            `🇹🇷 *TL Karşılığı (Kur: ${eurRate}):* ${Number(pricing.tryEquivalent || 0).toLocaleString('tr-TR')} TL\n\n`;
+        } else if (pricing && pricing.isCash && pricing.discount > 0) {
           wpMessage += `🚛 *Araç:* ${selectedCatalogVehicle.model}\n` +
             `💳 *Kampanyalı Satış Fiyatı:* ${pricing.basePrice.toLocaleString('tr-TR')} TL\n` +
             `🎁 *Özel Peşin Alım İndirimi:* -${pricing.discount.toLocaleString('tr-TR')} TL\n` +
@@ -447,12 +454,16 @@ export default function ProformaQuick() {
     }
   };
 
+  const selIsCustom = !!selectedCatalogVehicle && (selectedCatalogVehicle.isCustomPrice || selectedCatalogVehicle.segment === 'T-Way');
+
+  const segCount = (key) => pricingCatalog.filter(v => key === 'ALL' || v.segment === key).length;
   const segments = [
-    { key: 'ALL', label: 'Tümü (28)' },
-    { key: 'Daily 35', label: 'Daily 35 (12)' },
-    { key: 'Daily 70 C', label: 'Daily 70 C (8)' },
-    { key: 'Eurocargo', label: 'Eurocargo (5)' },
-    { key: 'S-Way', label: 'S-Way Çekici (3)' },
+    { key: 'ALL', label: `Tümü (${segCount('ALL')})` },
+    { key: 'Daily 35', label: `Daily 35 (${segCount('Daily 35')})` },
+    { key: 'Daily 70 C', label: `Daily 70 C (${segCount('Daily 70 C')})` },
+    { key: 'Eurocargo', label: `Eurocargo (${segCount('Eurocargo')})` },
+    { key: 'S-Way', label: `S-Way Çekici (${segCount('S-Way')})` },
+    ...(segCount('T-Way') > 0 ? [{ key: 'T-Way', label: `T-Way (${segCount('T-Way')})` }] : []),
   ];
 
   const [showLegacyTsb, setShowLegacyTsb] = useState(false);
@@ -599,7 +610,7 @@ export default function ProformaQuick() {
                 </option>
                 {filteredCatalogVehicles.map(v => (
                   <option key={v.id} value={v.id}>
-                    [{v.segment}] {v.model} — {v.currency === 'EUR' ? `${v.eurPrice.toLocaleString('tr-TR')} €` : (v.dealerCost ? `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL` : `Peşin: ${(v.cashPrice / 1000).toLocaleString('tr-TR')}k TL`)}
+                    [{v.segment}] {v.model} — {(v.isCustomPrice || v.segment === 'T-Way') ? 'Özel Fiyat (elle girilir)' : v.currency === 'EUR' ? `${Number(v.eurPrice || 0).toLocaleString('tr-TR')} €` : (v.dealerCost ? `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL` : `Peşin: ${(Number(v.cashPrice || 0) / 1000).toLocaleString('tr-TR')}k TL`)}
                   </option>
                 ))}
               </select>
@@ -619,7 +630,7 @@ export default function ProformaQuick() {
                     🎯 2026 FİYATLANDIRMA SEÇENEĞİ
                   </span>
                   <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.08)', padding: '2px 8px', borderRadius: '10px', color: '#cbd5e1' }}>
-                    {selectedCatalogVehicle.currency === 'EUR' ? `EUR: ${selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} €` : (selectedCatalogVehicle.dealerCost ? `Bayi Maliyeti: ${selectedCatalogVehicle.dealerCost.toLocaleString('tr-TR')} TL` : `Peşin Fiyat: ${selectedCatalogVehicle.cashPrice?.toLocaleString('tr-TR')} TL`)}
+                    {selIsCustom ? 'Projeye Özel Fiyat' : selectedCatalogVehicle.currency === 'EUR' ? `EUR: ${Number(selectedCatalogVehicle.eurPrice || 0).toLocaleString('tr-TR')} €` : (selectedCatalogVehicle.dealerCost ? `Bayi Maliyeti: ${selectedCatalogVehicle.dealerCost.toLocaleString('tr-TR')} TL` : `Peşin Fiyat: ${Number(selectedCatalogVehicle.cashPrice || 0).toLocaleString('tr-TR')} TL`)}
                   </span>
                 </div>
 
@@ -645,7 +656,7 @@ export default function ProformaQuick() {
                         {paymentType === 'campaign' && <FiCheck color="#38bdf8" />}
                       </div>
                       <div style={{ fontSize: '17px', fontWeight: 800, marginTop: '4px', color: '#ffffff' }}>
-                        {(selectedCatalogVehicle.campaignPrice + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
+                        {(Number(selectedCatalogVehicle.campaignPrice || 0) + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         Sübvansiyonlu Kredi Satış
@@ -671,12 +682,16 @@ export default function ProformaQuick() {
                         {paymentType === 'cash' && <FiCheck color="#34d399" />}
                       </div>
                       <div style={{ fontSize: '17px', fontWeight: 800, marginTop: '4px', color: '#34d399' }}>
-                        {(selectedCatalogVehicle.cashPrice + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
+                        {(Number(selectedCatalogVehicle.cashPrice || 0) + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
                       </div>
                       <div style={{ display: 'inline-block', fontSize: '11px', color: '#10b981', fontWeight: 700, background: 'rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '4px', marginTop: '2px' }}>
-                        🎁 -{selectedCatalogVehicle.cashDiscount.toLocaleString('tr-TR')} TL Peşin İndirimi
+                        🎁 -{Number(selectedCatalogVehicle.cashDiscount || 0).toLocaleString('tr-TR')} TL Peşin İndirimi
                       </div>
                     </div>
+                  </div>
+                ) : selIsCustom ? (
+                  <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)', padding: '12px', borderRadius: '10px', fontSize: '12px', color: '#fde68a', lineHeight: 1.45 }}>
+                    ⭐ <strong>Projeye özel fiyatlı araç.</strong> Liste fiyatı yok — aşağıdaki <strong>Anahtar Teslim Fiyat</strong> alanına müşteriye vereceğiniz fiyatı elle girin (sesle dikte de edebilirsiniz).
                   </div>
                 ) : (
                   /* S-Way Euro Bazlı Araçlar */
@@ -684,7 +699,7 @@ export default function ProformaQuick() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                       <div>
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Euro Satış Fiyatı</div>
-                        <div style={{ fontSize: '20px', fontWeight: 800, color: '#38bdf8' }}>{selectedCatalogVehicle.eurPrice.toLocaleString('tr-TR')} EUR</div>
+                        <div style={{ fontSize: '20px', fontWeight: 800, color: '#38bdf8' }}>{Number(selectedCatalogVehicle.eurPrice || 0).toLocaleString('tr-TR')} EUR</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <label style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>TCMB/Sabit Kur:</label>
@@ -700,7 +715,7 @@ export default function ProformaQuick() {
                     <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Hesaplanan TL Teklif Tutar:</span>
                       <span style={{ fontSize: '16px', fontWeight: 800, color: '#10b981' }}>
-                        {Math.round(selectedCatalogVehicle.eurPrice * eurRate).toLocaleString('tr-TR')} TL
+                        {Math.round(Number(selectedCatalogVehicle.eurPrice || 0) * eurRate).toLocaleString('tr-TR')} TL
                       </span>
                     </div>
                   </div>

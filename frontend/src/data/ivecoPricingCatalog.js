@@ -642,7 +642,7 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
     };
   }
 
-  if (currency === 'EUR') {
+  if (vehicle.currency === 'EUR') {
     // S-Way Çekici
     const eurVal = vehicle.eurPrice || 123000;
     basePrice = eurVal;

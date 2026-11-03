@@ -1,3 +1,4 @@
+import { openExternal } from '../../utils/openExternal';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { crmApi } from '../../api/client';
@@ -226,7 +227,7 @@ export default function ProformaDetail() {
       toast.success('📄 PDF indirildi! WhatsApp açıldı. Sohbete Ataş (📎) > Belge ile ekleyiniz.', { id: 'pdf-share', duration: 9000 });
 
       setTimeout(() => {
-        window.open(wpUrl, '_blank');
+        openExternal(wpUrl);
       }, 400);
 
     } catch (err) {
@@ -259,7 +260,7 @@ export default function ProformaDetail() {
       ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
       : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
-    window.open(wpUrl, '_blank');
+    openExternal(wpUrl);
     toast.success('WhatsApp açıldı! Müşteri linki açtığında canlı bildirim alacaksınız.');
   };
 

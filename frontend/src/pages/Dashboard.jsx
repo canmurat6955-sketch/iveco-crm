@@ -8,6 +8,8 @@ import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiM
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
 import { getWhatsAppUrl } from '../utils/whatsapp';
+import { getPublicOrigin } from '../utils/publicUrl';
+import { openExternal, buildWhatsAppUrl } from '../utils/openExternal';
 import WhatsAppActionModal from '../components/CRM/WhatsAppActionModal';
 import FieldAssistantHero, { TARGET_CITIES } from '../components/CRM/FieldAssistantHero';
 import TodayOpportunitiesCard from '../components/CRM/TodayOpportunitiesCard';
@@ -218,6 +220,37 @@ export default function Dashboard() {
           </div>
           <button type="button" className="proposal-card-action-btn">
             Teklif Hazırla
+          </button>
+        </div>
+
+        {/* ── FİYAT LİSTESİNİ MÜŞTERİYLE PAYLAŞ (MOBİL) ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', margin: '0 0 14px' }}>
+          <button
+            type="button"
+            onClick={() => {
+              const url = `${getPublicOrigin()}/fiyat-listesi?ref=muratonay`;
+              const text = `Merhaba,\n\nIVECO 2026 model Daily, Eurocargo ve S-Way araçlarımızın güncel fiyat listesi ve banka kredi kampanyalarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n${url}\n\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`;
+              openExternal(buildWhatsAppUrl(text));
+            }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', border: '1px solid rgba(37,211,102,0.45)', background: 'rgba(37,211,102,0.14)', color: '#4ade80', fontWeight: 800, fontSize: '0.88rem' }}
+          >
+            <FiMessageSquare size={16} /> Fiyat Listesini WhatsApp'tan Paylaş
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              const url = `${getPublicOrigin()}/fiyat-listesi?ref=muratonay`;
+              try {
+                await navigator.clipboard.writeText(url);
+                toast.success('Fiyat listesi linki kopyalandı');
+              } catch {
+                window.prompt('Linki kopyalayın:', url);
+              }
+            }}
+            style={{ padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(56,189,248,0.4)', background: 'rgba(56,189,248,0.1)', color: '#38bdf8', fontWeight: 700, fontSize: '0.8rem' }}
+            title="Linki kopyala"
+          >
+            Link Kopyala
           </button>
         </div>
 
