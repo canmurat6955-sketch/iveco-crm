@@ -2633,6 +2633,7 @@ IVECO ERC Samsun Otomotiv
       {activeMainTab === 'fiyatlar' && (
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
           <PricingCatalogTab
+            initialSector={sectorParam}
             onSelectVehicle={(vehicle) => {
               handleSelectVehicle(vehicle);
               setActiveMainTab('secici');

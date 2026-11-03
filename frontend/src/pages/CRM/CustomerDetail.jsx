@@ -129,14 +129,40 @@ export default function CustomerDetail() {
 
   // ── Akıllı Şasi & Kasa Seçici Modal State'i ──
   const [showChassisMatcher, setShowChassisMatcher] = useState(false);
+  const [selectedVipSector, setSelectedVipSector] = useState('auto');
+
+  const detectCustomerSectorKey = (cust) => {
+    if (!cust) return 'all';
+    const text = `${cust.sector || ''} ${cust.company_name || ''} ${cust.sales_notes || ''}`.toLowerCase();
+    if (text.includes('gıda') || text.includes('gida') || text.includes('frigo') || text.includes('süt') || text.includes('et') || text.includes('market') || text.includes('meşrubat')) return 'gida_frigo';
+    if (text.includes('kargo') || text.includes('dağıtım') || text.includes('dagitim') || text.includes('mobilya') || text.includes('nakliyat')) return 'kargo_dagitim';
+    if (text.includes('inşaat') || text.includes('insaat') || text.includes('nalbur') || text.includes('kereste') || text.includes('demir') || text.includes('hırdavat') || text.includes('sanayi')) return 'insaat_malzeme';
+    if (text.includes('tarım') || text.includes('tarim') || text.includes('yem') || text.includes('un') || text.includes('fındık') || text.includes('çeltik') || text.includes('gübre')) return 'tarim_yem';
+    if (text.includes('kurtarma') || text.includes('yol yardım') || text.includes('oto çekici')) return 'oto_kurtarma';
+    if (text.includes('hafriyat') || text.includes('şantiye') || text.includes('santiye') || text.includes('maden') || text.includes('beton') || text.includes('agrega') || text.includes('damper')) return 'hafriyat_santiye';
+    if (text.includes('uluslararası') || text.includes('tır') || text.includes('lojistik')) return 'agir_nakliye';
+    return 'all';
+  };
+
+  const getEffectiveVipSector = () => {
+    if (selectedVipSector !== 'auto') return selectedVipSector;
+    return detectCustomerSectorKey(customer);
+  };
+
+  const buildCustomerVipLink = (sectorOverride) => {
+    if (!customer) return '';
+    const origin = getPublicOrigin();
+    const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
+    const secKey = sectorOverride || getEffectiveVipSector();
+    const secParam = secKey && secKey !== 'all' ? `&sector=${encodeURIComponent(secKey)}` : '';
+    return `${origin}/fiyat-listesi?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}${secParam}&ref=muratonay`;
+  };
 
   const handleCopyPersonalizedLink = () => {
     if (!customer) return;
-    const origin = getPublicOrigin();
-    const cleanPhone = customer.phone ? customer.phone.replace(/\D/g, '') : '';
-    const link = `${origin}/ozel-teklif?cid=${customer.id}&company=${encodeURIComponent(customer.company_name)}&phone=${cleanPhone}&ref=muratonay`;
+    const link = buildCustomerVipLink();
     navigator.clipboard.writeText(link).then(() => {
-      toast.success(`${customer.company_name} için VIP Özel Teklif bağlantısı kopyalandı! 📋`);
+      toast.success(`${customer.company_name} için Sektöre Özel VIP Fiyat & Kredi bağlantısı kopyalandı! 📋`);
     }).catch(() => toast.error('Link kopyalanamadı'));
   };
 
@@ -146,13 +172,26 @@ export default function CustomerDetail() {
       return;
     }
     const contactName = contacts.find(c => c.is_primary)?.contact_name || customer.company_name;
+    const secKey = getEffectiveVipSector();
+    const sectorTitles = {
+      gida_frigo: 'Gıda & Soğuk Zincir Dağıtım',
+      kargo_dagitim: 'Kargo, Dağıtım & Nakliye',
+      insaat_malzeme: 'İnşaat, Nalbur & Sanayi',
+      tarim_yem: 'Tarım, Yem & Tonajlı Taşımacılık',
+      oto_kurtarma: 'Oto Kurtarma & Yol Yardım',
+      hafriyat_santiye: 'Hafriyat & Şantiye',
+      agir_nakliye: 'Uzun Yol & Uluslararası Lojistik'
+    };
+    const secLabel = sectorTitles[secKey] ? `*${sectorTitles[secKey]}* operasyonunuza özel süzülmüş ` : 'işletmenize özel ';
+    const vipLink = buildCustomerVipLink(secKey);
 
     const msg = (
-      `Sayın ${contactName},\n\n` +
-      `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu ${salesRepName} (0544 622 59 31).\n\n` +
-      `İşletmenizin taşımacılık operasyonuna tam uyumlu IVECO Daily şasi, panelvan ve ağır vasıta modellerimiz, resmi banka sübvansiyonlu faiz ve takas kampanyalarımız hakkında bilgi paylaşmak isterim.\n\n` +
-      `Firmanıza özel resmi bayi proforma teklifimiz, stok teslim durumları ve avantajlı fiyatlarımız için bu mesaj üzerinden veya telefonla bana her zaman ulaşabilirsiniz.\n\n` +
-      `İyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`
+      `Sayın *${contactName}*,\n\n` +
+      `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *${salesRepName}* (0544 622 59 31).\n\n` +
+      `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, %20 KDV vergi kalkanı hesabını, takas peşinat desteğini ve %0 faizli banka kredi seçeneklerini aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
+      `👉 ${vipLink}\n\n` +
+      `Beğendiğiniz model veya takas/kredi hesaplaması için bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
+      `İyi çalışmalar dilerim.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
     );
 
     openWhatsApp(customer.phone, msg, { customer });
@@ -643,38 +682,75 @@ export default function CustomerDetail() {
                 <FiTruck size={14} /> Şasi & Kasa Seçici
               </button>
 
-              <button
-                className="btn btn-sm"
-                onClick={handleSharePersonalizedWhatsApp}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  color: '#10b981',
-                  border: '1px solid rgba(16, 185, 129, 0.4)',
-                  fontWeight: 700
-                }}
-                title="Müşteriye resmi kampanya ve teklif tanıtım mesajı gönder"
-              >
-                <FiMessageSquare size={14} /> Teklif Mesajı
-              </button>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                borderRadius: 8,
+                padding: '2px 4px'
+              }}>
+                <select
+                  value={selectedVipSector}
+                  onChange={(e) => setSelectedVipSector(e.target.value)}
+                  style={{
+                    background: '#0f172a',
+                    color: '#a7f3d0',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: 6,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: '4px 6px',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                  title="Müşteriye gidecek VIP portal linkinde hangi sektör araçlarının süzüleceğini seçin"
+                >
+                  <option value="auto">🎯 Otomatik Sektör ({detectCustomerSectorKey(customer) === 'all' ? 'Tümü' : detectCustomerSectorKey(customer)})</option>
+                  <option value="all">🏢 Tüm İş Kolları</option>
+                  <option value="gida_frigo">🥩 Gıda & Soğuk Zincir</option>
+                  <option value="kargo_dagitim">📦 Kargo, Dağıtım & Nakliye</option>
+                  <option value="insaat_malzeme">🏗️ İnşaat, Nalbur & Sanayi</option>
+                  <option value="tarim_yem">🌾 Tarım, Yem & Tonajlı Yük</option>
+                  <option value="oto_kurtarma">🛞 Oto Kurtarma & Yol Yardım</option>
+                  <option value="hafriyat_santiye">🚜 Hafriyat & Şantiye</option>
+                  <option value="agir_nakliye">🛣️ Uzun Yol & Çekici</option>
+                </select>
 
-              <button
-                className="btn btn-sm"
-                onClick={handleCopyPersonalizedLink}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: '#cbd5e1',
-                  border: '1px solid #334155'
-                }}
-                title="Müşteriye özel bağlantıyı panoya kopyala"
-              >
-                <FiCopy size={13} /> Linki Kopyala
-              </button>
+                <button
+                  className="btn btn-sm"
+                  onClick={handleSharePersonalizedWhatsApp}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    background: 'rgba(16, 185, 129, 0.22)',
+                    color: '#10b981',
+                    border: '1px solid rgba(16, 185, 129, 0.45)',
+                    fontWeight: 700
+                  }}
+                  title="Müşterinin sektörüne göre filtrelenmiş VIP Portal linkini WhatsApp'tan gönder"
+                >
+                  <FiMessageSquare size={14} /> 📲 Sektöre Özel VIP Link
+                </button>
+
+                <button
+                  className="btn btn-sm"
+                  onClick={handleCopyPersonalizedLink}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#cbd5e1',
+                    border: '1px solid #334155'
+                  }}
+                  title="Müşteriye özel sektör filtreli VIP bağlantıyı panoya kopyala"
+                >
+                  <FiCopy size={13} /> Kopyala
+                </button>
+              </div>
 
               <button
                 className="btn btn-sm"

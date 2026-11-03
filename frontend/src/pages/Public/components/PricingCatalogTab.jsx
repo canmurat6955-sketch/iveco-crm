@@ -12,14 +12,49 @@ const CATEGORIES = [
   { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10-12 Teker)', shortLabel: 'T-Way Şantiye' }
 ];
 
-export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, salesRep }) {
+const SECTOR_FILTERS = [
+  { id: 'all', label: '🏢 Tüm İş Kolları', desc: 'Tüm IVECO ürün gamı' },
+  { id: 'gida_frigo', label: '🥩 Gıda & Soğuk Zincir', desc: 'Et, süt, dondurma, sebze-meyve ve market dağıtımına uygun şasi ve panelvanlar' },
+  { id: 'kargo_dagitim', label: '📦 Kargo, Dağıtım & Nakliye', desc: 'Şehir içi koli, e-ticaret, mobilya ve evden eve nakliyat araçları' },
+  { id: 'insaat_malzeme', label: '🏗️ İnşaat, Nalbur & Sanayi', desc: 'Demir, çimento, kereste, profil ve ağır yük taşımaya uygun çift teker şasiler' },
+  { id: 'tarim_yem', label: '🌾 Tarım, Yem & Tonajlı Yük', desc: 'Çeltik, fındık, un, gübre ve yüksek tonajlı bölge nakliyesi araçları' },
+  { id: 'oto_kurtarma', label: '🛞 Oto Kurtarma & Yol Yardım', desc: 'Kayar kasa ve vinç uygulamalarına uygun C-profil kamyon şasileri' },
+  { id: 'hafriyat_santiye', label: '🚜 Hafriyat & Şantiye', desc: '10 ve 12 teker damper, mikser ve ağır şantiye kamyonları' },
+  { id: 'agir_nakliye', label: '🛣️ Uzun Yol & Uluslararası Tır', desc: 'Uluslararası ve şehirlerarası dorse çekici filoları' }
+];
+
+function normalizeSectorId(rawSector) {
+  if (!rawSector) return 'all';
+  const s = String(rawSector).toLowerCase();
+  if (SECTOR_FILTERS.some(item => item.id === s)) return s;
+  if (s.includes('gıda') || s.includes('gida') || s.includes('frigo') || s.includes('süt') || s.includes('et') || s.includes('market')) return 'gida_frigo';
+  if (s.includes('kargo') || s.includes('dağıtım') || s.includes('dagitim') || s.includes('mobilya') || s.includes('nakliyat')) return 'kargo_dagitim';
+  if (s.includes('inşaat') || s.includes('insaat') || s.includes('nalbur') || s.includes('kereste') || s.includes('demir') || s.includes('sanayi')) return 'insaat_malzeme';
+  if (s.includes('tarım') || s.includes('tarim') || s.includes('yem') || s.includes('un') || s.includes('fındık') || s.includes('çeltik')) return 'tarim_yem';
+  if (s.includes('kurtarma') || s.includes('çekici') || s.includes('yol yardım')) return 'oto_kurtarma';
+  if (s.includes('hafriyat') || s.includes('şantiye') || s.includes('santiye') || s.includes('maden') || s.includes('beton') || s.includes('damper')) return 'hafriyat_santiye';
+  if (s.includes('uluslararası') || s.includes('tır') || s.includes('lojistik')) return 'agir_nakliye';
+  return 'all';
+}
+
+export default function PricingCatalogTab({ initialSector = '', onSelectVehicle, onDirectWhatsApp, salesRep }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => normalizeSectorId(initialSector));
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyDoubleWheels, setOnlyDoubleWheels] = useState(false);
   const [showTradeInBox, setShowTradeInBox] = useState(false);
   const [tradeInVehicleText, setTradeInVehicleText] = useState('');
   const [tradeInTargetModel, setTradeInTargetModel] = useState('Daily 35C16 Çift Teker');
+  const [showFleetBox, setShowFleetBox] = useState(false);
+  const [fleetQuantity, setFleetQuantity] = useState('2 - 3 Adet');
+  const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+
+  useEffect(() => {
+    if (initialSector) {
+      setSelectedSectorFilter(normalizeSectorId(initialSector));
+    }
+  }, [initialSector]);
 
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
@@ -29,6 +64,33 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
   const filteredVehicles = useMemo(() => {
     return IVECO_PRICING_CATALOG.filter(v => {
+      // Sector filter (Madde 1: İşinize Göre Hızlı Araç Filtresi)
+      if (selectedSectorFilter !== 'all') {
+        const isVan = v.category.toLowerCase().includes('panelvan');
+        const isDoubleWheel35 = v.segment === 'Daily 35' && !isVan && (v.category.toLowerCase().includes('çift teker') || v.model.toLowerCase().includes('35 c'));
+        const isSingleWheel35 = v.segment === 'Daily 35' && !isVan && !isDoubleWheel35;
+        const is70C = v.segment.includes('70') || v.segment.includes('72');
+        const isEurocargo = v.segment === 'Eurocargo';
+        const isSway = v.segment === 'S-Way';
+        const isTway = v.segment === 'T-Way';
+
+        if (selectedSectorFilter === 'gida_frigo') {
+          if (isTway || isSway) return false;
+        } else if (selectedSectorFilter === 'kargo_dagitim') {
+          if (isTway || isSway) return false;
+        } else if (selectedSectorFilter === 'insaat_malzeme') {
+          if (isVan || isSingleWheel35 || isSway) return false;
+        } else if (selectedSectorFilter === 'tarim_yem') {
+          if (isVan || isSingleWheel35) return false;
+        } else if (selectedSectorFilter === 'oto_kurtarma') {
+          if (!isDoubleWheel35 && (!is70C || isVan) && !isEurocargo) return false;
+        } else if (selectedSectorFilter === 'hafriyat_santiye') {
+          if (!isTway && !isEurocargo && (!is70C || isVan) && !isDoubleWheel35) return false;
+        } else if (selectedSectorFilter === 'agir_nakliye') {
+          if (!isSway && !isEurocargo) return false;
+        }
+      }
+
       // Category filter
       if (selectedCategory === 'daily35_chassis') {
         if (v.segment !== 'Daily 35' || v.category.includes('Panelvan')) return false;
@@ -64,7 +126,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
       return true;
     });
-  }, [selectedCategory, searchQuery, onlyDoubleWheels]);
+  }, [selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
 
   const handleVehicleQuote = (vehicle) => {
     if (onDirectWhatsApp) {
@@ -97,6 +159,15 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       onDirectWhatsApp(msg);
     }
   };
+
+  const handleFleetDiscountSubmit = () => {
+    if (onDirectWhatsApp) {
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, şirketimiz bünyesinde *${fleetQuantity}* *IVECO ${fleetTargetModel}* çoklu filo alımı planlıyoruz. Kurumsal filo özel iskontonuz, teslimat kotası ve finansman koşullarınız hakkında teklif rica ederiz.`;
+      onDirectWhatsApp(msg);
+    }
+  };
+
+  const activeSectorObj = SECTOR_FILTERS.find(s => s.id === selectedSectorFilter);
 
   return (
     <div style={{ color: '#f8fafc' }}>
@@ -141,7 +212,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
                     : selectedCategory === 'daily70'
                       ? '7.000 kg ve 7.200 kg azami yüklü ağırlıklı 70C16 şasi kamyon ve 70C18 yüksek hacimli (19.6 m³) panelvan resmi liste fiyatları.'
-                      : 'Tüm modellerde şeffaf resmi liste fiyatları, KDV vergi kalkanı ve takas desteği uygulanmıştır.'}
+                      : 'Tüm modellerde şeffaf resmi liste fiyatları, KDV vergi kalkanı, takas ve çoklu filo alım desteği uygulanmıştır.'}
               </p>
             )}
           </div>
@@ -174,10 +245,10 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
         </div>
       )}
 
-      {/* 🔄 TAKAS ARACIMI PEŞİNATA SAYDIR HIZLI BARI */}
+      {/* 🔄 TAKAS PEŞİNAT & 🏢 2+ ARAÇ FİLO İSKONTOSU ÇİFT AKSİYON BARI */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(28, 48, 80, 0.92) 100%)',
-        border: '1px solid rgba(245, 158, 11, 0.45)',
+        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(24, 42, 72, 0.94) 100%)',
+        border: '1px solid rgba(245, 158, 11, 0.42)',
         borderRadius: '12px',
         padding: isMobileView ? '10px 12px' : '12px 16px',
         marginBottom: isMobileView ? '12px' : '16px'
@@ -190,33 +261,54 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
           gap: '10px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '220px' }}>
-            <span style={{ fontSize: isMobileView ? '1.3rem' : '1.5rem' }}>🔄</span>
+            <span style={{ fontSize: isMobileView ? '1.25rem' : '1.45rem' }}>🤝</span>
             <div>
               <div style={{ fontSize: isMobileView ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#fde68a' }}>
-                Eski Ticari Aracınızı Takasa Verip Peşinat Saydırın!
+                Takas Peşinat Desteği & Kurumsal Filo İskontosu (2+ Araç)
               </div>
-              <div style={{ fontSize: isMobileView ? '0.72rem' : '0.76rem', color: '#e2e8f0' }}>
-                Markası ne olursa olsun (Transit, Sprinter, Atego, Isuzu, Master vb.) aracınızı değerinde sayıp kalanına kredi çıkarıyoruz.
+              <div style={{ fontSize: isMobileView ? '0.71rem' : '0.75rem', color: '#e2e8f0' }}>
+                Eski aracınızı peşinata saydırabilir veya 2 ve üzeri çoklu araç alımlarınız için özel filo iskontosu talep edebilirsiniz.
               </div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowTradeInBox(prev => !prev)}
-            style={{
-              background: showTradeInBox ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: showTradeInBox ? '#fff' : '#0f172a',
-              border: 'none',
-              borderRadius: '8px',
-              padding: isMobileView ? '8px 12px' : '8px 14px',
-              fontSize: '0.76rem',
-              fontWeight: 900,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            {showTradeInBox ? '✕ Kapat' : '🔄 Aracımı Peşinata Saydır'}
-          </button>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => { setShowTradeInBox(prev => !prev); setShowFleetBox(false); }}
+              style={{
+                background: showTradeInBox ? 'rgba(255,255,255,0.16)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: showTradeInBox ? '#fff' : '#0f172a',
+                border: 'none',
+                borderRadius: '8px',
+                padding: isMobileView ? '8px 11px' : '8px 13px',
+                fontSize: '0.75rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {showTradeInBox ? '✕ Kapat' : '🔄 Takas Aracımı Saydır'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setShowFleetBox(prev => !prev); setShowTradeInBox(false); }}
+              style={{
+                background: showFleetBox ? 'rgba(255,255,255,0.16)' : 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                color: '#ffffff',
+                border: '1px solid #38bdf8',
+                borderRadius: '8px',
+                padding: isMobileView ? '8px 11px' : '8px 13px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {showFleetBox ? '✕ Kapat' : '🏢 2+ Araç Filo İskontosu'}
+            </button>
+          </div>
         </div>
 
         {showTradeInBox && (
@@ -287,6 +379,138 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
             </button>
           </div>
         )}
+
+        {showFleetBox && (
+          <div style={{
+            marginTop: '12px',
+            paddingTop: '12px',
+            borderTop: '1px dashed rgba(56, 189, 248, 0.35)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            alignItems: 'center'
+          }}>
+            <select
+              value={fleetQuantity}
+              onChange={(e) => setFleetQuantity(e.target.value)}
+              style={{
+                flex: '1 1 150px',
+                padding: '9px 12px',
+                background: 'rgba(15, 28, 50, 0.9)',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+                outline: 'none'
+              }}
+            >
+              <option value="2 Adet">Alım Adedi: 2 Adet Araç</option>
+              <option value="3 - 5 Adet">Alım Adedi: 3 - 5 Adet Filo</option>
+              <option value="6 - 10 Adet">Alım Adedi: 6 - 10 Adet Filo</option>
+              <option value="10+ Adet Kurumsal Filo">Alım Adedi: 10+ Adet Kurumsal Filo</option>
+            </select>
+            <select
+              value={fleetTargetModel}
+              onChange={(e) => setFleetTargetModel(e.target.value)}
+              style={{
+                flex: '2 1 200px',
+                padding: '9px 12px',
+                background: 'rgba(15, 28, 50, 0.9)',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+                outline: 'none'
+              }}
+            >
+              <option value="Daily 35C16 Çift Teker Şasi">Model: Daily 35C16 Çift Teker Şasi</option>
+              <option value="Daily 35S16 Panelvan (12 / 16 / 18 m³)">Model: Daily Panelvan (12 / 16 / 18 m³)</option>
+              <option value="Daily 72C18 (7 Ton Kamyon)">Model: Daily 72C18 (7 Ton Kamyon)</option>
+              <option value="Eurocargo 100E / 150E / 160E">Model: Eurocargo Orta Ağır Kamyon</option>
+              <option value="S-Way Çekici (500 / 530 / 580 HP)">Model: S-Way Çekici Filosu</option>
+              <option value="T-Way 10 / 12 Teker Hafriyat">Model: T-Way Hafriyat & Mikser Filosu</option>
+            </select>
+            <button
+              type="button"
+              onClick={handleFleetDiscountSubmit}
+              style={{
+                background: '#22c55e',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '9px 16px',
+                fontSize: '0.8rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FiMessageSquare size={14} /> Filo Özel İskontosu İste
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 🎯 İŞİNİZE / SEKTÖRÜNÜZE GÖRE HIZLI FİLTRE (Madde 1) */}
+      <div style={{
+        background: 'rgba(24, 42, 72, 0.85)',
+        border: '1px solid rgba(125, 211, 252, 0.25)',
+        borderRadius: '12px',
+        padding: isMobileView ? '10px 10px' : '12px 14px',
+        marginBottom: isMobileView ? '10px' : '14px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '6px',
+          marginBottom: '8px'
+        }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#7dd3fc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            🎯 İŞİNİZE / SEKTÖRÜNÜZE UYGUN ARAÇLARI SÜZÜN:
+          </span>
+          {selectedSectorFilter !== 'all' && activeSectorObj && (
+            <span style={{ fontSize: '0.72rem', color: '#4ade80', fontWeight: 700 }}>
+              ✓ {activeSectorObj.desc}
+            </span>
+          )}
+        </div>
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '6px'
+        }}>
+          {SECTOR_FILTERS.map(sec => {
+            const isSel = selectedSectorFilter === sec.id;
+            return (
+              <button
+                key={sec.id}
+                type="button"
+                onClick={() => {
+                  setSelectedSectorFilter(sec.id);
+                  setSelectedCategory('all');
+                }}
+                style={{
+                  background: isSel ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'rgba(15, 28, 50, 0.78)',
+                  color: '#ffffff',
+                  border: isSel ? '1.5px solid #4ade80' : '1px solid rgba(148, 163, 184, 0.25)',
+                  borderRadius: '20px',
+                  padding: isMobileView ? '7px 10px' : '6px 12px',
+                  fontSize: isMobileView ? '0.74rem' : '0.75rem',
+                  fontWeight: isSel ? 800 : 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {sec.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
