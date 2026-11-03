@@ -72,7 +72,9 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       }
       const priceText = vehicle.currency === 'EUR'
         ? `€${(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV (Euro)`
-        : (vehicle.cashPrice ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin` : 'Özel Proje Fiyatı');
+        : (vehicle.cashDiscount > 0
+            ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
+            : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
       const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
@@ -330,7 +332,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 }}>
                   {vehicle.category}
                 </span>
-                {vehicle.cashDiscount && vehicle.currency !== 'EUR' ? (
+                {vehicle.cashDiscount > 0 && vehicle.currency !== 'EUR' ? (
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
@@ -366,7 +368,19 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   }}>
                     💶 İhracatçı Euro Kredisi Uyumlu
                   </span>
-                ) : null}
+                ) : (
+                  <span style={{
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    background: 'rgba(56, 189, 248, 0.18)',
+                    color: '#7dd3fc',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(56, 189, 248, 0.38)'
+                  }}>
+                    💳 Kredili Kampanya Fiyatı
+                  </span>
+                )}
               </div>
 
               {/* Title, Sticker & Specs */}
@@ -518,22 +532,41 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                     </div>
                   </>
                 ) : vehicle.campaignPrice ? (
-                  <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
-                      <span>Kampanyalı Liste:</span>
-                      <span style={{ textDecoration: 'line-through' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#fbbf24', marginBottom: '6px', fontWeight: 700 }}>
-                      <span>Peşin İndirimi:</span>
-                      <span>-{vehicle.cashDiscount.toLocaleString('tr-TR')} TL</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
-                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#4ade80', fontWeight: 800 }}>NET PEŞİN FİYAT:</span>
-                      <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
-                        {vehicle.cashPrice.toLocaleString('tr-TR')} TL
-                      </span>
-                    </div>
-                  </>
+                  vehicle.cashDiscount > 0 ? (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
+                        <span>Kampanyalı Liste:</span>
+                        <span style={{ textDecoration: 'line-through' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#fbbf24', marginBottom: '6px', fontWeight: 700 }}>
+                        <span>Peşin İndirimi:</span>
+                        <span>-{vehicle.cashDiscount.toLocaleString('tr-TR')} TL</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
+                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#4ade80', fontWeight: 800 }}>NET PEŞİN FİYAT:</span>
+                        <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
+                          {vehicle.cashPrice.toLocaleString('tr-TR')} TL
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
+                        <span>Kredili Kampanya Fiyatı:</span>
+                        <span style={{ fontWeight: 700, color: '#ffffff' }}>{vehicle.campaignPrice.toLocaleString('tr-TR')} TL</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.73rem', color: '#94a3b8', marginBottom: '6px', fontWeight: 600 }}>
+                        <span>Peşin / Nakit İndirimi:</span>
+                        <span>Bulunmamaktadır</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
+                        <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#38bdf8', fontWeight: 800 }}>KREDİLİ / NET FİYAT:</span>
+                        <span style={{ fontSize: isMobileView ? '1.22rem' : '1.05rem', color: '#4ade80', fontWeight: 900 }}>
+                          {vehicle.cashPrice.toLocaleString('tr-TR')} TL
+                        </span>
+                      </div>
+                    </>
+                  )
                 ) : (
                   <div style={{ textAlign: 'center', color: '#7dd3fc', fontWeight: 700, fontSize: '0.85rem' }}>
                     Özel Teklif & Döviz Kuru İçin Danışınız

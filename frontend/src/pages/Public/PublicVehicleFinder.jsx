@@ -258,10 +258,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '2.145.000 TL (Peşin) / 2.335.000 TL (Kampanyalı)',
-    campaignPriceText: '2.335.000 TL',
-    cashPriceText: '2.145.000 TL',
-    cashDiscountText: '190.000 TL',
+    priceRange: '2.045.000 TL (3750 Manuel) / 2.120.000 TL (3450 A8) / 2.150.000 TL (3750 A8)',
+    campaignPriceText: '2.150.000 TL (3750 A8) / 2.120.000 TL (3450 A8)',
+    cashPriceText: '2.045.000 TL (3750 Manuel) / 2.150.000 TL (3750 A8)',
+    cashDiscountText: null,
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
   },
@@ -1001,7 +1001,7 @@ export default function PublicVehicleFinder() {
             dims: ov.bodyLength ? { ...item.dims, length: ov.bodyLength } : item.dims,
             campaignPriceText: ov.campaignPrice && ov.currency !== 'EUR' ? `${ov.campaignPrice.toLocaleString('tr-TR')} TL` : item.campaignPriceText,
             cashPriceText: ov.cashPrice && ov.currency !== 'EUR' ? `${ov.cashPrice.toLocaleString('tr-TR')} TL` : item.cashPriceText,
-            cashDiscountText: ov.cashDiscount && ov.currency !== 'EUR' ? `${ov.cashDiscount.toLocaleString('tr-TR')} TL` : item.cashDiscountText,
+            cashDiscountText: ov.currency !== 'EUR' ? (ov.cashDiscount > 0 ? `${ov.cashDiscount.toLocaleString('tr-TR')} TL` : null) : item.cashDiscountText,
             displayPrice: ov.currency === 'EUR' && ov.eurPrice ? `${ov.eurPrice.toLocaleString('tr-TR')} €` : item.displayPrice
           } : {}),
           modelKey: item.key,
@@ -1469,7 +1469,9 @@ export default function PublicVehicleFinder() {
       : matched.currency === 'EUR'
         ? `*Fiyat Aralığı:* ${matched.displayPrice} (${matched.modelsDetail || 'Euro Dövizli'})\n`
         : matched.cashPriceText
-          ? `*Kampanyalı Fiyat:* ${matched.campaignPriceText}\n*Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
+          ? (matched.cashDiscountText
+              ? `*Kampanyalı Fiyat:* ${matched.campaignPriceText}\n*Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
+              : `*Kredili / Net Fiyat:* ${matched.campaignPriceText} (Peşin indirimi uygulanmamaktadır)\n`)
           : '';
 
     const isEurFinancing = loanCurrencyMode === 'EUR' || (matched.currency === 'EUR' && loanCurrencyMode !== 'TRY');

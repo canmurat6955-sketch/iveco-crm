@@ -151,7 +151,7 @@ export default function ProformaQuick() {
           ...v,
           dealerCost: v.dealer_cost || v.dealerCost,
           campaignPrice: v.campaign_price || v.campaignPrice,
-          cashDiscount: v.cash_discount || v.cashDiscount,
+          cashDiscount: v.cash_discount ?? v.cashDiscount ?? 0,
           cashPrice: v.cash_price || v.cashPrice,
           eurPrice: v.eur_price || v.eurPrice,
           autoTransmissionCost: v.auto_transmission_cost || v.autoTransmissionCost,
@@ -188,9 +188,12 @@ export default function ProformaQuick() {
     } else if (pricing.currency === 'EUR') {
       defaultNotes = `Teklifimiz ${Number(pricing.eurPrice || 0).toLocaleString('tr-TR')} EUR bedel üzerinden, ${rate} TL/EUR kuru baz alınarak hazırlanmıştır. Fatura tarihindeki TCMB Döviz Satış Kuru esas alınacaktır. Vergi kanunlarındaki değişiklikler yansıtılacaktır.`;
       defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Döviz Karşılığı TL)";
-    } else if (pType === 'cash') {
+    } else if (pType === 'cash' && Number(pricing.discount || 0) > 0) {
       defaultNotes = `Fiyatlarımız peşin satış koşulları esas alınarak ${Number(pricing.discount || 0).toLocaleString('tr-TR')} TL özel peşin alım indirimi uygulanarak oluşturulmuş olup ödeme nakten ve defaten gerçekleştirilecektir. SUBVANSİYONLU kredi kullandırılamaz. Vergi kanunlarında yapılacak değişiklikler lehde ve aleyhte fiyatlarımıza yansıtılacaktır.`;
       defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile (Peşin Alım)";
+    } else if (pType === 'cash') {
+      defaultNotes = `Fiyatlarımız resmi kampanyalı liste koşulları esas alınarak oluşturulmuştur (bu modelde ilave nakit indirimi uygulanmamaktadır). Vergi kanunlarında yapılacak değişiklikler lehde ve aleyhte fiyatlarımıza yansıtılacaktır.`;
+      defaultPayment = "Şirketimizin Garanti Merkez Şubesinde bulunan TR23 0006 2000 1900 0006 2888 37 Iban Nolu Hesabına EFT veya HAVALE talimatınız ile";
     } else {
       defaultNotes = `Fiyatlarımız IVECO resmi sübvansiyonlu banka kampanyası koşulları esas alınarak oluşturulmuştur. Banka kredi tahsis ve onay şartları geçerlidir. Vergi kanunlarında yapılacak değişiklikler yansıtılacaktır.`;
       defaultPayment = "IVECO Finans / Anlaşmalı Banka Kampanyası Kredisi ve Peşinat Talimatı ile";
@@ -685,8 +688,10 @@ export default function ProformaQuick() {
                       <div style={{ fontSize: '17px', fontWeight: 800, marginTop: '4px', color: '#34d399' }}>
                         {(Number(selectedCatalogVehicle.cashPrice || 0) + (hasAutoTransmission && selectedCatalogVehicle.autoTransmissionCost ? selectedCatalogVehicle.autoTransmissionCost : 0)).toLocaleString('tr-TR')} TL
                       </div>
-                      <div style={{ display: 'inline-block', fontSize: '11px', color: '#10b981', fontWeight: 700, background: 'rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '4px', marginTop: '2px' }}>
-                        🎁 -{Number(selectedCatalogVehicle.cashDiscount || 0).toLocaleString('tr-TR')} TL Peşin İndirimi
+                      <div style={{ display: 'inline-block', fontSize: '11px', color: Number(selectedCatalogVehicle.cashDiscount || 0) > 0 ? '#10b981' : '#94a3b8', fontWeight: 700, background: Number(selectedCatalogVehicle.cashDiscount || 0) > 0 ? 'rgba(16,185,129,0.15)' : 'rgba(148,163,184,0.15)', padding: '1px 6px', borderRadius: '4px', marginTop: '2px' }}>
+                        {Number(selectedCatalogVehicle.cashDiscount || 0) > 0
+                          ? `🎁 -${Number(selectedCatalogVehicle.cashDiscount || 0).toLocaleString('tr-TR')} TL Peşin İndirimi`
+                          : 'Nakit İndirimi Yok (Kredili Fiyat Geçerli)'}
                       </div>
                     </div>
                   </div>
