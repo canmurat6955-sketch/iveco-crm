@@ -731,6 +731,8 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
  * - Eurocargo 150E21 / 150E22 / 160E32 / 10 Teker -> /vehicles/eurocargo-150-160.jpg
  * - Eurocargo 100E19 / 120EL19 -> /vehicles/eurocargo-100-120.jpg
  * - Panelvan (Daily 35 VAN & 70C18 VAN) -> /vehicles/daily-panelvan.jpg
+ * - Daily 35S Tek Teker Şasi -> /vehicles/daily-35s-sasi.jpg
+ * - Daily 35C & Daily 70C / 72C Çift Teker Şasi -> /vehicles/daily-35c-72c.jpg
  * - S-Way Çekici -> /vehicles/sway-cekici.jpg
  */
 export function getVehicleSticker(vehicleOrKey) {
@@ -746,6 +748,12 @@ export function getVehicleSticker(vehicleOrKey) {
     }
     if (k.includes('panelvan') || k.includes('van')) {
       return { src: '/vehicles/daily-panelvan.jpg', label: 'IVECO Daily Panelvan' };
+    }
+    if (k === 'daily35_chassis' || k.includes('35s')) {
+      return { src: '/vehicles/daily-35s-sasi.jpg', label: 'IVECO Daily 35S Şasi' };
+    }
+    if (k === 'daily70' || k.includes('35c') || k.includes('70c') || k.includes('72c')) {
+      return { src: '/vehicles/daily-35c-72c.jpg', label: 'IVECO Daily 35C / 72C' };
     }
     if (k.includes('150e') || k.includes('160e') || k.includes('10teker')) {
       return { src: '/vehicles/eurocargo-150-160.jpg', label: 'IVECO Eurocargo 150E / 160E' };
@@ -776,7 +784,35 @@ export function getVehicleSticker(vehicleOrKey) {
     return { src: '/vehicles/daily-panelvan.jpg', label: 'Daily Panelvan' };
   }
 
-  // 4. Eurocargo 150E21, 150E22, 160E32 ve 10 Teker
+  // 4. Daily 35S Tek Teker Şasi
+  if (
+    id.includes('35s') ||
+    model.includes('35 s') ||
+    model.includes('35s') ||
+    segment.includes('35s')
+  ) {
+    return { src: '/vehicles/daily-35s-sasi.jpg', label: 'Daily 35S Tek Teker Şasi' };
+  }
+
+  // 5. Daily 35C & Daily 70C / 72C Çift Teker Şasi
+  if (
+    id.includes('35c') ||
+    id.includes('70c') ||
+    id.includes('72c') ||
+    model.includes('35 c') ||
+    model.includes('35c') ||
+    model.includes('70 c') ||
+    model.includes('70c') ||
+    model.includes('72 c') ||
+    model.includes('72c') ||
+    segment.includes('35c') ||
+    segment.includes('70 c') ||
+    segment.includes('72c')
+  ) {
+    return { src: '/vehicles/daily-35c-72c.jpg', label: 'Daily 35C / 72C Çift Teker' };
+  }
+
+  // 6. Eurocargo 150E21, 150E22, 160E32 ve 10 Teker
   if (
     id.includes('150e') ||
     id.includes('160e') ||
@@ -788,7 +824,7 @@ export function getVehicleSticker(vehicleOrKey) {
     return { src: '/vehicles/eurocargo-150-160.jpg', label: 'Eurocargo 150E / 160E' };
   }
 
-  // 5. Eurocargo 100E19 ve 120EL19
+  // 7. Eurocargo 100E19 ve 120EL19
   if (
     id.includes('100e') ||
     id.includes('120e') ||
@@ -801,4 +837,5 @@ export function getVehicleSticker(vehicleOrKey) {
 
   return null;
 }
+
 
