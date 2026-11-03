@@ -73,7 +73,7 @@ export const BANK_LIST = [
     "bg": "rgba(2, 132, 199, 0.15)",
     "border": "rgba(56, 189, 248, 0.4)",
     "icon": "🏛️",
-    "description": "IVECO Resmi Taşıt Finansmanı — %0 Faizden 2.500.000 TL'ye varan seçenekler"
+    "description": "800K-2M TL kamyonet, 4M TL'ye kadar kamyon & Eurocargo resmi kampanya tablosu"
   },
   {
     "id": "kuveyt_turk",
@@ -112,34 +112,34 @@ export const BANK_LIST = [
     "id": "akbank",
     "name": "Akbank",
     "shortName": "Akbank",
-    "badge": "%0 Faiz & 4M Filo",
+    "badge": "%0 Faiz Kampanyası",
     "color": "#ef4444",
     "bg": "rgba(239, 68, 68, 0.15)",
     "border": "rgba(248, 113, 113, 0.4)",
     "icon": "🦁",
-    "description": "800K-900K %0 faiz, 4M TL'ye varan ticari ve filo finansmanı"
+    "description": "800K-900K %0 faiz (Daily 35) ve 1M TL %0 faiz (Daily 70 & Eurocargo)"
   },
   {
     "id": "yapi_kredi",
     "name": "Yapı Kredi",
     "shortName": "Yapı Kredi",
-    "badge": "%0 Faiz & 2M Tavan",
+    "badge": "Daily 35 Kampanyası",
     "color": "#3b82f6",
     "bg": "rgba(59, 130, 246, 0.15)",
     "border": "rgba(96, 165, 250, 0.4)",
     "icon": "🦅",
-    "description": "800K-900K %0 faiz, 2.5M TL'ye kadar resmi ticari faiz oranları"
+    "description": "900K 9 ay %0.04, 2M TL'ye kadar Daily 35 resmi ticari faiz oranları"
   },
   {
     "id": "vakif_katilim",
     "name": "Vakıf Katılım",
     "shortName": "Vakıf Katılım",
-    "badge": "%0 Kâr Payı & Katılım",
+    "badge": "%0 Kâr Payı",
     "color": "#f59e0b",
     "bg": "rgba(245, 158, 11, 0.15)",
     "border": "rgba(251, 191, 36, 0.4)",
     "icon": "⭐",
-    "description": "800K-1M %0 kâr payı, katılım bankacılığı prensiplerine uygun finansman"
+    "description": "800K-900K (Daily 35) ve 1M TL (Daily 70 & Eurocargo) sıfır kâr paylı kampanya"
   },
   {
     "id": "bnp_paribas",
@@ -150,7 +150,7 @@ export const BANK_LIST = [
     "bg": "rgba(5, 150, 105, 0.15)",
     "border": "rgba(52, 211, 153, 0.4)",
     "icon": "🌐",
-    "description": "Daily 70 ve Eurocargo için 1.000.000 TL %0 faiz ve 2.500.000 TL ticari kredi"
+    "description": "1.000.000 TL 12 ay %0 faiz (Daily 70 & Eurocargo)"
   },
   {
     "id": "diger_yok",
@@ -169,340 +169,552 @@ export const BANK_CAMPAIGNS = {
   "teb_cetelem": {
     "daily35": [
       {
-        "id": "teb_35_800_8",
-        "title": "800.000 TL — 8 Ay (%0 Faiz)",
+        "id": "tc_35_800_8",
+        "title": "800.000 TL — 8 Ay (%0.14 Faiz)",
         "principal": 800000,
         "term": 8,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 100000,
-        "total": 800000,
+        "rateLabel": "%0.14",
+        "rate": 0.14,
+        "monthly": 100663,
+        "total": 805301,
         "highlight": true,
-        "tag": "EN ÇOK TERCİH EDİLEN"
+        "tag": "35C ŞASİ ÖZEL"
       },
       {
-        "id": "teb_35_900_9",
-        "title": "900.000 TL — 9 Ay (%0 Faiz)",
+        "id": "tc_35_900_9",
+        "title": "900.000 TL — 9 Ay (%0.14 Faiz)",
         "principal": 900000,
         "term": 9,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 100000,
-        "total": 900000,
+        "rateLabel": "%0.14",
+        "rate": 0.14,
+        "monthly": 100736,
+        "total": 906628,
         "highlight": true,
-        "tag": "9 AY SIFIR FAİZ"
+        "tag": "9 AY KAMPANYA"
       },
       {
-        "id": "teb_35_1000_12",
-        "title": "1.000.000 TL — 12 Ay (İndirimli)",
-        "principal": 1000000,
+        "id": "tc_35_900_12",
+        "title": "900.000 TL — 12 Ay (%0.89 Faiz)",
+        "principal": 900000,
         "term": 12,
-        "rateLabel": "%1.04",
-        "rate": 1.04,
-        "monthly": 89372,
-        "total": 1072464,
-        "tag": "DÜŞÜK ORAN"
+        "rateLabel": "%0.89",
+        "rate": 0.89,
+        "monthly": 79633,
+        "total": 955600
       },
       {
-        "id": "teb_35_1200_12",
-        "title": "1.200.000 TL — 12 Ay (Yüksek Kredi)",
-        "principal": 1200000,
-        "term": 12,
-        "rateLabel": "%1.47",
-        "rate": 1.47,
-        "monthly": 110278,
-        "total": 1323336,
-        "tag": "YÜKSEK LİMİT"
-      },
-      {
-        "id": "teb_35_1500_24",
-        "title": "1.500.000 TL — 24 Ay (Yüksek Kredi)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.13",
-        "rate": 2.13,
-        "monthly": 81476,
-        "total": 1955424,
-        "highlight": true,
-        "tag": "YÜKSEK KREDİ / 2 YIL"
-      },
-      {
-        "id": "teb_35_1500_36",
-        "title": "1.500.000 TL — 36 Ay Uzun Vade",
-        "principal": 1500000,
-        "term": 36,
-        "rateLabel": "%2.40",
-        "rate": 2.4,
-        "monthly": 63833,
-        "total": 2297988
-      },
-      {
-        "id": "teb_35_1500_48",
-        "title": "1.500.000 TL — 48 Ay Rahat Ödeme",
-        "principal": 1500000,
-        "term": 48,
-        "rateLabel": "%2.50",
-        "rate": 2.5,
-        "monthly": 54927,
-        "total": 2636496
-      },
-      {
-        "id": "teb_35_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.10 Faiz)",
-        "principal": 2000000,
+        "id": "tc_35_900_24",
+        "title": "900.000 TL — 24 Ay (%2.10 Faiz)",
+        "principal": 900000,
         "term": 24,
         "rateLabel": "%2.10",
         "rate": 2.1,
-        "monthly": 108252,
-        "total": 2598048,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
+        "monthly": 48696,
+        "total": 1168708
       },
       {
-        "id": "teb_35_2000_36",
-        "title": "2.000.000 TL — 36 Ay (%2.37 Faiz)",
+        "id": "tc_35_900_36",
+        "title": "900.000 TL — 36 Ay (%2.52 Faiz)",
+        "principal": 900000,
+        "term": 36,
+        "rateLabel": "%2.52",
+        "rate": 2.52,
+        "monthly": 39075,
+        "total": 1406706
+      },
+      {
+        "id": "tc_35_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%1.18 Faiz)",
+        "principal": 1000000,
+        "term": 12,
+        "rateLabel": "%1.18",
+        "rate": 1.18,
+        "monthly": 90196,
+        "total": 1082352
+      },
+      {
+        "id": "tc_35_1000_24",
+        "title": "1.000.000 TL — 24 Ay (%2.26 Faiz)",
+        "principal": 1000000,
+        "term": 24,
+        "rateLabel": "%2.26",
+        "rate": 2.26,
+        "monthly": 55131,
+        "total": 1323152
+      },
+      {
+        "id": "tc_35_1000_36",
+        "title": "1.000.000 TL — 36 Ay (%2.63 Faiz)",
+        "principal": 1000000,
+        "term": 36,
+        "rateLabel": "%2.63",
+        "rate": 2.63,
+        "monthly": 44188,
+        "total": 1590785
+      },
+      {
+        "id": "tc_35_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%2.03 Faiz)",
+        "principal": 1500000,
+        "term": 12,
+        "rateLabel": "%2.03",
+        "rate": 2.03,
+        "monthly": 142987,
+        "total": 1715848
+      },
+      {
+        "id": "tc_35_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%2.74 Faiz)",
+        "principal": 1500000,
+        "term": 24,
+        "rateLabel": "%2.74",
+        "rate": 2.74,
+        "monthly": 87402,
+        "total": 2097641,
+        "highlight": true,
+        "tag": "1.5 MİLYON TL"
+      },
+      {
+        "id": "tc_35_1500_36",
+        "title": "1.500.000 TL — 36 Ay (%2.98 Faiz)",
+        "principal": 1500000,
+        "term": 36,
+        "rateLabel": "%2.98",
+        "rate": 2.98,
+        "monthly": 70035,
+        "total": 2521243
+      },
+      {
+        "id": "tc_35_2000_12",
+        "title": "2.000.000 TL — 12 Ay (%2.44 Faiz)",
+        "principal": 2000000,
+        "term": 12,
+        "rateLabel": "%2.44",
+        "rate": 2.44,
+        "monthly": 195707,
+        "total": 2348483
+      },
+      {
+        "id": "tc_35_2000_24",
+        "title": "2.000.000 TL — 24 Ay (%2.97 Faiz)",
+        "principal": 2000000,
+        "term": 24,
+        "rateLabel": "%2.97",
+        "rate": 2.97,
+        "monthly": 119607,
+        "total": 2870578,
+        "highlight": true,
+        "tag": "2 MİLYON TAVAN"
+      },
+      {
+        "id": "tc_35_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%3.15 Faiz)",
         "principal": 2000000,
         "term": 36,
-        "rateLabel": "%2.37",
-        "rate": 2.37,
-        "monthly": 84807,
-        "total": 3053052,
-        "tag": "2M / 36 AY"
+        "rateLabel": "%3.15",
+        "rate": 3.15,
+        "monthly": 95859,
+        "total": 3450918
       }
     ],
     "daily70": [
       {
-        "id": "teb_70_1000_12",
-        "title": "1.000.000 TL — 12 Ay (%0 Faiz)",
+        "id": "tc_70_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%0.14 Faiz)",
         "principal": 1000000,
         "term": 12,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 83333,
-        "total": 1000000,
+        "rateLabel": "%0.14",
+        "rate": 0.14,
+        "monthly": 84132,
+        "total": 1009581,
         "highlight": true,
-        "tag": "1 YIL SIFIR FAİZ"
+        "tag": "12 AY KAMPANYA"
       },
       {
-        "id": "teb_70_1200_12",
-        "title": "1.200.000 TL — 12 Ay (%0.61 Faiz)",
+        "id": "tc_70_1000_24",
+        "title": "1.000.000 TL — 24 Ay (%1.67 Faiz)",
+        "principal": 1000000,
+        "term": 24,
+        "rateLabel": "%1.67",
+        "rate": 1.67,
+        "monthly": 51406,
+        "total": 1233751
+      },
+      {
+        "id": "tc_70_1000_36",
+        "title": "1.000.000 TL — 36 Ay (%2.21 Faiz)",
+        "principal": 1000000,
+        "term": 36,
+        "rateLabel": "%2.21",
+        "rate": 2.21,
+        "monthly": 41280,
+        "total": 1486096
+      },
+      {
+        "id": "tc_70_1200_12",
+        "title": "1.200.000 TL — 12 Ay (%0.75 Faiz)",
         "principal": 1200000,
         "term": 12,
-        "rateLabel": "%0.61",
-        "rate": 0.61,
-        "monthly": 104278,
-        "total": 1251336,
-        "tag": "ÖZEL İNDİRİM"
+        "rateLabel": "%0.75",
+        "rate": 0.75,
+        "monthly": 105192,
+        "total": 1262308
       },
       {
-        "id": "teb_70_1500_12",
-        "title": "1.500.000 TL — 12 Ay (%1.21 Faiz)",
+        "id": "tc_70_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.35 Faiz)",
         "principal": 1500000,
         "term": 12,
-        "rateLabel": "%1.21",
-        "rate": 1.21,
-        "monthly": 135597,
-        "total": 1627164,
-        "tag": "YÜKSEK KREDİ"
+        "rateLabel": "%1.35",
+        "rate": 1.35,
+        "monthly": 136814,
+        "total": 1641771
       },
       {
-        "id": "teb_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%1.99 Faiz)",
+        "id": "tc_70_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%2.36 Faiz)",
         "principal": 1500000,
         "term": 24,
-        "rateLabel": "%1.99",
-        "rate": 1.99,
-        "monthly": 80151,
-        "total": 1923624,
+        "rateLabel": "%2.36",
+        "rate": 2.36,
+        "monthly": 83666,
+        "total": 2007973,
         "highlight": true,
-        "tag": "24 AY AVANTAJ"
+        "tag": "1.5 MİLYON TL"
       },
       {
-        "id": "teb_70_1500_36",
-        "title": "1.500.000 TL — 36 Ay (%2.30 Faiz)",
+        "id": "tc_70_1500_36",
+        "title": "1.500.000 TL — 36 Ay (%2.71 Faiz)",
         "principal": 1500000,
         "term": 36,
-        "rateLabel": "%2.30",
-        "rate": 2.3,
-        "monthly": 62801,
-        "total": 2260836
+        "rateLabel": "%2.71",
+        "rate": 2.71,
+        "monthly": 67131,
+        "total": 2416717
       },
       {
-        "id": "teb_70_2000_12",
-        "title": "2.000.000 TL — 12 Ay (%1.80 Faiz)",
+        "id": "tc_70_2000_12",
+        "title": "2.000.000 TL — 12 Ay (%1.94 Faiz)",
         "principal": 2000000,
         "term": 12,
-        "rateLabel": "%1.80",
-        "rate": 1.8,
-        "monthly": 187868,
-        "total": 2254416,
-        "tag": "2 MİLYON TL LİMİT"
+        "rateLabel": "%1.94",
+        "rate": 1.94,
+        "monthly": 189549,
+        "total": 2274590
       },
       {
-        "id": "teb_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.32 Faiz)",
+        "id": "tc_70_2000_24",
+        "title": "2.000.000 TL — 24 Ay (%2.69 Faiz)",
         "principal": 2000000,
         "term": 24,
-        "rateLabel": "%2.32",
-        "rate": 2.32,
-        "monthly": 111037,
-        "total": 2664888,
-        "highlight": true,
-        "tag": "POPÜLER 2M"
-      },
-      {
-        "id": "teb_70_2000_36",
-        "title": "2.000.000 TL — 36 Ay (%2.53 Faiz)",
-        "principal": 2000000,
-        "term": 36,
-        "rateLabel": "%2.53",
-        "rate": 2.53,
-        "monthly": 86987,
-        "total": 3131532
-      },
-      {
-        "id": "teb_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.51 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.51",
-        "rate": 2.51,
-        "monthly": 141916,
-        "total": 3405984,
-        "tag": "MAKSİMUM GÜÇ"
-      },
-      {
-        "id": "teb_70_2500_36",
-        "title": "2.500.000 TL — 36 Ay (%2.67 Faiz)",
-        "principal": 2500000,
-        "term": 36,
-        "rateLabel": "%2.67",
-        "rate": 2.67,
-        "monthly": 111159,
-        "total": 4001724
-      },
-      {
-        "id": "teb_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.55 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.55",
-        "rate": 2.55,
-        "monthly": 171800,
-        "total": 4123200,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "teb_70_3500_36",
-        "title": "3.500.000 TL — 36 Ay (%2.68 Faiz)",
-        "principal": 3500000,
-        "term": 36,
-        "rateLabel": "%2.68",
-        "rate": 2.68,
-        "monthly": 157200,
-        "total": 5659200,
-        "tag": "3.5 MİLYON TL"
-      },
-      {
-        "id": "teb_70_4000_36",
-        "title": "4.000.000 TL — 36 Ay (%2.72 Faiz)",
-        "principal": 4000000,
-        "term": 36,
-        "rateLabel": "%2.72",
-        "rate": 2.72,
-        "monthly": 181500,
-        "total": 6534000,
-        "tag": "4 MİLYON TL LİMİT"
-      }
-    ],
-    "eurocargo": [
-      {
-        "id": "teb_ec_1000_12",
-        "title": "1.000.000 TL — 12 Ay (%0 Faiz)",
-        "principal": 1000000,
-        "term": 12,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 83333,
-        "total": 1000000,
-        "highlight": true,
-        "tag": "SIFIR FAİZ"
-      },
-      {
-        "id": "teb_ec_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%1.99 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%1.99",
-        "rate": 1.99,
-        "monthly": 80151,
-        "total": 1923624
-      },
-      {
-        "id": "teb_ec_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.32 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.32",
-        "rate": 2.32,
-        "monthly": 111037,
-        "total": 2664888,
+        "rateLabel": "%2.69",
+        "rate": 2.69,
+        "monthly": 115873,
+        "total": 2780963,
         "highlight": true,
         "tag": "2 MİLYON TL"
       },
       {
-        "id": "teb_ec_2000_36",
-        "title": "2.000.000 TL — 36 Ay (%2.53 Faiz)",
+        "id": "tc_70_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%2.95 Faiz)",
         "principal": 2000000,
         "term": 36,
-        "rateLabel": "%2.53",
-        "rate": 2.53,
-        "monthly": 86987,
-        "total": 3131532
+        "rateLabel": "%2.95",
+        "rate": 2.95,
+        "monthly": 92945,
+        "total": 3346026
       },
       {
-        "id": "teb_ec_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.51 Faiz)",
+        "id": "tc_70_2500_12",
+        "title": "2.500.000 TL — 12 Ay (%2.29 Faiz)",
+        "principal": 2500000,
+        "term": 12,
+        "rateLabel": "%2.29",
+        "rate": 2.29,
+        "monthly": 242311,
+        "total": 2907729
+      },
+      {
+        "id": "tc_70_2500_24",
+        "title": "2.500.000 TL — 24 Ay (%2.89 Faiz)",
         "principal": 2500000,
         "term": 24,
-        "rateLabel": "%2.51",
-        "rate": 2.51,
-        "monthly": 141916,
-        "total": 3405984,
-        "highlight": true,
-        "tag": "2.5 MİLYON TL"
+        "rateLabel": "%2.89",
+        "rate": 2.89,
+        "monthly": 148168,
+        "total": 3556025
       },
       {
-        "id": "teb_ec_2500_36",
-        "title": "2.500.000 TL — 36 Ay (%2.67 Faiz)",
+        "id": "tc_70_2500_36",
+        "title": "2.500.000 TL — 36 Ay (%3.09 Faiz)",
         "principal": 2500000,
         "term": 36,
-        "rateLabel": "%2.67",
-        "rate": 2.67,
-        "monthly": 111159,
-        "total": 4001724
+        "rateLabel": "%3.09",
+        "rate": 3.09,
+        "monthly": 118725,
+        "total": 4274103
       },
       {
-        "id": "teb_ec_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.60 Faiz)",
+        "id": "tc_70_3000_12",
+        "title": "3.000.000 TL — 12 Ay (%2.52 Faiz)",
+        "principal": 3000000,
+        "term": 12,
+        "rateLabel": "%2.52",
+        "rate": 2.52,
+        "monthly": 295053,
+        "total": 3540634
+      },
+      {
+        "id": "tc_70_3000_24",
+        "title": "3.000.000 TL — 24 Ay (%3.02 Faiz)",
         "principal": 3000000,
         "term": 24,
-        "rateLabel": "%2.60",
-        "rate": 2.6,
-        "monthly": 173200,
-        "total": 4156800,
-        "tag": "FİLO KREDİSİ"
+        "rateLabel": "%3.02",
+        "rate": 3.02,
+        "monthly": 180421,
+        "total": 4330109,
+        "tag": "3 MİLYON TL"
       },
       {
-        "id": "teb_ec_4000_36",
-        "title": "4.000.000 TL — 36 Ay (%2.85 Faiz)",
+        "id": "tc_70_3000_36",
+        "title": "3.000.000 TL — 36 Ay (%3.19 Faiz)",
+        "principal": 3000000,
+        "term": 36,
+        "rateLabel": "%3.19",
+        "rate": 3.19,
+        "monthly": 144670,
+        "total": 5208130
+      },
+      {
+        "id": "tc_70_4000_12",
+        "title": "4.000.000 TL — 12 Ay (%2.81 Faiz)",
+        "principal": 4000000,
+        "term": 12,
+        "rateLabel": "%2.81",
+        "rate": 2.81,
+        "monthly": 400662,
+        "total": 4807942
+      },
+      {
+        "id": "tc_70_4000_24",
+        "title": "4.000.000 TL — 24 Ay (%3.18 Faiz)",
+        "principal": 4000000,
+        "term": 24,
+        "rateLabel": "%3.18",
+        "rate": 3.18,
+        "monthly": 244898,
+        "total": 5877549,
+        "tag": "4 MİLYON TL TAVAN"
+      },
+      {
+        "id": "tc_70_4000_36",
+        "title": "4.000.000 TL — 36 Ay (%3.30 Faiz)",
         "principal": 4000000,
         "term": 36,
-        "rateLabel": "%2.85",
-        "rate": 2.85,
-        "monthly": 185200,
-        "total": 6667200,
-        "tag": "AĞIR VASITA FİLO"
+        "rateLabel": "%3.30",
+        "rate": 3.3,
+        "monthly": 196146,
+        "total": 7061254
+      }
+    ],
+    "eurocargo": [
+      {
+        "id": "tc_ec_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%0.14 Faiz)",
+        "principal": 1000000,
+        "term": 12,
+        "rateLabel": "%0.14",
+        "rate": 0.14,
+        "monthly": 84132,
+        "total": 1009581,
+        "highlight": true,
+        "tag": "12 AY KAMPANYA"
+      },
+      {
+        "id": "tc_ec_1000_24",
+        "title": "1.000.000 TL — 24 Ay (%1.67 Faiz)",
+        "principal": 1000000,
+        "term": 24,
+        "rateLabel": "%1.67",
+        "rate": 1.67,
+        "monthly": 51406,
+        "total": 1233751
+      },
+      {
+        "id": "tc_ec_1000_36",
+        "title": "1.000.000 TL — 36 Ay (%2.21 Faiz)",
+        "principal": 1000000,
+        "term": 36,
+        "rateLabel": "%2.21",
+        "rate": 2.21,
+        "monthly": 41280,
+        "total": 1486096
+      },
+      {
+        "id": "tc_ec_1200_12",
+        "title": "1.200.000 TL — 12 Ay (%0.75 Faiz)",
+        "principal": 1200000,
+        "term": 12,
+        "rateLabel": "%0.75",
+        "rate": 0.75,
+        "monthly": 105192,
+        "total": 1262308
+      },
+      {
+        "id": "tc_ec_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.35 Faiz)",
+        "principal": 1500000,
+        "term": 12,
+        "rateLabel": "%1.35",
+        "rate": 1.35,
+        "monthly": 136814,
+        "total": 1641771
+      },
+      {
+        "id": "tc_ec_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%2.36 Faiz)",
+        "principal": 1500000,
+        "term": 24,
+        "rateLabel": "%2.36",
+        "rate": 2.36,
+        "monthly": 83666,
+        "total": 2007973,
+        "highlight": true,
+        "tag": "1.5 MİLYON TL"
+      },
+      {
+        "id": "tc_ec_1500_36",
+        "title": "1.500.000 TL — 36 Ay (%2.71 Faiz)",
+        "principal": 1500000,
+        "term": 36,
+        "rateLabel": "%2.71",
+        "rate": 2.71,
+        "monthly": 67131,
+        "total": 2416717
+      },
+      {
+        "id": "tc_ec_2000_12",
+        "title": "2.000.000 TL — 12 Ay (%1.94 Faiz)",
+        "principal": 2000000,
+        "term": 12,
+        "rateLabel": "%1.94",
+        "rate": 1.94,
+        "monthly": 189549,
+        "total": 2274590
+      },
+      {
+        "id": "tc_ec_2000_24",
+        "title": "2.000.000 TL — 24 Ay (%2.69 Faiz)",
+        "principal": 2000000,
+        "term": 24,
+        "rateLabel": "%2.69",
+        "rate": 2.69,
+        "monthly": 115873,
+        "total": 2780963,
+        "highlight": true,
+        "tag": "2 MİLYON TL"
+      },
+      {
+        "id": "tc_ec_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%2.95 Faiz)",
+        "principal": 2000000,
+        "term": 36,
+        "rateLabel": "%2.95",
+        "rate": 2.95,
+        "monthly": 92945,
+        "total": 3346026
+      },
+      {
+        "id": "tc_ec_2500_12",
+        "title": "2.500.000 TL — 12 Ay (%2.29 Faiz)",
+        "principal": 2500000,
+        "term": 12,
+        "rateLabel": "%2.29",
+        "rate": 2.29,
+        "monthly": 242311,
+        "total": 2907729
+      },
+      {
+        "id": "tc_ec_2500_24",
+        "title": "2.500.000 TL — 24 Ay (%2.89 Faiz)",
+        "principal": 2500000,
+        "term": 24,
+        "rateLabel": "%2.89",
+        "rate": 2.89,
+        "monthly": 148168,
+        "total": 3556025
+      },
+      {
+        "id": "tc_ec_2500_36",
+        "title": "2.500.000 TL — 36 Ay (%3.09 Faiz)",
+        "principal": 2500000,
+        "term": 36,
+        "rateLabel": "%3.09",
+        "rate": 3.09,
+        "monthly": 118725,
+        "total": 4274103
+      },
+      {
+        "id": "tc_ec_3000_12",
+        "title": "3.000.000 TL — 12 Ay (%2.52 Faiz)",
+        "principal": 3000000,
+        "term": 12,
+        "rateLabel": "%2.52",
+        "rate": 2.52,
+        "monthly": 295053,
+        "total": 3540634
+      },
+      {
+        "id": "tc_ec_3000_24",
+        "title": "3.000.000 TL — 24 Ay (%3.02 Faiz)",
+        "principal": 3000000,
+        "term": 24,
+        "rateLabel": "%3.02",
+        "rate": 3.02,
+        "monthly": 180421,
+        "total": 4330109,
+        "tag": "3 MİLYON TL"
+      },
+      {
+        "id": "tc_ec_3000_36",
+        "title": "3.000.000 TL — 36 Ay (%3.19 Faiz)",
+        "principal": 3000000,
+        "term": 36,
+        "rateLabel": "%3.19",
+        "rate": 3.19,
+        "monthly": 144670,
+        "total": 5208130
+      },
+      {
+        "id": "tc_ec_4000_12",
+        "title": "4.000.000 TL — 12 Ay (%2.81 Faiz)",
+        "principal": 4000000,
+        "term": 12,
+        "rateLabel": "%2.81",
+        "rate": 2.81,
+        "monthly": 400662,
+        "total": 4807942
+      },
+      {
+        "id": "tc_ec_4000_24",
+        "title": "4.000.000 TL — 24 Ay (%3.18 Faiz)",
+        "principal": 4000000,
+        "term": 24,
+        "rateLabel": "%3.18",
+        "rate": 3.18,
+        "monthly": 244898,
+        "total": 5877549,
+        "tag": "4 MİLYON TL TAVAN"
+      },
+      {
+        "id": "tc_ec_4000_36",
+        "title": "4.000.000 TL — 36 Ay (%3.30 Faiz)",
+        "principal": 4000000,
+        "term": 36,
+        "rateLabel": "%3.30",
+        "rate": 3.3,
+        "monthly": 196146,
+        "total": 7061254
       }
     ]
   },
@@ -534,22 +746,22 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_900_12",
-        "title": "900.000 TL — 12 Ay (%0.78 Kar Payı)",
+        "title": "900.000 TL — 12 Ay (%0.76 Kar Payı)",
         "principal": 900000,
         "term": 12,
-        "rateLabel": "%0.78",
-        "rate": 0.78,
+        "rateLabel": "%0.76",
+        "rate": 0.76,
         "monthly": 79004,
         "total": 948048,
         "tag": "DÜŞÜK KAR PAYI"
       },
       {
         "id": "kt_35_900_24",
-        "title": "900.000 TL — 24 Ay (%1.78 Kar Payı)",
+        "title": "900.000 TL — 24 Ay (%1.73 Kar Payı)",
         "principal": 900000,
         "term": 24,
-        "rateLabel": "%1.78",
-        "rate": 1.78,
+        "rateLabel": "%1.73",
+        "rate": 1.73,
         "monthly": 46739,
         "total": 1121736
       },
@@ -652,7 +864,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_1000_24",
-        "title": "1.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -665,7 +877,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_1000_36",
-        "title": "1.000.000 TL — 6 Ay Ödemesiz (36 Ay)",
+        "title": "1.000.000 TL — 6 Ay Ödemesiz + 36 Eşit Taksit",
         "principal": 1000000,
         "term": 36,
         "gracePeriodMonths": 6,
@@ -677,7 +889,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_1500_24",
-        "title": "1.500.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.500.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1500000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -690,7 +902,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_1500_36",
-        "title": "1.500.000 TL — 6 Ay Ödemesiz (36 Ay)",
+        "title": "1.500.000 TL — 6 Ay Ödemesiz + 36 Eşit Taksit",
         "principal": 1500000,
         "term": 36,
         "gracePeriodMonths": 6,
@@ -701,7 +913,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_2000_24",
-        "title": "2.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "2.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 2000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -714,7 +926,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_35_grace_2000_36",
-        "title": "2.000.000 TL — 6 Ay Ödemesiz (36 Ay)",
+        "title": "2.000.000 TL — 6 Ay Ödemesiz + 36 Eşit Taksit",
         "principal": 2000000,
         "term": 36,
         "gracePeriodMonths": 6,
@@ -877,7 +1089,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_1000_24",
-        "title": "1.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -889,7 +1101,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_1500_24",
-        "title": "1.500.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.500.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1500000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -902,7 +1114,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_2000_24",
-        "title": "2.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "2.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 2000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -915,7 +1127,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_3000_24",
-        "title": "3.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "3.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 3000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -927,7 +1139,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_4000_24",
-        "title": "4.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "4.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 4000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1090,7 +1302,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_1000_24",
-        "title": "1.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1102,7 +1314,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_1500_24",
-        "title": "1.500.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "1.500.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 1500000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1115,7 +1327,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_2000_24",
-        "title": "2.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "2.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 2000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1128,7 +1340,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_3000_24",
-        "title": "3.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "3.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 3000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1140,7 +1352,7 @@ export const BANK_CAMPAIGNS = {
       },
       {
         "id": "kt_70_grace_4000_24",
-        "title": "4.000.000 TL — 6 Ay Ödemesiz (24 Ay)",
+        "title": "4.000.000 TL — 6 Ay Ödemesiz + 24 Eşit Taksit",
         "principal": 4000000,
         "term": 24,
         "gracePeriodMonths": 6,
@@ -1933,40 +2145,6 @@ export const BANK_CAMPAIGNS = {
         "rate": 2.04,
         "monthly": 42980,
         "total": 1031520
-      },
-      {
-        "id": "ak_35_1200_24",
-        "title": "1.200.000 TL — 24 Ay (%2.04 Faiz)",
-        "principal": 1200000,
-        "term": 24,
-        "rateLabel": "%2.04",
-        "rate": 2.04,
-        "monthly": 64470,
-        "total": 1547280
-      },
-      {
-        "id": "ak_35_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400,
-        "highlight": true,
-        "tag": "1.5 MİLYON TL"
-      },
-      {
-        "id": "ak_35_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.15 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 109200,
-        "total": 2620800,
-        "highlight": true,
-        "tag": "2 MİLYON TAVAN"
       }
     ],
     "daily70": [
@@ -2001,67 +2179,11 @@ export const BANK_CAMPAIGNS = {
         "rate": 2.01,
         "monthly": 39932,
         "total": 1437552
-      },
-      {
-        "id": "ak_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%1.85 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%1.85",
-        "rate": 1.85,
-        "monthly": 78540,
-        "total": 1884960,
-        "tag": "1.5M AVANTAJLI"
-      },
-      {
-        "id": "ak_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.10 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.10",
-        "rate": 2.1,
-        "monthly": 108250,
-        "total": 2598000,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "ak_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.25 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 137800,
-        "total": 3307200
-      },
-      {
-        "id": "ak_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.45 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.45",
-        "rate": 2.45,
-        "monthly": 168200,
-        "total": 4036800,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "ak_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.65 Faiz)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.65",
-        "rate": 2.65,
-        "monthly": 228400,
-        "total": 5481600,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
       }
     ],
     "eurocargo": [
       {
-        "id": "ak_70_1000_12",
+        "id": "ak_ec_1000_12",
         "title": "1.000.000 TL — 12 Ay (%0 Faiz)",
         "principal": 1000000,
         "term": 12,
@@ -2073,7 +2195,7 @@ export const BANK_CAMPAIGNS = {
         "tag": "12 AY SIFIR FAİZ"
       },
       {
-        "id": "ak_70_1000_24",
+        "id": "ak_ec_1000_24",
         "title": "1.000.000 TL — 24 Ay (%1.47 Faiz)",
         "principal": 1000000,
         "term": 24,
@@ -2083,7 +2205,7 @@ export const BANK_CAMPAIGNS = {
         "total": 1204248
       },
       {
-        "id": "ak_70_1000_36",
+        "id": "ak_ec_1000_36",
         "title": "1.000.000 TL — 36 Ay (%2.01 Faiz)",
         "principal": 1000000,
         "term": 36,
@@ -2091,90 +2213,22 @@ export const BANK_CAMPAIGNS = {
         "rate": 2.01,
         "monthly": 39932,
         "total": 1437552
-      },
-      {
-        "id": "ak_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%1.85 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%1.85",
-        "rate": 1.85,
-        "monthly": 78540,
-        "total": 1884960,
-        "tag": "1.5M AVANTAJLI"
-      },
-      {
-        "id": "ak_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.10 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.10",
-        "rate": 2.1,
-        "monthly": 108250,
-        "total": 2598000,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "ak_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.25 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 137800,
-        "total": 3307200
-      },
-      {
-        "id": "ak_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.45 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.45",
-        "rate": 2.45,
-        "monthly": 168200,
-        "total": 4036800,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "ak_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.65 Faiz)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.65",
-        "rate": 2.65,
-        "monthly": 228400,
-        "total": 5481600,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
       }
     ]
   },
   "yapi_kredi": {
     "daily35": [
       {
-        "id": "yk_35_800_8",
-        "title": "800.000 TL — 8 Ay (%0 Faiz)",
-        "principal": 800000,
-        "term": 8,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 100000,
-        "total": 800000,
-        "highlight": true,
-        "tag": "SIFIR FAİZ"
-      },
-      {
         "id": "yk_35_900_9",
-        "title": "900.000 TL — 9 Ay (%0 Faiz)",
+        "title": "900.000 TL — 9 Ay (%0.04 Faiz)",
         "principal": 900000,
         "term": 9,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 100000,
-        "total": 900000,
+        "rateLabel": "%0.04",
+        "rate": 0.04,
+        "monthly": 100231,
+        "total": 902080,
         "highlight": true,
-        "tag": "SIFIR FAİZ"
+        "tag": "9 AY KAMPANYA"
       },
       {
         "id": "yk_35_1000_12",
@@ -2283,168 +2337,8 @@ export const BANK_CAMPAIGNS = {
         "total": 3372624
       }
     ],
-    "daily70": [
-      {
-        "id": "yk_70_1000_12",
-        "title": "1.000.000 TL — 12 Ay (%0 Faiz)",
-        "principal": 1000000,
-        "term": 12,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 83333,
-        "total": 1000000,
-        "highlight": true,
-        "tag": "12 AY SIFIR FAİZ"
-      },
-      {
-        "id": "yk_70_1500_12",
-        "title": "1.500.000 TL — 12 Ay (%1.35 Faiz)",
-        "principal": 1500000,
-        "term": 12,
-        "rateLabel": "%1.35",
-        "rate": 1.35,
-        "monthly": 136200,
-        "total": 1634400
-      },
-      {
-        "id": "yk_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.10 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.10",
-        "rate": 2.1,
-        "monthly": 81180,
-        "total": 1948320,
-        "highlight": true,
-        "tag": "1.5 MİLYON TL"
-      },
-      {
-        "id": "yk_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.35 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 111900,
-        "total": 2685600,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "yk_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.54 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.54",
-        "rate": 2.54,
-        "monthly": 142800,
-        "total": 3427200
-      },
-      {
-        "id": "yk_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.68 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.68",
-        "rate": 2.68,
-        "monthly": 174500,
-        "total": 4188000,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "yk_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.85 Faiz)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.85",
-        "rate": 2.85,
-        "monthly": 238100,
-        "total": 5714400,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
-      }
-    ],
-    "eurocargo": [
-      {
-        "id": "yk_70_1000_12",
-        "title": "1.000.000 TL — 12 Ay (%0 Faiz)",
-        "principal": 1000000,
-        "term": 12,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 83333,
-        "total": 1000000,
-        "highlight": true,
-        "tag": "12 AY SIFIR FAİZ"
-      },
-      {
-        "id": "yk_70_1500_12",
-        "title": "1.500.000 TL — 12 Ay (%1.35 Faiz)",
-        "principal": 1500000,
-        "term": 12,
-        "rateLabel": "%1.35",
-        "rate": 1.35,
-        "monthly": 136200,
-        "total": 1634400
-      },
-      {
-        "id": "yk_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.10 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.10",
-        "rate": 2.1,
-        "monthly": 81180,
-        "total": 1948320,
-        "highlight": true,
-        "tag": "1.5 MİLYON TL"
-      },
-      {
-        "id": "yk_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.35 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 111900,
-        "total": 2685600,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "yk_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.54 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.54",
-        "rate": 2.54,
-        "monthly": 142800,
-        "total": 3427200
-      },
-      {
-        "id": "yk_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.68 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.68",
-        "rate": 2.68,
-        "monthly": 174500,
-        "total": 4188000,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "yk_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.85 Faiz)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.85",
-        "rate": 2.85,
-        "monthly": 238100,
-        "total": 5714400,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
-      }
-    ]
+    "daily70": [],
+    "eurocargo": []
   },
   "vakif_katilim": {
     "daily35": [
@@ -2471,40 +2365,6 @@ export const BANK_CAMPAIGNS = {
         "total": 900000,
         "highlight": true,
         "tag": "SIFIR KAR PAYI"
-      },
-      {
-        "id": "vk_35_1000_12",
-        "title": "1.000.000 TL — 12 Ay (%1.15 Kar Payı)",
-        "principal": 1000000,
-        "term": 12,
-        "rateLabel": "%1.15",
-        "rate": 1.15,
-        "monthly": 90100,
-        "total": 1081200
-      },
-      {
-        "id": "vk_35_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Kar Payı)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400,
-        "highlight": true,
-        "tag": "1.5 MİLYON TL"
-      },
-      {
-        "id": "vk_35_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.18 Kar Payı)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.18",
-        "rate": 2.18,
-        "monthly": 109800,
-        "total": 2635200,
-        "highlight": true,
-        "tag": "2 MİLYON TAVAN"
       }
     ],
     "daily70": [
@@ -2519,66 +2379,11 @@ export const BANK_CAMPAIGNS = {
         "total": 1000000,
         "highlight": true,
         "tag": "12 AY SIFIR KAR PAYI"
-      },
-      {
-        "id": "vk_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Kar Payı)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400
-      },
-      {
-        "id": "vk_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.25 Kar Payı)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 110200,
-        "total": 2644800,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "vk_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.35 Kar Payı)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 139500,
-        "total": 3348000
-      },
-      {
-        "id": "vk_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.45 Kar Payı)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.45",
-        "rate": 2.45,
-        "monthly": 168200,
-        "total": 4036800,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "vk_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.65 Kar Payı)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.65",
-        "rate": 2.65,
-        "monthly": 228400,
-        "total": 5481600,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
       }
     ],
     "eurocargo": [
       {
-        "id": "vk_70_1000_12",
+        "id": "vk_ec_1000_12",
         "title": "1.000.000 TL — 12 Ay (%0 Kar Payı)",
         "principal": 1000000,
         "term": 12,
@@ -2588,102 +2393,11 @@ export const BANK_CAMPAIGNS = {
         "total": 1000000,
         "highlight": true,
         "tag": "12 AY SIFIR KAR PAYI"
-      },
-      {
-        "id": "vk_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Kar Payı)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400
-      },
-      {
-        "id": "vk_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.25 Kar Payı)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 110200,
-        "total": 2644800,
-        "highlight": true,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "vk_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.35 Kar Payı)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 139500,
-        "total": 3348000
-      },
-      {
-        "id": "vk_70_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.45 Kar Payı)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.45",
-        "rate": 2.45,
-        "monthly": 168200,
-        "total": 4036800,
-        "tag": "3 MİLYON TL"
-      },
-      {
-        "id": "vk_70_4000_24",
-        "title": "4.000.000 TL — 24 Ay (%2.65 Kar Payı)",
-        "principal": 4000000,
-        "term": 24,
-        "rateLabel": "%2.65",
-        "rate": 2.65,
-        "monthly": 228400,
-        "total": 5481600,
-        "tag": "4 MİLYON TL TAVAN",
-        "highlight": true
       }
     ]
   },
   "bnp_paribas": {
-    "daily35": [
-      {
-        "id": "bnp_35_800_8",
-        "title": "800.000 TL — 8 Ay (%0 Faiz)",
-        "principal": 800000,
-        "term": 8,
-        "rateLabel": "%0 Faiz",
-        "rate": 0,
-        "monthly": 100000,
-        "total": 800000,
-        "highlight": true,
-        "tag": "SIFIR FAİZ"
-      },
-      {
-        "id": "bnp_35_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400,
-        "highlight": true,
-        "tag": "1.5M TİCARİ"
-      },
-      {
-        "id": "bnp_35_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.18 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.18",
-        "rate": 2.18,
-        "monthly": 109800,
-        "total": 2635200,
-        "tag": "2 MİLYON TL"
-      }
-    ],
+    "daily35": [],
     "daily70": [
       {
         "id": "bnp_70_1000_12",
@@ -2696,40 +2410,6 @@ export const BANK_CAMPAIGNS = {
         "total": 1000000,
         "highlight": true,
         "tag": "12 AY SIFIR FAİZ"
-      },
-      {
-        "id": "bnp_70_1500_24",
-        "title": "1.500.000 TL — 24 Ay (%2.15 Faiz)",
-        "principal": 1500000,
-        "term": 24,
-        "rateLabel": "%2.15",
-        "rate": 2.15,
-        "monthly": 81850,
-        "total": 1964400,
-        "highlight": true,
-        "tag": "1.5M KREDİ"
-      },
-      {
-        "id": "bnp_70_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.25 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 110200,
-        "total": 2644800,
-        "tag": "2 MİLYON TL"
-      },
-      {
-        "id": "bnp_70_2500_24",
-        "title": "2.500.000 TL — 24 Ay (%2.35 Faiz)",
-        "principal": 2500000,
-        "term": 24,
-        "rateLabel": "%2.35",
-        "rate": 2.35,
-        "monthly": 139500,
-        "total": 3348000,
-        "tag": "2.5 MİLYON TL"
       }
     ],
     "eurocargo": [
@@ -2744,28 +2424,6 @@ export const BANK_CAMPAIGNS = {
         "total": 1000000,
         "highlight": true,
         "tag": "SIFIR FAİZ"
-      },
-      {
-        "id": "bnp_ec_2000_24",
-        "title": "2.000.000 TL — 24 Ay (%2.25 Faiz)",
-        "principal": 2000000,
-        "term": 24,
-        "rateLabel": "%2.25",
-        "rate": 2.25,
-        "monthly": 110200,
-        "total": 2644800,
-        "highlight": true
-      },
-      {
-        "id": "bnp_ec_3000_24",
-        "title": "3.000.000 TL — 24 Ay (%2.40 Faiz)",
-        "principal": 3000000,
-        "term": 24,
-        "rateLabel": "%2.40",
-        "rate": 2.4,
-        "monthly": 168500,
-        "total": 4044000,
-        "tag": "3 MİLYON TL FİLO"
       }
     ]
   }

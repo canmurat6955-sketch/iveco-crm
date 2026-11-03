@@ -9,14 +9,7 @@ import {
 } from '../../../data/bankCampaigns';
 import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiGlobe } from 'react-icons/fi';
 
-const SAMPLE_LOAN_PRESETS = [
-  { amount: 800000, label: '800.000 TL (%0 Faiz Kampanyalı)', term: 12, rate: 0.00, monthly: 66667, total: 800000, desc: '12 Ay Sıfır Faiz — Yalnızca Anapara Geri Ödemeli' },
-  { amount: 1000000, label: '1.000.000 TL (%0 Faiz Kampanyalı)', term: 12, rate: 0.00, monthly: 83333, total: 1000000, desc: '12 Ay Sıfır Faiz — Yalnızca Anapara Geri Ödemeli' },
-  { amount: 1500000, label: '1.500.000 TL (24 Ay Esnek Ticari)', term: 24, rate: 1.99, monthly: 83500, total: 2004000, desc: 'KOBİ Destekli Düşük Ticari Faiz Oranı' },
-  { amount: 2000000, label: '2.000.000 TL (Daily 35 Tavan Finansman)', term: 36, rate: 2.19, monthly: 81200, total: 2923200, desc: 'Daily Kamyonet & Van İçin 2.000.000 TL Tavan Finansman' },
-  { amount: 4000000, label: '4.000.000 TL (72C & Eurocargo Tavan)', term: 36, rate: 2.39, monthly: 168000, total: 6048000, desc: '72C ve Eurocargo İçin 4.000.000 TL Tavan Finansman' },
-  { amount: 6000000, label: '6.000.000 TL (S-Way & T-Way Ağır Vasıta)', term: 36, rate: 2.49, monthly: 254000, total: 9144000, desc: 'S-Way Çekici & T-Way Ağır Vasıta 6.000.000 TL Kurumsal Finansman' }
-];
+// Not: Kaynaksız "hızlı kredi paketi" örnekleri kaldırıldı; yalnızca resmi banka tablolarındaki kampanyalar gösterilir.
 
 export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
   // Para Birimi Modu: 'TRY' veya 'EUR'
@@ -585,7 +578,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                   <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 600 }}>Tüm rakamlar resmi banka tablolarından alınmıştır</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
-                  {realCampaigns.slice(0, 12).map((camp, idx) => {
+                  {realCampaigns.map((camp, idx) => {
                     const isZero = camp.rate === 0;
                     const isGrace = camp.gracePeriodMonths || camp.gracePeriod || (camp.title && camp.title.includes('Ödemesiz'));
                     return (
@@ -678,40 +671,11 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               </div>
             )}
 
-            {/* Popular Loan Options */}
-            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '8px', textTransform: 'uppercase' }}>
-              💡 EN ÇOK KULLANILAN HIZLI TİCARİ KREDİ PAKETLERİ
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '10px' }}>
-              {SAMPLE_LOAN_PRESETS.map((preset, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => handleApplyPreset(preset)}
-                  style={{
-                    background: loanAmount === preset.amount ? 'rgba(2, 132, 199, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                    border: loanAmount === preset.amount ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '10px',
-                    padding: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#fff' }}>{preset.label}</span>
-                    {preset.rate === 0 && (
-                      <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
-                        %0 FAİZ
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '4px 0' }}>{preset.desc}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '6px' }}>
-                    <span style={{ color: '#cbd5e1' }}>Aylık Taksit: <strong style={{ color: '#4ade80' }}>{preset.monthly.toLocaleString('tr-TR')} TL</strong></span>
-                    <span style={{ color: '#94a3b8' }}>Vade: <strong>{preset.term} Ay</strong></span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {realCampaigns.length === 0 && (
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8', padding: '14px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '10px' }}>
+                Bu banka için seçili araç grubunda resmi kampanya tablosu bulunmuyor. Size özel teklif için satış temsilcimizle iletişime geçin.
+              </div>
+            )}
           </div>
         </div>
       )}
