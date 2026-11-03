@@ -717,9 +717,14 @@ export default function PublicVehicleFinder() {
   const [selectedBody, setSelectedBody] = useState(
     BODY_TYPES.some(b => b.id === bodyParam) ? bodyParam : 'frigo'
   );
+  const [selectedCatalogOverride, setSelectedCatalogOverride] = useState(null);
 
   // Doğrudan Araç Seçimi & Sürgü Etkileşim Fonksiyonları
-  const handleSelectVehicle = (modelKey) => {
+  const handleSelectVehicle = (modelKeyOrObj) => {
+    const isObj = modelKeyOrObj && typeof modelKeyOrObj === 'object';
+    const modelKey = isObj ? (modelKeyOrObj.finderKey || modelKeyOrObj.id || modelKeyOrObj.key) : modelKeyOrObj;
+    setSelectedCatalogOverride(isObj ? modelKeyOrObj : null);
+
     let item = VEHICLE_CATALOG.find(v => v.key === modelKey);
     if (!item && typeof modelKey === 'string') {
       const lower = modelKey.toLowerCase();
@@ -740,10 +745,12 @@ export default function PublicVehicleFinder() {
         item = VEHICLE_CATALOG.find(v => v.key === 'truck_120e');
       } else if (lower.includes('100e')) {
         item = VEHICLE_CATALOG.find(v => v.key === 'truck_100e');
+      } else if (lower.includes('van') || lower.includes('panelvan')) {
+        if (lower.includes('h3') || lower.includes('18')) item = VEHICLE_CATALOG.find(v => v.key === 'panelvan_18');
+        else if (lower.includes('4100') || lower.includes('16')) item = VEHICLE_CATALOG.find(v => v.key === 'panelvan_16');
+        else item = VEHICLE_CATALOG.find(v => v.key === 'panelvan_12');
       } else if (lower.includes('35c')) {
         item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35c');
-      } else if (lower.includes('van') || lower.includes('panelvan')) {
-        item = VEHICLE_CATALOG.find(v => v.key === 'panelvan_12');
       } else if (lower.includes('35s')) {
         item = VEHICLE_CATALOG.find(v => v.key === 'chassis_35s');
       }
@@ -754,16 +761,18 @@ export default function PublicVehicleFinder() {
     setVolumeM3(item.volumeM3);
     setSelectedBody(item.bodyType || 'kapali_kutu');
     setCustomDims(false);
-    toast.success(`${item.title} seçildi! ✓`);
+    toast.success(`${isObj && modelKeyOrObj.model ? modelKeyOrObj.model : item.title} seçildi! ✓`);
   };
 
   const handlePayloadChange = (val) => {
     setSelectedModelKey(null);
+    setSelectedCatalogOverride(null);
     setPayloadKg(val);
   };
 
   const handleVolumeChange = (val) => {
     setSelectedModelKey(null);
+    setSelectedCatalogOverride(null);
     setVolumeM3(val);
   };
 
@@ -980,8 +989,20 @@ export default function PublicVehicleFinder() {
             });
           }
         }
+        const ov = selectedCatalogOverride;
         return {
           ...item,
+          ...(ov ? {
+            title: ov.model || item.title,
+            fullTitle: ov.model || item.fullTitle,
+            modelTitle: ov.model || item.modelTitle,
+            wheelbase: ov.wheelbase ? `${ov.wheelbase} mm` : item.wheelbase,
+            dims: ov.bodyLength ? { ...item.dims, length: ov.bodyLength } : item.dims,
+            campaignPriceText: ov.campaignPrice && ov.currency !== 'EUR' ? `${ov.campaignPrice.toLocaleString('tr-TR')} TL` : item.campaignPriceText,
+            cashPriceText: ov.cashPrice && ov.currency !== 'EUR' ? `${ov.cashPrice.toLocaleString('tr-TR')} TL` : item.cashPriceText,
+            cashDiscountText: ov.cashDiscount && ov.currency !== 'EUR' ? `${ov.cashDiscount.toLocaleString('tr-TR')} TL` : item.cashDiscountText,
+            displayPrice: ov.currency === 'EUR' && ov.eurPrice ? `${ov.eurPrice.toLocaleString('tr-TR')} €` : item.displayPrice
+          } : {}),
           modelKey: item.key,
           totalGross: item.unladenWeight + item.payloadKg,
           multiRecommendations: multiRecs
@@ -1318,7 +1339,7 @@ export default function PublicVehicleFinder() {
         }
       ]
     };
-  }, [selectedModelKey, payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
+  }, [selectedModelKey, selectedCatalogOverride, payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
 
   // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
@@ -2658,7 +2679,7 @@ IVECO ERC Samsun Otomotiv
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
           <PricingCatalogTab
             onSelectVehicle={(vehicle) => {
-              handleSelectVehicle(vehicle.id || vehicle.key);
+              handleSelectVehicle(vehicle);
               setActiveMainTab('secici');
               setStep(2);
             }}
