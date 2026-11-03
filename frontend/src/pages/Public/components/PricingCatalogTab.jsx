@@ -80,77 +80,79 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
 
   return (
     <div style={{ color: '#f8fafc' }}>
-      {/* Tab Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%)',
-        border: '1px solid rgba(56, 189, 248, 0.35)',
-        borderRadius: isMobileView ? '12px' : '16px',
-        padding: isMobileView ? '12px 14px' : '18px 20px',
-        marginBottom: isMobileView ? '12px' : '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
-        <div>
-          <div style={{ fontSize: isMobileView ? '0.68rem' : '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            {selectedCategory === 'sway' 
-              ? '🛣️ S-WAY ÇEKİCİ GRUBU RESMİ EURO MATRİSİ'
-              : selectedCategory === 'tway'
-                ? '🚜 T-WAY AĞIR ŞANTİYE & HAFRİYAT MATRİSİ'
-                : selectedCategory === 'daily70'
-                  ? '🚛 DAILY 70C / 72C 7 TON KAMYON & PANELVAN LİSTESİ'
-                  : 'RESMİ 2026 MODEL FİYAT LİSTESİ'}
-          </div>
-          <h2 style={{ fontSize: isMobileView ? '1.05rem' : '1.25rem', fontWeight: 800, margin: '2px 0 0', color: '#fff' }}>
-            {selectedCategory === 'sway'
-              ? 'IVECO S-Way Ağır Vasıta & Çekici Fiyat Listesi'
-              : selectedCategory === 'tway'
-                ? 'IVECO T-Way 10-12 Teker Ağır Şantiye Fiyat Listesi'
-                : selectedCategory === 'daily70'
-                  ? 'IVECO Daily 70C / 72C 7 Ton Kamyon & Panelvan Fiyat Listesi'
-                  : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
-          </h2>
-          {!isMobileView && (
-            <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0' }}>
-              {selectedCategory === 'sway'
-                ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
+      {/* Tab Banner (Mobilde yalnızca özel bir kategori seçildiğinde gösterilir, tüm araçlarda tekrar etmez) */}
+      {(!isMobileView || selectedCategory !== 'all') && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: isMobileView ? '12px' : '16px',
+          padding: isMobileView ? '10px 12px' : '18px 20px',
+          marginBottom: isMobileView ? '10px' : '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div>
+            <div style={{ fontSize: isMobileView ? '0.68rem' : '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              {selectedCategory === 'sway' 
+                ? '🛣️ S-WAY ÇEKİCİ GRUBU RESMİ EURO MATRİSİ'
                 : selectedCategory === 'tway'
-                  ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
+                  ? '🚜 T-WAY AĞIR ŞANTİYE & HAFRİYAT MATRİSİ'
                   : selectedCategory === 'daily70'
-                    ? '7.000 kg ve 7.200 kg azami yüklü ağırlıklı 70C16 şasi kamyon ve 70C18 yüksek hacimli (19.6 m³) panelvan resmi liste fiyatları.'
-                    : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
-            </p>
-          )}
-        </div>
-        {!isMobileView && (
-          <div style={{
-            background: (selectedCategory === 'sway' || selectedCategory === 'tway') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
-            border: (selectedCategory === 'sway' || selectedCategory === 'tway') ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)',
-            borderRadius: '12px',
-            padding: '8px 14px',
-            textAlign: 'right'
-          }}>
-            {selectedCategory === 'sway' ? (
-              <>
-                <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>💶 EURO BAZLI LİSTE</div>
-                <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>İhracatçıya Özel Euro Kredisi</div>
-              </>
-            ) : selectedCategory === 'tway' ? (
-              <>
-                <div style={{ fontSize: '0.70rem', color: '#fbbf24', fontWeight: 700 }}>🚜 AĞIR HAFRİYAT KOTASI</div>
-                <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Cursor 13 (540 / 460 BG)</div>
-              </>
-            ) : (
-              <>
-                <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>⚡ 2026 KOTA TAHSİSİ</div>
-                <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Fabrika Teslimat Güvencesi</div>
-              </>
+                    ? '🚛 DAILY 70C / 72C 7 TON KAMYON & PANELVAN LİSTESİ'
+                    : 'RESMİ 2026 MODEL FİYAT LİSTESİ'}
+            </div>
+            <h2 style={{ fontSize: isMobileView ? '0.98rem' : '1.25rem', fontWeight: 800, margin: '2px 0 0', color: '#fff' }}>
+              {selectedCategory === 'sway'
+                ? 'IVECO S-Way Ağır Vasıta & Çekici Fiyat Listesi'
+                : selectedCategory === 'tway'
+                  ? 'IVECO T-Way 10-12 Teker Ağır Şantiye Fiyat Listesi'
+                  : selectedCategory === 'daily70'
+                    ? 'IVECO Daily 70C / 72C 7 Ton Kamyon & Panelvan Fiyat Listesi'
+                    : 'IVECO Sıfır Kilometre Şasi Fiyat Listesi'}
+            </h2>
+            {!isMobileView && (
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: '4px 0 0' }}>
+                {selectedCategory === 'sway'
+                  ? 'Uluslararası lojistik ve taşımacılık filoları için resmi Euro (€) liste fiyatları ve ihracatçı Euro kredisi seçenekleri.'
+                  : selectedCategory === 'tway'
+                    ? '10 ve 12 teker ağır kaya damperi ve mikser şasilerinde Euro (€) liste fiyatları ve fabrika kota tahsisi.'
+                    : selectedCategory === 'daily70'
+                      ? '7.000 kg ve 7.200 kg azami yüklü ağırlıklı 70C16 şasi kamyon ve 70C18 yüksek hacimli (19.6 m³) panelvan resmi liste fiyatları.'
+                      : 'Tüm modellerde şeffaf resmi liste fiyatları ve fabrika kota tahsisi uygulanmıştır.'}
+              </p>
             )}
           </div>
-        )}
-      </div>
+          {!isMobileView && (
+            <div style={{
+              background: (selectedCategory === 'sway' || selectedCategory === 'tway') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+              border: (selectedCategory === 'sway' || selectedCategory === 'tway') ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '12px',
+              padding: '8px 14px',
+              textAlign: 'right'
+            }}>
+              {selectedCategory === 'sway' ? (
+                <>
+                  <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>💶 EURO BAZLI LİSTE</div>
+                  <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>İhracatçıya Özel Euro Kredisi</div>
+                </>
+              ) : selectedCategory === 'tway' ? (
+                <>
+                  <div style={{ fontSize: '0.70rem', color: '#fbbf24', fontWeight: 700 }}>🚜 AĞIR HAFRİYAT KOTASI</div>
+                  <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Cursor 13 (540 / 460 BG)</div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>⚡ 2026 KOTA TAHSİSİ</div>
+                  <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Fabrika Teslimat Güvencesi</div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
       {(selectedCategory === 'daily35_chassis' || selectedCategory === 'daily35_van') && (
@@ -212,15 +214,16 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       )}
 
       {/* Filters & Search */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: isMobileView ? '14px' : '20px' }}>
-        {/* Category Pills */}
-        <div style={{
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: isMobileView ? '12px' : '20px' }}>
+        {/* Category Pills — Mobilde kesilmeyen net ızgara */}
+        <div style={isMobileView ? {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '6px'
+        } : {
           display: 'flex',
-          flexWrap: isMobileView ? 'nowrap' : 'wrap',
-          overflowX: isMobileView ? 'auto' : 'visible',
-          gap: '8px',
-          paddingBottom: isMobileView ? '4px' : 0,
-          WebkitOverflowScrolling: 'touch'
+          flexWrap: 'wrap',
+          gap: '8px'
         }}>
           {CATEGORIES.map(cat => (
             <button
@@ -228,20 +231,21 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               type="button"
               onClick={() => setSelectedCategory(cat.id)}
               style={{
-                background: selectedCategory === cat.id ? '#0284c7' : 'rgba(15, 23, 42, 0.75)',
+                gridColumn: (isMobileView && cat.id === 'all') ? 'span 3' : undefined,
+                background: selectedCategory === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(15, 23, 42, 0.8)',
                 color: selectedCategory === cat.id ? '#fff' : '#cbd5e1',
                 border: selectedCategory === cat.id ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: isMobileView ? '12px' : '20px',
-                padding: isMobileView ? '10px 14px' : '6px 14px',
-                fontSize: isMobileView ? '0.84rem' : '0.78rem',
+                borderRadius: isMobileView ? '10px' : '20px',
+                padding: isMobileView ? '9px 6px' : '6px 14px',
+                fontSize: isMobileView ? '0.78rem' : '0.78rem',
                 fontWeight: 800,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                flexShrink: 0,
+                textAlign: 'center',
                 transition: 'all 0.2s'
               }}
             >
-              {isMobileView ? cat.shortLabel : cat.label}
+              {isMobileView ? (cat.id === 'all' ? `Tüm Modeller (${IVECO_PRICING_CATALOG.length} Araç)` : cat.shortLabel) : cat.label}
             </button>
           ))}
         </div>

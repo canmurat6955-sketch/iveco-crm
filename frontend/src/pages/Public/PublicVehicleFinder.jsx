@@ -2123,7 +2123,7 @@ IVECO ERC Samsun Otomotiv
         )}
 
         {isMobileView ? (
-          /* ── MOBİL SADE ÜST ŞERİT (TEK SATIRDA LOGO + TEMSİLCİ + ARA / WHATSAPP) ── */
+          /* ── MOBİL SADE ÜST KART (TAM OKUNAKLI TEMSİLCİ & TEK TIK İLETİŞİM) ── */
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -2145,43 +2145,68 @@ IVECO ERC Samsun Otomotiv
               </div>
             )}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px',
-              background: 'rgba(15, 23, 42, 0.92)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(2, 44, 88, 0.45) 100%)',
               border: '1px solid rgba(56, 189, 248, 0.35)',
               borderRadius: '14px',
-              padding: '8px 12px'
+              padding: '10px 12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, textAlign: 'left' }}>
-                <img src="/logo-iveco-white.png" alt="IVECO" style={{ height: '18px', objectFit: 'contain', flexShrink: 0 }} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {SALES_REP.name} · IVECO ERC Samsun
+              {/* Üst Satır: IVECO Logosu + Can Murat Onay Bilgisi */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textAlign: 'left' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    fontSize: '0.82rem',
+                    flexShrink: 0,
+                    border: '1px solid rgba(56, 189, 248, 0.4)'
+                  }}>
+                    {SALES_REP.initials}
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 700 }}>
-                    2026 Fiyat Listesi & Kredi Portalı
+                  <div>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.2 }}>
+                      {SALES_REP.name}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700, marginTop: '1px' }}>
+                      IVECO ERC Samsun · {SALES_REP.phoneDisplay}
+                    </div>
                   </div>
                 </div>
+                <img
+                  src="/logo-iveco-white.png"
+                  alt="IVECO"
+                  style={{ height: '16px', width: 'auto', maxWidth: '78px', objectFit: 'contain', flexShrink: 0, opacity: 0.95 }}
+                />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+
+              {/* Alt Satır: Tam Genişlik Hızlı Ara & WhatsApp Butonları */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <a
                   href={`tel:${SALES_REP.phoneClean}`}
                   style={{
                     background: '#0284c7',
                     color: '#fff',
                     borderRadius: '10px',
-                    padding: '8px 10px',
-                    fontSize: '0.78rem',
+                    padding: '9px 10px',
+                    fontSize: '0.8rem',
                     fontWeight: 800,
                     textDecoration: 'none',
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    justifyContent: 'center',
+                    gap: '6px'
                   }}
                 >
-                  <FiPhone size={14} /> Ara
+                  <FiPhone size={14} /> Hemen Ara
                 </a>
                 <button
                   type="button"
@@ -2191,12 +2216,13 @@ IVECO ERC Samsun Otomotiv
                     color: '#fff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: '8px 10px',
-                    fontSize: '0.78rem',
+                    padding: '9px 10px',
+                    fontSize: '0.8rem',
                     fontWeight: 800,
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
+                    justifyContent: 'center',
+                    gap: '6px',
                     cursor: 'pointer'
                   }}
                 >
@@ -2472,11 +2498,11 @@ IVECO ERC Samsun Otomotiv
 
       {/* ── MÜŞTERİ MODÜLÜ ANA SEKMELERİ (TABS) ── */}
       {isMobileView ? (
-        <div style={{ maxWidth: '680px', margin: '0 auto 14px' }}>
+        <div style={{ maxWidth: '680px', margin: '0 auto 12px' }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '6px',
+            gridTemplateColumns: '1.15fr 1fr 0.85fr 0.85fr',
+            gap: '5px',
             background: 'rgba(15, 23, 42, 0.9)',
             padding: '5px',
             borderRadius: '14px',
@@ -2498,9 +2524,10 @@ IVECO ERC Samsun Otomotiv
                     color: isActive ? '#fff' : '#cbd5e1',
                     border: isActive ? '1px solid #38bdf8' : '1px solid transparent',
                     borderRadius: '10px',
-                    padding: '10px 6px',
-                    fontSize: '0.82rem',
+                    padding: '10px 4px',
+                    fontSize: '0.8rem',
                     fontWeight: isActive ? 800 : 700,
+                    whiteSpace: 'nowrap',
                     cursor: 'pointer'
                   }}
                 >
@@ -2516,9 +2543,10 @@ IVECO ERC Samsun Otomotiv
                 color: (activeMainTab === 'tco' || activeMainTab === 'sss' || activeMainTab === 'ust-yapi' || showMoreTabsMobile) ? '#38bdf8' : '#94a3b8',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '10px',
-                padding: '10px 6px',
+                padding: '10px 4px',
                 fontSize: '0.78rem',
                 fontWeight: 700,
+                whiteSpace: 'nowrap',
                 cursor: 'pointer'
               }}
             >
@@ -2811,15 +2839,17 @@ IVECO ERC Samsun Otomotiv
             {/* SEÇENEK A: DOĞRUDAN ARAÇ KATALOĞU */}
             {selectorMode === 'catalog' && (
               <div style={{ marginBottom: '18px' }}>
-                {/* Kategori Filtre Çipleri */}
-                <div style={{
+                {/* Kategori Filtre Çipleri — Mobilde kesilmeyen 3x2 net ızgara */}
+                <div style={isMobileView ? {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '6px',
+                  marginBottom: '12px'
+                } : {
                   display: 'flex',
-                  flexWrap: isMobileView ? 'nowrap' : 'wrap',
-                  overflowX: isMobileView ? 'auto' : 'visible',
-                  gap: isMobileView ? '8px' : '6px',
-                  marginBottom: '14px',
-                  paddingBottom: isMobileView ? '6px' : 0,
-                  WebkitOverflowScrolling: 'touch'
+                  flexWrap: 'wrap',
+                  gap: '6px',
+                  marginBottom: '14px'
                 }}>
                   {[
                     { id: 'all', label: 'Tüm Modeller', shortLabel: 'Tümü' },
@@ -2834,16 +2864,16 @@ IVECO ERC Samsun Otomotiv
                       type="button"
                       onClick={() => setSelectedCategoryTab(cat.id)}
                       style={{
-                        background: selectedCategoryTab === cat.id ? '#0284c7' : 'rgba(255, 255, 255, 0.06)',
+                        background: selectedCategoryTab === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.06)',
                         color: selectedCategoryTab === cat.id ? '#fff' : '#cbd5e1',
                         border: '1.5px solid',
                         borderColor: selectedCategoryTab === cat.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.12)',
-                        borderRadius: '22px',
-                        padding: isMobileView ? '9px 14px' : '5px 12px',
-                        fontSize: isMobileView ? '0.84rem' : '0.74rem',
-                        fontWeight: selectedCategoryTab === cat.id ? 800 : 600,
+                        borderRadius: isMobileView ? '10px' : '22px',
+                        padding: isMobileView ? '9px 6px' : '5px 12px',
+                        fontSize: isMobileView ? '0.77rem' : '0.74rem',
+                        fontWeight: selectedCategoryTab === cat.id ? 800 : 700,
                         whiteSpace: 'nowrap',
-                        flexShrink: 0,
+                        textAlign: 'center',
                         cursor: 'pointer'
                       }}
                     >
@@ -5065,34 +5095,8 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
-      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (CAN MURAT ONAY) ── */}
-      {isMobileView ? (
-        <button
-          type="button"
-          onClick={handleDirectWhatsApp}
-          style={{
-            position: 'fixed',
-            bottom: '16px',
-            right: '14px',
-            zIndex: 8900,
-            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-            color: '#fff',
-            border: '2px solid rgba(255,255,255,0.25)',
-            borderRadius: '28px',
-            padding: '10px 16px',
-            fontSize: '0.82rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.55), 0 0 14px rgba(34, 197, 94, 0.45)'
-          }}
-          title="WhatsApp'tan Can Murat Onay'a Yaz"
-        >
-          <FiMessageSquare size={16} /> WhatsApp
-        </button>
-      ) : (
+      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (CAN MURAT ONAY - YALNIZCA MASAÜSTÜ) ── */}
+      {!isMobileView && (
         <div style={{
           position: 'fixed',
           bottom: '18px',
