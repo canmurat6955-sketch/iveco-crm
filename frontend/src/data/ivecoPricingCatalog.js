@@ -724,3 +724,81 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
     hasAutoTransmission
   };
 }
+
+/**
+ * Verilen araç objesine veya model/kategori anahtarına göre ufak sticker görselini döndürür.
+ * - T-Way -> /vehicles/tway-damper.jpg
+ * - Eurocargo 150E21 / 150E22 / 160E32 / 10 Teker -> /vehicles/eurocargo-150-160.jpg
+ * - Eurocargo 100E19 / 120EL19 -> /vehicles/eurocargo-100-120.jpg
+ * - Panelvan (Daily 35 VAN & 70C18 VAN) -> /vehicles/daily-panelvan.jpg
+ * - S-Way Çekici -> /vehicles/sway-cekici.jpg
+ */
+export function getVehicleSticker(vehicleOrKey) {
+  if (!vehicleOrKey) return null;
+
+  if (typeof vehicleOrKey === 'string') {
+    const k = vehicleOrKey.toLowerCase();
+    if (k.includes('tway') || k.includes('t-way') || k === 'hafriyat') {
+      return { src: '/vehicles/tway-damper.jpg', label: 'IVECO T-Way Hafriyat' };
+    }
+    if (k.includes('sway') || k.includes('s-way') || k === 'cekici' || k === 'tractor_sway') {
+      return { src: '/vehicles/sway-cekici.jpg', label: 'IVECO S-Way Çekici' };
+    }
+    if (k.includes('panelvan') || k.includes('van')) {
+      return { src: '/vehicles/daily-panelvan.jpg', label: 'IVECO Daily Panelvan' };
+    }
+    if (k.includes('150e') || k.includes('160e') || k.includes('10teker')) {
+      return { src: '/vehicles/eurocargo-150-160.jpg', label: 'IVECO Eurocargo 150E / 160E' };
+    }
+    if (k.includes('100e') || k.includes('120e')) {
+      return { src: '/vehicles/eurocargo-100-120.jpg', label: 'IVECO Eurocargo 100E / 120E' };
+    }
+    return null;
+  }
+
+  const id = (vehicleOrKey.id || vehicleOrKey.key || '').toLowerCase();
+  const model = (vehicleOrKey.model || vehicleOrKey.title || vehicleOrKey.modelTitle || '').toLowerCase();
+  const category = (vehicleOrKey.category || '').toLowerCase();
+  const segment = (vehicleOrKey.segment || vehicleOrKey.series || '').toLowerCase();
+
+  // 1. T-Way
+  if (segment.includes('t-way') || segment.includes('tway') || id.includes('tway') || model.includes('t-way') || vehicleOrKey.isTway) {
+    return { src: '/vehicles/tway-damper.jpg', label: 'T-Way Şantiye' };
+  }
+
+  // 2. S-Way
+  if (segment.includes('s-way') || segment.includes('sway') || id.includes('sway') || model.includes('s-way') || id === 'tractor_sway') {
+    return { src: '/vehicles/sway-cekici.jpg', label: 'S-Way Çekici' };
+  }
+
+  // 3. Panelvan (Daily 35 Panelvan & Daily 70C18 Panelvan)
+  if (category.includes('panelvan') || id.includes('van') || id.includes('panelvan') || model.includes(' panelvan') || model.includes(' van ')) {
+    return { src: '/vehicles/daily-panelvan.jpg', label: 'Daily Panelvan' };
+  }
+
+  // 4. Eurocargo 150E21, 150E22, 160E32 ve 10 Teker
+  if (
+    id.includes('150e') ||
+    id.includes('160e') ||
+    id.includes('10teker') ||
+    model.includes('150 e') ||
+    model.includes('160 e') ||
+    model.includes('160/180')
+  ) {
+    return { src: '/vehicles/eurocargo-150-160.jpg', label: 'Eurocargo 150E / 160E' };
+  }
+
+  // 5. Eurocargo 100E19 ve 120EL19
+  if (
+    id.includes('100e') ||
+    id.includes('120e') ||
+    model.includes('100 e') ||
+    model.includes('120 el') ||
+    model.includes('120 e')
+  ) {
+    return { src: '/vehicles/eurocargo-100-120.jpg', label: 'Eurocargo 100E / 120E' };
+  }
+
+  return null;
+}
+

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { IVECO_PRICING_CATALOG } from '../../../data/ivecoPricingCatalog';
+import { IVECO_PRICING_CATALOG, getVehicleSticker } from '../../../data/ivecoPricingCatalog';
 import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag } from 'react-icons/fi';
 
 const CATEGORIES = [
@@ -300,6 +300,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
       {/* Vehicle Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '16px' }}>
         {filteredVehicles.map(vehicle => {
+          const sticker = getVehicleSticker(vehicle);
           return (
             <div
               key={vehicle.id}
@@ -316,7 +317,7 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
               }}
             >
               {/* Badges */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', gap: '6px', flexWrap: 'wrap' }}>
                 <span style={{
                   fontSize: '0.68rem',
                   fontWeight: 800,
@@ -367,11 +368,46 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                 ) : null}
               </div>
 
-              {/* Title & Specs */}
+              {/* Title, Sticker & Specs */}
               <div>
-                <h3 style={{ fontSize: isMobileView ? '1.08rem' : '0.98rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 8px', lineHeight: 1.3 }}>
-                  {vehicle.model}
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
+                  <h3 style={{ fontSize: isMobileView ? '1.06rem' : '0.98rem', fontWeight: 800, color: '#f8fafc', margin: 0, lineHeight: 1.3, flex: 1 }}>
+                    {vehicle.model}
+                  </h3>
+                  {sticker && (
+                    <div
+                      style={{
+                        width: isMobileView ? '78px' : '74px',
+                        height: isMobileView ? '54px' : '50px',
+                        borderRadius: '10px',
+                        background: '#ffffff',
+                        border: '2px solid rgba(56, 189, 248, 0.55)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '2px',
+                        transform: 'rotate(-1.5deg)'
+                      }}
+                      title={sticker.label}
+                    >
+                      <img
+                        src={sticker.src}
+                        alt={sticker.label}
+                        loading="lazy"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: '7px',
+                          display: 'block'
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: isMobileView ? '0.78rem' : '0.72rem', color: '#cbd5e1', marginBottom: '8px' }}>
                   <div>⚙️ <strong>Vites:</strong> {vehicle.transmission || 'Manuel'}</div>

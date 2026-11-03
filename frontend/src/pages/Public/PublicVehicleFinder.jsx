@@ -32,6 +32,7 @@ import {
   FiMail
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
+import { getVehicleSticker } from '../../data/ivecoPricingCatalog';
 import PricingCatalogTab from './components/PricingCatalogTab';
 import BodyStructureTab from './components/BodyStructureTab';
 import LoanFinanceTab from './components/LoanFinanceTab';
@@ -2914,6 +2915,7 @@ IVECO ERC Samsun Otomotiv
                 }}>
                   {VEHICLE_CATALOG.filter(v => selectedCategoryTab === 'all' || v.category === selectedCategoryTab).map(v => {
                     const isSelected = matched.key === v.key || matched.modelTitle === v.modelTitle;
+                    const sticker = getVehicleSticker(v);
                     return (
                       <div
                         key={v.key}
@@ -2947,11 +2949,42 @@ IVECO ERC Samsun Otomotiv
                             )}
                           </div>
 
-                          <h4 style={{ margin: '0 0 4px', fontSize: isMobileView ? '1.1rem' : '0.92rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.25 }}>
-                            {v.title}
-                          </h4>
-                          <div style={{ fontSize: isMobileView ? '0.78rem' : '0.7rem', color: '#38bdf8', fontWeight: 600, marginBottom: '10px' }}>
-                            {v.badge}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <h4 style={{ margin: '0 0 4px', fontSize: isMobileView ? '1.06rem' : '0.92rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.25 }}>
+                                {v.title}
+                              </h4>
+                              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
+                                {v.badge}
+                              </div>
+                            </div>
+                            {sticker && (
+                              <div
+                                title={sticker.label}
+                                style={{
+                                  flexShrink: 0,
+                                  width: isMobileView ? '74px' : '68px',
+                                  height: isMobileView ? '50px' : '46px',
+                                  background: '#ffffff',
+                                  borderRadius: '10px',
+                                  border: '2px solid rgba(56, 189, 248, 0.7)',
+                                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255,255,255,0.12)',
+                                  padding: '3px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  overflow: 'hidden',
+                                  transform: 'rotate(-1.5deg)'
+                                }}
+                              >
+                                <img
+                                  src={sticker.src}
+                                  alt={sticker.label}
+                                  loading="lazy"
+                                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                                />
+                              </div>
+                            )}
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '8px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
@@ -3378,16 +3411,50 @@ IVECO ERC Samsun Otomotiv
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                {matched.modelTitle}
-              </h3>
-              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 14px', lineHeight: 1.45 }}>
-                📏 Dingil: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong>
-                {matched.dims?.length && (
-                  <> · 📦 Uyumlu Kasa Boyu: <strong style={{ color: '#34d399' }}>{matched.dims.length}</strong></>
-                )}
-                {' '}· Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ fontSize: isMobileView ? '1.18rem' : '1.3rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
+                    {matched.modelTitle}
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
+                    📏 Dingil: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong>
+                    {matched.dims?.length && (
+                      <> · 📦 Uyumlu Kasa Boyu: <strong style={{ color: '#34d399' }}>{matched.dims.length}</strong></>
+                    )}
+                    {' '}· Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
+                  </p>
+                </div>
+                {(() => {
+                  const matchedSticker = getVehicleSticker(matched);
+                  if (!matchedSticker) return null;
+                  return (
+                    <div
+                      title={matchedSticker.label}
+                      style={{
+                        flexShrink: 0,
+                        width: isMobileView ? '84px' : '94px',
+                        height: isMobileView ? '58px' : '64px',
+                        background: '#ffffff',
+                        borderRadius: '11px',
+                        border: '2px solid rgba(56, 189, 248, 0.85)',
+                        boxShadow: '0 5px 14px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255,255,255,0.16)',
+                        padding: '3px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        transform: 'rotate(-1.5deg)'
+                      }}
+                    >
+                      <img
+                        src={matchedSticker.src}
+                        alt={matchedSticker.label}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
 
               {/* 🏷️ 2026 RESMİ SATIŞ FİYATI & PEŞİN İNDİRİMİ */}
               {matched.isTway ? (
