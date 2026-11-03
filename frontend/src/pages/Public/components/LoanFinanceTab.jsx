@@ -3,7 +3,6 @@ import {
   BANK_LIST, 
   EUR_LOAN_PRESETS, 
   EUR_PARTNER_BANKS, 
-  calculateEurLoan,
   getCampaignsForVehicleAndBank,
   HEAVY_CAMPAIGNS
 } from '../../../data/bankCampaigns';
@@ -24,19 +23,23 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
   const [selectedVehicleCategory, setSelectedVehicleCategory] = useState('daily35');
   const [campaignTypeFilter, setCampaignTypeFilter] = useState('all'); // 'all', 'zero', 'grace'
 
-  // EUR Kredi State'leri
-  const [selectedEurBankId, setSelectedEurBankId] = useState('eximbank');
-  const [selectedEurPresetId, setSelectedEurPresetId] = useState('eur_80k_36');
-  const [customEurAmount, setCustomEurAmount] = useState(80000);
-  const [customEurTerm, setCustomEurTerm] = useState(36);
+  // EUR Kredi State'leri — paketler doğrudan banka Excel tablolarından (varsayılan: Kuveyt Türk)
+  const [selectedEurBankId, setSelectedEurBankId] = useState('kuveyt_turk');
+  const [selectedEurPresetId, setSelectedEurPresetId] = useState(null);
+  const [eurTypeFilter, setEurTypeFilter] = useState('all'); // 'all' | 'zero' | 'grace' | 'equal'
 
   const activeBank = BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
   const activeEurBank = EUR_PARTNER_BANKS.find(b => b.id === selectedEurBankId) || EUR_PARTNER_BANKS[0];
-  const activeEurPreset = EUR_LOAN_PRESETS.find(p => p.id === selectedEurPresetId) || EUR_LOAN_PRESETS[1];
 
-  const dynamicEurCalc = useMemo(() => {
-    return calculateEurLoan(customEurAmount, customEurTerm, 5.49);
-  }, [customEurAmount, customEurTerm]);
+  const eurPackages = useMemo(() => {
+    let list = EUR_LOAN_PRESETS.filter(p => p.bankId === activeEurBank.id);
+    if (eurTypeFilter === 'zero') list = list.filter(p => p.rate === 0);
+    else if (eurTypeFilter === 'grace') list = list.filter(p => p.gracePeriodMonths);
+    else if (eurTypeFilter === 'equal') list = list.filter(p => !p.gracePeriodMonths && p.rate !== 0);
+    return list;
+  }, [activeEurBank.id, eurTypeFilter]);
+
+  const activeEurPreset = eurPackages.find(p => p.id === selectedEurPresetId) || eurPackages[0] || null;
 
   // Seçili banka ve araç grubuna ait resmi Excel kampanyaları
   const realCampaigns = useMemo(() => {
@@ -57,8 +60,6 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
 
   const handleApplyEurPreset = (preset) => {
     setSelectedEurPresetId(preset.id);
-    setCustomEurAmount(preset.principal);
-    setCustomEurTerm(preset.term);
   };
 
   const handleWhatsAppLoan = () => {
@@ -111,7 +112,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
             {currencyMode === 'EUR'
-              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Eximbank ve anlaşmalı bankalardan yıllık %4.50 - %6.00 arası düşük faizli Euro kredisi.'
+              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: 12 aya kadar %0 kâr payı, 48 aya kadar %0 faiz ve 6 ay ödemesiz seçenekler.'
               : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 1.000.000 TL\'ye kadar %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
           </p>
         </div>
@@ -208,7 +209,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
             <span style={{ fontSize: '1.4rem' }}>🇪🇺</span>
             <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
               <strong style={{ color: '#4ade80' }}>İhracatçı Firmalar İçin Euro Kredisi Neden Çok Büyük Avantajdır?</strong><br />
-              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Yıllık %40-50+ seviyesindeki TL faizleri yerine, <strong>yıllık %4.50 - %6.00 gibi çok düşük Euro faiziyle</strong> S-Way Çekici ve T-Way araçlarını finanse edebilir, navlun/ihracat gelirleriyle kur riski yaşamadan ödeyebilirler.
+              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€100.000 için 12 aya kadar %0 kâr payı</strong>, Garanti BBVA ve BNP Paribas'ta <strong>48 aya kadar %0 faiz</strong> kampanyası vardır; S-Way Çekici ve T-Way araçlarını navlun/ihracat gelirleriyle kur riski yaşamadan ödeyebilirsiniz.
             </div>
           </div>
 
@@ -279,7 +280,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
 
               <button
                 type="button"
-                onClick={() => handleWhatsAppEurLoan(activeEurPreset.principal, activeEurPreset.term, activeEurPreset.monthly, activeEurBank.name)}
+                onClick={() => activeEurPreset && handleWhatsAppEurLoan(activeEurPreset.principal, activeEurPreset.term, activeEurPreset.monthly, activeEurBank.name)}
                 style={{
                   background: '#22c55e',
                   color: '#fff',
@@ -298,13 +299,41 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               </button>
             </div>
 
-            {/* Popular Euro Packages */}
-            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, marginBottom: '10px', textTransform: 'uppercase' }}>
-              💡 S-WAY & T-WAY İÇİN EN ÇOK KULLANILAN EURO KREDİ PAKETLERİ
+            {/* Bank Euro Packages (resmi banka tablosu) */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>
+                📋 {activeEurBank.shortName} RESMİ EURO PAKETLERİ ({eurPackages.length} SEÇENEK) — S-WAY & T-WAY
+              </div>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {[['all', 'Tümü'], ['zero', '%0 Faiz / Kâr Payı'], ['grace', '6 Ay Ödemesiz'], ['equal', 'Eşit Taksit']].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => { setEurTypeFilter(key); setSelectedEurPresetId(null); }}
+                    style={{
+                      background: eurTypeFilter === key ? '#10b981' : 'rgba(255,255,255,0.05)',
+                      color: eurTypeFilter === key ? '#fff' : '#cbd5e1',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      borderRadius: '8px',
+                      padding: '4px 10px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
+            {eurPackages.length === 0 && (
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8', padding: '12px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '10px', marginBottom: '10px' }}>
+                Bu bankada seçili tipte Euro paketi yok. Diğer filtreleri deneyin veya satış temsilcimize danışın.
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
-              {EUR_LOAN_PRESETS.map((preset) => {
-                const isSelected = selectedEurPresetId === preset.id;
+              {eurPackages.map((preset) => {
+                const isSelected = activeEurPreset?.id === preset.id;
                 return (
                   <div
                     key={preset.id}
@@ -324,12 +353,19 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                         {preset.rateLabel}
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#fbbf24', margin: '4px 0', fontWeight: 700 }}>
-                      🏷️ {preset.tag}
+                    {preset.tag && (
+                      <div style={{ fontSize: '0.72rem', color: '#fbbf24', margin: '4px 0', fontWeight: 700 }}>
+                        🏷️ {preset.tag}
+                      </div>
+                    )}
+                    <div style={{ fontSize: '0.74rem', color: '#e2e8f0', margin: '4px 0', fontWeight: 600 }}>
+                      {preset.title}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '8px' }}>
-                      {preset.desc}
-                    </div>
+                    {preset.desc && (
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '8px' }}>
+                        {preset.desc}
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '8px' }}>
                       <span style={{ color: '#cbd5e1' }}>Aylık Taksit: <strong style={{ color: '#4ade80', fontSize: '0.98rem' }}>€{preset.monthly.toLocaleString('tr-TR')}</strong></span>
                       <span style={{ color: '#94a3b8' }}>Vade: <strong>{preset.term} Ay</strong></span>
@@ -339,77 +375,28 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               })}
             </div>
 
-            {/* Custom Euro Loan Calculator */}
-            <div style={{
-              marginTop: '18px',
-              padding: '14px',
-              background: 'rgba(2, 6, 23, 0.7)',
-              borderRadius: '10px',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '14px',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <div>
-                <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#38bdf8' }}>📐 KENDİ EURO KREDİ PLANINIZI HESAPLAYIN:</span>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <label style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                    Tutar (€):
-                    <input
-                      type="number"
-                      step="5000"
-                      value={customEurAmount}
-                      onChange={(e) => setCustomEurAmount(Number(e.target.value) || 0)}
-                      style={{
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        padding: '4px 8px',
-                        marginLeft: '6px',
-                        width: '100px',
-                        fontWeight: 700
-                      }}
-                    />
-                  </label>
-                  <label style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                    Vade:
-                    <select
-                      value={customEurTerm}
-                      onChange={(e) => setCustomEurTerm(Number(e.target.value))}
-                      style={{
-                        background: '#0f172a',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        padding: '4px 8px',
-                        marginLeft: '6px',
-                        fontWeight: 700
-                      }}
-                    >
-                      <option value={12}>12 Ay</option>
-                      <option value={24}>24 Ay</option>
-                      <option value={36}>36 Ay</option>
-                      <option value={48}>48 Ay</option>
-                    </select>
-                  </label>
+            {/* Seçili paket özeti — tüm rakamlar banka tablosundan, formülle hesaplanmaz */}
+            {activeEurPreset && (
+              <div style={{
+                marginTop: '18px',
+                padding: '14px',
+                background: 'rgba(2, 6, 23, 0.7)',
+                borderRadius: '10px',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '12px',
+                fontSize: '0.76rem'
+              }}>
+                <div><div style={{ color: '#64748b' }}>Seçili Paket</div><strong style={{ color: '#fff' }}>{activeEurPreset.title}</strong></div>
+                <div><div style={{ color: '#64748b' }}>Aylık Taksit</div><strong style={{ color: '#10b981', fontSize: '1.1rem' }}>€{activeEurPreset.monthly.toLocaleString('tr-TR')}</strong></div>
+                <div><div style={{ color: '#64748b' }}>Toplam Geri Ödeme</div><strong style={{ color: '#cbd5e1' }}>€{activeEurPreset.total.toLocaleString('tr-TR')}</strong></div>
+                <div><div style={{ color: '#64748b' }}>Oran</div><strong style={{ color: '#38bdf8' }}>{activeEurPreset.rateLabel}</strong></div>
+                <div style={{ gridColumn: '1 / -1', fontSize: '0.68rem', color: '#64748b' }}>
+                  Rakamlar {activeEurBank.name} resmi kampanya tablosundan alınmıştır. Kesin ödeme planı banka onayıyla netleşir.
                 </div>
               </div>
-
-              {dynamicEurCalc && (
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Hesaplanan Aylık Taksit (%5.49 Yıllık):</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>
-                    €{dynamicEurCalc.monthly.toLocaleString('tr-TR')} <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>/ ay</span>
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
-                    Toplam Geri Ödeme: €{dynamicEurCalc.total.toLocaleString('tr-TR')}
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       ) : (

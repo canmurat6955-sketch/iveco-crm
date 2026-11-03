@@ -784,8 +784,8 @@ export default function PublicVehicleFinder() {
 
   // İhracatçı Euro Kredisi State'leri (S-Way, T-Way ve Uluslararası Nakliye İçin)
   const [loanCurrencyMode, setLoanCurrencyMode] = useState('TRY');
-  const [selectedEurBankId, setSelectedEurBankId] = useState('eximbank');
-  const [selectedEurCampaignId, setSelectedEurCampaignId] = useState('eur_80k_36');
+  const [selectedEurBankId, setSelectedEurBankId] = useState('kuveyt_turk');
+  const [selectedEurCampaignId, setSelectedEurCampaignId] = useState(null);
 
   // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Can Murat Onay)
   const [showTestPanel, setShowTestPanel] = useState(false);
@@ -1344,9 +1344,13 @@ export default function PublicVehicleFinder() {
     return EUR_PARTNER_BANKS.find(b => b.id === selectedEurBankId) || EUR_PARTNER_BANKS[0];
   }, [selectedEurBankId]);
 
+  const eurBankPresets = useMemo(() => {
+    return EUR_LOAN_PRESETS.filter(p => p.bankId === activeEurBankMeta.id);
+  }, [activeEurBankMeta]);
+
   const activeEurCampaign = useMemo(() => {
-    return EUR_LOAN_PRESETS.find(p => p.id === selectedEurCampaignId) || EUR_LOAN_PRESETS[1];
-  }, [selectedEurCampaignId]);
+    return eurBankPresets.find(p => p.id === selectedEurCampaignId) || eurBankPresets[0] || null;
+  }, [eurBankPresets, selectedEurCampaignId]);
 
   // Model değişiminde EUR aracı (S-Way, T-Way) otomatik olarak Euro Kredisi modunu aktif eder
   useEffect(() => {
@@ -1368,7 +1372,7 @@ export default function PublicVehicleFinder() {
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
 
     const isEurFinancing = loanCurrencyMode === 'EUR' || (matched.currency === 'EUR' && loanCurrencyMode !== 'TRY');
-    const campaignSummary = isEurFinancing
+    const campaignSummary = (isEurFinancing && activeEurCampaign)
       ? `${activeEurBankMeta.name} — ${activeEurCampaign.title} (Aylık: €${activeEurCampaign.monthly.toLocaleString('tr-TR')})`
       : activeCampaign
         ? `${currentBankMeta.name} — ${activeCampaign.title} (Aylık: ${activeCampaign.monthly.toLocaleString('tr-TR')} TL)`
@@ -1436,10 +1440,10 @@ export default function PublicVehicleFinder() {
 
     const isEurFinancing = loanCurrencyMode === 'EUR' || (matched.currency === 'EUR' && loanCurrencyMode !== 'TRY');
 
-    const campaignText = isEurFinancing
+    const campaignText = (isEurFinancing && activeEurCampaign)
       ? `*Finansman Tercihi:* ${activeEurBankMeta.name} — ${activeEurCampaign.title}\n` +
         `*Aylık Taksit:* €${activeEurCampaign.monthly.toLocaleString('tr-TR')} / ay (Toplam Geri Ödeme: €${activeEurCampaign.total.toLocaleString('tr-TR')})\n` +
-        `*Kredi Kapsamı:* 32 Sayılı Karar / İhracatçı Düşük Faizli Euro Kredisi\n\n`
+        `*Kredi Kapsamı:* S-Way / T-Way Euro Finansman Kampanyası\n\n`
       : activeCampaign
         ? `*Seçilen Finansman:* ${currentBankMeta.name} — ${activeCampaign.title}\n` +
           `*Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
@@ -3416,8 +3420,8 @@ IVECO ERC Samsun Otomotiv
                     color: '#cbd5e1',
                     lineHeight: 1.45
                   }}>
-                    🛡️ <strong style={{ color: '#4ade80' }}>32 Sayılı Karar Kapsamında İhracatçı Döviz Kredisi:</strong><br />
-                    Döviz geliri olan uluslararası nakliye (TIR/Lojistik) ve ihracatçı firmalar için Eximbank ve anlaşmalı bankalarımızdan <strong>yıllık %4.50 - %6.00 arası</strong> çok düşük faizli Euro araç kredisi kullandırımı yapılmaktadır.
+                    🛡️ <strong style={{ color: '#4ade80' }}>S-Way / T-Way Euro Finansman Kampanyaları:</strong><br />
+                    Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için <strong>Kuveyt Türk</strong> (12 aya kadar %0 kâr payı, 6 ay ödemesiz seçenekler), <strong>Garanti BBVA</strong> ve <strong>BNP Paribas</strong> (%0 faizli Euro paketler) kampanya tabloları geçerlidir.
                   </div>
 
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px' }}>
@@ -3430,7 +3434,7 @@ IVECO ERC Samsun Otomotiv
                         <button
                           key={bank.id}
                           type="button"
-                          onClick={() => setSelectedEurBankId(bank.id)}
+                          onClick={() => { setSelectedEurBankId(bank.id); setSelectedEurCampaignId(null); }}
                           style={{
                             background: isSelected ? bank.bg : 'rgba(255, 255, 255, 0.04)',
                             border: `1.5px solid ${isSelected ? bank.color : 'rgba(255, 255, 255, 0.08)'}`,
@@ -3461,7 +3465,7 @@ IVECO ERC Samsun Otomotiv
                     Euro Kredi Paketini Seçin:
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '8px', marginBottom: '16px' }}>
-                    {EUR_LOAN_PRESETS.map(preset => {
+                    {eurBankPresets.map(preset => {
                       const isChosen = activeEurCampaign?.id === preset.id;
                       return (
                         <div
