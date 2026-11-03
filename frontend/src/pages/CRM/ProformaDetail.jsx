@@ -23,6 +23,7 @@ export default function ProformaDetail() {
   const [loading, setLoading] = useState(true);
   const [trackingInfo, setTrackingInfo] = useState(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [pendingShare, setPendingShare] = useState(null);
 
   // Mobil Görünüm Sığdırma & Zoom State'leri
   const [isFitToScreen, setIsFitToScreen] = useState(true);
@@ -209,7 +210,25 @@ export default function ProformaDetail() {
       // KESİNLİKLE SIFIR LİNK: Sadece saygın, kurumsal bir mesaj
       const shareText = `Sayın Yetkili,\n\nIVECO ERC Samsun Otomotiv olarak firmanız (${customer?.company_name || 'Değerli Müşterimiz'}) için hazırladığımız ${proforma.vehicle_model} resmi bayi proforma faturamız ekte bilgilerinize sunulmuştur.\n\nİyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv A.Ş.*`;
 
-      // 1. PDF dosyasını kullanıcının cihazına (telefona / bilgisayara) hemen indir
+      // 1. Telefonda: PDF dosyasını doğrudan paylaş menüsüyle gönder (link YOK, sadece dosya + mesaj)
+      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        try {
+          await navigator.share({ files: [pdfFile], text: shareText });
+          toast.success('📄 Proforma paylaşıldı!', { id: 'pdf-share' });
+        } catch (shareErr) {
+          if (shareErr?.name === 'AbortError') {
+            toast('Paylaşım iptal edildi.', { id: 'pdf-share' });
+          } else {
+            // iPhone, PDF hazırlanırken geçen süre yüzünden ilk denemeyi engelleyebilir → tek dokunuşla paylaş butonu
+            setPendingShare({ file: pdfFile, text: shareText });
+            toast.success('📄 PDF hazır! Alttaki "WhatsApp\'ta Paylaş" butonuna dokunun.', { id: 'pdf-share', duration: 6000 });
+          }
+        }
+        return;
+      }
+
+      // 2. Masaüstü: PDF'i indir ve WhatsApp Web'i aç
       const downloadUrl = window.URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = downloadUrl;
@@ -219,7 +238,6 @@ export default function ProformaDetail() {
       document.body.removeChild(a);
       setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 3000);
 
-      // 2. WhatsApp'ı aç (navigator.share KESİNLİKLE kullanılmaz!)
       const wpUrl = recipientPhone
         ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(shareText)}`
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
@@ -321,6 +339,34 @@ export default function ProformaDetail() {
 
   return (
     <div className="animate-in pb-12">
+      {pendingShare && (
+        <div className="no-print" style={{ position: 'fixed', left: 12, right: 12, bottom: 'calc(16px + env(safe-area-inset-bottom))', zIndex: 9999, display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            onClick={async () => {
+              const ps = pendingShare;
+              try {
+                await navigator.share({ files: [ps.file], text: ps.text });
+                toast.success('📄 Proforma paylaşıldı!');
+              } catch (e) {
+                if (e?.name !== 'AbortError') toast.error('Paylaşım açılamadı, tekrar deneyin.');
+              } finally {
+                setPendingShare(null);
+              }
+            }}
+            style={{ flex: 1, padding: '16px', borderRadius: 14, border: 'none', background: '#25D366', color: '#fff', fontWeight: 800, fontSize: '1rem', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}
+          >
+            📤 PDF'i WhatsApp'ta Paylaş
+          </button>
+          <button
+            type="button"
+            onClick={() => setPendingShare(null)}
+            style={{ padding: '16px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.2)', background: '#1e293b', color: '#cbd5e1', fontWeight: 700 }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {/* ── AKSİYON BARI (MOBİL ÖNCELİKLİ & DESKTOP) ── */}
       <div className="no-print mb-3">
         {isMobile ? (
