@@ -380,19 +380,19 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               <div style={{
                 marginTop: '18px',
                 padding: '14px',
-                background: 'rgba(2, 6, 23, 0.7)',
+                background: 'rgba(18, 34, 60, 0.85)',
                 borderRadius: '10px',
-                border: '1px solid rgba(16, 185, 129, 0.35)',
+                border: '1px solid rgba(16, 185, 129, 0.42)',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                 gap: '12px',
                 fontSize: '0.76rem'
               }}>
-                <div><div style={{ color: '#64748b' }}>Seçili Paket</div><strong style={{ color: '#fff' }}>{activeEurPreset.title}</strong></div>
-                <div><div style={{ color: '#64748b' }}>Aylık Taksit</div><strong style={{ color: '#10b981', fontSize: '1.1rem' }}>€{activeEurPreset.monthly.toLocaleString('tr-TR')}</strong></div>
-                <div><div style={{ color: '#64748b' }}>Toplam Geri Ödeme</div><strong style={{ color: '#cbd5e1' }}>€{activeEurPreset.total.toLocaleString('tr-TR')}</strong></div>
-                <div><div style={{ color: '#64748b' }}>Oran</div><strong style={{ color: '#38bdf8' }}>{activeEurPreset.rateLabel}</strong></div>
-                <div style={{ gridColumn: '1 / -1', fontSize: '0.68rem', color: '#64748b' }}>
+                <div><div style={{ color: '#cbd5e1', fontWeight: 600 }}>Seçili Paket</div><strong style={{ color: '#fff' }}>{activeEurPreset.title}</strong></div>
+                <div><div style={{ color: '#cbd5e1', fontWeight: 600 }}>Aylık Taksit</div><strong style={{ color: '#10b981', fontSize: '1.1rem' }}>€{activeEurPreset.monthly.toLocaleString('tr-TR')}</strong></div>
+                <div><div style={{ color: '#cbd5e1', fontWeight: 600 }}>Toplam Geri Ödeme</div><strong style={{ color: '#f1f5f9' }}>€{activeEurPreset.total.toLocaleString('tr-TR')}</strong></div>
+                <div><div style={{ color: '#cbd5e1', fontWeight: 600 }}>Oran</div><strong style={{ color: '#38bdf8' }}>{activeEurPreset.rateLabel}</strong></div>
+                <div style={{ gridColumn: '1 / -1', fontSize: '0.70rem', color: '#94a3b8' }}>
                   Rakamlar {activeEurBank.name} resmi kampanya tablosundan alınmıştır. Kesin ödeme planı banka onayıyla netleşir.
                 </div>
               </div>
@@ -418,8 +418,8 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                     type="button"
                     onClick={() => setSelectedBankId(bank.id)}
                     style={{
-                      background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.4) 0%, rgba(15, 23, 42, 0.85) 100%)' : 'rgba(15, 23, 42, 0.65)',
-                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                      background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.45) 0%, rgba(28, 48, 80, 0.92) 100%)' : 'rgba(30, 52, 86, 0.82)',
+                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
                       borderRadius: '12px',
                       padding: '12px 14px',
                       textAlign: 'left',
@@ -442,10 +442,10 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                         {bank.badge}
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#f8fafc' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff' }}>
                       {bank.name}
                     </div>
-                    <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginTop: '4px', lineHeight: 1.3 }}>
+                    <div style={{ fontSize: '0.70rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
                       {bank.description}
                     </div>
                   </button>
@@ -456,17 +456,17 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
 
           {/* Selected Bank Highlight & Presets */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.9)',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
+            background: 'rgba(26, 44, 74, 0.92)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
             borderRadius: '16px',
             padding: '20px',
             marginBottom: '22px'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.12)', paddingBottom: '12px' }}>
               <div>
                 <span style={{ fontSize: '1.4rem', marginRight: '6px' }}>{activeBank.icon}</span>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc' }}>{activeBank.name} Kampanyaları</span>
-                <div style={{ fontSize: '0.76rem', color: '#38bdf8', marginTop: '2px' }}>{activeBank.description}</div>
+                <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>{activeBank.name} Kampanyaları</span>
+                <div style={{ fontSize: '0.76rem', color: '#7dd3fc', marginTop: '2px' }}>{activeBank.description}</div>
               </div>
 
               <button
@@ -509,9 +509,9 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                       type="button"
                       onClick={() => setSelectedVehicleCategory(cat.id)}
                       style={{
-                        background: isSel ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255, 255, 255, 0.05)',
-                        border: isSel ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: isSel ? '#fff' : '#cbd5e1',
+                        background: isSel ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'rgba(35, 58, 94, 0.85)',
+                        border: isSel ? '1px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
+                        color: isSel ? '#fff' : '#e2e8f0',
                         padding: '6px 12px',
                         borderRadius: '8px',
                         fontSize: '0.76rem',
@@ -540,9 +540,9 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                       type="button"
                       onClick={() => setCampaignTypeFilter(f.id)}
                       style={{
-                        background: isSel ? 'rgba(34, 197, 94, 0.25)' : 'transparent',
-                        border: isSel ? '1px solid #22c55e' : '1px solid rgba(255, 255, 255, 0.08)',
-                        color: isSel ? '#4ade80' : '#94a3b8',
+                        background: isSel ? 'rgba(34, 197, 94, 0.25)' : 'rgba(35, 58, 94, 0.7)',
+                        border: isSel ? '1px solid #22c55e' : '1px solid rgba(148, 163, 184, 0.22)',
+                        color: isSel ? '#4ade80' : '#cbd5e1',
                         padding: '4px 10px',
                         borderRadius: '6px',
                         fontSize: '0.70rem',
@@ -562,7 +562,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ marginBottom: '22px' }}>
                 <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 800, marginBottom: '8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span>📋 {activeBank.name} RESMİ KAMPANYA PAKETLERİ ({realCampaigns.length} SEÇENEK)</span>
-                  <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 600 }}>Tüm rakamlar resmi banka tablolarından alınmıştır</span>
+                  <span style={{ fontSize: '0.68rem', color: '#cbd5e1', fontWeight: 600 }}>Tüm rakamlar resmi banka tablolarından alınmıştır</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
                   {realCampaigns.map((camp, idx) => {
@@ -572,8 +572,8 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                       <div
                         key={camp.id || idx}
                         style={{
-                          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%)',
-                          border: isZero ? '1px solid rgba(16, 185, 129, 0.4)' : (isGrace ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'),
+                          background: 'linear-gradient(135deg, rgba(35, 58, 94, 0.9) 0%, rgba(25, 43, 72, 0.92) 100%)',
+                          border: isZero ? '1px solid rgba(16, 185, 129, 0.45)' : (isGrace ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(148, 163, 184, 0.24)'),
                           borderRadius: '12px',
                           padding: '12px 14px',
                           display: 'flex',
@@ -584,7 +584,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                       >
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
-                            <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#ffffff' }}>
                               {camp.title || `${(camp.principal || 0).toLocaleString('tr-TR')} TL — ${camp.term} Ay`}
                             </span>
                             {camp.tag && (
@@ -602,24 +602,24 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                             )}
                           </div>
                           {camp.desc && (
-                            <div style={{ fontSize: '0.70rem', color: '#94a3b8', marginBottom: '6px' }}>{camp.desc}</div>
+                            <div style={{ fontSize: '0.70rem', color: '#cbd5e1', marginBottom: '6px' }}>{camp.desc}</div>
                           )}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', background: 'rgba(2, 6, 23, 0.5)', padding: '8px', borderRadius: '8px', fontSize: '0.72rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', background: 'rgba(15, 28, 50, 0.6)', border: '1px solid rgba(148, 163, 184, 0.16)', padding: '8px', borderRadius: '8px', fontSize: '0.72rem' }}>
                             <div>
-                              <div style={{ color: '#64748b' }}>Kredi Tutarı:</div>
+                              <div style={{ color: '#cbd5e1', fontWeight: 600 }}>Kredi Tutarı:</div>
                               <strong style={{ color: '#fff' }}>{(camp.principal || 0).toLocaleString('tr-TR')} TL</strong>
                             </div>
                             <div>
-                              <div style={{ color: '#64748b' }}>Faiz / Kar Payı:</div>
+                              <div style={{ color: '#cbd5e1', fontWeight: 600 }}>Faiz / Kar Payı:</div>
                               <strong style={{ color: isZero ? '#4ade80' : '#38bdf8' }}>{camp.rateLabel || `%${camp.rate}`}</strong>
                             </div>
                             <div>
-                              <div style={{ color: '#64748b' }}>Aylık Taksit:</div>
+                              <div style={{ color: '#cbd5e1', fontWeight: 600 }}>Aylık Taksit:</div>
                               <strong style={{ color: '#4ade80', fontSize: '0.84rem' }}>{(camp.monthly || 0).toLocaleString('tr-TR')} TL</strong>
                             </div>
                             <div>
-                              <div style={{ color: '#64748b' }}>Toplam Ödeme:</div>
-                              <strong style={{ color: '#cbd5e1' }}>{(camp.total || (camp.monthly * camp.term) || 0).toLocaleString('tr-TR')} TL</strong>
+                              <div style={{ color: '#cbd5e1', fontWeight: 600 }}>Toplam Ödeme:</div>
+                              <strong style={{ color: '#f1f5f9' }}>{(camp.total || (camp.monthly * camp.term) || 0).toLocaleString('tr-TR')} TL</strong>
                             </div>
                           </div>
                         </div>

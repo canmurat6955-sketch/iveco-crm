@@ -185,12 +185,12 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ background: 'rgba(2, 6, 23, 0.8)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                    <th style={{ padding: '12px 16px', color: '#94a3b8', fontWeight: 700, width: '22%' }}>Özellik / Parametre</th>
-                    <th style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, width: '28%', background: 'rgba(2, 132, 199, 0.12)' }}>
+                  <tr style={{ background: 'rgba(15, 28, 50, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.16)' }}>
+                    <th style={{ padding: '12px 16px', color: '#f1f5f9', fontWeight: 800, width: '22%' }}>Özellik / Parametre</th>
+                    <th style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, width: '28%', background: 'rgba(2, 132, 199, 0.16)' }}>
                       IVECO Eurocargo MLC 150 E 21
                     </th>
-                    <th style={{ padding: '12px 16px', color: '#94a3b8', fontWeight: 700, width: '24%' }}>
+                    <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
                       Rakip M. 1518 / 42
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
@@ -288,19 +288,19 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     <tr
                       key={idx}
                       style={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-                        background: row.highlight ? 'rgba(2, 132, 199, 0.06)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent')
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: row.highlight ? 'rgba(2, 132, 199, 0.08)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.03)' : 'transparent')
                       }}
                     >
                       <td style={{ padding: '12px 16px', color: '#f8fafc', fontWeight: 700 }}>
                         {row.feature}
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.08)' }}>
+                      <td style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.1)' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                           <FiCheck color="#38bdf8" /> {row.iveco}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#94a3b8' }}>
+                      <td style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 600 }}>
                         {row.competitor}
                       </td>
                       <td style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 600 }}>
@@ -400,12 +400,12 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ background: 'rgba(2, 6, 23, 0.8)', borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
-                    <th style={{ padding: '12px 16px', color: '#94a3b8', fontWeight: 700, width: '22%' }}>Özellik / Parametre</th>
-                    <th style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, width: '28%', background: 'rgba(2, 132, 199, 0.12)' }}>
+                  <tr style={{ background: 'rgba(15, 28, 50, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.16)' }}>
+                    <th style={{ padding: '12px 16px', color: '#f1f5f9', fontWeight: 800, width: '22%' }}>Özellik / Parametre</th>
+                    <th style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, width: '28%', background: 'rgba(2, 132, 199, 0.16)' }}>
                       IVECO Eurocargo MLC 100 E 19
                     </th>
-                    <th style={{ padding: '12px 16px', color: '#94a3b8', fontWeight: 700, width: '24%' }}>
+                    <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
                       10T Rakip Kamyon
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
@@ -496,19 +496,19 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     <tr
                       key={idx}
                       style={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-                        background: row.highlight ? 'rgba(2, 132, 199, 0.06)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent')
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: row.highlight ? 'rgba(2, 132, 199, 0.08)' : (idx % 2 === 0 ? 'rgba(255, 255, 255, 0.03)' : 'transparent')
                       }}
                     >
                       <td style={{ padding: '12px 16px', color: '#f8fafc', fontWeight: 700 }}>
                         {row.feature}
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.08)' }}>
+                      <td style={{ padding: '12px 16px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.1)' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                           <FiCheck color="#38bdf8" /> {row.iveco}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#94a3b8' }}>
+                      <td style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 600 }}>
                         {row.competitor}
                       </td>
                       <td style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 600 }}>
@@ -528,8 +528,8 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Daily Design & TCO Comparison Grid */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.9)',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
+            background: 'rgba(15, 28, 50, 0.9)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
             borderRadius: '16px',
             padding: '20px'
           }}>
@@ -565,15 +565,15 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
             <div style={{ overflowX: 'auto', marginBottom: '20px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'center' }}>
                 <thead>
-                  <tr style={{ background: 'rgba(2, 6, 23, 0.9)', borderBottom: '1px solid rgba(255, 255, 255, 0.15)' }}>
-                    <th style={{ padding: '12px 14px', textAlign: 'left', color: '#94a3b8', width: '25%' }}>Teknik / Tasarım Donanımı</th>
-                    <th style={{ padding: '12px 14px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.15)', width: '15%' }}>
+                  <tr style={{ background: 'rgba(15, 28, 50, 0.9)', borderBottom: '1px solid rgba(255, 255, 255, 0.16)' }}>
+                    <th style={{ padding: '12px 14px', textAlign: 'left', color: '#f1f5f9', fontWeight: 800, width: '25%' }}>Teknik / Tasarım Donanımı</th>
+                    <th style={{ padding: '12px 14px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.16)', width: '15%' }}>
                       IVECO Daily
                     </th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip F.</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip Ft.</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip R.</th>
-                    <th style={{ padding: '12px 14px', color: '#cbd5e1', width: '15%' }}>Rakip O.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip F.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip Ft.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip R.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip O.</th>
                   </tr>
                 </thead>
                 <tbody>

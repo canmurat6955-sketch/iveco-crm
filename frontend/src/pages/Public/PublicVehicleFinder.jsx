@@ -3614,20 +3614,20 @@ IVECO ERC Samsun Otomotiv
                       📐 ŞASİYE UYGUN KASA BOYUTLARI:
                     </span>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center' }}>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>KASA BOYU</span>
+                      <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '8px', padding: '8px 4px' }}>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 600, display: 'block' }}>KASA BOYU</span>
                         <strong style={{ fontSize: '0.82rem', color: '#38bdf8' }}>{matched.dims.length}</strong>
                       </div>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.04)', borderRadius: '8px', padding: '8px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>KASA ENİ</span>
+                      <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '8px', padding: '8px 4px' }}>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 600, display: 'block' }}>KASA ENİ</span>
                         <strong style={{ fontSize: '0.82rem', color: '#38bdf8' }}>{matched.dims.width}</strong>
                       </div>
-                      <div style={{ background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', padding: '8px 4px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#10b981', display: 'block' }}>NET HACİM</span>
-                        <strong style={{ fontSize: '0.82rem', color: '#10b981' }}>{matched.dims.volume}</strong>
+                      <div style={{ background: 'rgba(16, 185, 129, 0.12)', borderRadius: '8px', padding: '8px 4px', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
+                        <span style={{ fontSize: '0.65rem', color: '#34d399', fontWeight: 600, display: 'block' }}>NET HACİM</span>
+                        <strong style={{ fontSize: '0.82rem', color: '#34d399' }}>{matched.dims.volume}</strong>
                       </div>
                     </div>
-                    <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
                       <span>Euro Palet Kapasitesi: <strong style={{ color: '#fff' }}>{matched.dims.pallets}</strong></span>
                       <span>Kasa Yüksekliği: <strong style={{ color: '#38bdf8' }}>{matched.dims.height}</strong></span>
                     </div>
@@ -3635,9 +3635,9 @@ IVECO ERC Samsun Otomotiv
 
                   {/* ⚖️ KANTAR KARNESİ & GÜVENLİK ANALİZİ */}
                   <div style={{
-                    background: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.12)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                    background: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.14)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.14)' : 'rgba(239, 68, 68, 0.14)',
                     border: '1px solid',
-                    borderColor: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.4)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.4)' : 'rgba(239, 68, 68, 0.4)',
+                    borderColor: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.45)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.45)' : 'rgba(239, 68, 68, 0.45)',
                     borderRadius: '12px',
                     padding: '12px 14px',
                     marginBottom: '14px'
@@ -3652,27 +3652,27 @@ IVECO ERC Samsun Otomotiv
                         {matched.kantarTitle}
                       </strong>
                     </div>
-                    <p style={{ margin: '0 0 10px', fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.4 }}>
+                    <p style={{ margin: '0 0 10px', fontSize: '0.74rem', color: '#e2e8f0', lineHeight: 1.4 }}>
                       {matched.kantarDesc}
                     </p>
 
                     {/* Ağırlık Dökümü */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', padding: '8px 10px', fontSize: '0.7rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', background: 'rgba(15, 28, 50, 0.55)', borderRadius: '8px', padding: '8px 10px', fontSize: '0.7rem' }}>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
+                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
                         <strong style={{ color: '#fff' }}>{matched.unladenWeight} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Kasa Ağırlığı:</span>
+                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Kasa Ağırlığı:</span>
                         <strong style={{ color: '#fff' }}>+{BODY_TYPES.find(b => b.id === selectedBody)?.tare || 650} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Yükünüz:</span>
+                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Yükünüz:</span>
                         <strong style={{ color: '#38bdf8' }}>+{payloadKg} kg</strong>
                       </div>
                       <div>
-                        <span style={{ color: '#64748b', display: 'block' }}>Kantar Sınırı:</span>
-                        <strong style={{ color: '#10b981' }}>{matched.kantarLimit} kg</strong>
+                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Kantar Sınırı:</span>
+                        <strong style={{ color: '#34d399' }}>{matched.kantarLimit} kg</strong>
                       </div>
                     </div>
                   </div>
@@ -5333,17 +5333,17 @@ IVECO ERC Samsun Otomotiv
         border: '1px solid rgba(255, 255, 255, 0.08)',
         borderRadius: '12px',
         textAlign: 'center',
-        color: '#64748b',
-        fontSize: '0.68rem',
+        color: '#cbd5e1',
+        fontSize: '0.70rem',
         lineHeight: 1.55
       }}>
-        <div style={{ color: '#94a3b8', fontWeight: 700, marginBottom: '6px', fontSize: '0.74rem' }}>
+        <div style={{ color: '#f1f5f9', fontWeight: 800, marginBottom: '6px', fontSize: '0.76rem' }}>
           IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş. • Yetkili Satıcı & Servis
         </div>
         <p style={{ margin: '0 0 6px' }}>
-          <strong style={{ color: '#cbd5e1' }}>⚖️ Yasal Bilgilendirme:</strong> Bu portalda sunulan araç fiyatları, teknik ölçüler, kasa tavsiyeleri ve banka finansman simülasyonları tavsiye edilen bilgilendirme niteliğinde olup kesin satış taahhüdü (icap) veya nihai proforma fatura teşkil etmez.
+          <strong style={{ color: '#38bdf8' }}>⚖️ Yasal Bilgilendirme:</strong> Bu portalda sunulan araç fiyatları, teknik ölçüler, kasa tavsiyeleri ve banka finansman simülasyonları tavsiye edilen bilgilendirme niteliğinde olup kesin satış taahhüdü (icap) veya nihai proforma fatura teşkil etmez.
         </p>
-        <p style={{ margin: 0, color: '#475569', fontSize: '0.65rem' }}>
+        <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.67rem' }}>
           Nihai araç teslim tarihi, anahtar teslim fiyatı, opsiyonel donanımlar ve resmi kredi onay şartları IVECO ERC Samsun Otomotiv ile düzenlenecek resmi satış sözleşmesiyle kesinlik kazanır. Fiyatlar ve stok durumu fabrika/distribütör koşullarına bağlı olarak değişkenlik gösterebilir.
         </p>
       </div>
