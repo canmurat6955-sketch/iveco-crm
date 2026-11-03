@@ -369,12 +369,34 @@ export default function PricingCatalogTab({ onSelectVehicle, onDirectWhatsApp, s
                   {vehicle.model}
                 </h3>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: isMobileView ? '0.78rem' : '0.72rem', color: '#cbd5e1', marginBottom: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: isMobileView ? '0.78rem' : '0.72rem', color: '#cbd5e1', marginBottom: '8px' }}>
                   <div>⚙️ <strong>Vites:</strong> {vehicle.transmission || 'Manuel'}</div>
                   <div>🐎 <strong>Motor:</strong> {vehicle.engine || '-'}</div>
                   <div>⚡ <strong>Güç:</strong> {vehicle.power ? vehicle.power.split('(')[1]?.replace(')', '') || vehicle.power : '-'}</div>
                   <div>📏 <strong>Dingil:</strong> {vehicle.wheelbase ? `${vehicle.wheelbase} mm` : '-'}</div>
                 </div>
+
+                {/* Uyumlu Kasa Boyu & Dingil Karşılığı */}
+                {vehicle.bodyLength && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)',
+                    borderRadius: '8px',
+                    padding: isMobileView ? '7px 10px' : '5px 8px',
+                    marginBottom: '10px',
+                    fontSize: isMobileView ? '0.78rem' : '0.71rem'
+                  }}>
+                    <span style={{ color: '#94a3b8', fontWeight: 700 }}>
+                      📦 Uyumlu Kasa Boyu:
+                    </span>
+                    <strong style={{ color: '#34d399', fontWeight: 900 }}>
+                      {vehicle.bodyLength}
+                    </strong>
+                  </div>
+                )}
 
                 {/* Stock Quota & Legal Payload Indicator */}
                 {!isMobileView && (

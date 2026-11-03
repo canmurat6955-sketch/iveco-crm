@@ -154,7 +154,8 @@ export default function ProformaQuick() {
           cashDiscount: v.cash_discount || v.cashDiscount,
           cashPrice: v.cash_price || v.cashPrice,
           eurPrice: v.eur_price || v.eurPrice,
-          autoTransmissionCost: v.auto_transmission_cost || v.autoTransmissionCost
+          autoTransmissionCost: v.auto_transmission_cost || v.autoTransmissionCost,
+          bodyLength: v.body_length || v.bodyLength || IVECO_PRICING_CATALOG.find(x => x.id === v.id)?.bodyLength
         }));
         setPricingCatalog(mapped);
       }
@@ -610,7 +611,7 @@ export default function ProformaQuick() {
                 </option>
                 {filteredCatalogVehicles.map(v => (
                   <option key={v.id} value={v.id}>
-                    [{v.segment}] {v.model} — {(v.isCustomPrice || v.segment === 'T-Way') ? 'Özel Fiyat (elle girilir)' : v.currency === 'EUR' ? `${Number(v.eurPrice || 0).toLocaleString('tr-TR')} €` : (v.dealerCost ? `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL` : `Peşin: ${(Number(v.cashPrice || 0) / 1000).toLocaleString('tr-TR')}k TL`)}
+                    [{v.segment}] {v.model}{v.bodyLength ? ` (${v.bodyLength})` : ''} — {(v.isCustomPrice || v.segment === 'T-Way') ? 'Özel Fiyat (elle girilir)' : v.currency === 'EUR' ? `${Number(v.eurPrice || 0).toLocaleString('tr-TR')} €` : (v.dealerCost ? `Maliyet: ${(v.dealerCost / 1000).toLocaleString('tr-TR')}k TL` : `Peşin: ${(Number(v.cashPrice || 0) / 1000).toLocaleString('tr-TR')}k TL`)}
                   </option>
                 ))}
               </select>

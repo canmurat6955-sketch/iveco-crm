@@ -2903,7 +2903,7 @@ IVECO ERC Samsun Otomotiv
                             {v.badge}
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '10px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(0,0,0,0.35)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '8px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
                             <div>
                               <span style={{ color: '#64748b', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>NET YÜK</span>
                               <strong style={{ color: '#fff', fontSize: isMobileView ? '0.88rem' : undefined }}>{(v.payloadKg / 1000).toFixed(1)} Ton</strong>
@@ -2916,6 +2916,36 @@ IVECO ERC Samsun Otomotiv
                               <span style={{ color: '#64748b', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>EHLİYET</span>
                               <strong style={{ color: '#e2e8f0', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.license.split(' ')[0]}</strong>
                             </div>
+                          </div>
+
+                          {/* 📏 DİNGİL MESAFESİ & UYUMLU KASA BOYU REHBERİ */}
+                          <div style={{
+                            background: 'rgba(56, 189, 248, 0.1)',
+                            border: '1px solid rgba(56, 189, 248, 0.28)',
+                            borderRadius: '8px',
+                            padding: isMobileView ? '8px 10px' : '6px 8px',
+                            marginBottom: '10px',
+                            fontSize: isMobileView ? '0.76rem' : '0.66rem',
+                            lineHeight: 1.35
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span style={{ color: '#94a3b8' }}>
+                                📏 Dingil: <strong style={{ color: '#f8fafc' }}>{v.wheelbase.split(' (')[0]}</strong>
+                              </span>
+                              <span style={{ color: '#38bdf8', fontWeight: 800 }}>
+                                📦 Uyumlu Kasa: {v.dims?.length ? v.dims.length.replace(' (Önerilen:', ' • Önerilen:').replace(')', '') : '-'}
+                              </span>
+                            </div>
+                            {(v.key === 'chassis_35s' || v.key === 'chassis_35c') && (
+                              <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed rgba(255,255,255,0.1)', color: '#cbd5e1', fontSize: isMobileView ? '0.71rem' : '0.62rem' }}>
+                                💡 <strong>3450 Dingil:</strong> 3.50–3.80m Kasa · <strong>3750 Dingil:</strong> 4.10–4.30m Kasa · <strong>4100 Dingil:</strong> 4.50–4.80m Kasa
+                              </div>
+                            )}
+                            {v.key === 'truck_72c' && (
+                              <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed rgba(255,255,255,0.1)', color: '#cbd5e1', fontSize: isMobileView ? '0.71rem' : '0.62rem' }}>
+                                💡 <strong>3750 Dingil:</strong> 4.20m Kasa · <strong>4350 Dingil:</strong> 5.20m Kasa · <strong>4750 Dingil:</strong> 5.80–6.20m Kasa
+                              </div>
+                            )}
                           </div>
 
                           {/* 🏷️ 2026 ARAÇ FİYATLANDIRMA ALANI */}
@@ -3300,8 +3330,12 @@ IVECO ERC Samsun Otomotiv
               <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
                 {matched.modelTitle}
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: '0 0 14px' }}>
-                Şasi: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong> · Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 14px', lineHeight: 1.45 }}>
+                📏 Dingil: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong>
+                {matched.dims?.length && (
+                  <> · 📦 Uyumlu Kasa Boyu: <strong style={{ color: '#34d399' }}>{matched.dims.length}</strong></>
+                )}
+                {' '}· Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
               </p>
 
               {/* 🏷️ 2026 RESMİ SATIŞ FİYATI & PEŞİN İNDİRİMİ */}
