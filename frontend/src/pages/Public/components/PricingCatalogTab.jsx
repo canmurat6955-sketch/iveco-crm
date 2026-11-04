@@ -171,8 +171,8 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
 
   return (
     <div style={{ color: '#f8fafc' }}>
-      {/* Tab Banner (Mobilde yalnızca özel bir kategori seçildiğinde gösterilir, tüm araçlarda tekrar etmez) */}
-      {(!isMobileView || selectedCategory !== 'all') && (
+      {/* Tab Banner (Yalnızca özel bir kategori seçildiğinde gösterilir, tüm araçlarda üst başlığı tekrar etmez) */}
+      {selectedCategory !== 'all' && (
         <div style={{
           background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%)',
           border: '1px solid rgba(56, 189, 248, 0.35)',
@@ -810,40 +810,6 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                     <strong style={{ color: '#4ade80', fontWeight: 900 }}>
                       {vehicle.bodyLength}
                     </strong>
-                  </div>
-                )}
-
-                {/* Stock Quota & Legal Payload Indicator */}
-                {!isMobileView && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: 'rgba(2, 132, 199, 0.12)',
-                    border: '1px solid rgba(56, 189, 248, 0.25)',
-                    borderRadius: '8px',
-                    padding: '5px 8px',
-                    marginBottom: '12px',
-                    fontSize: '0.67rem'
-                  }}>
-                    <span style={{ color: '#7dd3fc', fontWeight: 700 }}>
-                      🟢 2026 Kota: Hazır Teslim Şasi
-                    </span>
-                    {vehicle.segment === 'Daily 35' && (
-                      <span style={{ color: '#34d399', fontWeight: 700 }}>
-                        🛡️ B Ehliyet / Kantar Uyumu
-                      </span>
-                    )}
-                    {vehicle.segment === 'T-Way' && (
-                      <span style={{ color: '#fbbf24', fontWeight: 700 }}>
-                        🚜 Ağır Hizmet / Kaya Damperi
-                      </span>
-                    )}
-                    {vehicle.segment === 'S-Way' && (
-                      <span style={{ color: '#7dd3fc', fontWeight: 700 }}>
-                        🛣️ Uzun Yol Çekici
-                      </span>
-                    )}
                   </div>
                 )}
               </div>

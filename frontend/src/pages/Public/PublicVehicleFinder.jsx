@@ -697,7 +697,7 @@ export default function PublicVehicleFinder() {
   const [showAllLoansMobile, setShowAllLoansMobile] = useState(false);
 
   const [step, setStep] = useState(1);
-  const [selectorMode, setSelectorMode] = useState(modelParam ? 'catalog' : 'catalog');
+  const [selectorMode, setSelectorMode] = useState(modelParam ? 'catalog' : 'slider');
   const [selectedCategoryTab, setSelectedCategoryTab] = useState('all');
   const [selectedModelKey, setSelectedModelKey] = useState(modelParam || null);
   const [selectedSector, setSelectedSector] = useState(
@@ -4285,49 +4285,51 @@ IVECO ERC Samsun Otomotiv
           )}
         </div>
 
-            {/* Can Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
-              border: '1px solid #38bdf8',
-              borderRadius: '14px',
-              padding: '14px 16px',
-              marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '10px',
-              boxShadow: '0 4px 16px rgba(2, 132, 199, 0.2)'
-            }}>
-              <div>
-                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <FiShare2 size={16} color="#22c55e" /> Bu Teklifi Müşteriye WhatsApp'tan Gönder
+            {/* Can Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu (Yalnızca Admin Modunda) */}
+            {isAdminMode && (
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
+                border: '1px solid #38bdf8',
+                borderRadius: '14px',
+                padding: '14px 16px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
+                boxShadow: '0 4px 16px rgba(2, 132, 199, 0.2)'
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiShare2 size={16} color="#22c55e" /> Bu Teklifi Müşteriye WhatsApp'tan Gönder
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                    {matched.title} ({activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL Kredi` : ''}) için zengin görsel kartı ve kişiselleştirilmiş bağlantı.
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
-                  {matched.title} ({activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL Kredi` : ''}) için zengin görsel kartı ve kişiselleştirilmiş bağlantı.
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSendModal(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '9px 16px',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
+                  }}
+                >
+                  <FiShare2 size={14} /> Müşteriye Gönder (WhatsApp / QR)
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowSendModal(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '9px 16px',
-                  fontSize: '0.78rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
-                }}
-              >
-                <FiShare2 size={14} /> Müşteriye Gönder (WhatsApp / QR)
-              </button>
-            </div>
+            )}
 
             {/* ── İLETİŞİM & TEKLİF ALMA FORMU ──────────────────────── */}
             {!submitted ? (
@@ -5137,144 +5139,6 @@ IVECO ERC Samsun Otomotiv
 
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── SAĞ ALT YÜZEN HIZLI İLETİŞİM DOCK'U (CAN MURAT ONAY - YALNIZCA MASAÜSTÜ) ── */}
-      {!isMobileView && (
-        <div style={{
-          position: 'fixed',
-          bottom: '18px',
-          right: '18px',
-          zIndex: 9000,
-          display: 'flex',
-          alignItems: 'center',
-          background: 'rgba(15, 23, 42, 0.95)',
-          border: '1.5px solid #38bdf8',
-          borderRadius: '35px',
-          padding: '6px 12px 6px 8px',
-          boxShadow: '0 10px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3)',
-          backdropFilter: 'blur(12px)',
-          gap: '8px',
-          maxWidth: 'calc(100vw - 24px)',
-          flexWrap: 'nowrap'
-        }}>
-          {/* Avatar & İsim */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '12px',
-              boxShadow: '0 0 10px rgba(56, 189, 248, 0.5)'
-            }}>
-              {SALES_REP.initials}
-            </div>
-            <div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#f8fafc', lineHeight: 1.1 }}>
-                {SALES_REP.name}
-              </div>
-              <div style={{ fontSize: '0.64rem', color: '#38bdf8', fontWeight: 600 }}>
-                {SALES_REP.title} • {SALES_REP.phoneDisplay}
-              </div>
-            </div>
-          </div>
-
-          {/* 📞 Ara */}
-          <a
-            href={`tel:${SALES_REP.phoneClean}`}
-            style={{
-              background: '#0284c7',
-              color: '#fff',
-              borderRadius: '20px',
-              padding: '5px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap'
-            }}
-            title="Can Murat Onay'ı Ara"
-          >
-            <FiPhone size={12} /> Ara
-          </a>
-
-          {/* 💬 WhatsApp */}
-          <button
-            type="button"
-            onClick={handleDirectWhatsApp}
-            style={{
-              background: '#22c55e',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '20px',
-              padding: '5px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap'
-            }}
-            title="WhatsApp'tan Yaz"
-          >
-            <FiMessageSquare size={12} /> WhatsApp
-          </button>
-
-          {/* ✉️ Mail (Masaüstünde gösterilir) */}
-          <button
-            type="button"
-            className="hide-on-mobile"
-            onClick={handleDirectEmail}
-            style={{
-              background: 'rgba(56, 189, 248, 0.15)',
-              color: '#38bdf8',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
-              borderRadius: '20px',
-              padding: '5px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap'
-            }}
-            title="E-Posta Gönder"
-          >
-            <FiMail size={12} /> Mail
-          </button>
-
-          {/* 📇 Rehbere Kaydet (Masaüstünde gösterilir) */}
-          <button
-            type="button"
-            className="hide-on-mobile"
-            onClick={handleDownloadVCard}
-            style={{
-              background: 'rgba(245, 158, 11, 0.15)',
-              color: '#fbbf24',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              borderRadius: '20px',
-              padding: '5px 10px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap'
-            }}
-            title="Rehbere Kaydet (vCard)"
-          >
-            <FiDownload size={12} /> Rehbere Ekle
-          </button>
         </div>
       )}
 

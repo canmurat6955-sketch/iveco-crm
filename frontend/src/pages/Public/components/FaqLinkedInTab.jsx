@@ -77,7 +77,7 @@ const FAQ_ITEMS = [
 const FAQ_CATEGORIES = [
   { id: 'all', label: 'Tüm Sorular' },
   { id: 'ehliyet', label: 'Ehliyet & Kantar' },
-  { id: 'tek_vs_cift_teker', label: 'Tek vs Çift Teker' },
+  { id: 'model_secimi', label: 'Tek vs Çift Teker' },
   { id: 'ust_yapi', label: 'Üst Yapı (Kasa)' },
   { id: 'kredi', label: 'Kredi & Finansman' },
   { id: 'teslimat', label: 'Takas & Teslimat' },
@@ -108,7 +108,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
 
   const handleAskSpecificQuestion = (questionTitle) => {
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, LinkedIn / Müşteri Rehberinizdeki *"${questionTitle}"* konusu hakkında size danışmak ve şirketimize özel detaylı bilgi almak istiyorum.`;
+      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, Müşteri Rehberinizdeki *"${questionTitle}"* konusu hakkında size danışmak ve şirketimize özel detaylı bilgi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -130,10 +130,10 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
       }}>
         <div>
           <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
-            💼 LINKEDIN & DİJİTAL MÜŞTERİ BİLGİ MERKEZİ
+            💡 IVECO ERC SAMSUN — MÜŞTERİ BİLGİ & DANIŞMA MERKEZİ
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
-            Ticari Araç Alıcılarının Aklına Gelen 10 Kritik Soru & Yanıtları
+            Ticari Araç Alıcılarının En Çok Merak Ettiği 10 Soru & Yanıtları
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
             Ehliyetten kantara, çift teker mukavemetinden %0 faizli kredilere kadar tüm sorularınızın şeffaf yanıtları.
