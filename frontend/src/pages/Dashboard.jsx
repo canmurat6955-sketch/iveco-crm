@@ -4,10 +4,10 @@ import { dashboardApi, crmApi, vehiclesApi, workbenchApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
-import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle, FiTrash2, FiFileText } from 'react-icons/fi';
+import { FiUsers, FiStar, FiSearch, FiPhone, FiBell, FiFolder, FiTrendingUp, FiMapPin, FiCamera, FiMap, FiTruck, FiRefreshCw, FiMessageSquare, FiCalendar, FiArrowRight, FiZap, FiCheckCircle, FiTrash2, FiFileText, FiBarChart2, FiChevronDown, FiChevronUp, FiSend } from 'react-icons/fi';
 import { CityDonutChart, SectorBarChart, TrendAreaChart, PipelineFunnel, SegmentChart, ChartLegend, RegionMap } from '../components/Charts/AnalyticsCharts';
 import toast from 'react-hot-toast';
-import { getWhatsAppUrl } from '../utils/whatsapp';
+import { getWhatsAppUrl, sendCustomerVipPortalWhatsApp } from '../utils/whatsapp';
 import { getPublicOrigin } from '../utils/publicUrl';
 import { openExternal, buildWhatsAppUrl } from '../utils/openExternal';
 import WhatsAppActionModal from '../components/CRM/WhatsAppActionModal';
@@ -64,6 +64,7 @@ export default function Dashboard() {
   const [nearbyList, setNearbyList] = useState([]);
 
   const [loadError, setLoadError] = useState(false);
+  const [showAnalyticsCharts, setShowAnalyticsCharts] = useState(false);
 
   const { user } = useAuth();
   const isMobile = useDeviceDetect();
@@ -500,198 +501,8 @@ export default function Dashboard() {
         isMobile={false}
       />
 
-      {/* ── ARAÇ BAZLI SATIŞ PIPELINE (Canlı Talep Dağılımı) ── */}
-      {vehiclePipeline && (
-        <div className="card glass-card mt-6" style={{ border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <FiTruck style={{ color: '#c084fc' }} size={18} />
-              <h3 className="card-title" style={{ margin: 0 }}>ARAÇ BAZLI SATIŞ PIPELINE</h3>
-            </div>
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-              Toplam Aktif Talep: <strong style={{ color: '#f8fafc' }}>{vehiclePipeline.total_demand_count} Müşteri</strong>
-            </span>
-          </div>
-
-          <div style={{ padding: '1.25rem' }}>
-            {/* Group Summary Badges */}
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-              {Object.entries(vehiclePipeline.group_counts || {}).map(([grp, cnt]) => (
-                <div key={grp} style={{
-                  background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10
-                }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc' }}>{grp}</span>
-                  <span style={{ background: '#3b82f6', color: '#fff', padding: '2px 8px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 800 }}>
-                    {cnt} müşteri
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Detailed Model Breakdown Bars */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.85rem' }}>
-              {vehiclePipeline.breakdown?.slice(0, 8).map((b, i) => (
-                <div key={i} style={{
-                  background: 'var(--bg-input)', padding: '0.85rem 1rem', borderRadius: 8,
-                  border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column', gap: 6
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f8fafc' }}>
-                      {b.vehicle_group} {b.model_or_type}
-                    </span>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#60a5fa' }}>
-                      {b.customer_count} müşteri ({b.total_vehicle_count} adet)
-                    </span>
-                  </div>
-                  <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{
-                      width: `${Math.min(100, b.percentage * 2)}%`,
-                      height: '100%',
-                      background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
-                      borderRadius: 3
-                    }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filo Yaşam Döngüsü & Yenileme Radarı */}
-      <FleetRenewalRadarWidget onOpenWhatsApp={(item) => setWhatsAppModalData(item)} />
-
-      {/* Pipeline + Trend Row */}
-      <div className="dashboard-row-2 mt-6">
-
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title"><FiTrendingUp style={{ marginRight: 8 }} /> Satış Pipeline</h3>
-            <span className="text-xs text-muted">Toplam: {Object.values(summary?.pipeline || {}).reduce((a, b) => a + b, 0)}</span>
-          </div>
-          <PipelineFunnel data={summary?.pipeline || {}} />
-        </div>
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title">Aylık Müşteri Trendi</h3>
-          </div>
-          {analytics && <TrendAreaChart data={analytics.monthly_trend} />}
-        </div>
-      </div>
-
-      {/* Charts Row */}
-      <div className="dashboard-row-3">
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title">Şehir Dağılımı</h3>
-          </div>
-          {analytics && (
-            <>
-              <CityDonutChart data={analytics.city_distribution} />
-              <ChartLegend data={analytics.city_distribution} />
-            </>
-          )}
-        </div>
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title">Sektör Dağılımı</h3>
-          </div>
-          {analytics && <SectorBarChart data={analytics.sector_breakdown} />}
-        </div>
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title"><FiMapPin style={{ marginRight: 8 }} /> Bölge Haritası</h3>
-          </div>
-          <RegionMap data={geoData} />
-        </div>
-      </div>
-
-      {/* Segment + Source Row */}
-      {analytics && (
-        <div className="dashboard-row-2">
-          <div className="card glass-card">
-            <div className="card-header"><h3 className="card-title">Segment Dağılımı</h3></div>
-            <div className="flex items-center" style={{ gap: '2rem' }}>
-              <SegmentChart data={analytics.segment_distribution} />
-              <ChartLegend data={analytics.segment_distribution} colors={{ A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#cbd5e1' }} />
-            </div>
-          </div>
-          <div className="card glass-card">
-            <div className="card-header"><h3 className="card-title">Potansiyel Dağılımı</h3></div>
-            <div className="flex items-center" style={{ gap: '2rem' }}>
-              <SegmentChart data={analytics.potential_distribution} />
-              <ChartLegend data={analytics.potential_distribution} colors={{ very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#cbd5e1' }} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Fleet Renewal & Upcoming Reminders Row */}
-      <div className="dashboard-row-2" style={{ marginBottom: '1.5rem' }}>
-        {/* Filo Yenileme Fırsatları */}
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title">
-              <FiRefreshCw style={{ marginRight: 8, color: 'var(--accent-amber)' }} /> Filo Yenileme Fırsatları (≥3 Yaş)
-            </h3>
-            <span className="badge badge-amber">{renewalOpportunities.length} Araç</span>
-          </div>
-          {renewalOpportunities.length > 0 ? (
-            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
-              {renewalOpportunities.slice(0, 6).map((v, i) => (
-                <div key={i} className="list-item" onClick={() => navigate(`/customers/${v.customer_id}`)} style={{ cursor: 'pointer' }}>
-                  <div className="list-avatar" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
-                    <FiTruck size={16} />
-                  </div>
-                  <div className="list-item-content">
-                    <div className="list-item-title">{v.company_name} <span className="text-xs text-muted">({v.city || '—'})</span></div>
-                    <div className="list-item-subtitle">{v.brand} {v.model} {v.plate_number ? `[${v.plate_number}]` : ''} · Model: {v.model_year}</div>
-                  </div>
-                  <span className="badge badge-amber">{v.vehicle_age} Yaşında</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state"><p>Yenileme kriterine uyan araç kaydı bulunmuyor.</p></div>
-          )}
-        </div>
-
-        {/* Yaklaşan Bilgilendirmeler */}
-        <div className="card glass-card">
-          <div className="card-header">
-            <h3 className="card-title">
-              <FiBell style={{ marginRight: 8, color: 'var(--accent-purple)' }} /> Yaklaşan Müşteri Bilgilendirmeleri (14 Gün)
-            </h3>
-            <span className="badge badge-purple">{upcomingReminders.length} Bildirim</span>
-          </div>
-          {upcomingReminders.length > 0 ? (
-            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
-              {upcomingReminders.slice(0, 6).map((r, i) => (
-                <div key={i} className="list-item" onClick={() => navigate(`/customers/${r.customer_id}`)} style={{ cursor: 'pointer' }}>
-                  <div className="list-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>
-                    <FiCalendar size={16} />
-                  </div>
-                  <div className="list-item-content">
-                    <div className="list-item-title">{r.company_name}</div>
-                    <div className="list-item-subtitle">{r.title} · <span style={{ color: 'var(--accent-blue-light)' }}>{r.reminder_date}</span></div>
-                  </div>
-                  {r.is_overdue ? (
-                    <span className="badge badge-red">Gecikti</span>
-                  ) : (
-                    <span className="badge badge-purple">Yakında</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state"><p>Önümüzdeki 14 gün için planlanan hatırlatıcı yok.</p></div>
-          )}
-        </div>
-      </div>
-
-      {/* Action Lists Row */}
-      <div className="dashboard-row-3">
+      {/* ── GÜNLÜK AKSİYON LİSTELERİ (Bugün Aranacak, Yeni Keşifler, Yüksek Potansiyel) ── */}
+      <div className="dashboard-row-3 mt-6">
         {/* Bugün Aranacaklar */}
         <div className="card glass-card">
           <div className="card-header">
@@ -707,30 +518,49 @@ export default function Dashboard() {
                   <div className="list-item-subtitle">{c.city} · {c.phone || 'Tel yok'}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 {c.phone && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setWhatsAppModalData({
-                        customer: {
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sendCustomerVipPortalWhatsApp({
                           id: c.customer_id,
                           company_name: c.customer_name,
                           phone: c.phone,
                           city: c.city
-                        },
-                        vehicleTitle: '',
-                        interestId: null,
-                        defaultStatus: 'offer_given'
-                      });
-                    }}
-                    className="btn btn-sm btn-success"
-                    style={{ padding: '3px 8px', fontSize: '0.72rem', background: '#25d366', borderColor: '#25d366', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                    title="WhatsApp & Kayıt"
-                  >
-                    <FiMessageSquare size={12} /> WA
-                  </button>
+                        }, { onSuccess: loadDashboard });
+                      }}
+                      className="btn btn-sm"
+                      style={{ padding: '3px 7px', fontSize: '0.70rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.35)', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700 }}
+                      title="Sektöre Özel VIP Portal Linki Gönder"
+                    >
+                      <FiSend size={11} /> VIP Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWhatsAppModalData({
+                          customer: {
+                            id: c.customer_id,
+                            company_name: c.customer_name,
+                            phone: c.phone,
+                            city: c.city
+                          },
+                          vehicleTitle: '',
+                          interestId: null,
+                          defaultStatus: 'offer_given'
+                        });
+                      }}
+                      className="btn btn-sm btn-success"
+                      style={{ padding: '3px 8px', fontSize: '0.72rem', background: '#25d366', borderColor: '#25d366', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      title="WhatsApp & Kayıt"
+                    >
+                      <FiMessageSquare size={12} /> WA
+                    </button>
+                  </>
                 )}
                 <span className="badge badge-amber">{c.status}</span>
               </div>
@@ -774,6 +604,250 @@ export default function Dashboard() {
             </div>
           )) : <div className="empty-state"><p>Zenginleştirme yapılmamış</p></div>}
         </div>
+      </div>
+
+      {/* ── HATIRLATICILAR & FİLO YENİLEME FIRSATLARI ── */}
+      <div className="dashboard-row-2" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+        {/* Yaklaşan Bilgilendirmeler */}
+        <div className="card glass-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FiBell style={{ marginRight: 8, color: 'var(--accent-purple)' }} /> Yaklaşan Müşteri Bilgilendirmeleri (14 Gün)
+            </h3>
+            <span className="badge badge-purple">{upcomingReminders.length} Bildirim</span>
+          </div>
+          {upcomingReminders.length > 0 ? (
+            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
+              {upcomingReminders.slice(0, 6).map((r, i) => (
+                <div key={i} className="list-item" onClick={() => navigate(`/customers/${r.customer_id}`)} style={{ cursor: 'pointer' }}>
+                  <div className="list-avatar" style={{ background: 'var(--accent-purple-glow)', color: 'var(--accent-purple)' }}>
+                    <FiCalendar size={16} />
+                  </div>
+                  <div className="list-item-content">
+                    <div className="list-item-title">{r.company_name}</div>
+                    <div className="list-item-subtitle">{r.title} · <span style={{ color: 'var(--accent-blue-light)' }}>{r.reminder_date}</span></div>
+                  </div>
+                  {r.is_overdue ? (
+                    <span className="badge badge-red">Gecikti</span>
+                  ) : (
+                    <span className="badge badge-purple">Yakında</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state"><p>Önümüzdeki 14 gün için planlanan hatırlatıcı yok.</p></div>
+          )}
+        </div>
+
+        {/* Filo Yenileme Fırsatları */}
+        <div className="card glass-card">
+          <div className="card-header">
+            <h3 className="card-title">
+              <FiRefreshCw style={{ marginRight: 8, color: 'var(--accent-amber)' }} /> Filo Yenileme Fırsatları (≥3 Yaş)
+            </h3>
+            <span className="badge badge-amber">{renewalOpportunities.length} Araç</span>
+          </div>
+          {renewalOpportunities.length > 0 ? (
+            <div className="custom-table-wrapper" style={{ maxHeight: 260, overflowY: 'auto' }}>
+              {renewalOpportunities.slice(0, 6).map((v, i) => (
+                <div key={i} className="list-item" onClick={() => navigate(`/customers/${v.customer_id}`)} style={{ cursor: 'pointer' }}>
+                  <div className="list-avatar" style={{ background: 'var(--accent-amber-glow)', color: 'var(--accent-amber)' }}>
+                    <FiTruck size={16} />
+                  </div>
+                  <div className="list-item-content">
+                    <div className="list-item-title">{v.company_name} <span className="text-xs text-muted">({v.city || '—'})</span></div>
+                    <div className="list-item-subtitle">{v.brand} {v.model} {v.plate_number ? `[${v.plate_number}]` : ''} · Model: {v.model_year}</div>
+                  </div>
+                  <span className="badge badge-amber">{v.vehicle_age} Yaşında</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state"><p>Yenileme kriterine uyan araç kaydı bulunmuyor.</p></div>
+          )}
+        </div>
+      </div>
+
+      {/* Filo Yaşam Döngüsü & Yenileme Radarı */}
+      <FleetRenewalRadarWidget onOpenWhatsApp={(item) => setWhatsAppModalData(item)} />
+
+      {/* ── AÇILIR/KAPANIR BÖLGE İSTATİSTİKLERİ & ANALİZ GRAFİKLERİ ── */}
+      <div className="mt-6" style={{ marginBottom: '1.5rem' }}>
+        <button
+          type="button"
+          onClick={() => setShowAnalyticsCharts(prev => !prev)}
+          style={{
+            width: '100%',
+            background: showAnalyticsCharts
+              ? 'linear-gradient(135deg, rgba(30, 58, 138, 0.65) 0%, rgba(15, 23, 42, 0.9) 100%)'
+              : 'rgba(15, 23, 42, 0.78)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '12px',
+            padding: '14px 20px',
+            color: '#f8fafc',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <FiBarChart2 size={18} color="#38bdf8" />
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#ffffff' }}>
+                Bölge İstatistikleri, Araç Pipeline & Analiz Grafikleri
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                Şehir/sektör dağılımı, araç bazlı talep grafikleri ve bölge haritasını incelemek için tıklayın
+              </div>
+            </div>
+          </div>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(56, 189, 248, 0.15)',
+            color: '#38bdf8',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            fontSize: '0.78rem',
+            fontWeight: 800
+          }}>
+            {showAnalyticsCharts ? (
+              <><FiChevronUp size={15} /> Grafikleri Gizle</>
+            ) : (
+              <><FiChevronDown size={15} /> Grafikleri Göster</>
+            )}
+          </span>
+        </button>
+
+        {showAnalyticsCharts && (
+          <div style={{ marginTop: '1rem' }}>
+            {/* ── ARAÇ BAZLI SATIŞ PIPELINE (Canlı Talep Dağılımı) ── */}
+            {vehiclePipeline && (
+              <div className="card glass-card" style={{ border: '1px solid rgba(139, 92, 246, 0.25)', marginBottom: '1.25rem' }}>
+                <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <FiTruck style={{ color: '#c084fc' }} size={18} />
+                    <h3 className="card-title" style={{ margin: 0 }}>ARAÇ BAZLI SATIŞ PIPELINE</h3>
+                  </div>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                    Toplam Aktif Talep: <strong style={{ color: '#f8fafc' }}>{vehiclePipeline.total_demand_count} Müşteri</strong>
+                  </span>
+                </div>
+
+                <div style={{ padding: '1.25rem' }}>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                    {Object.entries(vehiclePipeline.group_counts || {}).map(([grp, cnt]) => (
+                      <div key={grp} style={{
+                        background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: 8, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10
+                      }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc' }}>{grp}</span>
+                        <span style={{ background: '#3b82f6', color: '#fff', padding: '2px 8px', borderRadius: 12, fontSize: '0.75rem', fontWeight: 800 }}>
+                          {cnt} müşteri
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.85rem' }}>
+                    {vehiclePipeline.breakdown?.slice(0, 8).map((b, i) => (
+                      <div key={i} style={{
+                        background: 'var(--bg-input)', padding: '0.85rem 1rem', borderRadius: 8,
+                        border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', flexDirection: 'column', gap: 6
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f8fafc' }}>
+                            {b.vehicle_group} {b.model_or_type}
+                          </span>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#60a5fa' }}>
+                            {b.customer_count} müşteri ({b.total_vehicle_count} adet)
+                          </span>
+                        </div>
+                        <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{
+                            width: `${Math.min(100, b.percentage * 2)}%`,
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                            borderRadius: 3
+                          }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Pipeline + Trend Row */}
+            <div className="dashboard-row-2">
+              <div className="card glass-card">
+                <div className="card-header">
+                  <h3 className="card-title"><FiTrendingUp style={{ marginRight: 8 }} /> Satış Pipeline</h3>
+                  <span className="text-xs text-muted">Toplam: {Object.values(summary?.pipeline || {}).reduce((a, b) => a + b, 0)}</span>
+                </div>
+                <PipelineFunnel data={summary?.pipeline || {}} />
+              </div>
+              <div className="card glass-card">
+                <div className="card-header">
+                  <h3 className="card-title">Aylık Müşteri Trendi</h3>
+                </div>
+                {analytics && <TrendAreaChart data={analytics.monthly_trend} />}
+              </div>
+            </div>
+
+            {/* Charts Row */}
+            <div className="dashboard-row-3">
+              <div className="card glass-card">
+                <div className="card-header">
+                  <h3 className="card-title">Şehir Dağılımı</h3>
+                </div>
+                {analytics && (
+                  <>
+                    <CityDonutChart data={analytics.city_distribution} />
+                    <ChartLegend data={analytics.city_distribution} />
+                  </>
+                )}
+              </div>
+              <div className="card glass-card">
+                <div className="card-header">
+                  <h3 className="card-title">Sektör Dağılımı</h3>
+                </div>
+                {analytics && <SectorBarChart data={analytics.sector_breakdown} />}
+              </div>
+              <div className="card glass-card">
+                <div className="card-header">
+                  <h3 className="card-title"><FiMapPin style={{ marginRight: 8 }} /> Bölge Haritası</h3>
+                </div>
+                <RegionMap data={geoData} />
+              </div>
+            </div>
+
+            {/* Segment + Source Row */}
+            {analytics && (
+              <div className="dashboard-row-2">
+                <div className="card glass-card">
+                  <div className="card-header"><h3 className="card-title">Segment Dağılımı</h3></div>
+                  <div className="flex items-center" style={{ gap: '2rem' }}>
+                    <SegmentChart data={analytics.segment_distribution} />
+                    <ChartLegend data={analytics.segment_distribution} colors={{ A: '#10b981', B: '#2b7de9', C: '#f59e0b', D: '#ef4444', Belirlenmedi: '#cbd5e1' }} />
+                  </div>
+                </div>
+                <div className="card glass-card">
+                  <div className="card-header"><h3 className="card-title">Potansiyel Dağılımı</h3></div>
+                  <div className="flex items-center" style={{ gap: '2rem' }}>
+                    <SegmentChart data={analytics.potential_distribution} />
+                    <ChartLegend data={analytics.potential_distribution} colors={{ very_high: '#10b981', high: '#2b7de9', medium: '#f59e0b', low: '#ef4444', Belirlenmedi: '#cbd5e1' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* WhatsApp Teklif & Görüşme Modalı (Desktop) */}

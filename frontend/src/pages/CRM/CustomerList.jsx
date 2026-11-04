@@ -5,9 +5,9 @@ import toast from 'react-hot-toast';
 import { 
   FiDownload, FiPlus, FiTrash2, FiCheckSquare, FiSquare, FiGitMerge, 
   FiUsers, FiZap, FiTruck, FiPhone, FiMessageSquare, FiNavigation, FiMapPin, FiChevronRight,
-  FiCamera
+  FiCamera, FiSend, FiFileText
 } from 'react-icons/fi';
-import { openWhatsApp } from '../../utils/whatsapp';
+import { openWhatsApp, sendCustomerVipPortalWhatsApp } from '../../utils/whatsapp';
 import VehicleAISearchModal from '../../components/Search/VehicleAISearchModal';
 
 const SEGMENTS = { A: 'badge-green', B: 'badge-blue', C: 'badge-amber', D: 'badge-red' };
@@ -487,8 +487,8 @@ export default function CustomerList() {
                 {/* Mobile Quick Action Strip */}
                 <div
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: c.phone ? '1fr 1fr 1fr auto' : '1fr auto',
+                    display: 'flex',
+                    flexWrap: 'wrap',
                     gap: 6,
                     marginTop: 12,
                     paddingTop: 10,
@@ -503,6 +503,7 @@ export default function CustomerList() {
                       data-customer-name={c.company_name}
                       className="btn btn-xs"
                       style={{
+                        flex: '1 1 70px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -522,8 +523,31 @@ export default function CustomerList() {
                     <button
                       type="button"
                       className="btn btn-xs"
+                      onClick={() => sendCustomerVipPortalWhatsApp(c)}
+                      style={{
+                        flex: '1 1 90px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        background: 'rgba(56, 189, 248, 0.16)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        fontWeight: 800
+                      }}
+                      title="Müşterinin sektörüne göre süzülmüş VIP 2026 Fiyat & Kredi Portalı linkini gönder"
+                    >
+                      <FiSend size={12} /> VIP Link
+                    </button>
+                  )}
+
+                  {c.phone && (
+                    <button
+                      type="button"
+                      className="btn btn-xs"
                       onClick={() => openWhatsApp(c.phone, '', { customer: c })}
                       style={{
+                        flex: '1 1 65px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -537,6 +561,25 @@ export default function CustomerList() {
                       <FiMessageSquare size={13} /> WA
                     </button>
                   )}
+
+                  <button
+                    type="button"
+                    className="btn btn-xs"
+                    onClick={() => navigate('/proforma/quick', { state: { customer: c } })}
+                    style={{
+                      flex: '1 1 75px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      background: 'rgba(245, 158, 11, 0.15)',
+                      color: '#fbbf24',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      fontWeight: 700
+                    }}
+                  >
+                    <FiFileText size={12} /> Proforma
+                  </button>
 
                   <a
                     href={navUrl}
@@ -552,10 +595,11 @@ export default function CustomerList() {
                       color: '#c084fc',
                       border: '1px solid rgba(139, 92, 246, 0.3)',
                       textDecoration: 'none',
-                      fontWeight: 600
+                      fontWeight: 600,
+                      padding: '0 8px'
                     }}
                   >
-                    <FiNavigation size={13} /> Rota
+                    <FiNavigation size={13} />
                   </a>
 
                   <button
@@ -585,7 +629,7 @@ export default function CustomerList() {
               </th>
               <th>Firma Adı</th><th>Şehir</th><th>Sektör</th><th className="hide-on-mobile">Telefon</th>
               <th>Segment</th><th className="hide-on-mobile">Öncelik</th><th>Aşama</th><th className="hide-on-mobile">Skor</th><th className="hide-on-mobile">Kaynak</th>
-              <th style={{ width: 50 }}></th>
+              <th style={{ width: 170 }}>Hızlı Aksiyon</th>
             </tr>
           </thead>
           <tbody>
@@ -670,7 +714,34 @@ export default function CustomerList() {
                 </td>
                 <td className="hide-on-mobile"><span className="badge badge-blue">{c.source}</span></td>
                 <td onClick={e => e.stopPropagation()}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    {c.phone && (
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          sendCustomerVipPortalWhatsApp(c);
+                        }}
+                        title="Sektöre Özel VIP 2026 Fiyat & Kredi Portalı Linki Gönder"
+                        style={{
+                          background: 'rgba(56, 189, 248, 0.14)',
+                          border: '1px solid rgba(56, 189, 248, 0.35)',
+                          color: '#38bdf8',
+                          cursor: 'pointer',
+                          padding: '3px 7px',
+                          borderRadius: 4,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        <FiSend size={11} />
+                        <span>VIP Link</span>
+                      </button>
+                    )}
                     {c.phone && (
                       <button
                         type="button"
@@ -689,17 +760,40 @@ export default function CustomerList() {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: 4,
-                          fontSize: '0.74rem',
+                          fontSize: '0.72rem',
                           fontWeight: 700,
                           transition: 'all 0.2s'
                         }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(37, 211, 102, 0.25)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(37, 211, 102, 0.12)'}
                       >
-                        <FiMessageSquare size={13} />
+                        <FiMessageSquare size={12} />
                         <span>WA</span>
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        navigate('/proforma/quick', { state: { customer: c } });
+                      }}
+                      title="Bu Müşteri İçin Hızlı Proforma Hazırla"
+                      style={{
+                        background: 'rgba(245, 158, 11, 0.12)',
+                        border: '1px solid rgba(245, 158, 11, 0.3)',
+                        color: '#fbbf24',
+                        cursor: 'pointer',
+                        padding: '3px 6px',
+                        borderRadius: 4,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        fontSize: '0.72rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      <FiFileText size={12} />
+                    </button>
                     <button onClick={e => deleteSingle(c.id, c.company_name, e)} title="Sil"
                       style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4, borderRadius: 4, transition: 'color 0.2s' }}
                       onMouseEnter={e => e.target.style.color = '#ef4444'}

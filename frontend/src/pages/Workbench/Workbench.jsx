@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import {
   FiPhone, FiMessageCircle, FiCheckCircle, FiClock, FiAlertCircle,
   FiEdit2, FiTrash2, FiSearch, FiFilter, FiRefreshCw, FiLayers,
-  FiChevronRight, FiCheck, FiArrowRight, FiUserCheck, FiUsers
+  FiChevronRight, FiCheck, FiArrowRight, FiUserCheck, FiUsers,
+  FiSend, FiFileText
 } from 'react-icons/fi';
 import { workbenchApi } from '../../api/client';
 import { useWhatsApp } from '../../contexts/WhatsAppContext';
 import { useCall } from '../../contexts/CallContext';
+import { sendCustomerVipPortalWhatsApp } from '../../utils/whatsapp';
 
 export default function Workbench() {
   const [activeTab, setActiveTab] = useState('today'); // 'today' | 'missing_phone' | 'name_cleanup' | 'duplicates'
@@ -825,14 +827,14 @@ function renderCallCard(c, onRefresh, openWhatsAppModal, openCallModal) {
       </div>
 
       {/* Aksiyon Butonları */}
-      <div style={{ display: 'flex', gap: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         {c.phone && (
           <a
             href={`tel:${c.phone}`}
             data-customer-id={c.id}
             data-customer-name={c.company_name}
             style={{
-              flex: 1, padding: '8px 10px', borderRadius: '6px', background: '#0284c7',
+              flex: 1, minWidth: '64px', padding: '7px 8px', borderRadius: '6px', background: '#0284c7',
               color: '#fff', fontSize: '12px', fontWeight: 600, textDecoration: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px'
             }}
@@ -843,21 +845,52 @@ function renderCallCard(c, onRefresh, openWhatsAppModal, openCallModal) {
 
         {c.phone && (
           <button
-            onClick={() => openWhatsAppModal({ customer: c, onSuccess: onRefresh })}
+            onClick={() => sendCustomerVipPortalWhatsApp(c, { onSuccess: onRefresh })}
+            title="Sektörüne Özel VIP 2026 Fiyat & Kredi Portalı Linkini WhatsApp'tan Gönder"
             style={{
-              padding: '8px 12px', borderRadius: '6px', background: '#22c55e', border: 'none',
+              padding: '7px 10px', borderRadius: '6px',
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.35))',
+              border: '1px solid rgba(16,185,129,0.45)',
+              color: '#34d399', fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '4px'
+            }}
+          >
+            <FiSend size={12} /> VIP Link
+          </button>
+        )}
+
+        {c.phone && (
+          <button
+            onClick={() => openWhatsAppModal({ customer: c, onSuccess: onRefresh })}
+            title="Şablonlu WhatsApp Mesajı Gönder"
+            style={{
+              padding: '7px 10px', borderRadius: '6px', background: '#22c55e', border: 'none',
               color: '#fff', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: '4px'
             }}
           >
-            <FiMessageCircle size={14} /> WA
+            <FiMessageCircle size={13} /> WA
           </button>
         )}
+
+        <Link
+          to="/proforma/quick"
+          state={{ customer: c }}
+          title="Bu Müşteri İçin Tek Tıkla Hızlı Proforma Hazırla"
+          style={{
+            padding: '7px 10px', borderRadius: '6px',
+            background: 'rgba(59,130,246,0.14)', border: '1px solid rgba(59,130,246,0.35)',
+            color: '#60a5fa', fontSize: '12px', fontWeight: 600, textDecoration: 'none',
+            display: 'flex', alignItems: 'center', gap: '4px'
+          }}
+        >
+          <FiFileText size={12} /> Teklif
+        </Link>
 
         <button
           onClick={() => openCallModal({ customer: c, onSuccess: onRefresh })}
           style={{
-            padding: '8px 10px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)',
+            padding: '7px 10px', borderRadius: '6px', background: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.15)', color: '#f8fafc', fontSize: '12px',
             fontWeight: 600, cursor: 'pointer'
           }}
