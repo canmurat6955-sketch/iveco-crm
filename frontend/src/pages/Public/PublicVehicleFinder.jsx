@@ -41,7 +41,7 @@ import TcoCompetitorTab from './components/TcoCompetitorTab';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
-  name: 'Can Murat Onay',
+  name: 'Can M.',
   title: 'Satış Sorumlusu',
   dealership: 'IVECO ERC Samsun Otomotiv',
   dealershipShort: 'IVECO ERC Samsun',
@@ -50,7 +50,7 @@ const SALES_REP = {
   phoneWhatsapp: '905446225931',
   email: 'murat.onay@ercsamsunotomotiv.com',
   city: 'Samsun',
-  initials: 'CMO'
+  initials: 'CM'
 };
 
 // Sektör Seçenekleri
@@ -501,9 +501,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
     pdfName: 'Teknik Foy_T-Way_AD380T54_Rigid_6x4_Tipper.pdf',
-    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    priceRange: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     isTway: true,
-    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -534,9 +534,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad380t54-tipper.pdf',
     pdfName: 'T-WAY AD 380T 46 6x4 HAFRİYAT TEKNİK FÖY.pdf',
-    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    priceRange: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     isTway: true,
-    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -567,9 +567,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad410t54-tipper.pdf',
     pdfName: 'Teknik Foy_T-Way_AD410T54_Rigid_8x4_Tipper.pdf',
-    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    priceRange: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     isTway: true,
-    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -600,9 +600,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad410t46b-mixer.pdf',
     pdfName: 'Teknik Foy_TW_Rigid_8x4_AD410T46.pdf',
-    priceRange: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    priceRange: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     isTway: true,
-    consultPrompt: "Fiyatlandırma için Can Murat'a Danışabilirsiniz",
+    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün",
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -1444,7 +1444,7 @@ export default function PublicVehicleFinder() {
     try {
       await discoveryApi.recordIntentSignal(leadPayload);
       setSubmitted(true);
-      toast.success('Talebiniz alındı! Satış Sorumlumuz Can Murat Onay en kısa sürede sizinle iletişime geçecektir.');
+      toast.success('Talebiniz alındı! Satış Sorumlusu Can M. en kısa sürede sizinle iletişime geçecektir.');
     } catch (err) {
       console.error(err);
       toast.error('Kayıt alınırken bir sorun oluştu, lütfen doğrudan WhatsApp üzerinden iletişime geçin.');
@@ -1453,7 +1453,7 @@ export default function PublicVehicleFinder() {
     }
   };
 
-  // Doğrudan WhatsApp Aç (Can Murat Onay - Satış Sorumlusu)
+  // Doğrudan WhatsApp Aç (Can M. - Satış Sorumlusu)
   const handleDirectWhatsApp = (customMsg) => {
     const cleanPhone = SALES_REP.phoneWhatsapp;
     if (typeof customMsg === 'string' && customMsg.trim()) {
@@ -1461,8 +1461,8 @@ export default function PublicVehicleFinder() {
       return;
     }
     const clientGreeting = (customerCompany || customerName)
-      ? `Merhaba Can Murat Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`
-      : `Merhaba Can Murat Bey, paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`;
+      ? `Merhaba Can Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`
+      : `Merhaba Can Bey, paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`;
 
     const priceText = matched.isTway
       ? `*Fiyatlandırma:* T-Way Şantiye & Ağır Hizmet Özel Fiyatı\n`
@@ -1496,13 +1496,13 @@ export default function PublicVehicleFinder() {
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  // Can Murat Onay Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
+  // Satış Sorumlusu Can M. Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
   const handleDownloadVCard = () => {
     const vcard = 
 `BEGIN:VCARD
 VERSION:3.0
-N:Onay;Can Murat;;;
-FN:Can Murat Onay
+N:M.;Can;;;
+FN:Satış Sorumlusu Can M. (IVECO ERC)
 ORG:IVECO ERC Samsun Otomotiv
 TITLE:Satış Sorumlusu
 TEL;TYPE=CELL,VOICE;VALUE=uri:tel:+905446225931
@@ -1514,17 +1514,17 @@ END:VCARD`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'Can_Murat_Onay_IVECO_ERC.vcf');
+    link.setAttribute('download', 'IVECO_ERC_Satis_Sorumlusu_Can_M.vcf');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('📇 Can Murat Onay dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
+    toast.success('📇 Satış Sorumlusu Can M. dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
   };
 
   // Doğrudan E-Posta Gönderme
   const handleDirectEmail = () => {
     const subject = `IVECO Araç & Finansman Teklifi Talebi — ${customerCompany || customerName || 'Ticari Müşteri'}`;
-    const body = `Merhaba Can Murat Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
+    const body = `Merhaba Can Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
       `Seçilen Model: ${matched.modelTitle}\n` +
       `Yük İhtiyacı: ${payloadKg} kg (${matched.kantarTitle})\n` +
       `Finansman: ${currentBankMeta.name} — ${activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL (${activeCampaign.term} Ay)` : 'Resmi Kredi'}\n\n` +
@@ -1558,7 +1558,7 @@ END:VCARD`;
     }
   };
 
-  // VIP Test Paneli Fonksiyonları (Can Murat Onay - Satış Sorumlusu)
+  // VIP Test Paneli Fonksiyonları (Can M. - Satış Sorumlusu)
   const handleApplyPreset = (type) => {
     if (type === 'panelvan_12') {
       handleSelectVehicle('panelvan_12');
@@ -1617,7 +1617,7 @@ END:VCARD`;
   const handleCopyVipWhatsAppTemplate = () => {
     const link = getGeneratedVipLink(false);
     const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
-    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nSatış Sorumlusu Can M.\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
@@ -1644,7 +1644,7 @@ IVECO ERC Samsun Otomotiv olarak hazırladığımız dijital müşteri ve bilgi 
 Aşağıdaki bağlantıdan doğrudan inceleyebilir, aklınıza takılan her konuyu bana sorabilirsiniz:
 👉 ${link}
 
-📞 İletişim: Can Murat Onay | 0544 622 59 31
+📞 İletişim: Satış Sorumlusu Can M. | 0544 622 59 31
 IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
 
 #IVECO #Daily35 #Eurocargo #Kamyonet #TicariAraç #Lojistik #FiloYönetimi #Taşıma #Samsun #ERCSamsun #Kredi #Finansman`;
@@ -1709,7 +1709,7 @@ IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
 • Net Taşıma: ~${targetPayload} Ton
 • Kantar Güvencesi: ${targetKantar}
 • Kredi: 12-48 Ay Resmi Banka Taksit Seçenekleri
-• İletişim: Can Murat Onay (Satış Sorumlusu) | 0544 622 59 31
+• İletişim: Satış Sorumlusu Can M. | 0544 622 59 31
 • E-Posta: murat.onay@ercsamsunotomotiv.com`
       );
     }
@@ -1730,7 +1730,7 @@ Detaylı teknik föyü ve banka ödeme planını buradan anında görüntüleyeb
 🔗 ${link}
 
 Saygılarımla,
-*Can Murat Onay | Satış Sorumlusu*
+*Satış Sorumlusu Can M.*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -1755,7 +1755,7 @@ ${link}
 Seçtiğiniz şasinin stok ve fabrika teslim tarihleri için bu mesaja yanıt vermeniz yeterlidir.
 
 Saygılarımla,
-*Can Murat Onay | Satış Sorumlusu*
+*Satış Sorumlusu Can M.*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -2399,7 +2399,7 @@ IVECO ERC Samsun Otomotiv
                   gap: '4px',
                   cursor: 'pointer'
                 }}
-                title="Can Murat Onay İletişim Kartını Telefona İndir & Rehbere Kaydet"
+                title="Satış Sorumlusu Can M. İletişim Kartını Telefona İndir & Rehbere Kaydet"
               >
                 <FiDownload size={12} /> Rehbere Ekle
               </button>
@@ -3003,10 +3003,10 @@ IVECO ERC Samsun Otomotiv
                                 🚜 ŞANTİYE & HAFRİYAT ÖZEL FİYATI
                               </div>
                               <div style={{ fontSize: isMobileView ? '0.94rem' : '0.84rem', fontWeight: 900, color: '#fef08a', marginTop: '3px' }}>
-                                Fiyatlandırma için Can Murat'a Danışabilirsiniz
+                                Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün
                               </div>
                               <div style={{ fontSize: isMobileView ? '0.74rem' : '0.66rem', color: '#cbd5e1', marginTop: '2px' }}>
-                                Can Murat Onay: 0544 622 59 31
+                                Satış Sorumlusu Can M. • 0544 622 59 31
                               </div>
                             </div>
                           ) : v.currency === 'EUR' ? (
@@ -3432,14 +3432,14 @@ IVECO ERC Samsun Otomotiv
                       🚜 T-WAY ŞANTİYE & HAFRİYAT ÖZEL FİYATLANDIRMA
                     </div>
                     <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fef08a', marginTop: '4px' }}>
-                      Fiyatlandırma için Can Murat'a Danışabilirsiniz
+                      Fiyatlandırma İçin Satış Sorumlusu Can M. ile Görüşün
                     </div>
                     <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '3px' }}>
-                      Can Murat Onay · IVECO ERC Samsun Satış Sorumlusu (0544 622 59 31)
+                      Satış Sorumlusu Can M. · IVECO ERC Samsun (0544 622 59 31)
                     </div>
                   </div>
                   <a
-                    href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Murat Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}`}
+                    href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}`}
                     target="_blank"
                     rel="noreferrer"
                     style={{
@@ -4335,10 +4335,10 @@ IVECO ERC Samsun Otomotiv
             {!submitted ? (
               <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <FiFileText size={16} color="#38bdf8" /> Can Murat Onay (Satış Sorumlusu) — Resmi Teklif & Şasi Rezervasyonu
+                  <FiFileText size={16} color="#38bdf8" /> Satış Sorumlusu Can M. Sizinle İletişime Geçsin
                 </h4>
                 <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
-                  Bilgilerinizi bırakın; Can Murat Onay aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
+                  Bilgilerinizi bırakın; Satış Sorumlusu Can M. aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
@@ -4453,7 +4453,7 @@ IVECO ERC Samsun Otomotiv
                   }}
                 >
                   <FiPhone size={15} />
-                  {submitting ? 'İletiliyor...' : 'Can Murat Onay Beni Arasın & Teklif Göndersin'}
+                  {submitting ? 'İletiliyor...' : 'Satış Sorumlusu Can M. Sizinle İletişime Geçsin'}
                 </button>
               </form>
             ) : (
@@ -4467,7 +4467,7 @@ IVECO ERC Samsun Otomotiv
               }}>
                 <FiCheckCircle size={36} style={{ color: '#10b981', marginBottom: '8px' }} />
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                  Talebiniz Can Murat Onay'a (Satış Sorumlusu) Ulaştı!
+                  Talebiniz Satış Sorumlusu Can M.'ye Ulaştı!
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 10px' }}>
                   Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
@@ -4496,7 +4496,7 @@ IVECO ERC Samsun Otomotiv
                 marginBottom: '12px'
               }}
             >
-              <FiMessageSquare size={18} /> Can Murat Onay ile WhatsApp'tan Hemen Görüş
+              <FiMessageSquare size={18} /> Satış Sorumlusu Can M. ile WhatsApp'tan Hemen Görüş
             </button>
 
             <button

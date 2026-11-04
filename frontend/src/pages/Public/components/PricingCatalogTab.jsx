@@ -843,7 +843,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                       ⭐ PROJEYE ÖZEL ŞANTİYE FİYATLANDIRMASI
                     </div>
                     <div style={{ fontSize: isMobileView ? '1.08rem' : '1.02rem', fontWeight: 900, color: '#fef08a', marginBottom: '3px' }}>
-                      Can Murat Onay'a Danışınız
+                      Satış Sorumlusu Can M. ile Görüşün
                     </div>
                     <div style={{ fontSize: '0.70rem', color: '#cbd5e1', lineHeight: 1.35 }}>
                       T-Way ağır şantiye araçlarımız damper/mikser tipi, takas ve filo kotasına göre özel fiyatlandırılmaktadır.
@@ -1020,7 +1020,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                     gap: '4px',
                     whiteSpace: 'nowrap'
                   }}
-                  title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Can Murat'tan Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
+                  title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu Can M.'den Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
                 >
                   <FiMessageSquare size={isMobileView ? 14 : 12} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
                 </button>

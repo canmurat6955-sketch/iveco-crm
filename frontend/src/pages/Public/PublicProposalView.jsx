@@ -209,7 +209,7 @@ export default function PublicProposalView() {
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 700 }}>Satış & Filo Danışmanınız</div>
-                <div style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff' }}>{proposal.sales_rep_name || 'Can Murat ONAY'}</div>
+                <div style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff' }}>{proposal.sales_rep_name ? proposal.sales_rep_name.replace(/Can Murat\s*ONAY/i, 'Satış Sorumlusu Can M.') : 'Satış Sorumlusu Can M.'}</div>
                 <div style={{ fontSize: '12px', color: '#7dd3fc', fontWeight: 600, marginTop: 1 }}>IVECO ERC Samsun Otomotiv • 0544 622 59 31</div>
               </div>
             </div>

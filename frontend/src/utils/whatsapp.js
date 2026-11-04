@@ -102,11 +102,11 @@ export function sendCustomerVipPortalWhatsApp(cust, options = {}) {
 
   const msg = (
     `Sayın *${companyName}*,\n\n` +
-    `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can Murat ONAY* (0544 622 59 31).\n\n` +
+    `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
     `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, %20 KDV vergi kalkanı hesabını, takas peşinat desteğini ve %0 faizli banka kredi seçeneklerini aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
     `👉 ${vipLink}\n\n` +
     `Beğendiğiniz model veya takas/kredi hesaplaması için bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
-    `İyi çalışmalar dilerim.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+    `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
   );
 
   openWhatsApp(cust.phone, msg, { customer: cust, onSuccess: options.onSuccess });
