@@ -1617,7 +1617,7 @@ END:VCARD`;
   const handleCopyVipWhatsAppTemplate = () => {
     const link = getGeneratedVipLink(false);
     const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
-    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nCan Murat Onay | Satış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
@@ -1702,7 +1702,7 @@ IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
       return (
 `Sayın ${targetCompany} Yetkilisi,
 
-İşletmeniz için belirlediğimiz *${targetModel}* aracına ait teknik şasi detaylarını ve Ekim 2026 %0 faizli kredi simülatörünü aşağıdaki bağlantıdan tek tıkla inceleyebilirsiniz:
+İşletmeniz için belirlediğimiz *${targetModel}* aracına ait teknik şasi detaylarını ve 2026 güncel %0 faizli kredi simülatörünü aşağıdaki bağlantıdan tek tıkla inceleyebilirsiniz:
 
 👉 ${link}
 
@@ -1719,7 +1719,7 @@ IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
 `🚜 *AĞIR VASITA & ŞANTİYE TEKLİFİ — ${targetCompany.toUpperCase()}*
 
 Sayın Yetkili,
-Ağır hafriyat, maden ve şantiye operasyonunuz için yapılandırdığımız *${targetModel}* aracımıza ait karayolları yasal kantar sınırları, brüt GVW kapasitesi ve Ekim 2026 resmi ticari kredi imkanları hazırlanmıştır:
+Ağır hafriyat, maden ve şantiye operasyonunuz için yapılandırdığımız *${targetModel}* aracımıza ait karayolları yasal kantar sınırları, brüt GVW kapasitesi ve 2026 güncel resmi ticari kredi imkanları hazırlanmıştır:
 
 📌 *Araç:* ${targetModel}
 ⚖️ *Kantar / GVW:* ${targetKantar}
@@ -1741,7 +1741,7 @@ IVECO ERC Samsun Otomotiv
     return (
 `🌟 *SAYIN ${targetCompany.toUpperCase()} YETKİLİSİ,*
 
-IVECO ERC Samsun Otomotiv olarak, firmanızın taşımacılık operasyonuna özel hazırladığımız dijital şasi konfigürasyonunu ve Ekim 2026 anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) bilgilerinize sunarım.
+IVECO ERC Samsun Otomotiv olarak, firmanızın taşımacılık operasyonuna özel hazırladığımız dijital şasi konfigürasyonunu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) bilgilerinize sunarım.
 
 🚛 *Önerilen Model:* ${targetModel}
 ⚖️ *Kantar Sınırı:* ${targetKantar}
@@ -2583,7 +2583,7 @@ IVECO ERC Samsun Otomotiv
           {[
             { id: 'fiyatlar', label: '2026 Şasi Fiyat Listesi', badge: 'Kampanyalı' },
             { id: 'krediler', label: 'Banka Finansman & Kredi Planı', badge: '%0 Faiz' },
-            { id: 'tco', label: 'Neden IVECO? (TCO & Rakip Analizi)', badge: 'M. & F. Kıyaslama' },
+            { id: 'tco', label: 'Neden IVECO? (TCO & Rakip Analizi)', badge: 'Teknik Kıyaslama' },
             { id: 'secici', label: 'Şasi & Taşıma Kapasitesi (İstiap)', badge: null },
             { id: 'ust-yapi', label: 'Üst Yapı & Kasa Rehberi', badge: null },
             { id: 'sss', label: 'Sıkça Sorulanlar & Danışman', badge: 'ERC Samsun' }
@@ -5113,7 +5113,7 @@ IVECO ERC Samsun Otomotiv
                           IVECO ERC Otomotiv | Firmanıza Özel Şasi & Kredi Teklifi
                         </div>
                         <div style={{ fontSize: '0.65rem', color: '#aebac1', marginTop: '2px', lineHeight: 1.3 }}>
-                          İşletmenize özel şasi ölçüleri, karayolları kantar analizi ve Ekim 2026 %0 faizli kredi planları.
+                          İşletmenize özel şasi ölçüleri, karayolları kantar analizi ve 2026 güncel %0 faizli kredi planları.
                         </div>
                       </div>
                     </div>

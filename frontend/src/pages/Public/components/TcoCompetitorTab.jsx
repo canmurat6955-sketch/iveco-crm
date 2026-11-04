@@ -65,11 +65,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         {[
-          { id: 'daily_my26', label: 'Hafif Ticari (Daily MY26 vs F. & Rakipler)', icon: '🚐' },
-          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs M. 1518)', icon: '🚛' },
-          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs 10T Rakip)', icon: '🚚' },
-          { id: 'sway_heavy', label: 'Çekici & Ağır Vasıta (S-Way vs F-MAX & Actros)', icon: '🛣️' },
-          { id: 'market_feedback', label: 'Piyasa & Kullanıcı Geri Dönüşleri', icon: '💬' }
+          { id: 'daily_my26', label: 'Hafif Ticari (Daily vs Transit & Sprinter)', icon: '🚐' },
+          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs Atego 1518)', icon: '🚛' },
+          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs Isuzu NPR 10)', icon: '🚚' },
+          { id: 'sway_heavy', label: 'Çekici & Ağır Vasıta (S-Way vs F-MAX & Actros)', icon: '🛣️' }
         ].map((sub) => {
           const isActive = activeSubTab === sub.id;
           return (
@@ -101,7 +100,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         })}
       </div>
 
-      {/* ── BÖLÜM 1: 15T EUROCARGO VS M. ── */}
+      {/* ── BÖLÜM 1: 15T EUROCARGO VS ATEGO 1518 ── */}
       {activeSubTab === 'eurocargo_15t' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
@@ -110,7 +109,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⚙️ ŞANZIMAN & BASKI-BALATA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>ZF 8AP Tam Otomatik</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Tork konvertörlüdür, kuru kavrama baskı-balata <strong>YOKTUR</strong>. Rakip M.'nin 6 ileri PowerShift robotize şanzımanındaki gibi balata aşınması ve 65.000 TL+ değişim maliyeti sıfırdır.
+                Tork konvertörlüdür, kuru kavrama baskı-balata <strong>YOKTUR</strong>. Atego 1518'in 6 ileri PowerShift robotize şanzımanındaki gibi balata aşınması ve 65.000 TL+ değişim maliyeti sıfırdır.
               </p>
             </div>
 
@@ -118,7 +117,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>⚖️ NET YÜK KAPASİTESİ</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>+163 kg Daha Fazla İstiap</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.519 kg boş ağırlığı ile rakip M. 1518'den (4.682 kg) 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
+                Eurocargo 4.519 kg boş ağırlığı ile Atego 1518'den (4.682 kg) 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
               </p>
             </div>
 
@@ -126,7 +125,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🔄 ŞEHİR İÇİ MANEVRA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>88 cm Daha Dar Dönüş</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Daha uzun dingil mesafesine (4.185 mm) sahip olmasına rağmen 14.72 m dönüş çapı ile M.'den (15.60 m) dar sokaklarda çok daha kıvraktır.
+                Daha uzun dingil mesafesine (4.185 mm) sahip olmasına rağmen 14.72 m dönüş çapı ile Atego'dan (15.60 m) dar sokaklarda çok daha kıvraktır.
               </p>
             </div>
 
@@ -134,7 +133,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🐎 HI-SCR (EGR'SİZ) & 210 HP</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>210 HP • 750 Nm • 40.000 km Bakım</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.5L Tector 5 motor 210 HP üretirken M. 5.1L 177 HP'de kalır. EGR valfi içermeyen HI-SCR teknolojisi ile kurum tıkanması yaşatmaz.
+                Eurocargo 4.5L Tector 5 motor 210 HP üretirken Atego 5.1L 177 HP'de kalır. EGR valfi içermeyen HI-SCR teknolojisi ile kurum tıkanması yaşatmaz.
               </p>
             </div>
           </div>
@@ -159,12 +158,12 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG VERİLERİ (PTC 2026 MDT)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  15T Eurocargo MLC 150 E 21 vs 15T Rakip M. (Atego 1518 / 42)
+                  15T Eurocargo MLC 150 E 21 vs Mercedes Atego 1518 / 42
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => handleConsultantQuote('15T Eurocargo vs M. Karşılaştırması')}
+                onClick={() => handleConsultantQuote('15T Eurocargo vs Atego 1518 Karşılaştırması')}
                 style={{
                   background: '#22c55e',
                   color: '#fff',
@@ -192,7 +191,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO Eurocargo MLC 150 E 21
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
-                      Rakip M. 1518 / 42
+                      Mercedes Atego 1518 / 42
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
                       TCO & İşletme Avantajı
@@ -226,7 +225,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       feature: 'Periyodik Bakım Aralığı',
                       iveco: '40.000 km / 1 Yıl (800 Saat)',
                       competitor: '30.000 - 40.000 km (Ağır Hizmette 20.000-30.000 km)',
-                      advantage: 'Uzun bakım periyodu ve M. Servis A/B faturalarına kıyasla %35 daha ekonomik yetkili servis maliyeti.',
+                      advantage: 'Uzun bakım periyodu ve Atego Servis A/B faturalarına kıyasla %35 daha ekonomik yetkili servis maliyeti.',
                       highlight: true
                     },
                     {
@@ -531,7 +530,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         </div>
       )}
 
-      {/* ── BÖLÜM 3: DAILY MY26 VS RAKİP F. & DİĞERLERİ ── */}
+      {/* ── BÖLÜM 3: DAILY MY26 VS TRANSIT, SPRINTER, DUCATO, MASTER ── */}
       {activeSubTab === 'daily_my26' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards for Daily MY26 */}
@@ -540,7 +539,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 RESMİ BAKIM ARALIĞI</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>25.000 km / 1 Yıl Periyot</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Hem IVECO Daily'de hem tüm rakiplerde (Rakip F., M., Ft., R.) resmi bakım aralığı <strong>25.000 km / 1 Yıl</strong>'dır. Daily, ekonomik filtre/servis faturası ve sıfır sürpriz arıza ile TCO'da öne geçer.
+                Hem IVECO Daily'de hem tüm rakiplerde (Transit, Sprinter, Ducato, Master) resmi bakım aralığı <strong>25.000 km / 1 Yıl</strong>'dır. Daily, ekonomik filtre/servis faturası ve sıfır sürpriz arıza ile TCO'da öne geçer.
               </p>
             </div>
 
@@ -548,7 +547,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⛓️ ÇELİK ZİNCİRLİ FPT MOTOR</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>2.3L (400 Nm) & 3.0L (430 Nm)</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Çift sıra çelik zincirli FPT motor triger değişimi gerektirmez. Rakip F. 2.0L EcoBlue motorlardaki <strong>yağ içi ıslak triger kayışı (wet belt)</strong> kopma riski ve ağır revizyon masrafı yoktur.
+                Çift sıra çelik zincirli FPT motor triger değişimi gerektirmez. Ford Transit 2.0L EcoBlue motorlardaki <strong>yağ içi ıslak triger kayışı (wet belt)</strong> kopma riski ve ağır revizyon masrafı yoktur.
               </p>
             </div>
 
@@ -585,7 +584,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               </div>
               <button
                 type="button"
-                onClick={() => handleConsultantQuote('Daily MY26 vs Rakip F. Analizi')}
+                onClick={() => handleConsultantQuote('Daily MY26 vs Ford Transit & Mercedes Sprinter Analizi')}
                 style={{
                   background: '#22c55e',
                   color: '#fff',
@@ -613,10 +612,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     <th style={{ padding: '12px 14px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.16)', width: '15%' }}>
                       IVECO Daily
                     </th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip F. (Transit)</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip M. (Sprinter)</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip Ft. (Ducato)</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip R. (Master)</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Ford Transit</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Mercedes Sprinter</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Fiat Ducato</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Renault Master</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -723,7 +722,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* F. */}
+                      {/* FORD TRANSIT */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.f.status === 'cross' ? '#f87171' : (row.f.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.f.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -733,7 +732,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* M. */}
+                      {/* MERCEDES SPRINTER */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.m.status === 'cross' ? '#f87171' : (row.m.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.m.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -743,7 +742,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* FIAT */}
+                      {/* FIAT DUCATO */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.fiat.status === 'cross' ? '#f87171' : (row.fiat.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.fiat.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -753,7 +752,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* RENAULT */}
+                      {/* RENAULT MASTER */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.renault.status === 'cross' ? '#f87171' : (row.renault.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.renault.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -785,7 +784,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                   Filo Yöneticileri İçin 25.000 km Bakım, Çelik Zincir ve 3 Parça Tamponun Gerçek TCO Etkisi
                 </div>
                 <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                  Hafif ticari araç segmentinde hem IVECO Daily hem de rakipler (Rakip F., Rakip M., Rakip Ft., Rakip R.) yılda bir veya <strong>25.000 km'de bir periyodik bakıma</strong> girer. Ancak TCO farkını yaratan 3 ana unsur vardır: <strong>(1)</strong> Rakip F.'nin 2.0L motorundaki yağ içi ıslak triger kayışı (wet belt) ağır revizyon maliyeti doğururken, Daily'nin <strong>çelik zincirli 2.3L ve 3.0L FPT motorları</strong> triger değişimi istemez. <strong>(2)</strong> Rakip M.'nin yetkili servis A/B bakım faturaları çok yüksekken Daily yetkili servis bakımı ekonomiktir. <strong>(3)</strong> Köşe sürtmelerinde rakiplerde yekpare tampon komple değişirken, Daily'de <strong>3 parçalı modüler tamponun</strong> sadece ilgili köşesi dakikalar içinde düşük maliyetle yenilenir.
+                  Hafif ticari araç segmentinde hem IVECO Daily hem de rakipler (Ford Transit, Mercedes Sprinter, Fiat Ducato, Renault Master) yılda bir veya <strong>25.000 km'de bir periyodik bakıma</strong> girer. Ancak TCO farkını yaratan 3 ana unsur vardır: <strong>(1)</strong> Ford Transit'in 2.0L motorundaki yağ içi ıslak triger kayışı (wet belt) ağır revizyon maliyeti doğururken, Daily'nin <strong>çelik zincirli 2.3L ve 3.0L FPT motorları</strong> triger değişimi istemez. <strong>(2)</strong> Mercedes Sprinter'ın yetkili servis A/B bakım faturaları çok yüksekken Daily yetkili servis bakımı ekonomiktir. <strong>(3)</strong> Köşe sürtmelerinde rakiplerde yekpare tampon komple değişirken, Daily'de <strong>3 parçalı modüler tamponun</strong> sadece ilgili köşesi dakikalar içinde düşük maliyetle yenilenir.
                 </p>
               </div>
             </div>
@@ -802,7 +801,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>🔥 HI-SCR (EGR'SİZ MOTOR)</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>EGR Valfi & Soğutucusu Yok</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                S-Way 12.9L Cursor 13 motor egzoz gazını silindire geri basmaz. Rakip F-MAX ve Actros'ta görülen EGR valfi/soğutucusu arızası ve kurum birikimi S-Way'de sıfırdır.
+                S-Way 12.9L Cursor 13 motor egzoz gazını silindire geri basmaz. Ford F-MAX ve Mercedes Actros'ta görülen EGR valfi/soğutucusu arızası ve kurum birikimi S-Way'de sıfırdır.
               </p>
             </div>
 
@@ -851,7 +850,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>AĞIR VASITA ÇEKİCİ SEGMENTİ DOĞRULANMIŞ VERİLER</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  IVECO S-Way (AS440S500 / 530) vs Rakip F. (F-MAX 500) vs Rakip M. (Actros 1848 / 1851)
+                  IVECO S-Way (AS440S500 / 530) vs Ford F-MAX 500 vs Mercedes Actros 1848 / 1851
                 </h3>
               </div>
               <button
@@ -884,10 +883,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO S-Way (Cursor 13)
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
-                      Rakip F. (F-MAX 500)
+                      Ford F-MAX 500
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
-                      Rakip M. (Actros 1848 / 1851)
+                      Mercedes Actros 1848 / 1851
                     </th>
                   </tr>
                 </thead>
@@ -948,137 +947,6 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── BÖLÜM 4: SAHA & PİYASA GERİ DÖNÜŞLERİ ── */}
-      {activeSubTab === 'market_feedback' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 0.95) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '16px',
-            padding: '20px'
-          }}>
-            <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '4px' }}>
-              GERÇEK FİLO DENEYİMLERİ & SAHA İSTİHBARATI
-            </div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 16px' }}>
-              Piyasada Rakipler Hakkında Ne Konuşuluyor? Kullanıcı Geri Bildirimleri
-            </h3>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-              {/* M. Kartı */}
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                borderRadius: '12px',
-                padding: '16px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fca5a5' }}>
-                    Rakip M. Saha Geri Bildirimleri
-                  </span>
-                  <span style={{ fontSize: '0.66rem', fontWeight: 800, background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '2px 8px', borderRadius: '4px' }}>
-                    Yüksek TCO Riski
-                  </span>
-                </div>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.55 }}>
-                  <li><strong>Yüksek İlk Satın Alma & Yıldız Primi:</strong> Aynı taşıma kapasitesindeki araç için markaya fahiş ilk yatırım bedeli ödenmesi.</li>
-                  <li><strong>Çok Pahalı Yetkili Servis & Parça:</strong> Garanti süresi boyunca periyodik bakım faturalarının ve yedek parça birim fiyatlarının sektörel ortalamanın çok üzerinde olması.</li>
-                  <li><strong>Robotize Şanzıman Isınma Şikayetleri:</strong> Yoğun dur-kalk şehir içi dağıtımlarda debriyaj ısınma ikazı ve 80.000 - 120.000 km aralığında erken baskı-balata bitme maliyeti.</li>
-                  <li><strong>Donanımların Çoğunun Opsiyon Olması:</strong> Geri görüş kamerası, büyük ekran gibi temel unsurların dahi yüksek paket ücretleriyle satılması.</li>
-                </ul>
-              </div>
-
-              {/* F. Kartı */}
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: '12px',
-                padding: '16px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fde68a' }}>
-                    Rakip F. Saha Geri Bildirimleri
-                  </span>
-                  <span style={{ fontSize: '0.66rem', fontWeight: 800, background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '2px 8px', borderRadius: '4px' }}>
-                    Şasi & Motor Hassasiyeti
-                  </span>
-                </div>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.55 }}>
-                  <li><strong>Yekpare Ön Tampon Masrafı:</strong> Tek parça tampon sebebiyle en ufak sürtmede komple tampon değişimi zorunluluğu, kasko mini onarım limitlerinin aşılması.</li>
-                  <li><strong>Ağır Yükte Şasi Esnemesi & Çökme:</strong> Daily'nin kamyon tipi C-kesit merdiven şasisine karşın, hafif binek türevi gövde yapısının kantarda arkadan sarkma yapması.</li>
-                  <li><strong>Islak Triger Kayışı Hassasiyeti:</strong> Motor yağının içinde çalışan triger kayışı tasarımının periyodik bakım aksamalarında yağ pompasını tıkama riski ve piyasadaki revizyon endişeleri.</li>
-                  <li><strong>Zincirli FPT Motor Karşısında Ömür:</strong> Daily'nin 1.000.000 km ağır hizmet için tasarlanan 3.0L ve 2.3L FPT zincirli motorlarına kıyasla daha kısa motor revizyon ömrü.</li>
-                </ul>
-              </div>
-
-              {/* Rakip R. (Fransız Grubu) */}
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(148, 163, 184, 0.3)',
-                borderRadius: '12px',
-                padding: '16px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#e2e8f0' }}>
-                    Rakip R. Saha Geri Bildirimleri
-                  </span>
-                  <span style={{ fontSize: '0.66rem', fontWeight: 800, background: 'rgba(148, 163, 184, 0.2)', color: '#94a3b8', padding: '2px 8px', borderRadius: '4px' }}>
-                    Mukavemet & Değer Kaybı
-                  </span>
-                </div>
-                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.74rem', color: '#cbd5e1', lineHeight: 1.55 }}>
-                  <li><strong>Monokok Şasi Yetersizliği:</strong> Kamyon şasisi yerine sac kafes kullandıkları için ağır yük, frigorifik kasa ve damper uygulamalarında şasi burulması.</li>
-                  <li><strong>İkinci Elde Hızlı Değer Kaybı:</strong> IVECO ve diğer piyasa rakiplerine göre 3-5 yıl sonrasında ikinci el değerini koruyamaması ve yüksek amortisman kaybı.</li>
-                  <li><strong>Yetkili Üst Yapı Çözümlerinin Kısıtlılığı:</strong> Fabrika çıkışı karoseri hazırlık soketlerinin ve PTO (yavru şanzıman) çıkışlarının yetersizliği.</li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Bottom Call to Action */}
-            <div style={{
-              marginTop: '20px',
-              padding: '16px 20px',
-              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%)',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px'
-            }}>
-              <div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>
-                  Şirketinizin Filosuna Özel TCO Tasarruf Raporu İsteyin
-                </div>
-                <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                  Mevcut filonuzdaki araçların yıllık yakıt, periyodik bakım ve kasko hasar maliyetlerini karşılaştıralım.
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleConsultantQuote('Filo Özel TCO Tasarruf Raporu')}
-                style={{
-                  background: '#22c55e',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '10px 18px',
-                  fontSize: '0.80rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FiMessageSquare size={14} /> Murat Bey ile TCO Görüşmesi Yap
-              </button>
             </div>
           </div>
         </div>

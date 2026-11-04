@@ -454,63 +454,72 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         )}
       </div>
 
-      {/* 🎯 İŞİNİZE / SEKTÖRÜNÜZE GÖRE HIZLI FİLTRE (Madde 1) */}
+      {/* 🎯 İŞİNİZE / SEKTÖRÜNÜZE GÖRE KOMPAKT FİLTRE */}
       <div style={{
         background: 'rgba(24, 42, 72, 0.85)',
-        border: '1px solid rgba(125, 211, 252, 0.25)',
+        border: selectedSectorFilter !== 'all' ? '1.5px solid #4ade80' : '1px solid rgba(125, 211, 252, 0.25)',
         borderRadius: '12px',
-        padding: isMobileView ? '10px 10px' : '12px 14px',
-        marginBottom: isMobileView ? '10px' : '14px'
+        padding: isMobileView ? '8px 10px' : '10px 14px',
+        marginBottom: isMobileView ? '10px' : '14px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '10px'
       }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '6px',
-          marginBottom: '8px'
-        }}>
-          <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#7dd3fc', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            🎯 İŞİNİZE / SEKTÖRÜNÜZE UYGUN ARAÇLARI SÜZÜN:
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', flex: '1 1 260px' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#7dd3fc', whiteSpace: 'nowrap' }}>
+            🎯 Sektöre Göre Araç Süz:
           </span>
-          {selectedSectorFilter !== 'all' && activeSectorObj && (
-            <span style={{ fontSize: '0.72rem', color: '#4ade80', fontWeight: 700 }}>
-              ✓ {activeSectorObj.desc}
-            </span>
+          <select
+            value={selectedSectorFilter}
+            onChange={(e) => {
+              setSelectedSectorFilter(e.target.value);
+              setSelectedCategory('all');
+            }}
+            style={{
+              flex: isMobileView ? '1 1 100%' : '0 1 280px',
+              background: selectedSectorFilter !== 'all' ? 'rgba(5, 150, 105, 0.28)' : 'rgba(15, 28, 50, 0.95)',
+              color: '#ffffff',
+              border: selectedSectorFilter !== 'all' ? '1.5px solid #4ade80' : '1px solid rgba(125, 211, 252, 0.35)',
+              borderRadius: '8px',
+              padding: '7px 12px',
+              fontSize: '0.80rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
+            {SECTOR_FILTERS.map(sec => (
+              <option key={sec.id} value={sec.id} style={{ background: '#0f1c32', color: '#ffffff' }}>
+                {sec.label}
+              </option>
+            ))}
+          </select>
+          {selectedSectorFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setSelectedSectorFilter('all')}
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                color: '#fca5a5',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              ✕ Filtreyi Kaldır
+            </button>
           )}
         </div>
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '6px'
-        }}>
-          {SECTOR_FILTERS.map(sec => {
-            const isSel = selectedSectorFilter === sec.id;
-            return (
-              <button
-                key={sec.id}
-                type="button"
-                onClick={() => {
-                  setSelectedSectorFilter(sec.id);
-                  setSelectedCategory('all');
-                }}
-                style={{
-                  background: isSel ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'rgba(15, 28, 50, 0.78)',
-                  color: '#ffffff',
-                  border: isSel ? '1.5px solid #4ade80' : '1px solid rgba(148, 163, 184, 0.25)',
-                  borderRadius: '20px',
-                  padding: isMobileView ? '7px 10px' : '6px 12px',
-                  fontSize: isMobileView ? '0.74rem' : '0.75rem',
-                  fontWeight: isSel ? 800 : 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s'
-                }}
-              >
-                {sec.label}
-              </button>
-            );
-          })}
-        </div>
+        {selectedSectorFilter !== 'all' && activeSectorObj && (
+          <div style={{ fontSize: '0.73rem', color: '#4ade80', fontWeight: 700 }}>
+            ✓ {activeSectorObj.desc}
+          </div>
+        )}
       </div>
 
       {/* Yasal İstiap & Kantar Güvencesi Banner (YALNIZCA Daily 35 Serisi Seçildiğinde Gösterilir) */}
