@@ -65,10 +65,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         {[
-          { id: 'daily_my26', label: 'Hafif Ticari (Daily vs Transit & Sprinter)', icon: '🚐' },
-          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs Atego 1518)', icon: '🚛' },
-          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs Isuzu NPR 10)', icon: '🚚' },
-          { id: 'sway_heavy', label: 'Çekici & Ağır Vasıta (S-Way vs F-MAX & Actros)', icon: '🛣️' }
+          { id: 'daily_my26', label: 'Hafif Ticari (Daily vs Rakip F. & M.)', icon: '🚐' },
+          { id: 'eurocargo_15t', label: '15T Orta Ağır (Eurocargo vs Rakip M. 1518)', icon: '🚛' },
+          { id: 'eurocargo_10t', label: '10T Dağıtım (Eurocargo vs 10T Rakip)', icon: '🚚' },
+          { id: 'sway_heavy', label: 'Çekici & Ağır Vasıta (S-Way vs Rakip F. & M.)', icon: '🛣️' }
         ].map((sub) => {
           const isActive = activeSubTab === sub.id;
           return (
@@ -100,7 +100,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         })}
       </div>
 
-      {/* ── BÖLÜM 1: 15T EUROCARGO VS ATEGO 1518 ── */}
+      {/* ── BÖLÜM 1: 15T EUROCARGO VS RAKİP M. 1518 ── */}
       {activeSubTab === 'eurocargo_15t' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
@@ -109,7 +109,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⚙️ ŞANZIMAN & BASKI-BALATA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>ZF 8AP Tam Otomatik</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Tork konvertörlüdür, kuru kavrama baskı-balata <strong>YOKTUR</strong>. Atego 1518'in 6 ileri PowerShift robotize şanzımanındaki gibi balata aşınması ve 65.000 TL+ değişim maliyeti sıfırdır.
+                Tork konvertörlüdür, kuru kavrama baskı-balata <strong>YOKTUR</strong>. Rakip M. 1518'in 6 ileri robotize şanzımanındaki gibi balata aşınması ve 65.000 TL+ değişim maliyeti sıfırdır.
               </p>
             </div>
 
@@ -117,7 +117,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>⚖️ NET YÜK KAPASİTESİ</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>+163 kg Daha Fazla İstiap</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.519 kg boş ağırlığı ile Atego 1518'den (4.682 kg) 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
+                Eurocargo 4.519 kg boş ağırlığı ile Rakip M. 1518'den (4.682 kg) 163 kg daha hafiftir. Her seferde 10.481 kg net yük taşıyarak karayolları kantarında kazandırır.
               </p>
             </div>
 
@@ -125,7 +125,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700 }}>🔄 ŞEHİR İÇİ MANEVRA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>88 cm Daha Dar Dönüş</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Daha uzun dingil mesafesine (4.185 mm) sahip olmasına rağmen 14.72 m dönüş çapı ile Atego'dan (15.60 m) dar sokaklarda çok daha kıvraktır.
+                Daha uzun dingil mesafesine (4.185 mm) sahip olmasına rağmen 14.72 m dönüş çapı ile Rakip M.'den (15.60 m) dar sokaklarda çok daha kıvraktır.
               </p>
             </div>
 
@@ -133,7 +133,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700 }}>🐎 HI-SCR (EGR'SİZ) & 210 HP</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>210 HP • 750 Nm • 40.000 km Bakım</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Eurocargo 4.5L Tector 5 motor 210 HP üretirken Atego 5.1L 177 HP'de kalır. EGR valfi içermeyen HI-SCR teknolojisi ile kurum tıkanması yaşatmaz.
+                Eurocargo 4.5L Tector 5 motor 210 HP üretirken Rakip M. 5.1L 177 HP'de kalır. EGR valfi içermeyen HI-SCR teknolojisi ile kurum tıkanması yaşatmaz.
               </p>
             </div>
           </div>
@@ -158,12 +158,12 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG VERİLERİ (PTC 2026 MDT)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  15T Eurocargo MLC 150 E 21 vs Mercedes Atego 1518 / 42
+                  15T Eurocargo MLC 150 E 21 vs Rakip M. (1518 / 42)
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => handleConsultantQuote('15T Eurocargo vs Atego 1518 Karşılaştırması')}
+                onClick={() => handleConsultantQuote('15T Eurocargo vs Rakip M. 1518 Karşılaştırması')}
                 style={{
                   background: '#22c55e',
                   color: '#fff',
@@ -191,7 +191,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO Eurocargo MLC 150 E 21
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
-                      Mercedes Atego 1518 / 42
+                      Rakip M. (1518 / 42)
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
                       TCO & İşletme Avantajı
@@ -203,14 +203,14 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     {
                       feature: 'Şanzıman Tipi',
                       iveco: 'Full Otomatik (8 İleri ZF 8AP Tork Konvertörlü)',
-                      competitor: 'Otomatikleştirilmiş / Robotize (6 İleri PowerShift 3)',
+                      competitor: 'Otomatikleştirilmiş / Robotize (6 İleri)',
                       advantage: 'Kuru kavrama baskı-balata yok! Balata aşınması ve 65.000 TL+ değişim maliyeti sıfır.',
                       highlight: true
                     },
                     {
                       feature: 'Motor Gücü, Tork & Hacim',
                       iveco: '210 HP • 750 Nm Tork • 4.5L FPT Tector 5',
-                      competitor: '177 HP • 750 Nm Tork • 5.1L OM934',
+                      competitor: '177 HP • 750 Nm Tork • 5.1L',
                       advantage: '+33 HP daha yüksek beygir gücü. Düşük motor hacmiyle %8-12 yakıt tasarrufu.',
                       highlight: true
                     },
@@ -225,7 +225,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       feature: 'Periyodik Bakım Aralığı',
                       iveco: '40.000 km / 1 Yıl (800 Saat)',
                       competitor: '30.000 - 40.000 km (Ağır Hizmette 20.000-30.000 km)',
-                      advantage: 'Uzun bakım periyodu ve Atego Servis A/B faturalarına kıyasla %35 daha ekonomik yetkili servis maliyeti.',
+                      advantage: 'Uzun bakım periyodu ve Rakip M. Servis A/B faturalarına kıyasla %35 daha ekonomik yetkili servis maliyeti.',
                       highlight: true
                     },
                     {
@@ -331,7 +331,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 PERİYODİK BAKIM ARALIĞI</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>40.000 km vs 20.000 km</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                10T rakip kamyonlar (NPR 10 vb.) her 20.000 km'de servise girmek zorundayken, Eurocargo 40.000 km veya 800 saatte bir servise girer. <strong>Servis ziyareti yarı yarıya düşer!</strong>
+                10T rakip kamyonlar her 20.000 km'de servise girmek zorundayken, Eurocargo 40.000 km veya 800 saatte bir servise girer. <strong>Servis ziyareti yarı yarıya düşer!</strong>
               </p>
             </div>
 
@@ -380,7 +380,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>RESMİ KATALOG VERİLERİ (PTC 2026 MDT)</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  10T Eurocargo MLC 100 E 19 vs 10T Rakip Kamyon (NPR 10 Sınıfı)
+                  10T Eurocargo MLC 100 E 19 vs 10T Rakip Kamyon
                 </h3>
               </div>
               <button
@@ -413,7 +413,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO Eurocargo MLC 100 E 19
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '24%' }}>
-                      10T Rakip Kamyon (NPR 10)
+                      10T Rakip Kamyon
                     </th>
                     <th style={{ padding: '12px 16px', color: '#4ade80', fontWeight: 800, width: '26%' }}>
                       TCO & İşletme Avantajı
@@ -530,7 +530,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         </div>
       )}
 
-      {/* ── BÖLÜM 3: DAILY MY26 VS TRANSIT, SPRINTER, DUCATO, MASTER ── */}
+      {/* ── BÖLÜM 3: DAILY MY26 VS RAKİP F. & DİĞERLERİ ── */}
       {activeSubTab === 'daily_my26' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards for Daily MY26 */}
@@ -539,7 +539,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 RESMİ BAKIM ARALIĞI</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>25.000 km / 1 Yıl Periyot</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Hem IVECO Daily'de hem tüm rakiplerde (Transit, Sprinter, Ducato, Master) resmi bakım aralığı <strong>25.000 km / 1 Yıl</strong>'dır. Daily, ekonomik filtre/servis faturası ve sıfır sürpriz arıza ile TCO'da öne geçer.
+                Hem IVECO Daily'de hem tüm rakiplerde (Rakip F., M., Ft., R.) resmi bakım aralığı <strong>25.000 km / 1 Yıl</strong>'dır. Daily, ekonomik filtre/servis faturası ve sıfır sürpriz arıza ile TCO'da öne geçer.
               </p>
             </div>
 
@@ -547,7 +547,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⛓️ ÇELİK ZİNCİRLİ FPT MOTOR</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>2.3L (400 Nm) & 3.0L (430 Nm)</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                Çift sıra çelik zincirli FPT motor triger değişimi gerektirmez. Ford Transit 2.0L EcoBlue motorlardaki <strong>yağ içi ıslak triger kayışı (wet belt)</strong> kopma riski ve ağır revizyon masrafı yoktur.
+                Çift sıra çelik zincirli FPT motor triger değişimi gerektirmez. Rakip F. 2.0L motorlardaki <strong>yağ içi ıslak triger kayışı (wet belt)</strong> kopma riski ve ağır revizyon masrafı yoktur.
               </p>
             </div>
 
@@ -584,7 +584,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               </div>
               <button
                 type="button"
-                onClick={() => handleConsultantQuote('Daily MY26 vs Ford Transit & Mercedes Sprinter Analizi')}
+                onClick={() => handleConsultantQuote('Daily MY26 vs Rakip F. & M. Analizi')}
                 style={{
                   background: '#22c55e',
                   color: '#fff',
@@ -612,10 +612,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     <th style={{ padding: '12px 14px', color: '#38bdf8', fontWeight: 800, background: 'rgba(2, 132, 199, 0.16)', width: '15%' }}>
                       IVECO Daily
                     </th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Ford Transit</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Mercedes Sprinter</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Fiat Ducato</th>
-                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Renault Master</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip F.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip M.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip Ft.</th>
+                    <th style={{ padding: '12px 14px', color: '#e2e8f0', fontWeight: 700, width: '15%' }}>Rakip R.</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -633,8 +633,8 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       name: 'Motor Hacmi, Güç & Tork',
                       desc: 'Yüksek hacimli endüstriyel blok ile rampada bayılmayan yüksek tork ve uzun motor ömrü',
                       iveco: { status: 'check', text: '2.3L (156 HP/400 Nm) & 3.0L (180 HP/430 Nm)' },
-                      f: { status: 'opt', text: '2.0L EcoBlue (165-170 HP / 390 Nm)' },
-                      m: { status: 'opt', text: '2.0L OM654 (170 HP / 400 Nm)' },
+                      f: { status: 'opt', text: '2.0L (165-170 HP / 390 Nm)' },
+                      m: { status: 'opt', text: '2.0L (170 HP / 400 Nm)' },
                       fiat: { status: 'opt', text: '2.2L (140-180 HP / 380 Nm)' },
                       renault: { status: 'opt', text: '2.0L / 2.3L (150-170 HP)' }
                     },
@@ -661,7 +661,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       desc: 'Baskı balata yok, debriyaj maliyeti sıfır, 200 ms altında sarsıntısız geçiş',
                       iveco: { status: 'check', text: '8 İleri ZF Tork Konvertör' },
                       f: { status: 'opt', text: '10 İleri Otomatik' },
-                      m: { status: 'opt', text: '9 İleri 9G-TRONIC' },
+                      m: { status: 'opt', text: '9 İleri Otomatik' },
                       fiat: { status: 'opt', text: '8/9 İleri Otomatik' },
                       renault: { status: 'opt', text: '9 İleri / Robotize' }
                     },
@@ -722,7 +722,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* FORD TRANSIT */}
+                      {/* F. */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.f.status === 'cross' ? '#f87171' : (row.f.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.f.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -732,7 +732,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* MERCEDES SPRINTER */}
+                      {/* M. */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.m.status === 'cross' ? '#f87171' : (row.m.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.m.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -742,7 +742,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* FIAT DUCATO */}
+                      {/* Ft. */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.fiat.status === 'cross' ? '#f87171' : (row.fiat.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.fiat.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -752,7 +752,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                         </div>
                       </td>
 
-                      {/* RENAULT MASTER */}
+                      {/* R. */}
                       <td style={{ padding: '12px 14px' }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: row.renault.status === 'cross' ? '#f87171' : (row.renault.status === 'opt' ? '#fbbf24' : '#4ade80'), fontWeight: 600 }}>
                           {row.renault.status === 'cross' && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '16px', height: '16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', flexShrink: 0 }}>✕</span>}
@@ -784,7 +784,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                   Filo Yöneticileri İçin 25.000 km Bakım, Çelik Zincir ve 3 Parça Tamponun Gerçek TCO Etkisi
                 </div>
                 <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                  Hafif ticari araç segmentinde hem IVECO Daily hem de rakipler (Ford Transit, Mercedes Sprinter, Fiat Ducato, Renault Master) yılda bir veya <strong>25.000 km'de bir periyodik bakıma</strong> girer. Ancak TCO farkını yaratan 3 ana unsur vardır: <strong>(1)</strong> Ford Transit'in 2.0L motorundaki yağ içi ıslak triger kayışı (wet belt) ağır revizyon maliyeti doğururken, Daily'nin <strong>çelik zincirli 2.3L ve 3.0L FPT motorları</strong> triger değişimi istemez. <strong>(2)</strong> Mercedes Sprinter'ın yetkili servis A/B bakım faturaları çok yüksekken Daily yetkili servis bakımı ekonomiktir. <strong>(3)</strong> Köşe sürtmelerinde rakiplerde yekpare tampon komple değişirken, Daily'de <strong>3 parçalı modüler tamponun</strong> sadece ilgili köşesi dakikalar içinde düşük maliyetle yenilenir.
+                  Hafif ticari araç segmentinde hem IVECO Daily hem de rakipler (Rakip F., Rakip M., Rakip Ft., Rakip R.) yılda bir veya <strong>25.000 km'de bir periyodik bakıma</strong> girer. Ancak TCO farkını yaratan 3 ana unsur vardır: <strong>(1)</strong> Rakip F.'nin 2.0L motorundaki yağ içi ıslak triger kayışı (wet belt) ağır revizyon maliyeti doğururken, Daily'nin <strong>çelik zincirli 2.3L ve 3.0L FPT motorları</strong> triger değişimi istemez. <strong>(2)</strong> Rakip M.'nin yetkili servis A/B bakım faturaları çok yüksekken Daily yetkili servis bakımı ekonomiktir. <strong>(3)</strong> Köşe sürtmelerinde rakiplerde yekpare tampon komple değişirken, Daily'de <strong>3 parçalı modüler tamponun</strong> sadece ilgili köşesi dakikalar içinde düşük maliyetle yenilenir.
                 </p>
               </div>
             </div>
@@ -792,7 +792,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
         </div>
       )}
 
-      {/* ── BÖLÜM 4: ÇEKİCİ & AĞIR VASITA (S-WAY VS F-MAX & ACTROS) ── */}
+      {/* ── BÖLÜM 4: ÇEKİCİ & AĞIR VASITA (S-WAY VS RAKİP F. & RAKİP M.) ── */}
       {activeSubTab === 'sway_heavy' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
@@ -801,7 +801,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>🔥 HI-SCR (EGR'SİZ MOTOR)</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>EGR Valfi & Soğutucusu Yok</div>
               <p style={{ fontSize: '0.74rem', color: '#cbd5e1', margin: 0, lineHeight: 1.4 }}>
-                S-Way 12.9L Cursor 13 motor egzoz gazını silindire geri basmaz. Ford F-MAX ve Mercedes Actros'ta görülen EGR valfi/soğutucusu arızası ve kurum birikimi S-Way'de sıfırdır.
+                S-Way 12.9L Cursor 13 motor egzoz gazını silindire geri basmaz. Rakip F. ve Rakip M. çekicilerde görülen EGR valfi/soğutucusu arızası ve kurum birikimi S-Way'de sıfırdır.
               </p>
             </div>
 
@@ -850,7 +850,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               <div>
                 <span style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase' }}>AĞIR VASITA ÇEKİCİ SEGMENTİ DOĞRULANMIŞ VERİLER</span>
                 <h3 style={{ margin: '2px 0 0', fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
-                  IVECO S-Way (AS440S500 / 530) vs Ford F-MAX 500 vs Mercedes Actros 1848 / 1851
+                  IVECO S-Way (AS440S500 / 530) vs Rakip F. (500 PS) vs Rakip M. (1848 / 1851)
                 </h3>
               </div>
               <button
@@ -883,10 +883,10 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                       IVECO S-Way (Cursor 13)
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
-                      Ford F-MAX 500
+                      Rakip F. (500 PS)
                     </th>
                     <th style={{ padding: '12px 16px', color: '#e2e8f0', fontWeight: 800, width: '26%' }}>
-                      Mercedes Actros 1848 / 1851
+                      Rakip M. (1848 / 1851)
                     </th>
                   </tr>
                 </thead>
@@ -895,8 +895,8 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     {
                       feature: 'Motor Hacmi, Güç & Tork',
                       iveco: '12.9L Cursor 13 • 490 / 530 / 580 HP (2.500 - 2.800 Nm)',
-                      fmax: '12.7L Ecotorq • 500 PS (2.500 Nm)',
-                      actros: '12.8L OM471 • 476 - 510 PS (2.300 - 2.500 Nm)',
+                      fmax: '12.7L • 500 PS (2.500 Nm)',
+                      actros: '12.8L • 476 - 510 PS (2.300 - 2.500 Nm)',
                       highlight: true
                     },
                     {
@@ -909,8 +909,8 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
                     {
                       feature: 'Şanzıman Sistemi',
                       iveco: '12 İleri ZF HI-TRONIX Otomatikleştirilmiş',
-                      fmax: '16 İleri Ecotorq / ZF Otomatikleştirilmiş',
-                      actros: '12 İleri PowerShift 3 Otomatikleştirilmiş',
+                      fmax: '16 İleri Otomatikleştirilmiş',
+                      actros: '12 İleri Otomatikleştirilmiş',
                       highlight: false
                     },
                     {
