@@ -37,13 +37,16 @@ function normalizeSectorId(rawSector) {
   return 'all';
 }
 
-export default function PricingCatalogTab({ initialSector = '', onSelectVehicle, onDirectWhatsApp, salesRep }) {
+export default function PricingCatalogTab({ initialSector = '', onSelectVehicle, onDirectWhatsApp, onTrackFootprint, salesRep }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => normalizeSectorId(initialSector));
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyDoubleWheels, setOnlyDoubleWheels] = useState(false);
   const [showTradeInBox, setShowTradeInBox] = useState(false);
   const [tradeInVehicleText, setTradeInVehicleText] = useState('');
+  const [tradeInValue, setTradeInValue] = useState(1100000);
+  const [tradeInTerm, setTradeInTerm] = useState(24);
+  const [selectedTradeInVehicleId, setSelectedTradeInVehicleId] = useState('daily-35c16-3750');
   const [tradeInTargetModel, setTradeInTargetModel] = useState('Daily 35C16 Çift Teker');
   const [showFleetBox, setShowFleetBox] = useState(false);
   const [fleetQuantity, setFleetQuantity] = useState('2 - 3 Adet');
@@ -128,10 +131,56 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
     });
   }, [selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
 
+  const tradeInCatalogModels = useMemo(() => {
+    return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && v.currency !== 'EUR' && (v.campaignPrice || v.cashPrice));
+  }, []);
+
+  const selectedTradeVehicle = useMemo(() => {
+    return tradeInCatalogModels.find(v => v.id === selectedTradeInVehicleId) || tradeInCatalogModels[0] || {
+      id: 'daily-35c16-3750',
+      model: 'IVECO Daily 35C16 3750 Şasi',
+      campaignPrice: 1930000,
+      cashPrice: 1850000
+    };
+  }, [tradeInCatalogModels, selectedTradeInVehicleId]);
+
+  const tradeInCalc = useMemo(() => {
+    const vehiclePrice = selectedTradeVehicle?.campaignPrice || selectedTradeVehicle?.cashPrice || 1930000;
+    const safeTradeVal = Math.max(0, Number(tradeInValue) || 0);
+    const remainingPrincipal = Math.max(0, vehiclePrice - safeTradeVal);
+    const term = Number(tradeInTerm) || 24;
+
+    let monthlyPayment = 0;
+    let isZeroInterest = false;
+    if (remainingPrincipal === 0) {
+      monthlyPayment = 0;
+    } else if (remainingPrincipal <= 1000000 && term === 12) {
+      // 1.000.000 TL'ye kadar 12 Ay %0 Faiz avantajı
+      monthlyPayment = Math.round(remainingPrincipal / 12);
+      isZeroInterest = true;
+    } else {
+      const r = 0.0329; // Ortalama anlaşmalı ticari kredi oranı
+      const factor = Math.pow(1 + r, term);
+      monthlyPayment = Math.round((remainingPrincipal * r * factor) / (factor - 1));
+    }
+
+    return {
+      vehiclePrice,
+      safeTradeVal,
+      remainingPrincipal,
+      term,
+      monthlyPayment,
+      isZeroInterest
+    };
+  }, [selectedTradeVehicle, tradeInValue, tradeInTerm]);
+
   const handleVehicleQuote = (vehicle) => {
+    if (onTrackFootprint) {
+      onTrackFootprint('Fiyat Kartı Teklif İsteği', vehicle.model, `${(vehicle.cashPrice || vehicle.campaignPrice || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'}`);
+    }
     if (onDirectWhatsApp) {
       if (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) {
-        const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat) için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
+        const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat) için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
         onDirectWhatsApp(msg);
         return;
       }
@@ -140,29 +189,61 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         : (vehicle.cashDiscount > 0
             ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
             : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
+      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
   };
 
   const handleVehicleTradeIn = (vehicle) => {
+    if (onTrackFootprint) {
+      onTrackFootprint('Takas + Kredi Hesaplama Açıldı', vehicle.model, `Takas Peşinat Hesaplayıcı`);
+    }
+    if (!vehicle.isCustomPrice && vehicle.currency !== 'EUR') {
+      setSelectedTradeInVehicleId(vehicle.id);
+      setTradeInTargetModel(vehicle.model);
+      setShowTradeInBox(true);
+      setShowFleetBox(false);
+      setTimeout(() => {
+        const el = document.getElementById('tradein-loan-calc-box');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 80);
+      return;
+    }
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, mevcut ticari aracımı takasa vererek (peşinata saydırıp kalan tutarı kredilendirerek) sıfır *${vehicle.model}* almak istiyorum. Takas ekspertiz ve ödeme planı için görüşebilir miyiz?`;
+      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, mevcut ticari aracımı takasa vererek (peşinata saydırıp kalan tutarı kredilendirerek) sıfır *${vehicle.model}* almak istiyorum. Takas ekspertiz ve ödeme planı için görüşebilir miyiz?`;
       onDirectWhatsApp(msg);
     }
   };
 
   const handleGeneralTradeInSubmit = () => {
+    const modelName = selectedTradeVehicle?.model || tradeInTargetModel;
+    if (onTrackFootprint) {
+      onTrackFootprint(
+        'Takas + Kredi Teklif Talebi',
+        modelName,
+        `Takas: ${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL | Kalan Kredi: ${tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL (${tradeInCalc.term} Ay x ${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL)`
+      );
+    }
     if (onDirectWhatsApp) {
       const currentCar = tradeInVehicleText.trim() ? `*${tradeInVehicleText.trim()}*` : 'mevcut ticari aracımı';
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, elimdeki ${currentCar} takasa verip peşinata saydırarak sıfır *IVECO ${tradeInTargetModel}* almak istiyorum. Takas değerleme ve kredi farkı için bilgi alabilir miyim?`;
+      const msg =
+        `Merhaba ${salesRep?.name || 'Can Bey'}, elimdeki ${currentCar} (Tahmini Takas Değeri: *${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL*) peşinata saydırarak sıfır *${modelName}* (*${tradeInCalc.vehiclePrice.toLocaleString('tr-TR')} TL*) almak istiyorum.\n\n` +
+        `📊 *Takas + Kredi Hesabım:*\n` +
+        `• Sıfır Araç Bedeli: ${tradeInCalc.vehiclePrice.toLocaleString('tr-TR')} TL\n` +
+        `• Takas Peşinatım: -${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL\n` +
+        `• Kredilendirilecek Fark: *${tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL*\n` +
+        `• Tercih Edilen Vade: *${tradeInCalc.term} Ay* (Aylık ~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL)\n\n` +
+        `Takas ekspertiz ve kesin ödeme planı için benimle iletişime geçebilir misiniz?`;
       onDirectWhatsApp(msg);
     }
   };
 
   const handleFleetDiscountSubmit = () => {
+    if (onTrackFootprint) {
+      onTrackFootprint('Çoklu Filo İskonto Talebi', fleetTargetModel, `${fleetQuantity} Filo Alımı`);
+    }
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, şirketimiz bünyesinde *${fleetQuantity}* *IVECO ${fleetTargetModel}* çoklu filo alımı planlıyoruz. Kurumsal filo özel iskontonuz, teslimat kotası ve finansman koşullarınız hakkında teklif rica ederiz.`;
+      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, şirketimiz bünyesinde *${fleetQuantity}* *IVECO ${fleetTargetModel}* çoklu filo alımı planlıyoruz. Kurumsal filo özel iskontonuz, teslimat kotası ve finansman koşullarınız hakkında teklif rica ederiz.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -245,14 +326,17 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         </div>
       )}
 
-      {/* 🔄 TAKAS PEŞİNAT & 🏢 2+ ARAÇ FİLO İSKONTOSU ÇİFT AKSİYON BARI */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(24, 42, 72, 0.94) 100%)',
-        border: '1px solid rgba(245, 158, 11, 0.42)',
-        borderRadius: '12px',
-        padding: isMobileView ? '10px 12px' : '12px 16px',
-        marginBottom: isMobileView ? '12px' : '16px'
-      }}>
+      {/* 🔄 TAKAS + KREDİ NET ÖDEME HESAPLAYICI & 🏢 2+ ARAÇ FİLO İSKONTOSU ÇİFT AKSİYON BARI */}
+      <div
+        id="tradein-loan-calc-box"
+        style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(24, 42, 72, 0.94) 100%)',
+          border: showTradeInBox ? '1.5px solid #f59e0b' : '1px solid rgba(245, 158, 11, 0.42)',
+          borderRadius: '12px',
+          padding: isMobileView ? '10px 12px' : '12px 16px',
+          marginBottom: isMobileView ? '12px' : '16px'
+        }}
+      >
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -261,13 +345,13 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
           gap: '10px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '220px' }}>
-            <span style={{ fontSize: isMobileView ? '1.25rem' : '1.45rem' }}>🤝</span>
+            <span style={{ fontSize: isMobileView ? '1.25rem' : '1.45rem' }}>🔄</span>
             <div>
               <div style={{ fontSize: isMobileView ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#fde68a' }}>
-                Takas Peşinat Desteği & Kurumsal Filo İskontosu (2+ Araç)
+                Takas + Kredi Net Ödeme Hesaplayıcı & Filo İskontosu (2+ Araç)
               </div>
               <div style={{ fontSize: isMobileView ? '0.71rem' : '0.75rem', color: '#e2e8f0' }}>
-                Eski aracınızı peşinata saydırabilir veya 2 ve üzeri çoklu araç alımlarınız için özel filo iskontosu talep edebilirsiniz.
+                Mevcut aracınızı peşinata saydırıp kalan fark için aylık banka kredi taksitinizi anında hesaplayın.
               </div>
             </div>
           </div>
@@ -275,7 +359,14 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => { setShowTradeInBox(prev => !prev); setShowFleetBox(false); }}
+              onClick={() => {
+                const next = !showTradeInBox;
+                setShowTradeInBox(next);
+                setShowFleetBox(false);
+                if (next && onTrackFootprint) {
+                  onTrackFootprint('Takas + Kredi Hesaplayıcı Açıldı', selectedTradeVehicle?.model || 'Daily 35C16', 'Üst Bar');
+                }
+              }}
               style={{
                 background: showTradeInBox ? 'rgba(255,255,255,0.16)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 color: showTradeInBox ? '#fff' : '#0f172a',
@@ -288,7 +379,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                 whiteSpace: 'nowrap'
               }}
             >
-              {showTradeInBox ? '✕ Kapat' : '🔄 Takas Aracımı Saydır'}
+              {showTradeInBox ? '✕ Hesaplayıcıyı Kapat' : '🔄 Takas + Kredi Hesapla'}
             </button>
 
             <button
@@ -314,69 +405,216 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         {showTradeInBox && (
           <div style={{
             marginTop: '12px',
-            paddingTop: '12px',
-            borderTop: '1px dashed rgba(245, 158, 11, 0.35)',
+            paddingTop: '14px',
+            borderTop: '1px dashed rgba(245, 158, 11, 0.45)',
             display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px',
-            alignItems: 'center'
+            flexDirection: 'column',
+            gap: '12px'
           }}>
-            <input
-              type="text"
-              value={tradeInVehicleText}
-              onChange={(e) => setTradeInVehicleText(e.target.value)}
-              placeholder="Mevcut aracınız (Örn: 2020 Ford Transit 350ED / 2018 Atego...)"
-              style={{
-                flex: '2 1 220px',
-                padding: '9px 12px',
-                background: 'rgba(15, 28, 50, 0.85)',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '0.8rem',
-                outline: 'none'
-              }}
-            />
-            <select
-              value={tradeInTargetModel}
-              onChange={(e) => setTradeInTargetModel(e.target.value)}
-              style={{
-                flex: '1 1 180px',
-                padding: '9px 12px',
-                background: 'rgba(15, 28, 50, 0.9)',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
-                borderRadius: '8px',
-                color: '#fff',
-                fontSize: '0.8rem',
-                outline: 'none'
-              }}
-            >
-              <option value="Daily 35C16 Çift Teker">Hedef: Daily 35C16 Çift Teker</option>
-              <option value="Daily 35S16 Tek Teker / Panelvan">Hedef: Daily 35S16 / Panelvan</option>
-              <option value="Daily 72C18 (7 Ton Kamyon)">Hedef: Daily 72C18 (7 Ton)</option>
-              <option value="Eurocargo 100E / 150E / 160E">Hedef: Eurocargo Kamyon</option>
-              <option value="S-Way Çekici / T-Way Hafriyat">Hedef: S-Way / T-Way</option>
-            </select>
-            <button
-              type="button"
-              onClick={handleGeneralTradeInSubmit}
-              style={{
-                background: '#22c55e',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '9px 16px',
-                fontSize: '0.8rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              <FiMessageSquare size={14} /> WhatsApp'tan Takas Teklifi Al
-            </button>
+            {/* 1. Satır: Hedef Sıfır IVECO Modeli & Mevcut Takas Aracı */}
+            <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.2fr 1fr', gap: '10px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#7dd3fc', marginBottom: '4px' }}>
+                  1. Almak İstediğiniz Sıfır IVECO Modeli:
+                </label>
+                <select
+                  value={selectedTradeInVehicleId}
+                  onChange={(e) => {
+                    setSelectedTradeInVehicleId(e.target.value);
+                    const found = tradeInCatalogModels.find(v => v.id === e.target.value);
+                    if (found) setTradeInTargetModel(found.model);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    background: 'rgba(15, 28, 50, 0.95)',
+                    border: '1px solid rgba(56, 189, 248, 0.5)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    outline: 'none'
+                  }}
+                >
+                  {tradeInCatalogModels.map(v => (
+                    <option key={v.id} value={v.id} style={{ background: '#0f1c32', color: '#fff' }}>
+                      {v.model} — {(v.campaignPrice || v.cashPrice).toLocaleString('tr-TR')} TL
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#fde68a', marginBottom: '4px' }}>
+                  2. Takasa Vereceğiniz Mevcut Araç (Opsiyonel):
+                </label>
+                <input
+                  type="text"
+                  value={tradeInVehicleText}
+                  onChange={(e) => setTradeInVehicleText(e.target.value)}
+                  placeholder="Örn: 2020 Ford Transit 350ED / 2018 Daily / Atego..."
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    background: 'rgba(15, 28, 50, 0.9)',
+                    border: '1px solid rgba(245, 158, 11, 0.45)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '0.8rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 2. Satır: Takas Aracının Tahmini Peşinat Değeri + Vade Seçimi */}
+            <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.3fr 0.7fr', gap: '10px', alignItems: 'end' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px', flexWrap: 'wrap', gap: '4px' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fde68a' }}>
+                    3. Takas Aracınızın Tahmini Değeri (Peşinat):
+                  </label>
+                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                    {[750000, 1000000, 1250000, 1500000, 2000000].map(preset => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setTradeInValue(preset)}
+                        style={{
+                          padding: '3px 7px',
+                          borderRadius: '6px',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          background: Number(tradeInValue) === preset ? '#f59e0b' : 'rgba(255,255,255,0.08)',
+                          color: Number(tradeInValue) === preset ? '#0f172a' : '#cbd5e1',
+                          border: Number(tradeInValue) === preset ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.15)'
+                        }}
+                      >
+                        {(preset / 1000000).toLocaleString('tr-TR')}M TL
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <input
+                  type="number"
+                  step={50000}
+                  min={0}
+                  max={10000000}
+                  value={tradeInValue}
+                  onChange={(e) => setTradeInValue(Math.max(0, Number(e.target.value) || 0))}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    background: 'rgba(15, 28, 50, 0.95)',
+                    border: '1px solid rgba(245, 158, 11, 0.5)',
+                    borderRadius: '8px',
+                    color: '#fde68a',
+                    fontSize: '0.88rem',
+                    fontWeight: 800,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#7dd3fc', marginBottom: '5px' }}>
+                  4. Kalan Tutar İçin Kredi Vadesi:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                  {[12, 24, 36].map(t => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTradeInTerm(t)}
+                      style={{
+                        padding: '9px 6px',
+                        borderRadius: '8px',
+                        fontSize: '0.78rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        background: tradeInTerm === t ? 'linear-gradient(135deg, #0284c7, #004B93)' : 'rgba(15, 28, 50, 0.9)',
+                        color: '#fff',
+                        border: tradeInTerm === t ? '1.5px solid #38bdf8' : '1px solid rgba(148,163,184,0.3)'
+                      }}
+                    >
+                      {t} Ay
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Satır: Canlı Hesaplama Özeti & Gönder Butonu */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.88)',
+              border: '1px solid rgba(56, 189, 248, 0.38)',
+              borderRadius: '10px',
+              padding: isMobileView ? '10px 12px' : '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px'
+            }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobileView ? '10px' : '18px', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: '#94a3b8', fontWeight: 700 }}>SIFIR ARAÇ BEDELİ</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff' }}>
+                    {tradeInCalc.vehiclePrice.toLocaleString('tr-TR')} TL
+                  </div>
+                </div>
+                <div style={{ color: '#64748b', fontWeight: 900 }}>−</div>
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: '#fde68a', fontWeight: 700 }}>TAKAS PEŞİNATINIZ</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
+                    {tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL
+                  </div>
+                </div>
+                <div style={{ color: '#64748b', fontWeight: 900 }}>=</div>
+                <div>
+                  <div style={{ fontSize: '0.66rem', color: '#7dd3fc', fontWeight: 700 }}>KREDİLENDİRİLECEK FARK</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 900, color: '#38bdf8' }}>
+                    {tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL
+                  </div>
+                </div>
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.16)',
+                  border: '1px solid rgba(16, 185, 129, 0.45)',
+                  borderRadius: '8px',
+                  padding: '6px 12px'
+                }}>
+                  <div style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 800 }}>
+                    {tradeInCalc.term} AY TAHMİNİ TAKSİT {tradeInCalc.isZeroInterest ? '(%0 FAİZ!)' : ''}
+                  </div>
+                  <div style={{ fontSize: '1.02rem', fontWeight: 900, color: '#34d399' }}>
+                    {tradeInCalc.remainingPrincipal > 0 ? `~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL / Ay` : 'Kredi Gerekmiyor'}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGeneralTradeInSubmit}
+                style={{
+                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '9px',
+                  padding: '10px 16px',
+                  fontSize: '0.8rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
+                }}
+              >
+                <FiMessageSquare size={14} /> Satış Sorumlusu Can M. Sizinle İletişime Geçsin
+              </button>
+            </div>
           </div>
         )}
 

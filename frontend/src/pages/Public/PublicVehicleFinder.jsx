@@ -1393,6 +1393,51 @@ export default function PublicVehicleFinder() {
     }
   }, [matched?.key, matched?.currency]);
 
+  // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e İletir)
+  const sentFootprintsRef = React.useRef(new Set());
+  const recordCustomerFootprint = (actionLabel, modelOverride, campaignOverride) => {
+    if (isAdminMode || isPreviewMode) return;
+    const key = `${actionLabel}|${modelOverride || ''}|${campaignOverride || ''}`;
+    if (sentFootprintsRef.current.has(key)) return;
+    sentFootprintsRef.current.add(key);
+
+    const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
+    const visitorLabel = (customerCompany || customerName || '').trim() || 'Portal Ziyaretçisi';
+    const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+
+    discoveryApi.recordIntentSignal({
+      source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
+      search_query: `[Canlı Ayak İzi - ${actionLabel}]`,
+      target_model: modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog',
+      target_campaign: campaignOverride || (sectorParam ? `Sektör: ${sectorParam}` : '2026 Fiyat & Kredi Portalı'),
+      company_name: visitorLabel,
+      city: customerCity || 'Samsun',
+      phone: customerPhone || '',
+      page_url: window.location.href,
+      referrer: document.referrer || 'whatsapp_vip_link',
+      duration_seconds: durationSeconds,
+      scroll_depth: 80,
+      intent_score: (customerCompany || customerIdParam) ? 94 : 82,
+      intent_level: (customerCompany || customerIdParam) ? 'very_high' : 'high',
+      matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
+      notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
+    }).catch(() => {});
+  };
+
+  // Müşteri kendisine gönderilen VIP Linki açtığında anında CRM'e "Portal Açıldı" sinyali gönder
+  useEffect(() => {
+    if ((customerCompany || customerIdParam) && !isAdminMode && !isPreviewMode) {
+      const timer = setTimeout(() => {
+        recordCustomerFootprint(
+          'VIP Link Açıldı (Katalog İnceleniyor)',
+          selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
+          sectorParam ? `Sektör Filtresi: ${sectorParam}` : 'Genel Katalog'
+        );
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [customerCompany, customerIdParam]);
+
   // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {
     e.preventDefault();
@@ -2635,11 +2680,13 @@ IVECO ERC Samsun Otomotiv
           <PricingCatalogTab
             initialSector={sectorParam}
             onSelectVehicle={(vehicle) => {
+              recordCustomerFootprint('Kredi Planı İnceleme', vehicle?.model || String(vehicle), '2026 Fiyat Listesinden Seçildi');
               handleSelectVehicle(vehicle);
               setActiveMainTab('secici');
               setStep(2);
             }}
             onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
+            onTrackFootprint={recordCustomerFootprint}
             salesRep={SALES_REP}
           />
         </div>
@@ -5145,7 +5192,7 @@ IVECO ERC Samsun Otomotiv
       {/* ── FOOTER & YASAL BİLGİLENDİRME ─────────────────────────── */}
       <div style={{
         maxWidth: '740px',
-        margin: '28px auto 0',
+        margin: isMobileView ? '28px auto 76px' : '28px auto 0',
         padding: '16px 20px',
         background: 'rgba(15, 23, 42, 0.45)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -5165,6 +5212,102 @@ IVECO ERC Samsun Otomotiv
           Nihai araç teslim tarihi, anahtar teslim fiyatı, opsiyonel donanımlar ve resmi kredi onay şartları IVECO ERC Samsun Otomotiv ile düzenlenecek resmi satış sözleşmesiyle kesinlik kazanır. Fiyatlar ve stok durumu fabrika/distribütör koşullarına bağlı olarak değişkenlik gösterebilir.
         </p>
       </div>
+
+      {/* ── 📱 MOBİL SABİT HIZLI İLETİŞİM BARI (STICKY BOTTOM BAR) ── */}
+      {isMobileView && !showSendModal && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9980,
+          background: 'rgba(11, 21, 38, 0.96)',
+          backdropFilter: 'blur(12px)',
+          borderTop: '1.5px solid rgba(56, 189, 248, 0.42)',
+          boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.65)',
+          padding: '8px 10px calc(8px + env(safe-area-inset-bottom, 0px))',
+          display: 'grid',
+          gridTemplateColumns: '0.9fr 1.35fr 0.95fr',
+          gap: '7px',
+          alignItems: 'center'
+        }}>
+          <a
+            href={`tel:${SALES_REP.phoneClean}`}
+            onClick={() => recordCustomerFootprint('Mobil Alt Bar: Telefonla Ara', matched?.modelTitle, SALES_REP.phoneDisplay)}
+            style={{
+              background: '#0284c7',
+              color: '#fff',
+              borderRadius: '10px',
+              padding: '10px 6px',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <FiPhone size={13} /> Hemen Ara
+          </a>
+
+          <button
+            type="button"
+            onClick={() => {
+              recordCustomerFootprint('Mobil Alt Bar: WhatsApp Görüşme', matched?.modelTitle, 'Doğrudan WhatsApp');
+              handleDirectWhatsApp();
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '10px 8px',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 3px 10px rgba(34, 197, 94, 0.35)'
+            }}
+          >
+            <FiMessageSquare size={14} /> Can M. (WhatsApp)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              recordCustomerFootprint('Mobil Alt Bar: Teklif İste Formu', matched?.modelTitle, 'Hızlı Teklif');
+              setActiveMainTab('secici');
+              setStep(2);
+              setTimeout(() => {
+                window.scrollTo({ top: document.body.scrollHeight * 0.55, behavior: 'smooth' });
+              }, 100);
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: '#0f172a',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '10px 6px',
+              fontSize: '0.76rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <FiFileText size={13} /> Teklif İste
+          </button>
+        </div>
+      )}
     </div>
   );
 }

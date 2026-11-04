@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { dashboardApi, crmApi, vehiclesApi, workbenchApi } from '../api/client';
+import { dashboardApi, crmApi, vehiclesApi, workbenchApi, discoveryApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import useGeolocation from '../hooks/useGeolocation';
@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [discoveries, setDiscoveries] = useState([]);
   const [highPotential, setHighPotential] = useState([]);
   const [todayCalls, setTodayCalls] = useState([]);
+  const [liveFootprints, setLiveFootprints] = useState([]);
 
   // Filo Yenileme & Akıllı Takip State'leri
   const [upcomingReminders, setUpcomingReminders] = useState([]);
@@ -83,6 +84,7 @@ export default function Dashboard() {
       crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
       vehiclesApi.getTodayOpportunities().then(r => setOpportunities(r.data)).catch(() => {}),
       vehiclesApi.getVehiclePipeline().then(r => setVehiclePipeline(r.data)).catch(() => {}),
+      discoveryApi.getIntentSignals({ limit: 6 }).then(r => setLiveFootprints(r.data || [])).catch(() => {}),
       workbenchApi.getFieldAssistant({
         city: city === 'Tümü' ? undefined : city,
         lat: location?.latitude,
@@ -348,6 +350,46 @@ export default function Dashboard() {
           </div>
         </section>
 
+        {/* 📡 Canlı Müşteri Ayak İzi (Mobil) */}
+        {liveFootprints.length > 0 && (
+          <section className="mobile-section mb-6">
+            <div className="flex justify-between items-center mb-3">
+              <div className="section-title" style={{ margin: 0, color: '#38bdf8' }}>📡 CANLI MÜŞTERİ AYAK İZİ (PORTAL)</div>
+              <span className="badge badge-blue">{liveFootprints.length}</span>
+            </div>
+            <div className="mobile-list">
+              {liveFootprints.slice(0, 4).map((fp, i) => (
+                <div
+                  key={fp.id || i}
+                  className="mobile-list-item"
+                  onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/discovery/intent-radar')}
+                  style={{ borderLeft: '3px solid #38bdf8' }}
+                >
+                  <div className="item-avatar" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+                    <FiZap size={16} />
+                  </div>
+                  <div className="item-details">
+                    <div className="item-name">{fp.company_name || 'Portal Ziyaretçisi'}</div>
+                    <div className="item-sub" style={{ color: '#7dd3fc' }}>
+                      {fp.target_model || '2026 Katalog'} · {fp.search_query?.replace(/^\[|\]$/g, '') || 'Portal İncelemesi'}
+                    </div>
+                  </div>
+                  {fp.phone && (
+                    <a
+                      href={`tel:${fp.phone}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="btn btn-sm"
+                      style={{ padding: '5px 8px', background: '#0284c7', color: '#fff', borderRadius: 6, fontSize: '0.72rem', textDecoration: 'none' }}
+                    >
+                      <FiPhone size={12} />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Yaklaşan Bilgilendirmeler & Hatırlatıcılar */}
         {upcomingReminders.length > 0 && (
           <section className="mobile-section mb-6">
@@ -444,7 +486,7 @@ export default function Dashboard() {
   // ── DESKTOP DASHBOARD (Mevcut Görünüm) ─────────────────────────────
   return (
     <div className="animate-in">
-      {/* ⚡ SAHA SATIŞ ASİSTANI (Desktop Hero) */}
+      {/* ⚡ SAHA SATIST ASİSTANI (Desktop Hero) */}
       <FieldAssistantHero
         stats={fieldAssistant?.counts || {}}
         selectedCity={selectedCity}
@@ -500,6 +542,153 @@ export default function Dashboard() {
         cleaningAuto={cleaningAuto}
         isMobile={false}
       />
+
+      {/* ── 📡 CANLI MÜŞTERİ AYAK İZİ (Müşteri Form Doldurmasa Bile Portalda Ne İnceledi?) ── */}
+      {liveFootprints.length > 0 && (
+        <div className="card glass-card mt-6" style={{
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(12, 32, 62, 0.88) 100%)'
+        }}>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                width: 10, height: 10, borderRadius: '50%', background: '#10b981',
+                boxShadow: '0 0 10px #10b981', display: 'inline-block'
+              }} />
+              <h3 className="card-title" style={{ margin: 0, color: '#f8fafc', fontSize: '0.96rem' }}>
+                📡 Canlı Müşteri Ayak İzi (Portalda Ne İncelediler?)
+              </h3>
+              <span className="badge badge-blue" style={{ fontSize: '0.72rem' }}>
+                Son {liveFootprints.length} Sinyal
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/discovery/intent-radar')}
+              style={{
+                background: 'rgba(56, 189, 248, 0.14)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                color: '#38bdf8',
+                borderRadius: '8px',
+                padding: '5px 12px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5
+              }}
+            >
+              Tüm Niyet Radarını Aç <FiArrowRight size={13} />
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '10px', marginTop: '8px' }}>
+            {liveFootprints.slice(0, 6).map((fp, idx) => (
+              <div
+                key={fp.id || idx}
+                style={{
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderLeft: '3px solid #38bdf8',
+                  borderRadius: '10px',
+                  padding: '10px 12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '8px'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                    <div
+                      onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/discovery/intent-radar')}
+                      style={{ fontWeight: 800, fontSize: '0.86rem', color: '#f8fafc', cursor: 'pointer' }}
+                    >
+                      {fp.company_name || 'Portal Ziyaretçisi'}
+                    </div>
+                    <span style={{ fontSize: '0.68rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                      {fp.created_at ? new Date(fp.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : 'Canlı'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 700, marginTop: '3px' }}>
+                    🚛 {fp.target_model || '2026 Katalog İncelemesi'}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
+                    {fp.search_query?.replace(/^\[|\]$/g, '') || fp.target_campaign || 'VIP Portal Ziyareti'}
+                    {fp.target_campaign ? ` • ${fp.target_campaign}` : ''}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  {fp.phone && (
+                    <a
+                      href={`tel:${fp.phone}`}
+                      style={{
+                        padding: '4px 9px', borderRadius: '6px', background: '#0284c7', color: '#fff',
+                        fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
+                      }}
+                    >
+                      <FiPhone size={11} /> Ara
+                    </a>
+                  )}
+                  {fp.phone && (
+                    <button
+                      type="button"
+                      onClick={() => sendCustomerVipPortalWhatsApp({
+                        id: fp.matched_customer_id,
+                        company_name: fp.company_name,
+                        phone: fp.phone,
+                        city: fp.city
+                      })}
+                      style={{
+                        padding: '4px 9px', borderRadius: '6px',
+                        background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.45)',
+                        color: '#34d399', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4
+                      }}
+                    >
+                      <FiSend size={11} /> VIP Link
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/proforma/quick', {
+                      state: {
+                        customer: {
+                          id: fp.matched_customer_id,
+                          company_name: fp.company_name,
+                          phone: fp.phone,
+                          city: fp.city
+                        }
+                      }
+                    })}
+                    style={{
+                      padding: '4px 9px', borderRadius: '6px',
+                      background: 'rgba(59, 130, 246, 0.16)', border: '1px solid rgba(59, 130, 246, 0.35)',
+                      color: '#60a5fa', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4
+                    }}
+                  >
+                    <FiFileText size={11} /> Teklif
+                  </button>
+                  {fp.matched_customer_id && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/customers/${fp.matched_customer_id}`)}
+                      style={{
+                        marginLeft: 'auto', padding: '4px 8px', borderRadius: '6px',
+                        background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+                        color: '#cbd5e1', fontSize: '0.7rem', cursor: 'pointer'
+                      }}
+                    >
+                      Kartı Aç
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── GÜNLÜK AKSİYON LİSTELERİ (Bugün Aranacak, Yeni Keşifler, Yüksek Potansiyel) ── */}
       <div className="dashboard-row-3 mt-6">

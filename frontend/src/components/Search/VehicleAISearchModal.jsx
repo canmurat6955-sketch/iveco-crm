@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { vehiclesApi } from '../../api/client';
-import { FiSearch, FiX, FiZap, FiTruck, FiPhone, FiMessageSquare, FiExternalLink, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { vehiclesApi, crmApi } from '../../api/client';
+import { FiSearch, FiX, FiZap, FiTruck, FiPhone, FiMessageSquare, FiExternalLink, FiClock, FiAlertCircle, FiSend, FiFileText, FiUser } from 'react-icons/fi';
+import { sendCustomerVipPortalWhatsApp } from '../../utils/whatsapp';
 import toast from 'react-hot-toast';
 
 const EXAMPLE_QUERIES = [
@@ -20,7 +21,32 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchResponse, setSearchResponse] = useState(null);
+  const [quickCustomers, setQuickCustomers] = useState([]);
+  const [quickLoading, setQuickLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Canlı Müşteri Arama (Firma adı, kişi, şehir veya telefonun son 4 hanesi yazılır yazılmaz anında bulur)
+  useEffect(() => {
+    if (!isOpen) return;
+    const q = query.trim();
+    if (q.length < 2) {
+      setQuickCustomers([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        setQuickLoading(true);
+        const res = await crmApi.getCustomers({ search: q, limit: 6 });
+        const items = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.customers || []);
+        setQuickCustomers(items.slice(0, 6));
+      } catch (_) {
+        setQuickCustomers([]);
+      } finally {
+        setQuickLoading(false);
+      }
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [query, isOpen]);
 
   if (!isOpen) return null;
 
@@ -142,6 +168,119 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
 
         {/* Content Body */}
         <div style={{ overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* ⚡ HIZLI MÜŞTERİ BULUCU SONUÇLARI (Yazarken Anında Çıkar) */}
+          {(quickLoading || quickCustomers.length > 0) && (
+            <div style={{
+              background: 'rgba(15, 28, 50, 0.75)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: 12,
+              padding: '12px 14px'
+            }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: 10, fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <FiUser size={14} /> Hızlı Müşteri Eşleşmeleri ({quickCustomers.length})
+                </span>
+                {quickLoading && <span style={{ color: '#94a3b8', fontSize: '0.72rem' }}>Aranıyor...</span>}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {quickCustomers.map((c) => (
+                  <div
+                    key={c.id}
+                    style={{
+                      background: '#1e293b',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: 10,
+                      padding: '10px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: 10
+                    }}
+                  >
+                    <div
+                      onClick={() => handleCustomerClick(c.id)}
+                      style={{ flex: '1 1 200px', cursor: 'pointer' }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#f8fafc' }}>
+                        {c.company_name}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>
+                        {c.city || 'Şehir Yok'} {c.sector ? `• ${c.sector}` : ''} • Tel: {c.phone || '-'}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      {c.phone && (
+                        <a
+                          href={`tel:${c.phone}`}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            padding: '6px 10px', borderRadius: 7, background: '#0284c7', color: '#fff',
+                            fontSize: '0.74rem', fontWeight: 700, textDecoration: 'none',
+                            display: 'inline-flex', alignItems: 'center', gap: 4
+                          }}
+                        >
+                          <FiPhone size={12} /> Ara
+                        </a>
+                      )}
+                      {c.phone && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            sendCustomerVipPortalWhatsApp(c);
+                          }}
+                          style={{
+                            padding: '6px 10px', borderRadius: 7,
+                            background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.45)',
+                            color: '#34d399', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer',
+                            display: 'inline-flex', alignItems: 'center', gap: 4
+                          }}
+                          title="Sektörüne Özel VIP 2026 Fiyat & Kredi Portalı Linkini Gönder"
+                        >
+                          <FiSend size={12} /> VIP Link
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onClose();
+                          navigate('/proforma/quick', { state: { customer: c } });
+                        }}
+                        style={{
+                          padding: '6px 10px', borderRadius: 7,
+                          background: 'rgba(59, 130, 246, 0.16)', border: '1px solid rgba(59, 130, 246, 0.35)',
+                          color: '#60a5fa', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer',
+                          display: 'inline-flex', alignItems: 'center', gap: 4
+                        }}
+                        title="Bu Müşteri İçin Tek Tıkla Hızlı Proforma Hazırla"
+                      >
+                        <FiFileText size={12} /> Teklif
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCustomerClick(c.id)}
+                        style={{
+                          padding: '6px 10px', borderRadius: 7,
+                          background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.15)',
+                          color: '#e2e8f0', fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer'
+                        }}
+                      >
+                        Detay →
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Parsed Filters Display */}
           {searchResponse?.parsed_filters && (
             <div style={{

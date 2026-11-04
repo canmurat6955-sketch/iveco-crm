@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { FiPhone, FiX, FiCheck, FiCalendar, FiClock, FiFileText } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiPhone, FiX, FiCheck, FiCalendar, FiClock, FiFileText, FiMic, FiMicOff } from 'react-icons/fi';
 import { workbenchApi } from '../../api/client';
+import toast from 'react-hot-toast';
 
 const OUTCOMES = [
   { id: 'interested', label: 'Görüşüldü – İlgileniyor', color: '#10b981', desc: 'İletişim aşamasına taşınır' },
@@ -8,6 +9,13 @@ const OUTCOMES = [
   { id: 'call_back', label: 'Tekrar Aranacak', color: '#f59e0b', desc: 'Takip tarihi belirlenir' },
   { id: 'no_answer', label: 'Ulaşılamadı / Meşgul', color: '#8b5cf6', desc: 'Otomatik yarın tekrar aranacak' },
   { id: 'not_interested', label: 'İlgilenmiyor / Kayıp', color: '#ef4444', desc: 'Fırsat kaybedildi olarak işaretlenir' },
+];
+
+const QUICK_NOTE_CHIPS = [
+  'Daily 35C16 ilgileniyor, fiyat inceliyor.',
+  'Mevcut aracını takasa verip kredi kullanmak istiyor.',
+  'Haftaya tekrar aranacak, ortaklarıyla görüşecek.',
+  'Eurocargo / ağır vasıta şasi teslim süresi sordu.'
 ];
 
 export default function CallOutcomeModal({ isOpen, onClose, customer, onSuccess }) {
@@ -18,6 +26,66 @@ export default function CallOutcomeModal({ isOpen, onClose, customer, onSuccess 
   const [followUpDate, setFollowUpDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (_) {}
+      }
+    };
+  }, []);
+
+  const toggleVoiceDictation = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Tarayıcınız sesle yazdırma özelliğini desteklemiyor (Chrome veya Edge önerilir).');
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) {}
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'tr-TR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(r => r[0]?.transcript || '')
+          .join(' ')
+          .trim();
+        if (transcript) {
+          setNotes(prev => (prev ? `${prev.trim()} ${transcript}` : transcript));
+          toast.success('🎙️ Sesli not eklendi');
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      setIsListening(false);
+      toast.error('Mikrofon başlatılamadı.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
@@ -138,22 +206,66 @@ export default function CallOutcomeModal({ isOpen, onClose, customer, onSuccess 
             </div>
           )}
 
-          {/* Not */}
+          {/* Not + 🎙️ Sesle Yazdır */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#cbd5e1', marginBottom: '6px' }}>
-              <FiFileText size={14} /> Görüşme Notu (İsteğe bağlı):
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', gap: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#cbd5e1', margin: 0 }}>
+                <FiFileText size={14} /> Görüşme Notu:
+              </label>
+              <button
+                type="button"
+                onClick={toggleVoiceDictation}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  borderRadius: '20px',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  background: isListening ? 'rgba(239, 68, 68, 0.25)' : 'rgba(56, 189, 248, 0.16)',
+                  border: isListening ? '1px solid #ef4444' : '1px solid rgba(56, 189, 248, 0.4)',
+                  color: isListening ? '#fca5a5' : '#38bdf8'
+                }}
+                title="Mikrofonla konuşarak notu otomatik yazdırın"
+              >
+                {isListening ? <FiMicOff size={13} /> : <FiMic size={13} />}
+                {isListening ? '🔴 Dinleniyor... (Durdur)' : '🎙️ Sesle Yazdır'}
+              </button>
+            </div>
             <textarea
               rows={2}
-              placeholder="Örn: Daily 35C16 sordu, fiyat istedi..."
+              placeholder="Mikrofona basıp konuşun veya buraya yazın (Örn: Daily 35C16 sordu, fiyat istedi...)"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               style={{
                 width: '100%', padding: '10px 12px', borderRadius: '8px',
-                background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.15)',
+                background: 'rgba(0,0,0,0.25)', border: isListening ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.15)',
                 color: '#fff', fontSize: '13px', resize: 'vertical'
               }}
             />
+            {/* Tek Tık Hızlı Not Şablonları */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '6px' }}>
+              {QUICK_NOTE_CHIPS.map((chip, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setNotes(prev => (prev ? `${prev.trim()} ${chip}` : chip))}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: '#94a3b8',
+                    borderRadius: '6px',
+                    padding: '3px 7px',
+                    fontSize: '11px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  + {chip}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Butonlar */}

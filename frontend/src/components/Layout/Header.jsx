@@ -36,6 +36,17 @@ export default function Header() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowAiSearch(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const getTitle = () => {
     if (location.pathname.match(/^\/customers\/\d+$/)) return 'Müşteri Detayı';
     return PAGE_TITLES[location.pathname] || 'Iveco Enterprise CRM';
