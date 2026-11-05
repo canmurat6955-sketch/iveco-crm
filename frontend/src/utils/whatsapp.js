@@ -111,15 +111,21 @@ export function sendCustomerVipPortalWhatsApp(cust, options = {}) {
   );
 
   const cid = cust.id || cust.customer_id;
+  const followUpDate48h = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   if (cid) {
     const sectorNote = sectorTitles[secKey] ? ` (${sectorTitles[secKey]})` : '';
     crmApi.createInteraction(cid, {
       interaction_type: 'whatsapp',
       notes: `[WhatsApp] VIP Dijital Showroom & 2026 Fiyat/Kredi Hesaplayıcı Linki gönderildi${sectorNote}.`,
-      next_action: 'Canlı Ayak İzi / Portal inceleme takibi'
+      next_action: '48 Saat Unutma Kalkanı: VIP Katalog & Teklif geri dönüş takibi',
+      next_action_date: followUpDate48h
     }).catch(() => {});
   }
 
-  openWhatsApp(cust.phone, msg, { customer: cust, onSuccess: options.onSuccess });
+  openWhatsApp(cust.phone, msg, {
+    customer: cust,
+    skipModal: Boolean(options.skipModal),
+    onSuccess: options.onSuccess
+  });
 }
 

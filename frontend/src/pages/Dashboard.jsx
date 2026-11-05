@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardApi, crmApi, vehiclesApi, workbenchApi, discoveryApi } from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
@@ -66,6 +66,32 @@ export default function Dashboard() {
 
   const [loadError, setLoadError] = useState(false);
   const [showAnalyticsCharts, setShowAnalyticsCharts] = useState(false);
+  const lastSeenFootprintIdRef = useRef(null);
+
+  const playFootprintChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const now = ctx.currentTime;
+      const playTone = (freq, startOffset, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + startOffset);
+        gain.gain.setValueAtTime(0.14, now + startOffset);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + startOffset + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + startOffset);
+        osc.stop(now + startOffset + duration);
+      };
+      playTone(880, 0, 0.18);
+      playTone(1174.66, 0.16, 0.28);
+    } catch {
+      // Ses çalınamazsa sessizce geç
+    }
+  };
 
   const { user } = useAuth();
   const isMobile = useDeviceDetect();
@@ -84,7 +110,13 @@ export default function Dashboard() {
       crmApi.getFleetRenewalOpportunities().then(r => setRenewalOpportunities(r.data || [])),
       vehiclesApi.getTodayOpportunities().then(r => setOpportunities(r.data)).catch(() => {}),
       vehiclesApi.getVehiclePipeline().then(r => setVehiclePipeline(r.data)).catch(() => {}),
-      discoveryApi.getIntentSignals({ limit: 6 }).then(r => setLiveFootprints(r.data || [])).catch(() => {}),
+      discoveryApi.getIntentSignals({ limit: 6 }).then(r => {
+        const list = r.data || [];
+        setLiveFootprints(list);
+        if (list.length > 0 && list[0].id && !lastSeenFootprintIdRef.current) {
+          lastSeenFootprintIdRef.current = list[0].id;
+        }
+      }).catch(() => {}),
       workbenchApi.getFieldAssistant({
         city: city === 'Tümü' ? undefined : city,
         lat: location?.latitude,
@@ -124,7 +156,24 @@ export default function Dashboard() {
 
   const refreshLiveFootprints = () => {
     discoveryApi.getIntentSignals({ limit: 6 })
-      .then(r => setLiveFootprints(r.data || []))
+      .then(r => {
+        const list = r.data || [];
+        if (list.length > 0 && list[0].id) {
+          if (lastSeenFootprintIdRef.current && list[0].id > lastSeenFootprintIdRef.current) {
+            const newest = list[0];
+            playFootprintChime();
+            toast.success(
+              `🔥 CANLI MÜŞTERİ PORTALDA: ${newest.company_name || 'Ziyaretçi'} şu an ${newest.target_model || '2026 Katalog'} inceliyor!`,
+              { duration: 8000 }
+            );
+            if (typeof document !== 'undefined') {
+              document.title = `🔥 (1) ${newest.company_name || 'MÜŞTERİ'} PORTALDA! | IVECO CRM`;
+            }
+          }
+          lastSeenFootprintIdRef.current = list[0].id;
+        }
+        setLiveFootprints(list);
+      })
       .catch(() => {});
   };
 
@@ -139,7 +188,18 @@ export default function Dashboard() {
     const fpInterval = setInterval(() => {
       refreshLiveFootprints();
     }, 20000);
-    return () => clearInterval(fpInterval);
+    const resetTitle = () => {
+      if (typeof document !== 'undefined' && document.title.startsWith('🔥')) {
+        document.title = 'IVECO CRM — Müşteri İstihbarat & Satış';
+      }
+    };
+    window.addEventListener('focus', resetTitle);
+    window.addEventListener('click', resetTitle);
+    return () => {
+      clearInterval(fpInterval);
+      window.removeEventListener('focus', resetTitle);
+      window.removeEventListener('click', resetTitle);
+    };
   }, []);
 
   // Konum alındığında yakındaki müşterileri dinamik sorgula

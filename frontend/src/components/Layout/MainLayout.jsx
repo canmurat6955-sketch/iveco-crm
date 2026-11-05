@@ -12,6 +12,7 @@ import { useVisit } from '../../contexts/VisitContext';
 import toast from 'react-hot-toast';
 
 import PwaInstallPrompt from '../common/PwaInstallPrompt';
+import OfficeQuickAssistantDrawer from '../CRM/OfficeQuickAssistantDrawer';
 
 export default function MainLayout() {
   const isMobile = useDeviceDetect();
@@ -51,6 +52,7 @@ export default function MainLayout() {
           <Outlet />
         </main>
         <VehicleAISearchModal isOpen={showMobileSearch} onClose={() => setShowMobileSearch(false)} />
+        <OfficeQuickAssistantDrawer />
         <PwaInstallPrompt />
         <BottomNav onVisitStart={handleQuickVisit} />
       </div>
@@ -68,6 +70,7 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+      <OfficeQuickAssistantDrawer />
     </div>
   );
 }

@@ -23,6 +23,9 @@ export default function Workbench() {
   // ─────────────────────────────────────────────────────────────
   const [todayData, setTodayData] = useState(null);
   const [todayLoading, setTodayLoading] = useState(true);
+  const [serialVipOpen, setSerialVipOpen] = useState(false);
+  const [serialVipIndex, setSerialVipIndex] = useState(0);
+  const [sentVipIds, setSentVipIds] = useState([]);
 
   const loadTodayQueue = async () => {
     setTodayLoading(true);
@@ -288,6 +291,143 @@ export default function Workbench() {
             <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>Veri bulunamadı.</div>
           ) : (
             <div>
+              {/* ⚡ SERİ VIP LİNK KUYRUĞU (Ofisten 3 Dakikada 20 Firmaya Gönder & Sıradakine Geç) */}
+              {(() => {
+                const rawPool = [
+                  ...(todayData.followups || []),
+                  ...(todayData.stale_pipeline || []),
+                  ...(todayData.new_calls || [])
+                ];
+                const seen = new Set();
+                const vipQueue = rawPool.filter(c => {
+                  const cid = c.id || c.customer_id;
+                  if (!c.phone || !cid || seen.has(cid) || sentVipIds.includes(cid)) return false;
+                  seen.add(cid);
+                  return true;
+                });
+                const currentVipTarget = vipQueue[serialVipIndex] || vipQueue[0] || null;
+
+                return (
+                  <div style={{
+                    marginBottom: '20px',
+                    padding: '14px 18px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, rgba(6, 78, 59, 0.55) 0%, rgba(15, 23, 42, 0.92) 100%)',
+                    border: '1px solid rgba(16, 185, 129, 0.45)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: 800, color: '#34d399', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>⚡ Ofis Hızlandırıcı: Seri VIP Link Kuyruğu</span>
+                          <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#a7f3d0', padding: '2px 8px', borderRadius: '999px', fontSize: '11px' }}>
+                            Kuyrukta {vipQueue.length} Firma • Bugün Gönderilen: {sentVipIds.length}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '2px' }}>
+                          Tek tek uğraşmadan sıradaki firmaya kişiye özel 2026 Fiyat + Takas/Kredi VIP Linkini gönder, otomatik 48 saat takip kurulsun ve sıradakine geçsin.
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSerialVipOpen(prev => !prev);
+                          setSerialVipIndex(0);
+                        }}
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '8px',
+                          background: serialVipOpen ? 'rgba(255,255,255,0.1)' : '#10b981',
+                          color: serialVipOpen ? '#e2e8f0' : '#052e16',
+                          border: 'none',
+                          fontWeight: 800,
+                          fontSize: '12.5px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {serialVipOpen ? 'Seri Modu Gizle' : `⚡ Seri VIP Link Modunu Başlat (${vipQueue.length})`}
+                      </button>
+                    </div>
+
+                    {serialVipOpen && (
+                      currentVipTarget ? (
+                        <div style={{
+                          background: 'rgba(15, 23, 42, 0.85)',
+                          border: '1px solid rgba(52, 211, 153, 0.35)',
+                          borderRadius: '10px',
+                          padding: '14px 16px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: '12px'
+                        }}>
+                          <div>
+                            <div style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, textTransform: 'uppercase' }}>
+                              Sıradaki Firma ({Math.min(serialVipIndex + 1, vipQueue.length)} / {vipQueue.length})
+                            </div>
+                            <div style={{ fontSize: '17px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                              {currentVipTarget.company_name}
+                            </div>
+                            <div style={{ fontSize: '12.5px', color: '#94a3b8', marginTop: '3px' }}>
+                              📍 {currentVipTarget.city || 'Samsun'}{currentVipTarget.district ? ` / ${currentVipTarget.district}` : ''} • 📞 {currentVipTarget.phone} • 🏷️ {currentVipTarget.sector || 'Ticari Filo'}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const cid = currentVipTarget.id || currentVipTarget.customer_id;
+                                sendCustomerVipPortalWhatsApp(currentVipTarget, { skipModal: true });
+                                setSentVipIds(prev => [...prev, cid]);
+                              }}
+                              style={{
+                                padding: '10px 16px',
+                                borderRadius: '9px',
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                color: '#052e16',
+                                border: 'none',
+                                fontWeight: 900,
+                                fontSize: '13px',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '7px',
+                                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
+                              }}
+                            >
+                              <FiSend size={14} /> 💬 VIP Link Gönder & Sıradakine Geç →
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSerialVipIndex(prev => (prev + 1) % Math.max(1, vipQueue.length))}
+                              style={{
+                                padding: '10px 12px',
+                                borderRadius: '9px',
+                                background: 'rgba(255,255,255,0.08)',
+                                color: '#cbd5e1',
+                                border: '1px solid rgba(255,255,255,0.14)',
+                                fontWeight: 700,
+                                fontSize: '12px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Bu Firmayı Atla →
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '13px', color: '#a7f3d0', fontWeight: 700 }}>
+                          🎉 Harika! Kuyruktaki tüm telefonlu firmalara VIP Katalog linkini gönderdin. Şimdi Gösterge Panelindeki Canlı Ayak İzinden tıklayanları takip edebilirsin.
+                        </div>
+                      )
+                    )}
+                  </div>
+                );
+              })()}
+
               {/* İstatistik Çubuğu */}
               <div style={{
                 display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
