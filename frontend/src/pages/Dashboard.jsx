@@ -122,8 +122,24 @@ export default function Dashboard() {
     }
   };
 
+  const refreshLiveFootprints = () => {
+    discoveryApi.getIntentSignals({ limit: 6 })
+      .then(r => setLiveFootprints(r.data || []))
+      .catch(() => {});
+  };
+
+  const isFreshFootprint = (createdAt) => {
+    if (!createdAt) return false;
+    const diffMs = Date.now() - new Date(createdAt).getTime();
+    return diffMs >= 0 && diffMs <= 20 * 60 * 1000; // Son 20 dakika
+  };
+
   useEffect(() => {
     loadDashboard();
+    const fpInterval = setInterval(() => {
+      refreshLiveFootprints();
+    }, 20000);
+    return () => clearInterval(fpInterval);
   }, []);
 
   // Konum alındığında yakındaki müşterileri dinamik sorgula
@@ -355,21 +371,37 @@ export default function Dashboard() {
           <section className="mobile-section mb-6">
             <div className="flex justify-between items-center mb-3">
               <div className="section-title" style={{ margin: 0, color: '#38bdf8' }}>📡 CANLI MÜŞTERİ AYAK İZİ (PORTAL)</div>
-              <span className="badge badge-blue">{liveFootprints.length}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={refreshLiveFootprints}
+                  style={{ background: 'rgba(56, 189, 248, 0.14)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', borderRadius: 6, padding: '2px 7px', fontSize: '0.68rem', fontWeight: 700 }}
+                >
+                  🔄 Canlı
+                </button>
+                <span className="badge badge-blue">{liveFootprints.length}</span>
+              </div>
             </div>
             <div className="mobile-list">
               {liveFootprints.slice(0, 4).map((fp, i) => (
                 <div
                   key={fp.id || i}
                   className="mobile-list-item"
-                  onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/discovery/intent-radar')}
-                  style={{ borderLeft: '3px solid #38bdf8' }}
+                  onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/intent-radar')}
+                  style={{ borderLeft: isFreshFootprint(fp.created_at) ? '3px solid #10b981' : '3px solid #38bdf8' }}
                 >
                   <div className="item-avatar" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
                     <FiZap size={16} />
                   </div>
                   <div className="item-details">
-                    <div className="item-name">{fp.company_name || 'Portal Ziyaretçisi'}</div>
+                    <div className="item-name" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span>{fp.company_name || 'Portal Ziyaretçisi'}</span>
+                      {isFreshFootprint(fp.created_at) && (
+                        <span style={{ background: '#10b981', color: '#052e16', fontSize: '0.62rem', fontWeight: 900, padding: '1px 5px', borderRadius: 4 }}>
+                          🔥 YENİ
+                        </span>
+                      )}
+                    </div>
                     <div className="item-sub" style={{ color: '#7dd3fc' }}>
                       {fp.target_model || '2026 Katalog'} · {fp.search_query?.replace(/^\[|\]$/g, '') || 'Portal İncelemesi'}
                     </div>
@@ -550,7 +582,7 @@ export default function Dashboard() {
           background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(12, 32, 62, 0.88) 100%)'
         }}>
           <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <span style={{
                 width: 10, height: 10, borderRadius: '50%', background: '#10b981',
                 boxShadow: '0 0 10px #10b981', display: 'inline-block'
@@ -561,26 +593,48 @@ export default function Dashboard() {
               <span className="badge badge-blue" style={{ fontSize: '0.72rem' }}>
                 Son {liveFootprints.length} Sinyal
               </span>
+              <span style={{ fontSize: '0.7rem', color: '#34d399', fontWeight: 600 }}>
+                • Otomatik Canlı (20 sn)
+              </span>
             </div>
-            <button
-              type="button"
-              onClick={() => navigate('/discovery/intent-radar')}
-              style={{
-                background: 'rgba(56, 189, 248, 0.14)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
-                color: '#38bdf8',
-                borderRadius: '8px',
-                padding: '5px 12px',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5
-              }}
-            >
-              Tüm Niyet Radarını Aç <FiArrowRight size={13} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                type="button"
+                onClick={refreshLiveFootprints}
+                style={{
+                  background: 'rgba(16, 185, 129, 0.14)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  color: '#34d399',
+                  borderRadius: '8px',
+                  padding: '5px 10px',
+                  fontSize: '0.73rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+                title="Şimdi Yenile"
+              >
+                🔄 Şimdi Yenile
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/intent-radar')}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.14)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  color: '#38bdf8',
+                  borderRadius: '8px',
+                  padding: '5px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5
+                }}
+              >
+                Tüm Niyet Radarını Aç <FiArrowRight size={13} />
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(310px, 1fr))', gap: '10px', marginTop: '8px' }}>
@@ -589,8 +643,8 @@ export default function Dashboard() {
                 key={fp.id || idx}
                 style={{
                   background: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderLeft: '3px solid #38bdf8',
+                  border: isFreshFootprint(fp.created_at) ? '1px solid rgba(16, 185, 129, 0.45)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  borderLeft: isFreshFootprint(fp.created_at) ? '3px solid #10b981' : '3px solid #38bdf8',
                   borderRadius: '10px',
                   padding: '10px 12px',
                   display: 'flex',
@@ -602,10 +656,15 @@ export default function Dashboard() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
                     <div
-                      onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/discovery/intent-radar')}
-                      style={{ fontWeight: 800, fontSize: '0.86rem', color: '#f8fafc', cursor: 'pointer' }}
+                      onClick={() => fp.matched_customer_id ? navigate(`/customers/${fp.matched_customer_id}`) : navigate('/intent-radar')}
+                      style={{ fontWeight: 800, fontSize: '0.86rem', color: '#f8fafc', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}
                     >
-                      {fp.company_name || 'Portal Ziyaretçisi'}
+                      <span>{fp.company_name || 'Portal Ziyaretçisi'}</span>
+                      {isFreshFootprint(fp.created_at) && (
+                        <span style={{ background: '#10b981', color: '#052e16', fontSize: '0.64rem', fontWeight: 900, padding: '1px 6px', borderRadius: 4 }}>
+                          🔥 YENİ
+                        </span>
+                      )}
                     </div>
                     <span style={{ fontSize: '0.68rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>
                       {fp.created_at ? new Date(fp.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : 'Canlı'}

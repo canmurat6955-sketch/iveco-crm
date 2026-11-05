@@ -4,6 +4,7 @@
  */
 
 import { getPublicOrigin } from './publicUrl';
+import { crmApi } from '../api/client';
 
 export function getWhatsAppUrl(phone, text = '') {
   if (!phone) return '#';
@@ -108,6 +109,16 @@ export function sendCustomerVipPortalWhatsApp(cust, options = {}) {
     `Beğendiğiniz model veya takas/kredi hesaplaması için bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
     `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
   );
+
+  const cid = cust.id || cust.customer_id;
+  if (cid) {
+    const sectorNote = sectorTitles[secKey] ? ` (${sectorTitles[secKey]})` : '';
+    crmApi.createInteraction(cid, {
+      interaction_type: 'whatsapp',
+      notes: `[WhatsApp] VIP Dijital Showroom & 2026 Fiyat/Kredi Hesaplayıcı Linki gönderildi${sectorNote}.`,
+      next_action: 'Canlı Ayak İzi / Portal inceleme takibi'
+    }).catch(() => {});
+  }
 
   openWhatsApp(cust.phone, msg, { customer: cust, onSuccess: options.onSuccess });
 }

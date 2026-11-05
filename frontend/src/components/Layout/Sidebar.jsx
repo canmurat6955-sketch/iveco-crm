@@ -5,7 +5,7 @@ import { FiHome, FiUsers, FiActivity, FiFolder, FiBell, FiColumns, FiCompass, Fi
 import { useAuth } from '../../contexts/AuthContext';
 import WhatsAppIntegrationModal from '../CRM/WhatsAppIntegrationModal';
 
-const SECONDARY_PATHS = ['/scan-card', '/discovery', '/intent-radar', '/sales', '/contacts', '/campaigns', '/vehicles/management'];
+const SECONDARY_PATHS = ['/scan-card', '/sales', '/contacts', '/campaigns', '/vehicles/management'];
 
 export default function Sidebar() {
   const location = useLocation();
@@ -55,7 +55,7 @@ export default function Sidebar() {
 
       <nav className="sidebar-nav">
         <div className="nav-section">
-          <div className="nav-section-title">Günlük İş Akışı</div>
+          <div className="nav-section-title">Ofis & Günlük İş Akışı</div>
           <NavLink to="/" end className={`nav-item ${isActive('/') && location.pathname === '/' ? 'active' : ''}`}>
             <span className="nav-icon"><FiHome size={18} /></span>
             Bugün & Dashboard
@@ -67,6 +67,14 @@ export default function Sidebar() {
           <NavLink to="/customers" className={`nav-item ${isActive('/customers') ? 'active' : ''}`}>
             <span className="nav-icon"><FiUsers size={18} /></span>
             Müşteriler
+          </NavLink>
+          <NavLink to="/discovery" className={`nav-item ${isActive('/discovery') ? 'active' : ''}`}>
+            <span className="nav-icon" style={{ color: '#34d399' }}><FiCompass size={18} /></span>
+            B2B Firma Keşfi
+          </NavLink>
+          <NavLink to="/intent-radar" className={`nav-item ${isActive('/intent-radar') ? 'active' : ''}`}>
+            <span className="nav-icon" style={{ color: '#f59e0b' }}><FiTarget size={18} /></span>
+            Canlı Niyet Radarı
           </NavLink>
           <NavLink to="/proforma/quick" className={`nav-item ${isActive('/proforma/quick') ? 'active' : ''}`}>
             <span className="nav-icon" style={{ color: '#38bdf8' }}><FiFileText size={18} /></span>
@@ -117,7 +125,7 @@ export default function Sidebar() {
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
               <FiTool size={14} color="#94a3b8" />
-              <span>Saha & Yönetim Araçları</span>
+              <span>Diğer & Yönetim Araçları</span>
             </span>
             {showSecondaryMenu ? <FiChevronUp size={15} /> : <FiChevronDown size={15} />}
           </button>
@@ -127,14 +135,6 @@ export default function Sidebar() {
               <NavLink to="/scan-card" className={`nav-item ${isActive('/scan-card') ? 'active' : ''}`}>
                 <span className="nav-icon" style={{ color: '#ec4899' }}><FiCamera size={17} /></span>
                 Kartvizit Tara
-              </NavLink>
-              <NavLink to="/discovery" className={`nav-item ${isActive('/discovery') ? 'active' : ''}`}>
-                <span className="nav-icon"><FiCompass size={17} /></span>
-                Firma Keşfi
-              </NavLink>
-              <NavLink to="/intent-radar" className={`nav-item ${isActive('/intent-radar') ? 'active' : ''}`}>
-                <span className="nav-icon" style={{ color: '#f59e0b' }}><FiTarget size={17} /></span>
-                Arama & Niyet Radarı
               </NavLink>
               <NavLink to="/sales" className={`nav-item ${isActive('/sales') ? 'active' : ''}`}>
                 <span className="nav-icon"><FiActivity size={17} /></span>
