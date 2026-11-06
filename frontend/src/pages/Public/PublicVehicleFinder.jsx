@@ -1393,6 +1393,17 @@ export default function PublicVehicleFinder() {
     }
   }, [matched?.key, matched?.currency]);
 
+  const socialSourceLabel = React.useMemo(() => {
+    const code = (refCode || '').toLowerCase();
+    if (code.includes('insta') || code.includes('reels')) return '📸 Instagram Ziyaretçisi';
+    if (code.includes('linkedin')) return '💼 LinkedIn Ziyaretçisi';
+    if (code.includes('wa_durum') || code.includes('durum')) return '🟢 WhatsApp Durum Ziyaretçisi';
+    if (code.includes('wa_tanitim')) return '💬 WhatsApp Tanıtım Ziyaretçisi';
+    if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
+    if (code.includes('sosyal')) return '📱 Sosyal Medya Ziyaretçisi';
+    return '';
+  }, [refCode]);
+
   // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e İletir)
   const sentFootprintsRef = React.useRef(new Set());
   const recordCustomerFootprint = (actionLabel, modelOverride, campaignOverride) => {
@@ -1402,7 +1413,10 @@ export default function PublicVehicleFinder() {
     sentFootprintsRef.current.add(key);
 
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
-    const visitorLabel = (customerCompany || customerName || '').trim() || 'Portal Ziyaretçisi';
+    const baseName = (customerCompany || customerName || '').trim();
+    const visitorLabel = baseName
+      ? (socialSourceLabel ? `${baseName} (${socialSourceLabel})` : baseName)
+      : (socialSourceLabel || 'Portal Ziyaretçisi');
     const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
 
     discoveryApi.recordIntentSignal({
@@ -1414,29 +1428,29 @@ export default function PublicVehicleFinder() {
       city: customerCity || 'Samsun',
       phone: customerPhone || '',
       page_url: window.location.href,
-      referrer: document.referrer || 'whatsapp_vip_link',
+      referrer: document.referrer || (refCode || 'whatsapp_vip_link'),
       duration_seconds: durationSeconds,
       scroll_depth: 80,
-      intent_score: (customerCompany || customerIdParam) ? 94 : 82,
+      intent_score: (customerCompany || customerIdParam) ? 94 : 85,
       intent_level: (customerCompany || customerIdParam) ? 'very_high' : 'high',
       matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
-      notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
+      notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nKaynak: ${socialSourceLabel || 'Doğrudan / VIP Link'}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
     }).catch(() => {});
   };
 
-  // Müşteri kendisine gönderilen VIP Linki açtığında anında CRM'e "Portal Açıldı" sinyali gönder
+  // Müşteri kendisine gönderilen VIP Linki veya Sosyal Medya Linkini açtığında anında CRM'e "Portal Açıldı" sinyali gönder
   useEffect(() => {
-    if ((customerCompany || customerIdParam) && !isAdminMode && !isPreviewMode) {
+    if ((customerCompany || customerIdParam || socialSourceLabel) && !isAdminMode && !isPreviewMode) {
       const timer = setTimeout(() => {
         recordCustomerFootprint(
-          'VIP Link Açıldı (Katalog İnceleniyor)',
+          socialSourceLabel ? `${socialSourceLabel} Portala Girdi` : 'VIP Link Açıldı (Katalog İnceleniyor)',
           selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
-          sectorParam ? `Sektör Filtresi: ${sectorParam}` : 'Genel Katalog'
+          sectorParam ? `Sektör Filtresi: ${sectorParam}` : (socialSourceLabel || 'Genel Katalog')
         );
       }, 2500);
       return () => clearTimeout(timer);
     }
-  }, [customerCompany, customerIdParam]);
+  }, [customerCompany, customerIdParam, socialSourceLabel]);
 
   // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {

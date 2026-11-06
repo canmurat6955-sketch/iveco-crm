@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 import { crmApi } from '../../api/client';
 import { sendCustomerVipPortalWhatsApp } from '../../utils/whatsapp';
+import { getPublicOrigin } from '../../utils/publicUrl';
 import { IVECO_PRICING_CATALOG } from '../../data/ivecoPricingCatalog';
 import toast from 'react-hot-toast';
 
@@ -304,9 +305,9 @@ export default function OfficeQuickAssistantDrawer() {
             {/* Sekme Seçici */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: '1fr 1fr 1fr',
               gap: '6px',
-              padding: '10px 16px',
+              padding: '10px 14px',
               background: 'rgba(15, 23, 42, 0.9)',
               borderBottom: '1px solid rgba(255,255,255,0.08)'
             }}>
@@ -314,41 +315,61 @@ export default function OfficeQuickAssistantDrawer() {
                 type="button"
                 onClick={() => setActiveTab('logger')}
                 style={{
-                  padding: '9px 10px',
+                  padding: '8px 6px',
                   borderRadius: '8px',
                   border: 'none',
                   background: activeTab === 'logger' ? '#0284c7' : 'rgba(255,255,255,0.05)',
                   color: activeTab === 'logger' ? '#fff' : '#94a3b8',
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: '0.73rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px'
+                  gap: '5px'
                 }}
               >
-                <FiPhoneCall size={14} /> 1. Hızlı Görüşme Kaydı
+                <FiPhoneCall size={13} /> 1. Hızlı Kayıt
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('cheatsheet')}
                 style={{
-                  padding: '9px 10px',
+                  padding: '8px 6px',
                   borderRadius: '8px',
                   border: 'none',
                   background: activeTab === 'cheatsheet' ? '#0284c7' : 'rgba(255,255,255,0.05)',
                   color: activeTab === 'cheatsheet' ? '#fff' : '#94a3b8',
                   fontWeight: 800,
-                  fontSize: '0.78rem',
+                  fontSize: '0.73rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px'
+                  gap: '5px'
                 }}
               >
-                <FiBookOpen size={14} /> 2. Telefon Kopya Kağıdı
+                <FiBookOpen size={13} /> 2. Kopya Kağıdı
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('social')}
+                style={{
+                  padding: '8px 6px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: activeTab === 'social' ? '#10b981' : 'rgba(255,255,255,0.05)',
+                  color: activeTab === 'social' ? '#052e16' : '#94a3b8',
+                  fontWeight: 800,
+                  fontSize: '0.73rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px'
+                }}
+              >
+                <FiZap size={13} /> 3. Sosyal Medya
               </button>
             </div>
 
@@ -653,7 +674,7 @@ export default function OfficeQuickAssistantDrawer() {
                     </button>
                   </div>
                 </div>
-              ) : (
+              ) : activeTab === 'cheatsheet' ? (
                 /* TAB 2: TELEFON KOPYA KAĞIDI */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {/* 1M TL Kredi Hızlı Kopya Kutusu */}
@@ -767,6 +788,160 @@ export default function OfficeQuickAssistantDrawer() {
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* TAB 3: SOSYAL MEDYA TAKİPLİ LİNKLER & HAZIR LANSMAN METİNLERİ */
+                (() => {
+                  const origin = getPublicOrigin();
+                  const socialCards = [
+                    {
+                      id: 'wa_durum',
+                      badge: '🟢 WhatsApp Durum (Status)',
+                      color: '#22c55e',
+                      link: `${origin}/fiyat-listesi?ref=wa_durum`,
+                      desc: 'Durumdan tıklayanlar Dashboard’a "🟢 WhatsApp Durum Ziyaretçisi" olarak düşer.',
+                      text:
+                        `🚛 2026 IVECO Şasi Fiyatları & Canlı "Takas + Kredi" Hesaplama Ekranımız Yayında!\n\n` +
+                        `Beni aramanıza veya form doldurmanıza gerek kalmadan:\n` +
+                        `✅ Elinizdeki aracın takas peşinatını düşün,\n` +
+                        `✅ 1.000.000 TL %0 Faiz (Aylık 83.333 TL) krediyle kalan net taksitinizi 10 saniyede kendiniz hesaplayın,\n` +
+                        `✅ %20 KDV vergi kalkanı avantajınızı görün:\n\n` +
+                        `👉 ${origin}/fiyat-listesi?ref=wa_durum\n\n` +
+                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
+                    },
+                    {
+                      id: 'instagram',
+                      badge: '📸 Instagram Biyografi & Reels',
+                      color: '#ec4899',
+                      link: `${origin}/fiyat-listesi?ref=instagram`,
+                      desc: 'Profilinden veya Reels’ten tıklayanlar "📸 Instagram Ziyaretçisi" olarak düşer.',
+                      text:
+                        `"2026 sıfır IVECO alırsam, elimdeki aracı takasa verince ayda kaç TL öderim?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
+                        `🔹 1. Adım: Profilimdeki linke tıklayın,\n` +
+                        `🔹 2. Adım: İstediğiniz 2026 IVECO modelini ve elinizdeki takas aracının değerini seçin,\n` +
+                        `🔹 3. Adım: 1.000.000 TL'ye 12 Ay %0 Faiz avantajıyla kalan aylık taksitinizi ve %20 KDV vergi kalkanını anında ekranda görün!\n\n` +
+                        `👉 ${origin}/fiyat-listesi?ref=instagram\n\n` +
+                        `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
+                    },
+                    {
+                      id: 'linkedin',
+                      badge: '💼 LinkedIn Kurumsal Lansman',
+                      color: '#38bdf8',
+                      link: `${origin}/fiyat-listesi?ref=linkedin`,
+                      desc: 'LinkedIn’den tıklayan filo yöneticileri "💼 LinkedIn Ziyaretçisi" olarak düşer.',
+                      text:
+                        `Ticari araç ve filo yatırımlarında "tahmini fiyatlarla" değil, şeffaf ve anlık finansal verilerle karar verme dönemini başlatıyoruz. 🚛📈\n\n` +
+                        `IVECO ERC Samsun Otomotiv olarak geliştirdiğimiz "Dijital Showroom, TCO & Finansman Simülatörü" platformumuz üzerinden:\n` +
+                        `1️⃣ Sektörel Şasi & Üstyapı Sihirbazı,\n` +
+                        `2️⃣ Canlı Takas + Kredi Simülasyonu (%0 Faiz Seçenekleri),\n` +
+                        `3️⃣ %20 KDV Vergi Kalkanı & 5 Yıllık Yakıt (TCO) Analizini 30 saniyede inceleyebilirsiniz:\n\n` +
+                        `🔗 ${origin}/fiyat-listesi?ref=linkedin\n\n` +
+                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31`
+                    },
+                    {
+                      id: 'facebook',
+                      badge: '📘 Facebook Kamyoncu & Nakliyeci Grupları',
+                      color: '#60a5fa',
+                      link: `${origin}/fiyat-listesi?ref=facebook`,
+                      desc: 'Facebook gruplarından tıklayanlar "📘 Facebook Ziyaretçisi" olarak düşer.',
+                      text:
+                        `Karadeniz bölgesindeki nakliyeci, gıda dağıtım ve hafriyatçı esnafımız için 2026 IVECO Canlı Takas + Kredi Hesaplama ekranımızı açtık! 🚛\n\n` +
+                        `Kimseyi aramanıza gerek kalmadan aşağıdaki linkten elinizdeki aracın takas değerini seçip 2026 Daily, Eurocargo, S-Way ve T-Way için kalan aylık kredi taksitinizi kendiniz hesaplayın:\n\n` +
+                        `👉 ${origin}/fiyat-listesi?ref=facebook\n\n` +
+                        `Satış Sorumlusu Can M. — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)`
+                    }
+                  ];
+
+                  const copyToClipboard = (val, label) => {
+                    navigator.clipboard.writeText(val);
+                    toast.success(`✅ ${label} panoya kopyalandı!`);
+                  };
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{
+                        padding: '10px 12px',
+                        borderRadius: '9px',
+                        background: 'rgba(16, 185, 129, 0.12)',
+                        border: '1px solid rgba(16, 185, 129, 0.35)',
+                        fontSize: '0.74rem',
+                        color: '#a7f3d0',
+                        lineHeight: 1.45
+                      }}>
+                        📡 Aşağıdaki özel takip linklerinden birini paylaştığında, tıklayan kişi form doldurmasa bile Gösterge Panelindeki <strong>Canlı Müşteri Ayak İzi</strong> kutuna hangi sosyal medyadan geldiğiyle birlikte düşer ve zil çalar!
+                      </div>
+
+                      {socialCards.map(card => (
+                        <div
+                          key={card.id}
+                          style={{
+                            padding: '12px',
+                            borderRadius: '10px',
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderLeft: `3px solid ${card.color}`,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px'
+                          }}
+                        >
+                          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
+                            {card.badge}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                            {card.desc}
+                          </div>
+                          <div style={{
+                            padding: '6px 8px',
+                            borderRadius: '6px',
+                            background: 'rgba(2, 6, 23, 0.7)',
+                            fontSize: '0.7rem',
+                            color: '#38bdf8',
+                            wordBreak: 'break-all',
+                            fontFamily: 'monospace'
+                          }}>
+                            {card.link}
+                          </div>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(card.link, `${card.badge} Takip Linki`)}
+                              style={{
+                                flex: 1,
+                                padding: '7px 10px',
+                                borderRadius: '7px',
+                                background: 'rgba(56, 189, 248, 0.16)',
+                                border: '1px solid rgba(56, 189, 248, 0.4)',
+                                color: '#38bdf8',
+                                fontWeight: 800,
+                                fontSize: '0.72rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              🔗 Sadece Linki Kopyala
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(card.text, `${card.badge} Hazır Paylaşım Metni`)}
+                              style={{
+                                flex: 1.3,
+                                padding: '7px 10px',
+                                borderRadius: '7px',
+                                background: '#10b981',
+                                border: 'none',
+                                color: '#052e16',
+                                fontWeight: 900,
+                                fontSize: '0.72rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              📋 Hazır Metni + Linki Kopyala
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()
               )}
             </div>
           </div>
