@@ -38,6 +38,7 @@ import BodyStructureTab from './components/BodyStructureTab';
 import LoanFinanceTab from './components/LoanFinanceTab';
 import FaqLinkedInTab from './components/FaqLinkedInTab';
 import TcoCompetitorTab from './components/TcoCompetitorTab';
+import CustomerSmartActionHub from './components/CustomerSmartActionHub';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
@@ -2688,6 +2689,46 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
+      {/* 💡 HIZLI AKSİYON KISAYOL BANDI (Randevu / 24 Saat Opsiyon / Fotoğrafla Takas / 2. El Habercisi) */}
+      <div style={{
+        maxWidth: '1080px',
+        margin: '0 auto 16px',
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: '8px'
+      }}>
+        {[
+          { label: '📅 Showroom / İş Yeri / Görüntülü Randevu Al', color: '#10b981' },
+          { label: '🔒 Fiyatı 24 Saat Adıma Opsiyonla', color: '#f59e0b' },
+          { label: '📸 3 Fotoğrafla 15 Dk’da Takas Fiyatı Al', color: '#38bdf8' },
+          { label: '🧾 Muhasebecime %20 KDV Vergi Özeti İste', color: '#60a5fa' },
+          { label: '🔔 Sıfır Bütçemi Aşıyor: 2. El Takas Habercisi', color: '#c084fc' }
+        ].map((chip, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('smart-customer-action-hub');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            style={{
+              background: 'rgba(15, 23, 42, 0.85)',
+              border: `1px solid ${chip.color}66`,
+              color: '#f8fafc',
+              borderRadius: '999px',
+              padding: '6px 13px',
+              fontSize: '0.73rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 3px 10px rgba(0,0,0,0.25)'
+            }}
+          >
+            {chip.label} ↓
+          </button>
+        ))}
+      </div>
+
       {/* ── SEKME 2: 2026 MODEL FİYAT LİSTESİ ── */}
       {activeMainTab === 'fiyatlar' && (
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
@@ -5202,6 +5243,20 @@ IVECO ERC Samsun Otomotiv
           </div>
         </div>
       )}
+
+      {/* 💡 6'LI AKILLI MÜŞTERİ ÇÖZÜM & RANDEVU MERKEZİ */}
+      <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
+        <CustomerSmartActionHub
+          activeModelTitle={matched?.modelTitle || 'IVECO 2026 Ticari Araç'}
+          activePrice={matched?.cashPrice || matched?.campaignPrice || 2150000}
+          customerCompany={customerCompany || customerName}
+          customerPhone={customerPhone}
+          customerCity={customerCity}
+          customerId={customerIdParam}
+          salesRep={SALES_REP}
+          onTrackFootprint={recordCustomerFootprint}
+        />
+      </div>
 
       {/* ── FOOTER & YASAL BİLGİLENDİRME ─────────────────────────── */}
       <div style={{
