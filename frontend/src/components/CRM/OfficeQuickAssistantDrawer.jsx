@@ -795,45 +795,50 @@ export default function OfficeQuickAssistantDrawer() {
                   const socialCards = [
                     {
                       id: 'wa_durum',
-                      badge: '🟢 WhatsApp Durum (Status)',
+                      badge: '🟢 WhatsApp Durum (Status) — En Güçlü Kanca',
                       color: '#22c55e',
                       link: `${origin}/fiyat-listesi?ref=wa_durum`,
                       desc: 'Durumdan tıklayanlar Dashboard’a "🟢 WhatsApp Durum Ziyaretçisi" olarak düşer.',
                       text:
-                        `🚛 2026 IVECO Şasi Fiyatları & Canlı "Takas + Kredi" Hesaplama Ekranımız Yayında!\n\n` +
-                        `Beni aramanıza veya form doldurmanıza gerek kalmadan:\n` +
-                        `✅ Elinizdeki aracın takas peşinatını düşün,\n` +
-                        `✅ 1.000.000 TL %0 Faiz (Aylık 83.333 TL) krediyle kalan net taksitinizi 10 saniyede kendiniz hesaplayın,\n` +
-                        `✅ %20 KDV vergi kalkanı avantajınızı görün:\n\n` +
+                        `🚛 2026 IVECO Canlı Fiyat, Takas & Randevu Ekranımız Açıldı!\n\n` +
+                        `Kimseyi aramanıza gerek kalmadan tek tıkla:\n` +
+                        `🔄 Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz (83.333 TL/Ay) ile kalan taksitinizi hesaplayın,\n` +
+                        `📸 Mevcut aracınızın 3 fotoğrafını gönderip 15 dk'da takas ön fiyatı alın,\n` +
+                        `🔒 Beğendiğiniz şasiyi 24 saat ücretsiz adınıza opsiyonlayın veya\n` +
+                        `☕ Showroom kahve / görüntülü araç turu randevunuzu seçin:\n\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_durum\n\n` +
                         `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
                     },
                     {
                       id: 'instagram',
-                      badge: '📸 Instagram Biyografi & Reels',
+                      badge: '📸 Instagram Biyografi & Reels Lansmanı',
                       color: '#ec4899',
                       link: `${origin}/fiyat-listesi?ref=instagram`,
                       desc: 'Profilinden veya Reels’ten tıklayanlar "📸 Instagram Ziyaretçisi" olarak düşer.',
                       text:
-                        `"2026 sıfır IVECO alırsam, elimdeki aracı takasa verince ayda kaç TL öderim?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
-                        `🔹 1. Adım: Profilimdeki linke tıklayın,\n` +
-                        `🔹 2. Adım: İstediğiniz 2026 IVECO modelini ve elinizdeki takas aracının değerini seçin,\n` +
-                        `🔹 3. Adım: 1.000.000 TL'ye 12 Ay %0 Faiz avantajıyla kalan aylık taksitinizi ve %20 KDV vergi kalkanını anında ekranda görün!\n\n` +
-                        `👉 ${origin}/fiyat-listesi?ref=instagram\n\n` +
+                        `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
+                        `Yeni Dijital Showroom ekranımızda neler var?\n` +
+                        `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
+                        `📸 3 Fotoğrafla 15 Dakikada WhatsApp Takas Ekspertizi,\n` +
+                        `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
+                        `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
+                        `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
+                        `👉 Hemen denemek için profilimdeki linke tıklayın:\n${origin}/fiyat-listesi?ref=instagram\n\n` +
                         `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
                     },
                     {
                       id: 'linkedin',
-                      badge: '💼 LinkedIn Kurumsal Lansman',
+                      badge: '💼 LinkedIn Kurumsal Filo Lansmanı',
                       color: '#38bdf8',
                       link: `${origin}/fiyat-listesi?ref=linkedin`,
                       desc: 'LinkedIn’den tıklayan filo yöneticileri "💼 LinkedIn Ziyaretçisi" olarak düşer.',
                       text:
-                        `Ticari araç ve filo yatırımlarında "tahmini fiyatlarla" değil, şeffaf ve anlık finansal verilerle karar verme dönemini başlatıyoruz. 🚛📈\n\n` +
-                        `IVECO ERC Samsun Otomotiv olarak geliştirdiğimiz "Dijital Showroom, TCO & Finansman Simülatörü" platformumuz üzerinden:\n` +
-                        `1️⃣ Sektörel Şasi & Üstyapı Sihirbazı,\n` +
-                        `2️⃣ Canlı Takas + Kredi Simülasyonu (%0 Faiz Seçenekleri),\n` +
-                        `3️⃣ %20 KDV Vergi Kalkanı & 5 Yıllık Yakıt (TCO) Analizini 30 saniyede inceleyebilirsiniz:\n\n` +
+                        `Ticari araç ve filo yatırımlarında telefon trafiğine girmeden, 30 saniyede şeffaf fizibilite çıkarabileceğiniz "IVECO ERC Dijital Showroom & Finansman Merkezi" yayında. 🚛📈\n\n` +
+                        `Platform üzerinden doğrudan:\n` +
+                        `1️⃣ Tonaj ve üstyapıya göre 2026 Daily, Eurocargo, S-Way ve T-Way şasi eşleştirmesi,\n` +
+                        `2️⃣ Takas peşinatı + %0 faizli ticari kredi nakit akış simülasyonu,\n` +
+                        `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı & Amortisman özeti,\n` +
+                        `4️⃣ 24 saatlik ücretsiz şasi/fiyat blokajı ve İş Yeri Ziyareti / Online Sunum randevusu oluşturabilirsiniz:\n\n` +
                         `🔗 ${origin}/fiyat-listesi?ref=linkedin\n\n` +
                         `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31`
                     },
@@ -844,9 +849,11 @@ export default function OfficeQuickAssistantDrawer() {
                       link: `${origin}/fiyat-listesi?ref=facebook`,
                       desc: 'Facebook gruplarından tıklayanlar "📘 Facebook Ziyaretçisi" olarak düşer.',
                       text:
-                        `Karadeniz bölgesindeki nakliyeci, gıda dağıtım ve hafriyatçı esnafımız için 2026 IVECO Canlı Takas + Kredi Hesaplama ekranımızı açtık! 🚛\n\n` +
-                        `Kimseyi aramanıza gerek kalmadan aşağıdaki linkten elinizdeki aracın takas değerini seçip 2026 Daily, Eurocargo, S-Way ve T-Way için kalan aylık kredi taksitinizi kendiniz hesaplayın:\n\n` +
-                        `👉 ${origin}/fiyat-listesi?ref=facebook\n\n` +
+                        `Karadeniz bölgesindeki nakliyeci, gıda dağıtım ve hafriyatçı esnafımız için 2026 IVECO Canlı Hesaplama & Takas Ekranımızı açtık! 🚛\n\n` +
+                        `👉 İster elinizdeki aracın takas değerini seçip kalan kredi taksitinizi ekranda görün,\n` +
+                        `👉 İster mevcut aracınızın 3 fotoğrafını gönderip 15 dakikada takas fiyatı alın,\n` +
+                        `👉 Sıfır bütçenizi aşıyorsa "Takastan Temiz 2. El Habercisi"ne kaydolun, takasa temiz araç düştüğü gün ilk size haber verelim:\n\n` +
+                        `🔗 ${origin}/fiyat-listesi?ref=facebook\n\n` +
                         `Satış Sorumlusu Can M. — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)`
                     }
                   ];
