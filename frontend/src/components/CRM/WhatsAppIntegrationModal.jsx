@@ -12,7 +12,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
   const [statusData, setStatusData] = useState(null);
   const [qrData, setQrData] = useState(null);
   const [testingSend, setTestingSend] = useState(false);
-  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [apiKeyInput, setApiKeyInput] = useState('6810148');
   const [savingKey, setSavingKey] = useState(false);
 
   useEffect(() => {
@@ -26,9 +26,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
     try {
       const res = await whatsappApi.getStatus();
       setStatusData(res.data);
-      if (res.data?.callmebot_apikey !== undefined) {
-        setApiKeyInput(res.data.callmebot_apikey || '');
-      }
+      setApiKeyInput(res.data?.callmebot_apikey || '6810148');
     } catch (err) {
       console.error('WhatsApp status error:', err);
       setStatusData({
@@ -36,8 +34,8 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         phone_number: '0544 622 59 31',
         display_name: 'Can Murat Onay',
         auto_notify_rep: true,
-        callmebot_apikey: '',
-        has_callmebot_key: false,
+        callmebot_apikey: '6810148',
+        has_callmebot_key: true,
         recent_messages: []
       });
     } finally {

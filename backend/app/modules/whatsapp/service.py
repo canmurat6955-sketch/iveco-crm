@@ -12,6 +12,9 @@ from sqlalchemy.orm import Session
 
 from app.modules.whatsapp.models import WhatsAppSession, WhatsAppMessageLog
 
+DEFAULT_CALLMEBOT_APIKEY = "6810148"
+_LAST_PORTAL_ALERT_TS: Dict[str, float] = {}
+
 
 class WhatsAppService:
     def __init__(self, db: Session):
@@ -20,8 +23,10 @@ class WhatsAppService:
     def _extract_apikey(self, session: WhatsAppSession) -> str:
         raw = (session.qr_data or "").strip()
         if raw.startswith("callmebot:"):
-            return raw.split("callmebot:", 1)[1].strip()
-        return ""
+            val = raw.split("callmebot:", 1)[1].strip()
+            if val:
+                return val
+        return DEFAULT_CALLMEBOT_APIKEY
 
     def get_or_create_session(self) -> WhatsAppSession:
         """Retrieves or creates the primary WhatsApp connection session."""
@@ -32,10 +37,16 @@ class WhatsAppService:
                 status="connected",
                 phone_number="0544 622 59 31",
                 display_name="Can Murat Onay",
+                qr_data=f"callmebot:{DEFAULT_CALLMEBOT_APIKEY}",
                 notify_phone="905446225931",
                 auto_notify_rep=True,
             )
             self.db.add(session)
+            self.db.commit()
+            self.db.refresh(session)
+        elif not session.qr_data or not session.qr_data.startswith("callmebot:"):
+            session.qr_data = f"callmebot:{DEFAULT_CALLMEBOT_APIKEY}"
+            session.status = "connected"
             self.db.commit()
             self.db.refresh(session)
         return session
@@ -279,6 +290,13 @@ class WhatsAppService:
         session = self.get_or_create_session()
         if not session.auto_notify_rep or not self._extract_apikey(session):
             return None
+
+        now_ts = datetime.now(timezone.utc).timestamp()
+        dedup_key = f"{company_name or 'anon'}:{action_label or ''}"
+        last_ts = _LAST_PORTAL_ALERT_TS.get(dedup_key, 0.0)
+        if now_ts - last_ts < 45:
+            return None
+        _LAST_PORTAL_ALERT_TS[dedup_key] = now_ts
 
         city_text = f" ({city})" if city else ""
         phone_text = f"\n📞 Tel: {phone}" if phone else ""
