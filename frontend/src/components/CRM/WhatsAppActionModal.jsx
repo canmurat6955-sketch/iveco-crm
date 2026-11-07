@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import VoiceInputButton from '../common/VoiceInputButton';
 import { salesApi, vehiclesApi, crmApi, campaignsApi } from '../../api/client';
-import { launchNativeWhatsApp } from '../../utils/whatsapp';
+import { launchNativeWhatsApp, buildVipPortalMessageByTone } from '../../utils/whatsapp';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { getPublicOrigin } from '../../utils/publicUrl';
@@ -685,10 +685,97 @@ export default function WhatsAppActionModal({
               </div>
             </div>
 
+            {/* 🗣️ 3 FARKLI KONUŞMA DİLİ İLE KİŞİYE ÖZEL VIP PORTAL LİNKİ */}
+            <div style={{
+              marginBottom: '0.85rem',
+              padding: '10px 12px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.9) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.35)'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: '#6ee7b7', fontWeight: 800, display: 'block', marginBottom: 7 }}>
+                🗣️ VIP Dijital Danışman Linki — Konuşma Dilini Seç (Tek Tıkla Değiştir):
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const msg = buildVipPortalMessageByTone({ ...customer, ...customerForm }, 'friendly');
+                    setMessage(msg);
+                    toast.success('Samimi Esnaf diliyle VIP link metni hazırlandı!');
+                  }}
+                  style={{
+                    fontSize: '0.74rem',
+                    padding: '7px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(16, 185, 129, 0.2)',
+                    color: '#a7f3d0',
+                    border: '1px solid rgba(16, 185, 129, 0.5)',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🤝 Samimi / Tanıdık Esnaf
+                  <div style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 500, marginTop: 2 }}>
+                    "Abi merhaba, hayırlı işler..."
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const msg = buildVipPortalMessageByTone({ ...customer, ...customerForm }, 'new_lead');
+                    setMessage(msg);
+                    toast.success('Yeni Müşteri (İlk Temas) VIP link metni hazırlandı!');
+                  }}
+                  style={{
+                    fontSize: '0.74rem',
+                    padding: '7px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(2, 132, 199, 0.2)',
+                    color: '#bae6fd',
+                    border: '1px solid rgba(56, 189, 248, 0.5)',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🎯 Yeni Müşteri (İlk Temas)
+                  <div style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 500, marginTop: 2 }}>
+                    Net, saygılı, 2026 fiyat & takas
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const msg = buildVipPortalMessageByTone({ ...customer, ...customerForm }, 'corporate_fleet');
+                    setMessage(msg);
+                    toast.success('Kurumsal Filo & %20 KDV VIP link metni hazırlandı!');
+                  }}
+                  style={{
+                    fontSize: '0.74rem',
+                    padding: '7px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(245, 158, 11, 0.18)',
+                    color: '#fde68a',
+                    border: '1px solid rgba(251, 191, 36, 0.5)',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🏢 Kurumsal Filo & %20 KDV
+                  <div style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 500, marginTop: 2 }}>
+                    Vergi kalkanı, TCO & çoklu alım
+                  </div>
+                </button>
+              </div>
+            </div>
+
             {/* Hızlı Şablonlar */}
             <div style={{ marginBottom: '0.85rem' }}>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
-                💡 Hızlı Şablonlar (Tek tıkla hazır metin):
+                💡 Diğer Hızlı Şablonlar (Tek tıkla hazır metin):
               </span>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button

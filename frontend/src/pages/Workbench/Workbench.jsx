@@ -26,6 +26,7 @@ export default function Workbench() {
   const [serialVipOpen, setSerialVipOpen] = useState(false);
   const [serialVipIndex, setSerialVipIndex] = useState(0);
   const [sentVipIds, setSentVipIds] = useState([]);
+  const [serialVipTone, setSerialVipTone] = useState('friendly');
 
   const loadTodayQueue = async () => {
     setTodayLoading(true);
@@ -359,63 +360,109 @@ export default function Workbench() {
                           borderRadius: '10px',
                           padding: '14px 16px',
                           display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
+                          flexDirection: 'column',
                           gap: '12px'
                         }}>
-                          <div>
-                            <div style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, textTransform: 'uppercase' }}>
-                              Sıradaki Firma ({Math.min(serialVipIndex + 1, vipQueue.length)} / {vipQueue.length})
-                            </div>
-                            <div style={{ fontSize: '17px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                              {currentVipTarget.company_name}
-                            </div>
-                            <div style={{ fontSize: '12.5px', color: '#94a3b8', marginTop: '3px' }}>
-                              📍 {currentVipTarget.city || 'Samsun'}{currentVipTarget.district ? ` / ${currentVipTarget.district}` : ''} • 📞 {currentVipTarget.phone} • 🏷️ {currentVipTarget.sector || 'Ticari Filo'}
+                          {/* 3 Konuşma Dili Seçici */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '8px',
+                            paddingBottom: '10px',
+                            borderBottom: '1px solid rgba(255,255,255,0.08)'
+                          }}>
+                            <span style={{ fontSize: '12px', color: '#a7f3d0', fontWeight: 800 }}>
+                              🗣️ Mesaj Konuşma Dili:
+                            </span>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                              {[
+                                { id: 'friendly', label: '🤝 Samimi / Tanıdık Esnaf ("Abi merhaba...")' },
+                                { id: 'new_lead', label: '🎯 Yeni Müşteri (İlk Temas)' },
+                                { id: 'corporate_fleet', label: '🏢 Kurumsal Filo (%20 KDV & Çoklu Alım)' }
+                              ].map((t) => (
+                                <button
+                                  key={t.id}
+                                  type="button"
+                                  onClick={() => setSerialVipTone(t.id)}
+                                  style={{
+                                    padding: '6px 11px',
+                                    borderRadius: '999px',
+                                    fontSize: '11.5px',
+                                    fontWeight: 800,
+                                    cursor: 'pointer',
+                                    background: serialVipTone === t.id ? '#10b981' : 'rgba(255,255,255,0.06)',
+                                    color: serialVipTone === t.id ? '#052e16' : '#cbd5e1',
+                                    border: serialVipTone === t.id ? '1px solid #34d399' : '1px solid rgba(255,255,255,0.14)'
+                                  }}
+                                >
+                                  {t.label}
+                                </button>
+                              ))}
                             </div>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const cid = currentVipTarget.id || currentVipTarget.customer_id;
-                                sendCustomerVipPortalWhatsApp(currentVipTarget, { skipModal: true });
-                                setSentVipIds(prev => [...prev, cid]);
-                              }}
-                              style={{
-                                padding: '10px 16px',
-                                borderRadius: '9px',
-                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                color: '#052e16',
-                                border: 'none',
-                                fontWeight: 900,
-                                fontSize: '13px',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '7px',
-                                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
-                              }}
-                            >
-                              <FiSend size={14} /> 💬 VIP Link Gönder & Sıradakine Geç →
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setSerialVipIndex(prev => (prev + 1) % Math.max(1, vipQueue.length))}
-                              style={{
-                                padding: '10px 12px',
-                                borderRadius: '9px',
-                                background: 'rgba(255,255,255,0.08)',
-                                color: '#cbd5e1',
-                                border: '1px solid rgba(255,255,255,0.14)',
-                                fontWeight: 700,
-                                fontSize: '12px',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Bu Firmayı Atla →
-                            </button>
+
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '12px'
+                          }}>
+                            <div>
+                              <div style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, textTransform: 'uppercase' }}>
+                                Sıradaki Firma ({Math.min(serialVipIndex + 1, vipQueue.length)} / {vipQueue.length})
+                              </div>
+                              <div style={{ fontSize: '17px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                                {currentVipTarget.company_name}
+                              </div>
+                              <div style={{ fontSize: '12.5px', color: '#94a3b8', marginTop: '3px' }}>
+                                📍 {currentVipTarget.city || 'Samsun'}{currentVipTarget.district ? ` / ${currentVipTarget.district}` : ''} • 📞 {currentVipTarget.phone} • 🏷️ {currentVipTarget.sector || 'Ticari Filo'}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const cid = currentVipTarget.id || currentVipTarget.customer_id;
+                                  sendCustomerVipPortalWhatsApp(currentVipTarget, { skipModal: true, tone: serialVipTone });
+                                  setSentVipIds(prev => [...prev, cid]);
+                                }}
+                                style={{
+                                  padding: '10px 16px',
+                                  borderRadius: '9px',
+                                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                  color: '#052e16',
+                                  border: 'none',
+                                  fontWeight: 900,
+                                  fontSize: '13px',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '7px',
+                                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
+                                }}
+                              >
+                                <FiSend size={14} /> 💬 VIP Link Gönder & Sıradakine Geç →
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setSerialVipIndex(prev => (prev + 1) % Math.max(1, vipQueue.length))}
+                                style={{
+                                  padding: '10px 12px',
+                                  borderRadius: '9px',
+                                  background: 'rgba(255,255,255,0.08)',
+                                  color: '#cbd5e1',
+                                  border: '1px solid rgba(255,255,255,0.14)',
+                                  fontWeight: 700,
+                                  fontSize: '12px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Bu Firmayı Atla →
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ) : (

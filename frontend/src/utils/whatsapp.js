@@ -85,35 +85,65 @@ export function buildCustomerVipPortalLink(cust, sectorOverride) {
   return `${origin}/fiyat-listesi?cid=${cid}&company=${encodeURIComponent(companyName)}&phone=${cleanPhone}${secParam}&ref=muratonay`;
 }
 
-export function sendCustomerVipPortalWhatsApp(cust, options = {}) {
-  if (!cust?.phone) return;
-  const companyName = cust.company_name || cust.customer_name || 'Yetkili';
-  const secKey = options.sector || detectCustomerSectorKey(cust);
-  const sectorTitles = {
-    gida_frigo: 'Gıda & Soğuk Zincir Dağıtım',
-    kargo_dagitim: 'Kargo, Dağıtım & Nakliye',
-    insaat_malzeme: 'İnşaat, Nalbur & Sanayi',
-    tarim_yem: 'Tarım, Yem & Tonajlı Taşımacılık',
-    oto_kurtarma: 'Oto Kurtarma & Yol Yardım',
-    hafriyat_santiye: 'Hafriyat & Şantiye',
-    agir_nakliye: 'Uzun Yol & Uluslararası Lojistik'
-  };
-  const secLabel = sectorTitles[secKey] ? `*${sectorTitles[secKey]}* operasyonunuza özel süzülmüş ` : 'işletmenize özel ';
+const SECTOR_TITLES = {
+  gida_frigo: 'Gıda & Soğuk Zincir Dağıtım',
+  kargo_dagitim: 'Kargo, Dağıtım & Nakliye',
+  insaat_malzeme: 'İnşaat, Nalbur & Sanayi',
+  tarim_yem: 'Tarım, Yem & Tonajlı Taşımacılık',
+  oto_kurtarma: 'Oto Kurtarma & Yol Yardım',
+  hafriyat_santiye: 'Hafriyat & Şantiye',
+  agir_nakliye: 'Uzun Yol & Uluslararası Lojistik'
+};
+
+export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverride) {
+  const companyName = cust?.company_name || cust?.customer_name || 'Yetkili';
+  const secKey = sectorOverride || detectCustomerSectorKey(cust);
+  const secLabel = SECTOR_TITLES[secKey] ? `*${SECTOR_TITLES[secKey]}* operasyonunuza özel süzülmüş ` : 'işletmenize özel ';
   const vipLink = buildCustomerVipPortalLink(cust, secKey);
 
-  const msg = (
+  if (tone === 'friendly') {
+    return (
+      `Abi merhaba, hayırlı işler dilerim.\n\n` +
+      `IVECO ERC Samsun'da işini çok kolaylaştıracak yeni bir canlı ekran açtık. Artık 2026 model şasi fiyatlarına bakmak veya elindeki aracın takas değerini düşüp kalan kredi taksitini görmek için beni aramana bile gerek yok :)\n\n` +
+      `Aşağıdaki sana özel linkten elindeki aracın takasını seçip 1M TL %0 faizle kalan ödemeyi 10 saniyede kendin hesaplayabilir, istersen 3 fotoğraf gönderip 15 dk'da takas fiyatı alabilirsin:\n\n` +
+      `👉 ${vipLink}\n\n` +
+      `Kafana yatan bir model olursa ekrandaki tek tuşla bana düşüyor zaten. Bol kazançlar!\n` +
+      `*Satış Sorumlusu Can M. - 0544 622 59 31*`
+    );
+  }
+
+  if (tone === 'corporate_fleet') {
+    return (
+      `Sayın *${companyName}* Yönetimi,\n\n` +
+      `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
+      `Çoklu araç yatırımlarınız ve 2026 filo yenileme planlarınız kapsamında; ${secLabel}filo iskontosu, mali müşavirinize tek tıkla iletebileceğiniz %20 KDV vergi kalkanı & amortisman özeti, 5 yıllık yakıt (TCO) analizi ve takas + ticari kredi simülasyonunu içeren kurumsal bağlantınızı bilgilerinize sunarım:\n\n` +
+      `👉 ${vipLink}\n\n` +
+      `İhtiyacınıza özel proforma çalışması veya iş yerinizde/online görüşme randevusu için bağlantı üzerinden doğrudan talep oluşturabilirsiniz.\n\n` +
+      `Saygılarımla,\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+    );
+  }
+
+  // Varsayılan: 'new_lead' (Yeni Müşteri / İlk Temas)
+  return (
     `Sayın *${companyName}*,\n\n` +
     `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
-    `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, %20 KDV vergi kalkanı hesabını, takas peşinat desteğini ve %0 faizli banka kredi seçeneklerini aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
+    `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 3 fotoğrafla 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
     `👉 ${vipLink}\n\n` +
-    `Beğendiğiniz model veya takas/kredi hesaplaması için bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
+    `Beğendiğiniz modeli 24 saat ücretsiz adınıza opsiyonlayabilir veya bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
     `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
   );
+}
+
+export function sendCustomerVipPortalWhatsApp(cust, options = {}) {
+  if (!cust?.phone) return;
+  const secKey = options.sector || detectCustomerSectorKey(cust);
+  const tone = options.tone || 'new_lead';
+  const msg = buildVipPortalMessageByTone(cust, tone, secKey);
 
   const cid = cust.id || cust.customer_id;
   const followUpDate48h = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   if (cid) {
-    const sectorNote = sectorTitles[secKey] ? ` (${sectorTitles[secKey]})` : '';
+    const sectorNote = SECTOR_TITLES[secKey] ? ` (${SECTOR_TITLES[secKey]})` : '';
     crmApi.createInteraction(cid, {
       interaction_type: 'whatsapp',
       notes: `[WhatsApp] VIP Dijital Showroom & 2026 Fiyat/Kredi Hesaplayıcı Linki gönderildi${sectorNote}.`,

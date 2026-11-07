@@ -2581,50 +2581,226 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
+      {/* 🚀 4 BÜYÜK TERTEMİZ BAŞLANGIÇ KUTUSU ("NE YAPMAK İSTERSİNİZ?") */}
+      <div style={{
+        maxWidth: '1080px',
+        margin: '0 auto 16px',
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(23, 37, 84, 0.9) 100%)',
+        border: '1px solid rgba(56, 189, 248, 0.35)',
+        borderRadius: '18px',
+        padding: isMobileView ? '12px' : '16px 20px',
+        boxShadow: '0 10px 28px rgba(2, 6, 23, 0.35)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '6px',
+          marginBottom: '10px'
+        }}>
+          <div style={{ fontSize: isMobileView ? '0.84rem' : '0.92rem', fontWeight: 900, color: '#f8fafc' }}>
+            ✨ Hoş Geldiniz — Hemen Ne Yapmak İstersiniz?
+          </div>
+          <span style={{ fontSize: '0.7rem', color: '#7dd3fc', fontWeight: 700 }}>
+            Tek dokunuşla ilgili ekrana geçin
+          </span>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+          gap: isMobileView ? '8px' : '10px'
+        }}>
+          {/* Kutu 1: 2026 Araç & Şasi Fiyatlarına Bak */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainTab('fiyatlar');
+              recordCustomerFootprint('Başlangıç Kutusu', '2026 Fiyat Listesi', '4 Kutu Hızlı Başlangıç');
+            }}
+            style={{
+              textAlign: 'left',
+              padding: isMobileView ? '11px 10px' : '13px 14px',
+              borderRadius: '13px',
+              background: activeMainTab === 'fiyatlar'
+                ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(30, 58, 138, 0.65) 100%)'
+                : 'rgba(30, 41, 59, 0.85)',
+              border: activeMainTab === 'fiyatlar' ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              transition: 'all 0.18s'
+            }}
+          >
+            <div style={{ fontSize: isMobileView ? '1.15rem' : '1.3rem', marginBottom: '4px' }}>🚛</div>
+            <div style={{ fontSize: isMobileView ? '0.78rem' : '0.84rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.25 }}>
+              2026 Araç & Şasi Fiyatlarına Bak
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#bae6fd', marginTop: '4px', lineHeight: 1.3 }}>
+              Daily, Eurocargo, S-Way & T-Way liste ve kampanya fiyatları
+            </div>
+          </button>
+
+          {/* Kutu 2: Aracımın Takasını Düş & Kredi Hesapla */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainTab('fiyatlar');
+              recordCustomerFootprint('Başlangıç Kutusu', 'Takas + Kredi Hesaplayıcı', '4 Kutu Hızlı Başlangıç');
+              setTimeout(() => {
+                const el = document.getElementById('tradein-loan-calc-box');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 120);
+            }}
+            style={{
+              textAlign: 'left',
+              padding: isMobileView ? '11px 10px' : '13px 14px',
+              borderRadius: '13px',
+              background: 'rgba(30, 41, 59, 0.85)',
+              border: '1px solid rgba(52, 211, 153, 0.4)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              transition: 'all 0.18s'
+            }}
+          >
+            <div style={{ fontSize: isMobileView ? '1.15rem' : '1.3rem', marginBottom: '4px' }}>🔄</div>
+            <div style={{ fontSize: isMobileView ? '0.78rem' : '0.84rem', fontWeight: 900, color: '#6ee7b7', lineHeight: 1.25 }}>
+              Aracımın Takasını Düş & Kredi Hesapla
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
+              Eski aracınızı peşinat sayıp aylık taksitinizi görün
+            </div>
+          </button>
+
+          {/* Kutu 3: 3 Fotoğrafla 15 Dk'da Takas Fiyatı Al */}
+          <button
+            type="button"
+            onClick={() => {
+              recordCustomerFootprint('Başlangıç Kutusu', '3 Fotoğrafla Takas Ekspertiz', '4 Kutu Hızlı Başlangıç');
+              window.dispatchEvent(new CustomEvent('iveco:select-smart-action', { detail: { action: 'tradein_photo' } }));
+              const el = document.getElementById('smart-customer-action-hub');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            style={{
+              textAlign: 'left',
+              padding: isMobileView ? '11px 10px' : '13px 14px',
+              borderRadius: '13px',
+              background: 'rgba(30, 41, 59, 0.85)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              transition: 'all 0.18s'
+            }}
+          >
+            <div style={{ fontSize: isMobileView ? '1.15rem' : '1.3rem', marginBottom: '4px' }}>📸</div>
+            <div style={{ fontSize: isMobileView ? '0.78rem' : '0.84rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.25 }}>
+              3 Fotoğrafla 15 Dk’da Takas Fiyatı Al
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
+              Plazaya gelmeden WhatsApp’tan ön ekspertiz bedeli
+            </div>
+          </button>
+
+          {/* Kutu 4: Randevu Al / Fiyatı 24 Saat Kilitle */}
+          <button
+            type="button"
+            onClick={() => {
+              recordCustomerFootprint('Başlangıç Kutusu', 'Randevu & 24 Saat Opsiyon', '4 Kutu Hızlı Başlangıç');
+              window.dispatchEvent(new CustomEvent('iveco:select-smart-action', { detail: { action: 'appointment' } }));
+              const el = document.getElementById('smart-customer-action-hub');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            style={{
+              textAlign: 'left',
+              padding: isMobileView ? '11px 10px' : '13px 14px',
+              borderRadius: '13px',
+              background: 'rgba(30, 41, 59, 0.85)',
+              border: '1px solid rgba(251, 191, 36, 0.45)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              transition: 'all 0.18s'
+            }}
+          >
+            <div style={{ fontSize: isMobileView ? '1.15rem' : '1.3rem', marginBottom: '4px' }}>📅</div>
+            <div style={{ fontSize: isMobileView ? '0.78rem' : '0.84rem', fontWeight: 900, color: '#fcd34d', lineHeight: 1.25 }}>
+              Randevu Al / Fiyatı 24 Saat Kilitle
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
+              Showroom kahvesi, görüntülü tur veya fiyat opsiyonu
+            </div>
+          </button>
+        </div>
+      </div>
+
       {/* ── MÜŞTERİ MODÜLÜ ANA SEKMELERİ (TABS) ── */}
       {isMobileView ? (
         <div style={{ maxWidth: '680px', margin: '0 auto 14px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '6px',
-            background: 'rgba(24, 42, 72, 0.95)',
-            padding: '6px',
-            borderRadius: '14px',
-            border: '1px solid rgba(125, 211, 252, 0.3)'
-          }}>
-            {[
-              { id: 'fiyatlar', label: '🏷️ Fiyat Listesi' },
-              { id: 'krediler', label: '💳 Kredi & %0 Faiz' },
-              { id: 'tco', label: '⚔️ Neden IVECO?' },
-              { id: 'secici', label: '🚛 Araç & Tonaj Seç' },
-              { id: 'ust-yapi', label: '🏗️ Üst Yapı Rehberi' },
-              { id: 'sss', label: '❓ Merak Edilenler' }
-            ].map((tab) => {
-              const isActive = activeMainTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => { setActiveMainTab(tab.id); setShowMoreTabsMobile(false); }}
-                  style={{
-                    background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(15, 28, 50, 0.65)',
-                    color: isActive ? '#ffffff' : '#f1f5f9',
-                    border: isActive ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.22)',
-                    borderRadius: '10px',
-                    padding: '10px 4px',
-                    fontSize: '0.76rem',
-                    fontWeight: isActive ? 800 : 700,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    boxShadow: isActive ? '0 3px 10px rgba(2, 132, 199, 0.35)' : 'none'
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowMoreTabsMobile(prev => !prev)}
+            style={{
+              width: '100%',
+              padding: '9px 14px',
+              borderRadius: '12px',
+              background: 'rgba(24, 42, 72, 0.92)',
+              border: '1px solid rgba(125, 211, 252, 0.3)',
+              color: '#e2e8f0',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <span>📚 Diğer Detaylı Rehberler (Üstyapı, Kapasite, TCO, SSS)</span>
+            <span style={{ color: '#38bdf8' }}>{showMoreTabsMobile ? 'Gizle ▲' : 'Tümünü Gör ▾'}</span>
+          </button>
+
+          {showMoreTabsMobile && (
+            <div style={{
+              marginTop: '6px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '6px',
+              background: 'rgba(24, 42, 72, 0.95)',
+              padding: '8px',
+              borderRadius: '14px',
+              border: '1px solid rgba(125, 211, 252, 0.3)'
+            }}>
+              {[
+                { id: 'fiyatlar', label: '🏷️ 2026 Fiyat Listesi' },
+                { id: 'krediler', label: '💳 Kredi & %0 Faiz' },
+                { id: 'ust-yapi', label: '🏗️ Üst Yapı Rehberi' },
+                { id: 'secici', label: '🚛 Şasi & Tonaj Seç' },
+                { id: 'tco', label: '⚔️ Neden IVECO? (TCO)' },
+                { id: 'sss', label: '❓ Merak Edilenler' }
+              ].map((tab) => {
+                const isActive = activeMainTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => { setActiveMainTab(tab.id); setShowMoreTabsMobile(false); }}
+                    style={{
+                      background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(15, 28, 50, 0.65)',
+                      color: isActive ? '#ffffff' : '#f1f5f9',
+                      border: isActive ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.22)',
+                      borderRadius: '10px',
+                      padding: '10px 6px',
+                      fontSize: '0.76rem',
+                      fontWeight: isActive ? 800 : 700,
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                      boxShadow: isActive ? '0 3px 10px rgba(2, 132, 199, 0.35)' : 'none'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : (
         <div style={{
@@ -2688,46 +2864,6 @@ IVECO ERC Samsun Otomotiv
           })}
         </div>
       )}
-
-      {/* 💡 HIZLI AKSİYON KISAYOL BANDI (Randevu / 24 Saat Opsiyon / Fotoğrafla Takas / 2. El Habercisi) */}
-      <div style={{
-        maxWidth: '1080px',
-        margin: '0 auto 16px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: '8px'
-      }}>
-        {[
-          { label: '📅 Showroom / İş Yeri / Görüntülü Randevu Al', color: '#10b981' },
-          { label: '🔒 Fiyatı 24 Saat Adıma Opsiyonla', color: '#f59e0b' },
-          { label: '📸 3 Fotoğrafla 15 Dk’da Takas Fiyatı Al', color: '#38bdf8' },
-          { label: '🧾 Muhasebecime %20 KDV Vergi Özeti İste', color: '#60a5fa' },
-          { label: '🔔 Sıfır Bütçemi Aşıyor: 2. El Takas Habercisi', color: '#c084fc' }
-        ].map((chip, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => {
-              const el = document.getElementById('smart-customer-action-hub');
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            style={{
-              background: 'rgba(15, 23, 42, 0.85)',
-              border: `1px solid ${chip.color}66`,
-              color: '#f8fafc',
-              borderRadius: '999px',
-              padding: '6px 13px',
-              fontSize: '0.73rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(0,0,0,0.25)'
-            }}
-          >
-            {chip.label} ↓
-          </button>
-        ))}
-      </div>
 
       {/* ── SEKME 2: 2026 MODEL FİYAT LİSTESİ ── */}
       {activeMainTab === 'fiyatlar' && (

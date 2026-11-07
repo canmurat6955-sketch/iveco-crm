@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FiCalendar, FiLock, FiCamera, FiFileText, FiBell, FiPackage,
   FiCheckCircle, FiPhone, FiMessageCircle, FiClock, FiMapPin, FiVideo
@@ -66,6 +66,17 @@ export default function CustomerSmartActionHub({
   onTrackFootprint
 }) {
   const [selectedAction, setSelectedAction] = useState('appointment'); // 'appointment' | 'option24h' | 'tradein_photo' | 'tax_summary' | 'body_pkg' | 'second_hand'
+
+  useEffect(() => {
+    const handleSelectAction = (e) => {
+      const act = e?.detail?.action;
+      if (act) {
+        setSelectedAction(act);
+      }
+    };
+    window.addEventListener('iveco:select-smart-action', handleSelectAction);
+    return () => window.removeEventListener('iveco:select-smart-action', handleSelectAction);
+  }, []);
 
   // Ortak iletişim state
   const [nameInput, setNameInput] = useState(customerCompany || '');
