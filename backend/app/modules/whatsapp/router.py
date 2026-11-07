@@ -27,6 +27,7 @@ class PairingConfirmRequest(BaseModel):
 class SettingsRequest(BaseModel):
     notify_phone: Optional[str] = None
     auto_notify_rep: Optional[bool] = None
+    callmebot_apikey: Optional[str] = None
 
 
 @router.get("/status")
@@ -71,11 +72,12 @@ def send_whatsapp_message(req: SendMessageRequest, db: Session = Depends(get_db)
 
 @router.post("/settings")
 def update_whatsapp_settings(req: SettingsRequest, db: Session = Depends(get_db)):
-    """Bildirim telefonu ve anlık takip uyarı ayarlarını günceller."""
+    """Bildirim telefonu, CallMeBot API anahtarı ve anlık takip uyarı ayarlarını günceller."""
     service = WhatsAppService(db)
     return service.update_settings(
         notify_phone=req.notify_phone,
-        auto_notify_rep=req.auto_notify_rep
+        auto_notify_rep=req.auto_notify_rep,
+        callmebot_apikey=req.callmebot_apikey,
     )
 
 

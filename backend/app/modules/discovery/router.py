@@ -275,7 +275,22 @@ def record_intent_signal(
 ):
     """Web sitesi, kampanya linki veya Google üzerinden gelen niyet sinyalini kaydeder (IP Rate Limited)."""
     _check_intent_signal_rate_limit(request)
-    return DiscoveryService(db).create_intent_signal(data)
+    res = DiscoveryService(db).create_intent_signal(data)
+    try:
+        if (data.intent_score and data.intent_score >= 90) or (
+            data.source in ("crm_existing_customer", "smart_action_hub", "public_pricing_catalog")
+        ):
+            from app.modules.whatsapp.service import WhatsAppService
+            WhatsAppService(db).notify_rep_portal_footprint(
+                company_name=data.company_name or "Portal Ziyaretçisi",
+                action_label=data.search_query or data.target_campaign or "Portal İncelemesi",
+                vehicle_model=data.target_model or "IVECO 2026",
+                city=data.city,
+                phone=data.phone,
+            )
+    except Exception:
+        pass
+    return res
 
 
 @router.post("/intent-signals/{signal_id}/convert-to-lead")

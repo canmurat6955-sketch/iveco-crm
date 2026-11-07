@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FiMessageSquare, FiX, FiCheckCircle, FiAlertCircle, 
-  FiRefreshCw, FiSmartphone, FiSend, FiShield, FiBell, FiPower 
+  FiRefreshCw, FiSmartphone, FiSend, FiShield, FiBell, FiPower, FiKey, FiExternalLink
 } from 'react-icons/fi';
 import { whatsappApi } from '../../api/client';
+import { launchNativeWhatsApp } from '../../utils/whatsapp';
 import toast from 'react-hot-toast';
 
 export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
@@ -11,6 +12,8 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
   const [statusData, setStatusData] = useState(null);
   const [qrData, setQrData] = useState(null);
   const [testingSend, setTestingSend] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [savingKey, setSavingKey] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -23,18 +26,44 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
     try {
       const res = await whatsappApi.getStatus();
       setStatusData(res.data);
+      if (res.data?.callmebot_apikey !== undefined) {
+        setApiKeyInput(res.data.callmebot_apikey || '');
+      }
     } catch (err) {
       console.error('WhatsApp status error:', err);
-      // Fallback default state
       setStatusData({
-        status: 'disconnected',
+        status: 'connected',
         phone_number: '0544 622 59 31',
         display_name: 'Can Murat Onay',
         auto_notify_rep: true,
+        callmebot_apikey: '',
+        has_callmebot_key: false,
         recent_messages: []
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveApiKey = async () => {
+    setSavingKey(true);
+    try {
+      const cleanKey = apiKeyInput.trim();
+      await whatsappApi.updateSettings({
+        callmebot_apikey: cleanKey,
+        notify_phone: '905446225931',
+        auto_notify_rep: true
+      });
+      toast.success(
+        cleanKey
+          ? 'CallMeBot API şifresi kaydedildi! Şimdi "Test Gönder" ile telefonunuza gerçek mesaj atabilirsiniz.'
+          : 'CallMeBot API şifresi temizlendi.'
+      );
+      await loadStatus();
+    } catch (err) {
+      toast.error('API şifresi kaydedilemedi');
+    } finally {
+      setSavingKey(false);
     }
   };
 
@@ -44,7 +73,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
       const res = await whatsappApi.generateQr();
       setQrData(res.data);
       setStatusData(prev => ({ ...prev, status: 'qr_ready' }));
-      toast.success('Eşleştirme QR kodu oluşturuldu. Lütfen telefonunuzdan okutunuz.');
+      toast.success('Eşleştirme QR kodu oluşturuldu.');
     } catch (err) {
       toast.error('QR kod oluşturulamadı');
     } finally {
@@ -59,7 +88,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         phone: '0544 622 59 31',
         display_name: 'Can Murat Onay'
       });
-      toast.success('WhatsApp bağlantısı başarıyla kuruldu!');
+      toast.success('WhatsApp bağlantısı aktif edildi!');
       setQrData(null);
       await loadStatus();
     } catch (err) {
@@ -87,14 +116,38 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
   const handleSendTestMessage = async () => {
     setTestingSend(true);
     try {
-      await whatsappApi.sendTestMessage();
-      toast.success('Test uyarısı 0544 622 59 31 numaralı telefonunuza iletildi!');
+      const res = await whatsappApi.sendTestMessage();
+      const data = res?.data || {};
+      if (data.delivery_status === 'delivered') {
+        toast.success('✅ Gerçek WhatsApp mesajı 0544 622 59 31 telefonunuza gönderildi!');
+      } else if (!data.has_callmebot_key) {
+        toast('⚠️ Henüz CallMeBot API şifresi girmediğiniz için sadece CRM günlüğüne yazıldı. Telefonunuza gerçek mesaj gelmesi için yukarıdaki 6 haneli şifreyi girin veya "Masaüstü WhatsApp Testi"ne basın.', {
+          icon: '📲',
+          duration: 6000
+        });
+      } else {
+        toast.error(data.delivery_detail || 'CallMeBot mesajı iletilemedi, şifrenizi kontrol edin.');
+      }
       await loadStatus();
     } catch (err) {
       toast.error('Test mesajı gönderilemedi');
     } finally {
       setTestingSend(false);
     }
+  };
+
+  const handleDirectDesktopTest = () => {
+    const msg = `✅ *ERC SAMSUN IVECO CRM — Masaüstü WhatsApp Köprüsü Testi*\n\nCan Murat Bey merhaba, bilgisayarınızdaki WhatsApp Masaüstü / Web köprüsü sorunsuz çalışıyor! Müşterilere gönderdiğiniz tüm VIP linkler ve teklifler bu hat üzerinden doğrudan açılacaktır.`;
+    launchNativeWhatsApp('905446225931', msg);
+    toast.success('Bilgisayarınızdaki gerçek WhatsApp uygulaması açıldı!');
+  };
+
+  const handleOpenNewCallMeBotNumber = () => {
+    // Yeni bot numarası: +34 644 95 73 56
+    const botPhone = '34644957356';
+    const botText = 'I allow callmebot to send me messages';
+    launchNativeWhatsApp(botPhone, botText);
+    toast.success('Yeni CallMeBot numarası (+34 644 95 73 56) WhatsApp’ta açıldı! Önce numarayı rehberinize kaydedip mesajı gönderin.');
   };
 
   const handleToggleAutoNotify = async () => {
@@ -111,7 +164,8 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const isConnected = statusData?.status === 'connected';
+  const isConnected = statusData?.status === 'connected' || statusData?.has_callmebot_key;
+  const hasRealBotKey = Boolean(statusData?.has_callmebot_key);
 
   return (
     <div style={{
@@ -133,8 +187,8 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '20px',
         width: '100%',
-        maxWidth: '560px',
-        maxHeight: '90vh',
+        maxWidth: '610px',
+        maxHeight: '92vh',
         display: 'flex',
         flexDirection: 'column',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
@@ -191,14 +245,14 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Body */}
-        <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ padding: '18px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
           {/* Status Ribbon */}
           <div style={{
-            background: isConnected ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-            border: `1px solid ${isConnected ? 'rgba(34, 197, 94, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+            background: hasRealBotKey ? 'rgba(34, 197, 94, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+            border: `1px solid ${hasRealBotKey ? 'rgba(34, 197, 94, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
             borderRadius: '14px',
-            padding: '14px 18px',
+            padding: '13px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -210,306 +264,283 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                 width: '12px',
                 height: '12px',
                 borderRadius: '50%',
-                background: isConnected ? '#22c55e' : '#f59e0b',
-                boxShadow: `0 0 10px ${isConnected ? '#22c55e' : '#f59e0b'}`
+                background: hasRealBotKey ? '#22c55e' : '#f59e0b',
+                boxShadow: `0 0 10px ${hasRealBotKey ? '#22c55e' : '#f59e0b'}`
               }} />
               <div>
                 <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
-                  {isConnected ? 'WhatsApp Hattı Aktif & Bağlı' : 'WhatsApp Bağlantısı Bekleniyor'}
+                  {hasRealBotKey
+                    ? '✅ Gerçek Cep Telefonu Bildirim Botu Aktif & Bağlı'
+                    : '📲 Masaüstü Köprüsü Aktif — Cep Telefonu Bot Şifresi Bekleniyor'}
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
-                  {isConnected 
-                    ? `Hat Sahibi: Can Murat Onay (${statusData?.phone_number || '0544 622 59 31'})`
-                    : 'Telefonunuzdaki WhatsApp Web ile CRM arasında güvenli köprü kurun'}
+                <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
+                  Hat Sahibi: Can Murat Onay ({statusData?.phone_number || '0544 622 59 31'})
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 🔑 YENİ CALLMEBOT (+34 644 95 73 56) KURULUM VE ŞİFRE KUTUSU */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.92) 100%)',
+            border: '1px solid rgba(16, 185, 129, 0.4)',
+            borderRadius: '14px',
+            padding: '14px 16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              <div style={{ fontSize: '0.84rem', fontWeight: 900, color: '#6ee7b7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FiKey size={15} /> Cep Telefonuna Gerçek WhatsApp Bildirimi (CallMeBot Şifresi)
+              </div>
+              <span style={{
+                fontSize: '0.66rem',
+                fontWeight: 800,
+                padding: '2px 8px',
+                borderRadius: '999px',
+                background: hasRealBotKey ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                color: hasRealBotKey ? '#4ade80' : '#fcd34d'
+              }}>
+                {hasRealBotKey ? `Şifre Kayıtlı (${statusData.callmebot_apikey})` : 'Şifre Girilmedi'}
+              </span>
+            </div>
+
+            <div style={{
+              fontSize: '0.73rem',
+              color: '#e2e8f0',
+              lineHeight: 1.5,
+              background: 'rgba(2, 6, 23, 0.55)',
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.07)',
+              marginBottom: '10px'
+            }}>
+              <div style={{ fontWeight: 800, color: '#fde68a', marginBottom: '4px' }}>
+                💡 Neden "This Bot is full" uyarısı aldın ve ne yapmalısın?
+              </div>
+              <div>1️⃣ Eski bot dolduğu için sana <strong>yeni bot numarasını (+34 644 95 73 56)</strong> verdi.</div>
+              <div>2️⃣ <strong>Çok Önemli:</strong> Önce cep telefonunun rehberine <strong>+34 644 95 73 56</strong> numarasını kaydet (Rehbere eklemezsen şifre üretmez!).</div>
+              <div>3️⃣ Ardından bu yeni numaraya WhatsApp'tan <strong>I allow callmebot to send me messages</strong> (veya <strong>I allow callmebot to call me</strong>) yazıp gönder.</div>
+              <div>4️⃣ Sana cevaben gelen <strong>6 haneli APIKey şifresini</strong> aşağıdaki kutuya yazıp kaydet!</div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <button
+                type="button"
+                onClick={handleOpenNewCallMeBotNumber}
+                style={{
+                  background: 'rgba(37, 211, 102, 0.18)',
+                  border: '1px solid rgba(37, 211, 102, 0.45)',
+                  color: '#86efac',
+                  borderRadius: '9px',
+                  padding: '7px 12px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiExternalLink size={13} /> Yeni Botu (+34 644 95 73 56) WhatsApp’ta Aç & Mesajı Hazırla
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <input
+                type="text"
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                placeholder="CallMeBot'tan gelen APIKey şifresini buraya yapıştırın (Örn: 482915)"
+                style={{
+                  flex: 1,
+                  minWidth: '220px',
+                  padding: '9px 12px',
+                  borderRadius: '9px',
+                  background: '#020617',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  color: '#f8fafc',
+                  fontSize: '0.78rem',
+                  fontWeight: 700
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleSaveApiKey}
+                disabled={savingKey}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#052e16',
+                  border: 'none',
+                  borderRadius: '9px',
+                  padding: '9px 16px',
+                  fontSize: '0.78rem',
+                  fontWeight: 900,
+                  cursor: 'pointer'
+                }}
+              >
+                {savingKey ? 'Kaydediliyor...' : '💾 Şifreyi Kaydet'}
+              </button>
+            </div>
+          </div>
+
+          {/* Notification Toggle Card */}
+          <div style={{
+            background: 'rgba(2, 6, 23, 0.6)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '14px',
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '10px',
+                background: 'rgba(56, 189, 248, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#38bdf8'
+              }}>
+                <FiBell size={20} />
+              </div>
+              <div>
+                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
+                  Canlı Teklif & Portal Hareketi Uyarısı (Radar)
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                  Müşteri proformayı açtığında veya portalda işlem yaptığında 0544 622 59 31 hattınıza uyarı düşer.
                 </div>
               </div>
             </div>
 
-            {isConnected ? (
+            <button
+              type="button"
+              onClick={handleToggleAutoNotify}
+              style={{
+                background: statusData?.auto_notify_rep ? '#22c55e' : 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '20px',
+                padding: '6px 14px',
+                fontSize: '0.74rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              {statusData?.auto_notify_rep ? 'Aktif' : 'Kapalı'}
+            </button>
+          </div>
+
+          {/* Test Button Card */}
+          <div style={{
+            background: 'rgba(2, 6, 23, 0.6)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '14px',
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div>
+              <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
+                Hattı Test Et (0544 622 59 31)
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                İster CallMeBot ile arka planda, ister doğrudan bilgisayarınızdaki WhatsApp’ı açarak test edin.
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <button
                 type="button"
-                onClick={handleDisconnect}
-                disabled={loading}
+                onClick={handleDirectDesktopTest}
                 style={{
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: '#f87171',
-                  borderRadius: '8px',
-                  padding: '6px 12px',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
+                  background: 'rgba(37, 211, 102, 0.18)',
+                  color: '#86efac',
+                  border: '1px solid rgba(37, 211, 102, 0.45)',
+                  borderRadius: '10px',
+                  padding: '8px 13px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px'
                 }}
               >
-                <FiPower size={13} /> Oturumu Kapat
+                💬 Masaüstü WhatsApp’ımda Aç
               </button>
-            ) : null}
+              <button
+                type="button"
+                onClick={handleSendTestMessage}
+                disabled={testingSend}
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '8px 14px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiSend size={13} /> {testingSend ? 'İletiliyor...' : 'Bot İle Test Gönder'}
+              </button>
+            </div>
           </div>
 
-          {/* QR Pairing Area (If not connected) */}
-          {!isConnected && (
-            <div style={{
-              background: 'rgba(2, 6, 23, 0.5)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '16px',
-              padding: '20px',
-              textAlign: 'center'
-            }}>
-              {qrData ? (
-                <div>
-                  <div style={{
-                    display: 'inline-block',
-                    background: '#fff',
-                    padding: '12px',
-                    borderRadius: '12px',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-                    marginBottom: '16px'
-                  }}>
-                    <img
-                      src={qrData.qr_image_url}
-                      alt="WhatsApp Web QR Kodu"
-                      style={{ width: '220px', height: '220px', display: 'block' }}
-                    />
-                  </div>
-
-                  <div style={{ fontSize: '0.84rem', color: '#f8fafc', fontWeight: 700, marginBottom: '6px' }}>
-                    Telefonunuzdan QR Kodu Taratın
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', maxWidth: '400px', margin: '0 auto 16px', lineHeight: 1.4 }}>
-                    WhatsApp ➔ <strong>Bağlı Cihazlar</strong> ➔ <strong>Cihaz Bağla</strong> seçeneğine girip kameranızı bu koda tutun.
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button
-                      type="button"
-                      onClick={handleConfirmPairing}
-                      disabled={loading}
+          {/* Recent Dispatches */}
+          {statusData?.recent_messages && statusData.recent_messages.length > 0 && (
+            <div>
+              <div style={{ fontSize: '0.74rem', color: '#cbd5e1', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                Son Otomatik Bildirim Günlüğü
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {statusData.recent_messages.map(log => {
+                  const isRealDelivered = log.status === 'delivered';
+                  return (
+                    <div
+                      key={log.id}
                       style={{
-                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '10px',
-                        padding: '10px 18px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
+                        background: 'rgba(15, 23, 42, 0.6)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        fontSize: '0.72rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        justifyContent: 'space-between',
+                        gap: '8px'
                       }}
                     >
-                      <FiCheckCircle size={16} /> Eşleştirmeyi Tamamla
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleGenerateQr}
-                      disabled={loading}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#f8fafc',
-                        borderRadius: '10px',
-                        padding: '10px 14px',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <FiRefreshCw size={14} className={loading ? 'crm-spin' : ''} /> Yenile
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ padding: '20px 10px' }}>
-                  <div style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    background: 'rgba(37, 211, 102, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#25D366',
-                    margin: '0 auto 14px'
-                  }}>
-                    <FiSmartphone size={32} />
-                  </div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
-                    WhatsApp Web Köprüsü Kurun
-                  </h3>
-                  <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '0 auto 20px', maxWidth: '380px' }}>
-                    Telefonunuzu sisteme bağlayarak müşterilere tek tıkla antetli teklif gönderebilir ve müşteri teklifi açtığı anda anlık uyarı alabilirsiniz.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleGenerateQr}
-                    disabled={loading}
-                    style={{
-                      background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '12px',
-                      padding: '12px 24px',
-                      fontSize: '0.86rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      boxShadow: '0 4px 16px rgba(37, 211, 102, 0.35)'
-                    }}
-                  >
-                    <FiRefreshCw size={16} /> QR Kodu Başlat
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Connected Controls */}
-          {isConnected && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {/* Notification Toggle Card */}
-              <div style={{
-                background: 'rgba(2, 6, 23, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '14px',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
-                    background: 'rgba(56, 189, 248, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#38bdf8'
-                  }}>
-                    <FiBell size={20} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
-                      Canlı Teklif Okundu Uyarısı (Radar)
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                      Müşteri proforma bağlantısını açtığında telefonunuza anında WhatsApp uyarısı düşer.
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleToggleAutoNotify}
-                  style={{
-                    background: statusData?.auto_notify_rep ? '#22c55e' : 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '20px',
-                    padding: '6px 14px',
-                    fontSize: '0.74rem',
-                    fontWeight: 800,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {statusData?.auto_notify_rep ? 'Aktif' : 'Kapalı'}
-                </button>
-              </div>
-
-              {/* Test Button Card */}
-              <div style={{
-                background: 'rgba(2, 6, 23, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '14px',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px'
-              }}>
-                <div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
-                    Hattı Test Et (0544 622 59 31)
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                    Kendi WhatsApp numaranıza sistemden doğrulama mesajı gönderin.
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleSendTestMessage}
-                  disabled={testingSend}
-                  style={{
-                    background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '8px 16px',
-                    fontSize: '0.76rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <FiSend size={13} /> {testingSend ? 'İletiliyor...' : 'Test Gönder'}
-                </button>
-              </div>
-
-              {/* Recent Dispatches */}
-              {statusData?.recent_messages && statusData.recent_messages.length > 0 && (
-                <div>
-                  <div style={{ fontSize: '0.74rem', color: '#cbd5e1', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                    Son Otomatik Bildirim Günlüğü
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {statusData.recent_messages.map(log => (
-                      <div
-                        key={log.id}
-                        style={{
-                          background: 'rgba(15, 23, 42, 0.6)',
-                          border: '1px solid rgba(255, 255, 255, 0.05)',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.72rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between'
-                        }}
-                      >
-                        <div>
-                          <span style={{ color: '#38bdf8', fontWeight: 700 }}>{log.recipient_name}: </span>
-                          <span style={{ color: '#cbd5e1' }}>{log.content}</span>
-                        </div>
-                        <span style={{
-                          color: '#4ade80',
-                          background: 'rgba(34, 197, 94, 0.15)',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontSize: '0.64rem',
-                          fontWeight: 700
-                        }}>
-                          İletildi
-                        </span>
+                      <div>
+                        <span style={{ color: '#38bdf8', fontWeight: 700 }}>{log.recipient_name}: </span>
+                        <span style={{ color: '#cbd5e1' }}>{log.content}</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      <span style={{
+                        color: isRealDelivered ? '#4ade80' : '#fcd34d',
+                        background: isRealDelivered ? 'rgba(34, 197, 94, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '0.64rem',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {isRealDelivered ? 'Telefona İletildi' : 'CRM Kaydı (Şifre Bekliyor)'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
