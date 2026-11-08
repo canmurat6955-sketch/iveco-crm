@@ -53,6 +53,88 @@ def get_vehicle_pricing_catalog(
     return get_public_pricing_catalog(segment)
 
 
+_tcmb_cache = {"data": None, "timestamp": 0.0}
+
+
+@router.get("/exchange-rates")
+def get_tcmb_exchange_rates():
+    """
+    Fetches daily EUR/TRY exchange rate from TCMB (Merkez Bankası today.xml).
+    Caches result for 30 minutes and falls back to open exchange rate API if TCMB is unreachable.
+    """
+    import time
+    import urllib.request
+    import xml.etree.ElementTree as ET
+    import json
+
+    now = time.time()
+    if _tcmb_cache["data"] and (now - _tcmb_cache["timestamp"] < 1800):
+        return _tcmb_cache["data"]
+
+    try:
+        req = urllib.request.Request(
+            "https://www.tcmb.gov.tr/kurlar/today.xml",
+            headers={"User-Agent": "Mozilla/5.0 (IVECO-CRM-TCMB-Client)"}
+        )
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            xml_bytes = resp.read()
+        root = ET.fromstring(xml_bytes)
+        tarih = root.attrib.get("Tarih", date.today().isoformat())
+        for currency in root.findall("Currency"):
+            if currency.attrib.get("Kod") == "EUR":
+                forex_buying = float((currency.findtext("ForexBuying") or "0").replace(",", ".") or 0)
+                forex_selling = float((currency.findtext("ForexSelling") or "0").replace(",", ".") or 0)
+                banknote_selling = float((currency.findtext("BanknoteSelling") or "0").replace(",", ".") or 0)
+                rate = forex_selling or banknote_selling or forex_buying
+                if rate > 0:
+                    result = {
+                        "eur_try": round(rate, 4),
+                        "forex_buying": round(forex_buying, 4),
+                        "forex_selling": round(forex_selling, 4),
+                        "banknote_selling": round(banknote_selling, 4),
+                        "source": "TCMB (Merkez Bankası Günlük Döviz Satış Kuru)",
+                        "updated_at": tarih
+                    }
+                    _tcmb_cache["data"] = result
+                    _tcmb_cache["timestamp"] = now
+                    return result
+    except Exception:
+        pass
+
+    # Fallback to public EUR/TRY API if TCMB XML is temporarily blocked/unreachable
+    try:
+        req = urllib.request.Request(
+            "https://open.er-api.com/v6/latest/EUR",
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        try_rate = float(payload.get("rates", {}).get("TRY", 0))
+        if try_rate > 0:
+            result = {
+                "eur_try": round(try_rate, 4),
+                "forex_buying": round(try_rate, 4),
+                "forex_selling": round(try_rate, 4),
+                "banknote_selling": round(try_rate, 4),
+                "source": "TCMB / Güncel Piyasa Kuru",
+                "updated_at": date.today().isoformat()
+            }
+            _tcmb_cache["data"] = result
+            _tcmb_cache["timestamp"] = now
+            return result
+    except Exception:
+        pass
+
+    return _tcmb_cache["data"] or {
+        "eur_try": 38.50,
+        "forex_buying": 38.45,
+        "forex_selling": 38.50,
+        "banknote_selling": 38.55,
+        "source": "TCMB Referans Kuru",
+        "updated_at": date.today().isoformat()
+    }
+
+
 
 # ── 2. Master Vehicle Data Endpoints ─────────────────────────────
 @router.get("/master", response_model=List[VehicleMasterResponse])

@@ -465,6 +465,7 @@ export const vehiclesApi = {
   getCascadeData: () => api.get('/vehicles/cascade-data'),
   parseVehicleCode: (code) => api.get('/vehicles/parse-code', { params: { code } }),
   getPricingCatalog: (segment) => api.get('/vehicles/pricing-catalog', { params: { segment } }),
+  getExchangeRates: () => api.get('/vehicles/exchange-rates'),
 
   // Customer Vehicle Interests
   getCustomerInterests: (customerId) => api.get(`/vehicles/customers/${customerId}/interests`),
@@ -492,6 +493,70 @@ export const vehiclesApi = {
   getChassisConfigurations: () => api.get('/vehicles/chassis-configurations'),
   matchChassis: (data) => api.post('/vehicles/match-chassis', data),
 };
+
+// Günlük TCMB (Merkez Bankası) Euro Kuru Çekici (Önbellekli + Yedekli)
+let _cachedEurRateInfo = null;
+export async function fetchTcmbEurRate() {
+  if (_cachedEurRateInfo && (Date.now() - _cachedEurRateInfo.ts < 1800000)) {
+    return _cachedEurRateInfo;
+  }
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      const saved = window.sessionStorage.getItem('tcmb_eur_rate_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.rate > 0 && (Date.now() - (parsed.ts || 0) < 1800000)) {
+          _cachedEurRateInfo = parsed;
+          return parsed;
+        }
+      }
+    }
+  } catch (_) {}
+
+  try {
+    const res = await vehiclesApi.getExchangeRates();
+    const rate = Number(res?.data?.eur_try || res?.data?.forex_selling || 0);
+    if (rate > 0) {
+      const info = {
+        rate,
+        source: res.data.source || 'TCMB Günlük Döviz Satış Kuru',
+        updatedAt: res.data.updated_at || new Date().toLocaleDateString('tr-TR'),
+        ts: Date.now()
+      };
+      _cachedEurRateInfo = info;
+      try {
+        window.sessionStorage?.setItem('tcmb_eur_rate_v1', JSON.stringify(info));
+      } catch (_) {}
+      return info;
+    }
+  } catch (_) {}
+
+  try {
+    const resp = await fetch('https://open.er-api.com/v6/latest/EUR');
+    const data = await resp.json();
+    const rate = Number(data?.rates?.TRY || 0);
+    if (rate > 0) {
+      const info = {
+        rate: Number(rate.toFixed(4)),
+        source: 'TCMB Günlük Gösterge Kuru',
+        updatedAt: new Date().toLocaleDateString('tr-TR'),
+        ts: Date.now()
+      };
+      _cachedEurRateInfo = info;
+      try {
+        window.sessionStorage?.setItem('tcmb_eur_rate_v1', JSON.stringify(info));
+      } catch (_) {}
+      return info;
+    }
+  } catch (_) {}
+
+  return {
+    rate: 38.50,
+    source: 'TCMB Referans Kuru',
+    updatedAt: new Date().toLocaleDateString('tr-TR'),
+    ts: Date.now()
+  };
+}
 
 // ── WhatsApp Integration API (Seviye 3 Entegrasyon) ──────────────
 export const whatsappApi = {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
-import { discoveryApi } from '../../api/client';
+import { discoveryApi, fetchTcmbEurRate } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
 import { BANK_LIST, AMOUNT_TIERS, getAmountTiersForCategory, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS } from '../../data/bankCampaigns';
 import {
@@ -686,6 +686,17 @@ export default function PublicVehicleFinder() {
   const isFromLinkedIn = refCode === 'linkedin' || searchParams.get('source') === 'linkedin';
   const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
   const [isMobileView, setIsMobileView] = useState(isMobile);
+  const [tcmbEurRate, setTcmbEurRate] = useState(38.50);
+
+  useEffect(() => {
+    let active = true;
+    fetchTcmbEurRate().then(info => {
+      if (active && info?.rate > 0) {
+        setTcmbEurRate(info.rate);
+      }
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     const onResize = () => setIsMobileView(window.innerWidth <= 768);
@@ -3255,12 +3266,20 @@ IVECO ERC Samsun Otomotiv
                               padding: isMobileView ? '10px 12px' : '8px 10px',
                               marginBottom: '10px'
                             }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
                                 <span style={{ fontSize: isMobileView ? '0.74rem' : '0.66rem', color: '#93c5fd', fontWeight: 700 }}>ÇEKİCİ FİYAT ARALIĞI:</span>
-                                <span style={{ fontSize: isMobileView ? '1.08rem' : '0.92rem', fontWeight: 900, color: '#60a5fa' }}>{v.displayPrice}</span>
+                                <span style={{ fontSize: isMobileView ? '1.02rem' : '0.88rem', fontWeight: 900, color: '#60a5fa' }}>
+                                  {v.displayPrice}{' '}
+                                  <span style={{ color: '#4ade80', fontWeight: 800, fontSize: isMobileView ? '0.86rem' : '0.76rem' }}>
+                                    ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} – {Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                                  </span>
+                                </span>
                               </div>
-                              <div style={{ fontSize: isMobileView ? '0.7rem' : '0.62rem', color: '#94a3b8', marginTop: '3px', lineHeight: 1.3 }}>
-                                {v.modelsDetail || '500 Full Plus: 123.000 € • 580: 126.000 € • Diamond: 131.000 €'}
+                              <div style={{ fontSize: isMobileView ? '0.7rem' : '0.62rem', color: '#cbd5e1', marginTop: '3px', lineHeight: 1.35 }}>
+                                500 Full Plus: 123.000 € ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • 580: 126.000 € ({Math.round(126000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • Diamond: 131.000 € ({Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                              </div>
+                              <div style={{ fontSize: isMobileView ? '0.66rem' : '0.58rem', color: '#93c5fd', marginTop: '3px', fontWeight: 700 }}>
+                                🏛️ TCMB Günlük Euro Kuru: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL
                               </div>
                             </div>
                           ) : (
@@ -3708,10 +3727,13 @@ IVECO ERC Samsun Otomotiv
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
                     <div>
                       <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase' }}>
-                        🛣️ 2026 S-WAY ÇEKİCİ RESMİ LİSTE FİYATLARI
+                        🛣️ 2026 S-WAY ÇEKİCİ RESMİ LİSTE FİYATLARI (🏛️ TCMB KUR: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL)
                       </span>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#60a5fa', marginTop: '2px' }}>
-                        {matched.displayPrice || '123.000 € – 131.000 €'}
+                      <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#60a5fa', marginTop: '2px' }}>
+                        {matched.displayPrice || '123.000 € – 131.000 €'}{' '}
+                        <span style={{ fontSize: '0.96rem', color: '#4ade80', fontWeight: 800 }}>
+                          ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL – {Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                        </span>
                       </div>
                     </div>
                     <span style={{ background: '#1d4ed8', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
@@ -3721,15 +3743,21 @@ IVECO ERC Samsun Otomotiv
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginTop: '8px' }}>
                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
                       <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>500 Full Plus:</span>
-                      <strong style={{ fontSize: '0.95rem', color: '#fff' }}>123.000 €</strong>
+                      <strong style={{ fontSize: '0.92rem', color: '#fff' }}>
+                        123.000 € <span style={{ color: '#4ade80', fontSize: '0.80rem' }}>({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
+                      </strong>
                     </div>
                     <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
                       <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>580 Full Plus:</span>
-                      <strong style={{ fontSize: '0.95rem', color: '#fff' }}>126.000 €</strong>
+                      <strong style={{ fontSize: '0.92rem', color: '#fff' }}>
+                        126.000 € <span style={{ color: '#4ade80', fontSize: '0.80rem' }}>({Math.round(126000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
+                      </strong>
                     </div>
                     <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
                       <span style={{ fontSize: '0.68rem', color: '#fbbf24', display: 'block' }}>580 Diamond:</span>
-                      <strong style={{ fontSize: '0.95rem', color: '#fef08a' }}>131.000 €</strong>
+                      <strong style={{ fontSize: '0.92rem', color: '#fef08a' }}>
+                        131.000 € <span style={{ color: '#fde047', fontSize: '0.80rem' }}>({Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
+                      </strong>
                     </div>
                   </div>
                 </div>

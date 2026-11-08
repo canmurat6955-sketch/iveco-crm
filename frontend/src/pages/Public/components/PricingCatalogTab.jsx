@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { IVECO_PRICING_CATALOG, getVehicleSticker } from '../../../data/ivecoPricingCatalog';
+import { fetchTcmbEurRate } from '../../../api/client';
 import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag } from 'react-icons/fi';
 
 const CATEGORIES = [
@@ -52,6 +53,17 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
   const [fleetQuantity, setFleetQuantity] = useState('2 - 3 Adet');
   const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+  const [tcmbEurRate, setTcmbEurRate] = useState(38.50);
+
+  useEffect(() => {
+    let active = true;
+    fetchTcmbEurRate().then(info => {
+      if (active && info?.rate > 0) {
+        setTcmbEurRate(info.rate);
+      }
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (initialSector) {
@@ -184,8 +196,10 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         onDirectWhatsApp(msg);
         return;
       }
+      const eurVal = vehicle.eurPrice || vehicle.cashPrice || 0;
+      const tryEq = Math.round(eurVal * tcmbEurRate);
       const priceText = vehicle.currency === 'EUR'
-        ? `€${(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV (Euro)`
+        ? `€${eurVal.toLocaleString('tr-TR')} (${tryEq.toLocaleString('tr-TR')} TL - TCMB Kur: ${tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL) + KDV`
         : (vehicle.cashDiscount > 0
             ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
             : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
@@ -1089,18 +1103,29 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px', gap: '6px', flexWrap: 'wrap' }}>
                       <span>Resmi Liste Fiyatı:</span>
-                      <span style={{ fontWeight: 700, color: '#ffffff' }}>€{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')} + KDV</span>
+                      <span style={{ fontWeight: 700, color: '#ffffff', textAlign: 'right' }}>
+                        €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}{' '}
+                        <span style={{ color: '#fde047', fontWeight: 800 }}>
+                          ({Math.round((vehicle.eurPrice || vehicle.cashPrice) * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                        </span>{' '}
+                        + KDV
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.74rem', color: '#7dd3fc', marginBottom: '6px' }}>
-                      <span>Finansman & Teslimat:</span>
-                      <span>Euro Kredisi & Filo Kotası</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.74rem' : '0.70rem', color: '#93c5fd', marginBottom: '6px' }}>
+                      <span>🏛️ Merkez Bankası (TCMB) Kur:</span>
+                      <span style={{ fontWeight: 700, color: '#e0f2fe' }}>
+                        1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Günlük)
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px', flexWrap: 'wrap', gap: '4px' }}>
                       <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#7dd3fc', fontWeight: 800 }}>EURO PROJE FİYATI:</span>
-                      <span style={{ fontSize: isMobileView ? '1.22rem' : '1.08rem', color: '#38bdf8', fontWeight: 900 }}>
-                        €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}
+                      <span style={{ fontSize: isMobileView ? '1.12rem' : '1.0rem', color: '#38bdf8', fontWeight: 900, textAlign: 'right' }}>
+                        €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}{' '}
+                        <span style={{ fontSize: isMobileView ? '0.92rem' : '0.84rem', color: '#4ade80', fontWeight: 800 }}>
+                          ({Math.round((vehicle.eurPrice || vehicle.cashPrice) * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                        </span>
                       </span>
                     </div>
                     <div style={{

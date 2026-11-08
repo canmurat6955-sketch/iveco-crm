@@ -143,8 +143,13 @@ export default function ProformaQuick() {
   const [hasAutoTransmission, setHasAutoTransmission] = useState(false);
   const [eurRate, setEurRate] = useState(38.0);
 
-  // Authenticated CRM users fetch live pricing with internal dealer cost
+  // Authenticated CRM users fetch live pricing with internal dealer cost + daily TCMB EUR rate
   useEffect(() => {
+    vehiclesApi.getExchangeRates?.().then(res => {
+      const r = Number(res?.data?.eur_try || res?.data?.forex_selling || 0);
+      if (r > 0) setEurRate(Number(r.toFixed(2)));
+    }).catch(() => {});
+
     vehiclesApi.getPricingCatalog().then(res => {
       if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
         const mapped = res.data.map(v => ({

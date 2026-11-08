@@ -112,8 +112,8 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
             {currencyMode === 'EUR'
-              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: 12 aya kadar %0 kâr payı, 48 aya kadar %0 faiz ve 6 ay ödemesiz seçenekler.'
-              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 1.000.000 TL\'ye kadar %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
+              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: Kuveyt Türk\'te 24 aya kadar %0 kâr payı, 6 ay ödemesiz dönem ve 60 aya kadar eşit taksit seçenekleri.'
+              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 800.000 TL - 1.500.000 TL arası %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
           </p>
         </div>
         <div style={{
@@ -209,7 +209,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
             <span style={{ fontSize: '1.4rem' }}>🇪🇺</span>
             <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
               <strong style={{ color: '#4ade80' }}>İhracatçı Firmalar İçin Euro Kredisi Neden Çok Büyük Avantajdır?</strong><br />
-              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€100.000 için 12 aya kadar %0 kâr payı</strong>, Garanti BBVA ve BNP Paribas'ta <strong>48 aya kadar %0 faiz</strong> kampanyası vardır; S-Way Çekici ve T-Way araçlarını navlun/ihracat gelirleriyle kur riski yaşamadan ödeyebilirsiniz.
+              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€80.000 için 24 aya kadar, €90.000 - €110.000 için 12 aya kadar %0 kâr payı</strong> ve 6 ay ödemesiz dönem; Garanti BBVA ve BNP Paribas'ta ise <strong>60 aya kadar çok düşük faizli sabit Euro taksit</strong> imkanı vardır.
             </div>
           </div>
 
