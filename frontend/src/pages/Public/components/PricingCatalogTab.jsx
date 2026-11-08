@@ -1,7 +1,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { IVECO_PRICING_CATALOG, getVehicleSticker } from '../../../data/ivecoPricingCatalog';
 import { fetchTcmbEurRate } from '../../../api/client';
-import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag } from 'react-icons/fi';
+import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag, FiCamera } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+
+const REQUIRED_TRADEIN_PHOTOS = [
+  { id: 'dis_gorunum', label: '1. Dışarıdan Resim', icon: '📸', desc: 'Dıştan genel görünüm' },
+  { id: 'ic_gorunum', label: '2. İçeriden Resim', icon: '💺', desc: 'Kabin içi & torpido' },
+  { id: 'km_saati', label: '3. KM Kadran Resmi', icon: '⏲️', desc: 'Güncel kilometre saati' },
+  { id: 'ruhsat', label: '4. Ruhsat Resmi', icon: '📄', desc: 'Araç ruhsat yaprağı' }
+];
 
 const CATEGORIES = [
   { id: 'all', label: 'Tüm Araçlar', shortLabel: 'Tümü' },
@@ -49,11 +57,34 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
   const [tradeInTerm, setTradeInTerm] = useState(24);
   const [selectedTradeInVehicleId, setSelectedTradeInVehicleId] = useState('daily-35c16-3750');
   const [tradeInTargetModel, setTradeInTargetModel] = useState('Daily 35C16 Çift Teker');
+  const [tradeInPhotos, setTradeInPhotos] = useState({
+    dis_gorunum: null,
+    ic_gorunum: null,
+    km_saati: null,
+    ruhsat: null
+  });
   const [showFleetBox, setShowFleetBox] = useState(false);
   const [fleetQuantity, setFleetQuantity] = useState('2 - 3 Adet');
   const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const [tcmbEurRate, setTcmbEurRate] = useState(38.50);
+
+  const uploadedPhotoCount = REQUIRED_TRADEIN_PHOTOS.filter(p => Boolean(tradeInPhotos[p.id])).length;
+
+  const handleSelectTradeInPhoto = (slotId, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setTradeInPhotos(prev => ({
+        ...prev,
+        [slotId]: { name: file.name, dataUrl: ev.target.result }
+      }));
+      const slotMeta = REQUIRED_TRADEIN_PHOTOS.find(s => s.id === slotId);
+      toast.success(`${slotMeta?.label || 'Resim'} eklendi ✓`);
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     let active = true;
@@ -144,7 +175,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
   }, [selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
 
   const tradeInCatalogModels = useMemo(() => {
-    return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && v.currency !== 'EUR' && (v.campaignPrice || v.cashPrice));
+    return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && (v.campaignPrice || v.cashPrice || v.eurPrice));
   }, []);
 
   const selectedTradeVehicle = useMemo(() => {
@@ -157,7 +188,10 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
   }, [tradeInCatalogModels, selectedTradeInVehicleId]);
 
   const tradeInCalc = useMemo(() => {
-    const vehiclePrice = selectedTradeVehicle?.campaignPrice || selectedTradeVehicle?.cashPrice || 1930000;
+    const isEur = selectedTradeVehicle?.currency === 'EUR';
+    const vehiclePrice = isEur
+      ? Math.round((selectedTradeVehicle?.eurPrice || selectedTradeVehicle?.cashPrice || 123000) * tcmbEurRate)
+      : (selectedTradeVehicle?.campaignPrice || selectedTradeVehicle?.cashPrice || 1930000);
     const safeTradeVal = Math.max(0, Number(tradeInValue) || 0);
     const remainingPrincipal = Math.max(0, vehiclePrice - safeTradeVal);
     const term = Number(tradeInTerm) || 24;
@@ -166,8 +200,8 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
     let isZeroInterest = false;
     if (remainingPrincipal === 0) {
       monthlyPayment = 0;
-    } else if (remainingPrincipal <= 1000000 && term === 12) {
-      // 1.000.000 TL'ye kadar 12 Ay %0 Faiz avantajı
+    } else if (!isEur && remainingPrincipal <= 1000000 && term === 12) {
+      // 1.000.000 TL'ye kadar 12 Ay %0 Faiz avantajı (Hafif Ticari)
       monthlyPayment = Math.round(remainingPrincipal / 12);
       isZeroInterest = true;
     } else {
@@ -184,7 +218,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
       monthlyPayment,
       isZeroInterest
     };
-  }, [selectedTradeVehicle, tradeInValue, tradeInTerm]);
+  }, [selectedTradeVehicle, tradeInValue, tradeInTerm, tcmbEurRate]);
 
   const handleVehicleQuote = (vehicle) => {
     if (onTrackFootprint) {
@@ -212,7 +246,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
     if (onTrackFootprint) {
       onTrackFootprint('Takas + Kredi Hesaplama Açıldı', vehicle.model, `Takas Peşinat Hesaplayıcı`);
     }
-    if (!vehicle.isCustomPrice && vehicle.currency !== 'EUR') {
+    if (!vehicle.isCustomPrice) {
       setSelectedTradeInVehicleId(vehicle.id);
       setTradeInTargetModel(vehicle.model);
       setShowTradeInBox(true);
@@ -224,18 +258,33 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
       return;
     }
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, mevcut ticari aracımı takasa vererek (peşinata saydırıp kalan tutarı kredilendirerek) sıfır *${vehicle.model}* almak istiyorum. Takas ekspertiz ve ödeme planı için görüşebilir miyiz?`;
+      const msg =
+        `Merhaba ${salesRep?.name || 'Can Bey'}, mevcut ticari aracımı takasa vererek sıfır *${vehicle.model}* almak istiyorum.\n\n` +
+        `📸 *Takas Ön Ekspertiz İçin Gerekli 4 Resim:*\n` +
+        `1️⃣ Dışarıdan Görünüm Resmi (1 Adet)\n` +
+        `2️⃣ İçeriden Kabin Resmi (1 Adet)\n` +
+        `3️⃣ Kilometre (KM) Kadran Resmi (1 Adet)\n` +
+        `4️⃣ Araç Ruhsat Resmi (1 Adet)\n\n` +
+        `Takas ekspertiz ve ödeme planı için görüşebilir miyiz?`;
       onDirectWhatsApp(msg);
     }
   };
 
   const handleGeneralTradeInSubmit = () => {
+    const missing = REQUIRED_TRADEIN_PHOTOS.filter(p => !tradeInPhotos[p.id]);
+    if (missing.length > 0) {
+      toast.error(
+        `Takasla fiyat almak için 4 resim gereklidir: 1 Dışarıdan, 1 İçeriden, KM ve Ruhsat resmi. (Eksik: ${missing.map(m => m.label).join(', ')})`,
+        { duration: 4000 }
+      );
+      return;
+    }
     const modelName = selectedTradeVehicle?.model || tradeInTargetModel;
     if (onTrackFootprint) {
       onTrackFootprint(
-        'Takas + Kredi Teklif Talebi',
+        'Takas + Kredi Teklif Talebi (4 Resimli)',
         modelName,
-        `Takas: ${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL | Kalan Kredi: ${tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL (${tradeInCalc.term} Ay x ${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL)`
+        `Takas: ${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL | Kalan Kredi: ${tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL (${tradeInCalc.term} Ay x ${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL) | 4/4 Resim Hazır`
       );
     }
     if (onDirectWhatsApp) {
@@ -247,6 +296,11 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
         `• Takas Peşinatım: -${tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL\n` +
         `• Kredilendirilecek Fark: *${tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL*\n` +
         `• Tercih Edilen Vade: *${tradeInCalc.term} Ay* (Aylık ~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL)\n\n` +
+        `📸 *Takas Ekspertizi 4 Resim Kontrolü (Tamamlandı ✓):*\n` +
+        `1️⃣ Dışarıdan Görünüm Resmi (1 Adet) ✅\n` +
+        `2️⃣ İçeriden Kabin Resmi (1 Adet) ✅\n` +
+        `3️⃣ Kilometre (KM) Kadran Resmi (1 Adet) ✅\n` +
+        `4️⃣ Araç Ruhsat Resmi (1 Adet) ✅\n\n` +
         `Takas ekspertiz ve kesin ödeme planı için benimle iletişime geçebilir misiniz?`;
       onDirectWhatsApp(msg);
     }
@@ -452,7 +506,9 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                 >
                   {tradeInCatalogModels.map(v => (
                     <option key={v.id} value={v.id} style={{ background: '#0f1c32', color: '#fff' }}>
-                      {v.model} — {(v.campaignPrice || v.cashPrice).toLocaleString('tr-TR')} TL
+                      {v.model} — {v.currency === 'EUR'
+                        ? `€${(v.eurPrice || v.cashPrice).toLocaleString('tr-TR')} (${Math.round((v.eurPrice || v.cashPrice) * tcmbEurRate).toLocaleString('tr-TR')} TL)`
+                        : `${(v.campaignPrice || v.cashPrice).toLocaleString('tr-TR')} TL`}
                     </option>
                   ))}
                 </select>
@@ -559,7 +615,92 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
               </div>
             </div>
 
-            {/* 3. Satır: Canlı Hesaplama Özeti & Gönder Butonu */}
+            {/* 3. Satır: Takasla Fiyat Almak İçin Gerekli 4 Resim (1 Dıştan, 1 İçten, KM, Ruhsat) */}
+            <div style={{
+              background: 'rgba(15, 28, 50, 0.85)',
+              border: uploadedPhotoCount === 4 ? '1.5px solid #10b981' : '1px dashed rgba(245, 158, 11, 0.5)',
+              borderRadius: '10px',
+              padding: isMobileView ? '10px' : '12px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fde68a' }}>
+                  5. Takasla Fiyat Almak İçin Gerekli 4 Resim (1 Dışarıdan • 1 İçeriden • KM • Ruhsat):
+                </div>
+                <span style={{
+                  fontSize: '0.7rem',
+                  fontWeight: 900,
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  background: uploadedPhotoCount === 4 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.2)',
+                  color: uploadedPhotoCount === 4 ? '#34d399' : '#fde68a',
+                  border: uploadedPhotoCount === 4 ? '1px solid #10b981' : '1px solid rgba(245, 158, 11, 0.45)'
+                }}>
+                  {uploadedPhotoCount === 4 ? '✓ 4 / 4 Resim Eklendi' : `${uploadedPhotoCount} / 4 Resim Eklendi (4 Resim Zorunlu)`}
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px' }}>
+                {REQUIRED_TRADEIN_PHOTOS.map(slot => {
+                  const uploaded = tradeInPhotos[slot.id];
+                  return (
+                    <label
+                      key={slot.id}
+                      style={{
+                        background: uploaded ? 'rgba(16, 185, 129, 0.14)' : 'rgba(15, 23, 42, 0.9)',
+                        border: uploaded ? '1.5px solid #10b981' : '1px solid rgba(148, 163, 184, 0.35)',
+                        borderRadius: '8px',
+                        padding: '8px 10px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '4px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '0.73rem', fontWeight: 800, color: uploaded ? '#34d399' : '#f8fafc' }}>
+                          {slot.icon} {slot.label}
+                        </span>
+                        {uploaded && <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 900 }}>✓</span>}
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
+                        {slot.desc}
+                      </div>
+                      {uploaded ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                          <img
+                            src={uploaded.dataUrl}
+                            alt={slot.label}
+                            style={{ width: '38px', height: '30px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #10b981' }}
+                          />
+                          <span style={{ fontSize: '0.66rem', color: '#6ee7b7', fontWeight: 800 }}>Yüklendi (Değiştir)</span>
+                        </div>
+                      ) : (
+                        <div style={{
+                          marginTop: '3px',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          color: '#38bdf8',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <FiCamera size={12} /> Resim Seç / Çek
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleSelectTradeInPhoto(slot.id, e)}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 4. Satır: Canlı Hesaplama Özeti & Gönder Butonu */}
             <div style={{
               background: 'rgba(15, 23, 42, 0.88)',
               border: '1px solid rgba(56, 189, 248, 0.38)',
@@ -611,8 +752,10 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                 type="button"
                 onClick={handleGeneralTradeInSubmit}
                 style={{
-                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  color: '#fff',
+                  background: uploadedPhotoCount === 4
+                    ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+                    : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  color: uploadedPhotoCount === 4 ? '#fff' : '#0f172a',
                   border: 'none',
                   borderRadius: '9px',
                   padding: '10px 16px',
@@ -626,7 +769,10 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                   boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
                 }}
               >
-                <FiMessageSquare size={14} /> Satış Sorumlusu Can M. Sizinle İletişime Geçsin
+                <FiMessageSquare size={14} />
+                {uploadedPhotoCount === 4
+                  ? '4 Resmi & Takas Hesabımı Gönder (Can M.)'
+                  : `4 Resmi Ekle & Takasla Fiyat Al (${uploadedPhotoCount}/4)`}
               </button>
             </div>
           </div>

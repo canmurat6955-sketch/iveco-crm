@@ -55,6 +55,69 @@ const SECOND_HAND_SEGMENTS = [
   'Temiz 2. El T-Way / Trakker İnşaat & Damper'
 ];
 
+const REQUIRED_TRADEIN_PHOTOS = [
+  {
+    id: 'dis_gorunum',
+    label: '1. Dışarıdan Görünüm Resmi',
+    shortLabel: 'Dıştan Resim',
+    icon: '📸',
+    desc: 'Aracın dışarıdan genel görünümü ve kasa durumu (1 adet)'
+  },
+  {
+    id: 'ic_gorunum',
+    label: '2. İçeriden Kabin Resmi',
+    shortLabel: 'İçten Resim',
+    icon: '💺',
+    desc: 'Kabin içi, direksiyon, koltuk ve göğüs durumu (1 adet)'
+  },
+  {
+    id: 'km_saati',
+    label: '3. Kilometre (KM) Resmi',
+    shortLabel: 'KM Resmi',
+    icon: '⏲️',
+    desc: 'Güncel kilometreyi net gösteren kadran resmi (1 adet)'
+  },
+  {
+    id: 'ruhsat',
+    label: '4. Araç Ruhsat Resmi',
+    shortLabel: 'Ruhsat Resmi',
+    icon: '📄',
+    desc: 'Model yılı, motor/şasi ve tescil yaprağı resmi (1 adet)'
+  }
+];
+
+function compressImageToDataUrl(file, maxDim = 720, quality = 0.68) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = ev.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function CustomerSmartActionHub({
   activeModelTitle = 'IVECO 2026 Ticari Araç',
   activePrice = 2150000,
@@ -91,6 +154,16 @@ export default function CustomerSmartActionHub({
 
   // 2. 24 Saat Opsiyon state
   const [optionCode, setOptionCode] = useState('');
+
+  // 3. 4 Resimle Takasla Fiyat Al state (1 Dıştan, 1 İçten, KM, Ruhsat)
+  const [tradeInPhotos, setTradeInPhotos] = useState({
+    dis_gorunum: null,
+    ic_gorunum: null,
+    km_saati: null,
+    ruhsat: null
+  });
+  const [tradeInCarInfo, setTradeInCarInfo] = useState('');
+  const [tradeInKmInput, setTradeInKmInput] = useState('');
 
   // 5. Üstyapı paket state
   const [selectedBodyPkg, setSelectedBodyPkg] = useState(BODY_PACKAGES[0]);
@@ -173,18 +246,82 @@ export default function CustomerSmartActionHub({
     toast.success(`24 Saatlik Opsiyon Kodunuz: #${code}`);
   };
 
-  // 3. WhatsApp'tan 3 Fotoğrafla Takas Ön Fiyatlama
-  const handleTradeInPhotoWhatsApp = async () => {
-    await sendSignalToCrm({
-      tag: '📸 FOTOĞRAFLA TAKAS ÖN FİYAT TALEBİ',
-      model: activeModelTitle,
-      campaign: '15 Dk WhatsApp Takas Ekspertizi',
-      notes: `Müşteri mevcut aracının fotoğraflarını WhatsApp'tan gönderip 15 dakikada takas ön fiyatı almak için butona tıkladı.`
+  // 3. 4 Resimle Takas Ön Fiyatlama (1 Dıştan, 1 İçten, KM, Ruhsat)
+  const uploadedTradeInCount = REQUIRED_TRADEIN_PHOTOS.filter(p => Boolean(tradeInPhotos[p.id])).length;
+
+  const handleTradeInPhotoSelect = async (slotId, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await compressImageToDataUrl(file);
+      setTradeInPhotos(prev => ({
+        ...prev,
+        [slotId]: {
+          file,
+          name: file.name,
+          dataUrl
+        }
+      }));
+      const slotMeta = REQUIRED_TRADEIN_PHOTOS.find(s => s.id === slotId);
+      toast.success(`${slotMeta?.shortLabel || 'Resim'} eklendi ✓`);
+    } catch {
+      toast.error('Fotoğraf yüklenirken bir sorun oluştu, lütfen tekrar deneyin.');
+    }
+  };
+
+  const handleRemoveTradeInPhoto = (slotId) => {
+    setTradeInPhotos(prev => ({ ...prev, [slotId]: null }));
+  };
+
+  const handleTradeInPhotoWhatsApp = async (requireAllFour = true) => {
+    const missingSlots = REQUIRED_TRADEIN_PHOTOS.filter(p => !tradeInPhotos[p.id]);
+    if (requireAllFour && missingSlots.length > 0) {
+      toast.error(
+        `Takasla fiyat almak için 4 resim gereklidir. Eksik: ${missingSlots.map(m => m.shortLabel).join(', ')}`,
+        { duration: 4000 }
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    const photoPayload = {};
+    REQUIRED_TRADEIN_PHOTOS.forEach(p => {
+      if (tradeInPhotos[p.id]?.dataUrl) {
+        photoPayload[p.id] = tradeInPhotos[p.id].dataUrl;
+      }
     });
+    const hasAnyPhoto = Object.keys(photoPayload).length > 0;
+    const serializedPhotos = hasAnyPhoto ? `\n||TRADEIN_PHOTOS_JSON:${JSON.stringify(photoPayload)}` : '';
+
+    await sendSignalToCrm({
+      tag: `📸 4 RESİMLE TAKAS FİYAT TALEBİ (${uploadedTradeInCount}/4 Resim)`,
+      model: activeModelTitle,
+      campaign: `Takas Ekspertizi (${uploadedTradeInCount}/4 Resim Yüklendi)`,
+      notes:
+        `Müşteri 4 Resimle Takas Ön Fiyat Talebi Gönderdi!\n` +
+        `• Hedef Sıfır Araç: ${activeModelTitle}\n` +
+        `• Mevcut Takas Aracı: ${tradeInCarInfo.trim() || 'Belirtilmedi'}\n` +
+        `• Mevcut KM: ${tradeInKmInput.trim() || 'KM Resminde'}\n` +
+        `• Yüklenen Resimler (${uploadedTradeInCount}/4): Dıştan (${tradeInPhotos.dis_gorunum ? '✓' : 'Eksik'}), İçten (${tradeInPhotos.ic_gorunum ? '✓' : 'Eksik'}), KM (${tradeInPhotos.km_saati ? '✓' : 'Eksik'}), Ruhsat (${tradeInPhotos.ruhsat ? '✓' : 'Eksik'})` +
+        serializedPhotos
+    });
+    setSubmitting(false);
+
+    const carDesc = tradeInCarInfo.trim() ? `*${tradeInCarInfo.trim()}*` : 'mevcut ticari aracım';
+    const kmDesc = tradeInKmInput.trim() ? ` (*${tradeInKmInput.trim()} KM*)` : '';
     const msg =
       `Merhaba Can Bey,\n\n` +
-      `2026 model *${activeModelTitle}* için elimdeki mevcut aracın *Takas Ön Fiyatlamasını* öğrenmek istiyorum.\n\n` +
-      `Mevcut aracımın fotoğraflarını / ruhsat bilgisini buradan paylaşıyorum, tahmini takas bedelini ve kalan kredi tablosunu çıkarabilir miyiz?`;
+      `2026 model *${activeModelTitle}* için elimdeki ${carDesc}${kmDesc} adına *Takasla Fiyat Almak* istiyorum.\n\n` +
+      `📸 *Takas Ekspertizi İçin Gerekli 4 Resim:*\n` +
+      `1️⃣ *Dışarıdan Görünüm Resmi (1 Adet)* ${tradeInPhotos.dis_gorunum ? '✅ (Yüklendi)' : '📷'}\n` +
+      `2️⃣ *İçeriden Kabin Resmi (1 Adet)* ${tradeInPhotos.ic_gorunum ? '✅ (Yüklendi)' : '📷'}\n` +
+      `3️⃣ *Kilometre (KM) Kadran Resmi (1 Adet)* ${tradeInPhotos.km_saati ? '✅ (Yüklendi)' : '📷'}\n` +
+      `4️⃣ *Araç Ruhsat Resmi (1 Adet)* ${tradeInPhotos.ruhsat ? '✅ (Yüklendi)' : '📷'}\n\n` +
+      `Tahmini takas bedelini ve kalan kredi ödeme planını çıkarabilir miyiz?`;
+
+    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can M. ekranına iletildi!`);
+
+    // Mobil cihazda Web Share API destekleniyorsa ve 4 dosya seçildiyse doğrudan paylaşım seçeneği veya WhatsApp açılışı
     window.open(`https://wa.me/${cleanWhatsappPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -300,7 +437,7 @@ export default function CustomerSmartActionHub({
         {[
           { id: 'appointment', icon: '📅', title: 'Randevu / Ziyaret İste', sub: 'Showroom, İş Yeri veya Görüntülü' },
           { id: 'option24h', icon: '🔒', title: '24 Saat Adıma Ayır', sub: 'Ortağıma/Muhasebeye Soracağım' },
-          { id: 'tradein_photo', icon: '📸', title: '3 Fotoğrafla Takas Fiyatı', sub: '15 Dk’da WhatsApp Ekspertiz' },
+          { id: 'tradein_photo', icon: '📸', title: '4 Resimle Takasla Fiyat Al', sub: 'Dıştan, İçten, KM & Ruhsat (15 Dk)' },
           { id: 'tax_summary', icon: '🧾', title: 'Muhasebecime Vergi Özeti', sub: '%20 KDV & Amortisman Tablosu' },
           { id: 'body_pkg', icon: '📦', title: 'Kasa + Şasi Anahtar Teslim', sub: 'Frigo, Tenteli, Damper, Kurtarıcı' },
           { id: 'second_hand', icon: '🔔', title: 'Takastan 2. El Habercisi', sub: 'Sıfır Bütçemi Aşıyor Diyenlere' }
@@ -542,36 +679,225 @@ export default function CustomerSmartActionHub({
         </form>
       )}
 
-      {/* 3. WHATSAPP'TAN 3 FOTOĞRAFLA TAKAS ÖN FİYATLAMA */}
+      {/* 3. 4 RESİMLE TAKASLA FİYAT AL (1 DIŞTAN, 1 İÇTEN, KM VE RUHSAT RESMİ) */}
       {selectedAction === 'tradein_photo' && (
         <div style={{ background: 'rgba(2, 6, 23, 0.55)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
-          <div style={{ fontSize: '0.92rem', fontWeight: 900, color: '#34d399', marginBottom: '6px' }}>
-            📸 Sanayiye veya Showroom'a Gelmeden 15 Dakikada Takas Ön Fiyatı Alın
-          </div>
-          <p style={{ fontSize: '0.79rem', color: '#cbd5e1', margin: '0 0 14px', lineHeight: 1.5 }}>
-            Elinizdeki mevcut ticari aracın (markası ne olursa olsun) <strong>3 fotoğrafını, model yılını ve kilometresini</strong> WhatsApp üzerinden doğrudan <strong>Satış Sorumlusu Can M.</strong>'ye gönderin; 15 dakika içinde takas peşinat değerinizi ve kalan net kredi taksitinizi hesaplayıp size dönelim.
-          </p>
-          <button
-            type="button"
-            onClick={handleTradeInPhotoWhatsApp}
-            style={{
-              width: '100%',
-              padding: '13px',
-              borderRadius: '10px',
-              background: '#22c55e',
-              color: '#052e16',
-              border: 'none',
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '6px' }}>
+            <div style={{ fontSize: '0.94rem', fontWeight: 900, color: '#34d399' }}>
+              📸 Sanayiye veya Plazaya Gelmeden 4 Resimle 15 Dakikada Takasla Fiyat Alın
+            </div>
+            <span style={{
+              background: uploadedTradeInCount === 4 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(245, 158, 11, 0.2)',
+              border: uploadedTradeInCount === 4 ? '1px solid #10b981' : '1px solid rgba(245, 158, 11, 0.5)',
+              color: uploadedTradeInCount === 4 ? '#34d399' : '#fde68a',
+              fontSize: '0.74rem',
               fontWeight: 900,
-              fontSize: '0.88rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}
-          >
-            <FiCamera size={17} /> 📸 WhatsApp'ı Aç & Aracımın Fotoğraflarını Gönder (Can M.)
-          </button>
+              padding: '4px 10px',
+              borderRadius: '999px'
+            }}>
+              {uploadedTradeInCount === 4 ? '✓ 4 / 4 Resim Hazır' : `📷 ${uploadedTradeInCount} / 4 Gerekli Resim Eklendi`}
+            </span>
+          </div>
+
+          <p style={{ fontSize: '0.79rem', color: '#cbd5e1', margin: '0 0 12px', lineHeight: 1.5 }}>
+            Mevcut ticari aracınızın net takas ön fiyatlaması için <strong>4 adet resim</strong> gereklidir:{' '}
+            <strong style={{ color: '#fde68a' }}>1 adet dışarıdan, 1 adet içeriden (kabin), 1 adet kilometre (KM) saati ve 1 adet ruhsat resmi.</strong>{' '}
+            Aşağıdaki kutulardan telefon kameranızla çekebilir veya galeriden seçebilirsiniz:
+          </p>
+
+          {/* 4 Resim Yükleme Kutuları */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(195px, 1fr))',
+            gap: '10px',
+            marginBottom: '12px'
+          }}>
+            {REQUIRED_TRADEIN_PHOTOS.map((slot) => {
+              const uploaded = tradeInPhotos[slot.id];
+              return (
+                <div
+                  key={slot.id}
+                  style={{
+                    background: uploaded ? 'rgba(16, 185, 129, 0.12)' : 'rgba(15, 23, 42, 0.85)',
+                    border: uploaded ? '1.5px solid #10b981' : '1px dashed rgba(148, 163, 184, 0.45)',
+                    borderRadius: '10px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '8px'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 900, color: uploaded ? '#34d399' : '#f8fafc' }}>
+                        {slot.icon} {slot.label}
+                      </span>
+                      {uploaded && (
+                        <span style={{ fontSize: '0.68rem', fontWeight: 900, color: '#10b981' }}>✓ Yüklendi</span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '3px', lineHeight: 1.35 }}>
+                      {slot.desc}
+                    </div>
+                  </div>
+
+                  {uploaded ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                      <img
+                        src={uploaded.dataUrl}
+                        alt={slot.label}
+                        style={{
+                          width: '56px',
+                          height: '44px',
+                          objectFit: 'cover',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(16, 185, 129, 0.6)'
+                        }}
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+                        <label
+                          style={{
+                            background: 'rgba(56, 189, 248, 0.2)',
+                            color: '#7dd3fc',
+                            border: '1px solid rgba(56, 189, 248, 0.4)',
+                            borderRadius: '6px',
+                            padding: '4px 8px',
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            textAlign: 'center'
+                          }}
+                        >
+                          Değiştir
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleTradeInPhotoSelect(slot.id, e)}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTradeInPhoto(slot.id)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.18)',
+                            color: '#fca5a5',
+                            border: '1px solid rgba(239, 68, 68, 0.35)',
+                            borderRadius: '6px',
+                            padding: '3px 8px',
+                            fontSize: '0.66rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ✕ Kaldır
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        background: 'rgba(56, 189, 248, 0.14)',
+                        border: '1px solid rgba(56, 189, 248, 0.4)',
+                        color: '#7dd3fc',
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        marginTop: '2px'
+                      }}
+                    >
+                      <FiCamera size={14} /> Resim Çek / Seç
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleTradeInPhotoSelect(slot.id, e)}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Opsiyonel Araç & İletişim Bilgisi */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '8px', marginBottom: '12px' }}>
+            <input
+              type="text"
+              value={tradeInCarInfo}
+              onChange={(e) => setTradeInCarInfo(e.target.value)}
+              placeholder="Takas Aracınız (Örn: 2020 Transit / Daily)"
+              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.16)', color: '#fff', fontSize: '0.8rem' }}
+            />
+            <input
+              type="text"
+              value={tradeInKmInput}
+              onChange={(e) => setTradeInKmInput(e.target.value)}
+              placeholder="Güncel KM (Örn: 185.000 KM)"
+              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.16)', color: '#fff', fontSize: '0.8rem' }}
+            />
+            <input
+              type="tel"
+              value={phoneInput}
+              onChange={(e) => setPhoneInput(e.target.value)}
+              placeholder="Cep Telefonunuz (05XX...)"
+              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(56, 189, 248, 0.4)', color: '#fff', fontSize: '0.8rem' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => handleTradeInPhotoWhatsApp(true)}
+              style={{
+                width: '100%',
+                padding: '13px',
+                borderRadius: '10px',
+                background: uploadedTradeInCount === 4 ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#052e16',
+                border: 'none',
+                fontWeight: 900,
+                fontSize: '0.86rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <FiCamera size={17} />
+              {uploadedTradeInCount === 4
+                ? '✅ 4 Resmi Gönder & 15 Dk’da Takas Fiyatı Al (Can M.)'
+                : `📸 4 Resmi Tamamla & Takasla Fiyat Al (${uploadedTradeInCount}/4 Resim Eklendi)`}
+            </button>
+
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => handleTradeInPhotoWhatsApp(false)}
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: '8px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                color: '#7dd3fc',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                fontWeight: 800,
+                fontSize: '0.76rem',
+                cursor: 'pointer'
+              }}
+            >
+              💬 4 Resmi (Dıştan, İçten, KM, Ruhsat) Doğrudan WhatsApp Sohbetinden Göndermek İstiyorum
+            </button>
+          </div>
         </div>
       )}
 

@@ -42,7 +42,7 @@ const FAQ_ITEMS = [
     category: 'teslimat',
     categoryLabel: 'Takas & Teslimat',
     question: 'Eski ticari aracımı takasa verebilir miyim? Ekspertiz süreci nasıl işler?',
-    answer: 'EVET, ESKİ ARACINIZI DEĞERİNDE TAKASA ALIYORUZ.\n\nMarkası veya modeli ne olursa olsun mevcut ticari aracınızı (Ford Transit, Mercedes Sprinter/Atego, Isuzu, Renault Master vb.) uzman ekspertiz ekibimizle piyasa rayiç bedelinde değerlendiriyoruz. Takas bedelini yeni IVECO aracınızın peşinatı olarak sayıyor, kalan tutara %0 faizli veya düşük oranlı kredi tanımlayabiliyoruz.'
+    answer: 'EVET, ESKİ ARACINIZI DEĞERİNDE TAKASA ALIYORUZ.\n\nMarkası veya modeli ne olursa olsun mevcut ticari aracınızı (Ford Transit, Mercedes Sprinter/Atego, Isuzu, Renault Master vb.) uzman ekspertiz ekibimizle piyasa rayiç bedelinde değerlendiriyoruz. Plazaya gelmeden 15 dakikada ön fiyat almak için aracınızın 4 resmini (1 adet dışarıdan, 1 adet içeriden, 1 adet KM kadranı ve 1 adet ruhsat resmi) sistemden yüklemeniz veya WhatsApp\'tan iletmeniz yeterlidir. Takas bedelini yeni IVECO aracınızın peşinatı olarak sayıyor, kalan tutara %0 faizli veya düşük oranlı kredi tanımlayabiliyoruz.'
   },
   {
     id: 'turkiye_teslimat',

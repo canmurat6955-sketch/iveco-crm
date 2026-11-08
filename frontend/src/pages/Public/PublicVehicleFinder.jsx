@@ -2683,11 +2683,11 @@ IVECO ERC Samsun Otomotiv
             </div>
           </button>
 
-          {/* Kutu 3: 3 Fotoğrafla 15 Dk'da Takas Fiyatı Al */}
+          {/* Kutu 3: 4 Resimle 15 Dk'da Takasla Fiyat Al */}
           <button
             type="button"
             onClick={() => {
-              recordCustomerFootprint('Başlangıç Kutusu', '3 Fotoğrafla Takas Ekspertiz', '4 Kutu Hızlı Başlangıç');
+              recordCustomerFootprint('Başlangıç Kutusu', '4 Resimle Takas Ekspertiz', '4 Kutu Hızlı Başlangıç');
               window.dispatchEvent(new CustomEvent('iveco:select-smart-action', { detail: { action: 'tradein_photo' } }));
               const el = document.getElementById('smart-customer-action-hub');
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2705,10 +2705,10 @@ IVECO ERC Samsun Otomotiv
           >
             <div style={{ fontSize: isMobileView ? '1.15rem' : '1.3rem', marginBottom: '4px' }}>📸</div>
             <div style={{ fontSize: isMobileView ? '0.78rem' : '0.84rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.25 }}>
-              3 Fotoğrafla 15 Dk’da Takas Fiyatı Al
+              4 Resimle 15 Dk’da Takasla Fiyat Al
             </div>
             <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
-              Plazaya gelmeden WhatsApp’tan ön ekspertiz bedeli
+              1 dıştan, 1 içten, KM ve ruhsat resmi ile hızlı ön ekspertiz
             </div>
           </button>
 

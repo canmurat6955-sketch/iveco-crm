@@ -759,11 +759,65 @@ export default function IntentRadar() {
                     )}
                   </div>
 
-                  {signal.notes && (
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: '6px 0 0', lineHeight: 1.4 }}>
-                      {signal.notes}
-                    </p>
-                  )}
+                  {signal.notes && (() => {
+                    const parts = String(signal.notes).split('||TRADEIN_PHOTOS_JSON:');
+                    const cleanText = parts[0]?.trim();
+                    let photosObj = null;
+                    if (parts[1]) {
+                      try {
+                        photosObj = JSON.parse(parts[1]);
+                      } catch {
+                        photosObj = null;
+                      }
+                    }
+                    const photoLabels = {
+                      dis_gorunum: '1. Dıştan',
+                      ic_gorunum: '2. İçten',
+                      km_saati: '3. KM',
+                      ruhsat: '4. Ruhsat'
+                    };
+                    return (
+                      <div style={{ marginTop: '6px' }}>
+                        {cleanText && (
+                          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4, whiteSpace: 'pre-line' }}>
+                            {cleanText}
+                          </p>
+                        )}
+                        {photosObj && Object.keys(photosObj).length > 0 && (
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+                            {Object.entries(photosObj).map(([k, src]) => (
+                              <a
+                                key={k}
+                                href={src}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  background: 'rgba(16, 185, 129, 0.12)',
+                                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                                  borderRadius: '6px',
+                                  padding: '4px',
+                                  textDecoration: 'none'
+                                }}
+                                title="Büyütmek için tıklayın"
+                              >
+                                <img
+                                  src={src}
+                                  alt={photoLabels[k] || k}
+                                  style={{ width: '54px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                                />
+                                <span style={{ fontSize: '0.65rem', color: '#34d399', fontWeight: 700, marginTop: '2px' }}>
+                                  {photoLabels[k] || k}
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* 3. SÜTUN: Davranış & Niyet Skoru */}

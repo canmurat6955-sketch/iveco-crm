@@ -105,7 +105,7 @@ export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverr
     return (
       `Abi merhaba, hayırlı işler dilerim.\n\n` +
       `IVECO ERC Samsun'da işini çok kolaylaştıracak yeni bir canlı ekran açtık. Artık 2026 model şasi fiyatlarına bakmak veya elindeki aracın takas değerini düşüp kalan kredi taksitini görmek için beni aramana bile gerek yok :)\n\n` +
-      `Aşağıdaki sana özel linkten elindeki aracın takasını seçip 1M TL %0 faizle kalan ödemeyi 10 saniyede kendin hesaplayabilir, istersen 3 fotoğraf gönderip 15 dk'da takas fiyatı alabilirsin:\n\n` +
+      `Aşağıdaki sana özel linkten elindeki aracın takasını seçip 1M TL %0 faizle kalan ödemeyi 10 saniyede kendin hesaplayabilir, istersen 4 resim (dıştan, içten, KM ve ruhsat) yükleyip 15 dk'da takasla fiyat alabilirsin:\n\n` +
       `👉 ${vipLink}\n\n` +
       `Kafana yatan bir model olursa ekrandaki tek tuşla bana düşüyor zaten. Bol kazançlar!\n` +
       `*Satış Sorumlusu Can M. - 0544 622 59 31*`
@@ -127,7 +127,7 @@ export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverr
   return (
     `Sayın *${companyName}*,\n\n` +
     `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
-    `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 3 fotoğrafla 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
+    `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (dıştan, içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
     `👉 ${vipLink}\n\n` +
     `Beğendiğiniz modeli 24 saat ücretsiz adınıza opsiyonlayabilir veya bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
     `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`

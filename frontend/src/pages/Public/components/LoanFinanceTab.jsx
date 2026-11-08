@@ -569,13 +569,20 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                 gap: '10px'
               }}>
                 <div style={{ fontSize: '0.76rem', color: '#fde68a', fontWeight: 700 }}>
-                  🔄 <strong>Nakit Peşinatınız Yok mu?</strong> Mevcut ticari aracınızı (Transit, Sprinter, Atego, Isuzu vb.) peşinat sayıp kalan tutara kredi kullandırıyoruz.
+                  🔄 <strong>Nakit Peşinatınız Yok mu?</strong> Mevcut aracınızın <strong>4 resmini (1 dışarıdan, 1 içeriden, KM ve ruhsat)</strong> göndererek takas peşinatına saydırıp kalan tutara kredi kullanabilirsiniz.
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     if (onDirectWhatsApp) {
-                      const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, mevcut ticari aracımı takasa vererek peşinat saydırmak ve kalan tutar için *${activeBank.name}* üzerinden ticari kredi kullanmak istiyorum. Bilgi alabilir miyim?`;
+                      const msg =
+                        `Merhaba ${salesRep?.name || 'Can Murat Bey'}, mevcut ticari aracımı takasa vererek peşinat saydırmak ve kalan tutar için *${activeBank.name}* üzerinden ticari kredi kullanmak istiyorum.\n\n` +
+                        `📸 *Takas Ön Ekspertiz İçin Gerekli 4 Resim:*\n` +
+                        `1️⃣ Dışarıdan Görünüm Resmi (1 Adet)\n` +
+                        `2️⃣ İçeriden Kabin Resmi (1 Adet)\n` +
+                        `3️⃣ Kilometre (KM) Kadran Resmi (1 Adet)\n` +
+                        `4️⃣ Araç Ruhsat Resmi (1 Adet)\n\n` +
+                        `Takas değerleme ve kredi ödeme planı hakkında bilgi alabilir miyim?`;
                       onDirectWhatsApp(msg);
                     }
                   }}
@@ -591,7 +598,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  🔄 Takas + Kredi İste
+                  🔄 4 Resimle Takas + Kredi İste
                 </button>
               </div>
             </div>
