@@ -1538,7 +1538,7 @@ export default function PublicVehicleFinder() {
     const priceText = matched.isTway
       ? `*Fiyatlandırma:* T-Way Şantiye & Ağır Hizmet Özel Fiyatı\n`
       : matched.currency === 'EUR'
-        ? `*Fiyat Aralığı:* ${matched.displayPrice} (${matched.modelsDetail || 'Euro Dövizli'})\n`
+        ? `*Fiyat Aralığı:* 500 Full Plus: 123.000 € (${Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • 580 Full Plus: 126.000 € (${Math.round(126000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • 580 Diamond: 131.000 € (${Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL) [TCMB Kur: ${tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL]\n`
         : matched.cashPriceText
           ? (matched.cashDiscountText
               ? `*Kampanyalı Fiyat:* ${matched.campaignPriceText}\n*Net Peşin Fiyat:* ${matched.cashPriceText} (-${matched.cashDiscountText} Peşin İndirimi)\n`
@@ -4543,7 +4543,7 @@ IVECO ERC Samsun Otomotiv
                     lineHeight: 1.35,
                     marginTop: '4px'
                   }}>
-                    🛡️ <em>Resmi IVECO anlaşmalı ticari finansman tablosudur. Katkı payı bayimiz ve üretici tarafından sübvanse edilmiş olup ilave masraf veya gizli komisyon yansıtılmaz.</em>
+                    🛡️ <em>Resmi IVECO anlaşmalı ticari finansman tablosudur. Özel kampanya oranları uygulanmış olup ilave masraf veya gizli komisyon yansıtılmaz.</em>
                   </div>
                 </div>
               )}

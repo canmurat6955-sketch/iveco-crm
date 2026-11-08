@@ -216,7 +216,7 @@ export default function PublicProposalView() {
 
             <div style={{ display: 'flex', gap: '10px', flex: '1 1 240px' }}>
               <a
-                href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Murat Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
+                href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -235,7 +235,7 @@ export default function PublicProposalView() {
                   width: '100%'
                 }}
               >
-                <FiMessageSquare size={16} /> Murat Bey ile WhatsApp'tan Görüş
+                <FiMessageSquare size={16} /> Satış Sorumlusu Can M. ile WhatsApp'tan Görüş
               </a>
             </div>
           </div>

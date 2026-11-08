@@ -803,7 +803,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `🚛 2026 IVECO Canlı Fiyat, Takas & Randevu Ekranımız Açıldı!\n\n` +
                         `Kimseyi aramanıza gerek kalmadan tek tıkla:\n` +
                         `🔄 Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz (83.333 TL/Ay) ile kalan taksitinizi hesaplayın,\n` +
-                        `📸 Mevcut aracınızın 3 fotoğrafını gönderip 15 dk'da takas ön fiyatı alın,\n` +
+                        `📸 Mevcut aracınızın 4 resmini (dıştan, içten, KM ve ruhsat) gönderip 15 dk'da takas ön fiyatı alın,\n` +
                         `🔒 Beğendiğiniz şasiyi 24 saat ücretsiz adınıza opsiyonlayın veya\n` +
                         `☕ Showroom kahve / görüntülü araç turu randevunuzu seçin:\n\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_durum\n\n` +
@@ -819,7 +819,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
                         `Yeni Dijital Showroom ekranımızda neler var?\n` +
                         `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
-                        `📸 3 Fotoğrafla 15 Dakikada WhatsApp Takas Ekspertizi,\n` +
+                        `📸 4 Resimle (Dıştan, İçten, KM, Ruhsat) 15 Dakikada Takas Ekspertizi,\n` +
                         `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
                         `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
                         `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
@@ -851,7 +851,7 @@ export default function OfficeQuickAssistantDrawer() {
                       text:
                         `Karadeniz bölgesindeki nakliyeci, gıda dağıtım ve hafriyatçı esnafımız için 2026 IVECO Canlı Hesaplama & Takas Ekranımızı açtık! 🚛\n\n` +
                         `👉 İster elinizdeki aracın takas değerini seçip kalan kredi taksitinizi ekranda görün,\n` +
-                        `👉 İster mevcut aracınızın 3 fotoğrafını gönderip 15 dakikada takas fiyatı alın,\n` +
+                        `👉 İster mevcut aracınızın 4 resmini (dıştan, içten, KM ve ruhsat) gönderip 15 dakikada takasla fiyat alın,\n` +
                         `👉 Sıfır bütçenizi aşıyorsa "Takastan Temiz 2. El Habercisi"ne kaydolun, takasa temiz araç düştüğü gün ilk size haber verelim:\n\n` +
                         `🔗 ${origin}/fiyat-listesi?ref=facebook\n\n` +
                         `Satış Sorumlusu Can M. — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)`
