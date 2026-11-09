@@ -89,6 +89,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
 
   // --- SEKME 1: SOSYAL MEDYA & WHATSAPP MÜŞTERİ LİNK ÜRETİCİ STATE'LERİ ---
   const [selectedChannelId, setSelectedChannelId] = useState('wa_durum');
+  const [hookStyle, setHookStyle] = useState('curiosity_short'); // 'curiosity_short' | 'tradein_hook' | 'tax_hook' | 'detailed'
   const [channelSector, setChannelSector] = useState('all');
   const [vipTone, setVipTone] = useState('friendly'); // 'friendly' | 'new_lead' | 'corporate'
   const [vipCustomerSearch, setVipCustomerSearch] = useState('');
@@ -188,11 +189,77 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   // Sekme 1 için üretilen Hazır Paylaşım Mesajı
   const channelGeneratedMessage = useMemo(() => {
     const link = channelGeneratedLink;
+    const discountShortNote = enableChannelDiscount && Number(channelDiscountValue) > 0
+      ? (channelDiscountType === 'percent'
+          ? ` (Linkin içine sana özel %${channelDiscountValue} iskonto da tanımladım)`
+          : ` (Linkin içine sana özel araç başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL indirim de tanımladım)`)
+      : '';
     const discountLine = enableChannelDiscount && Number(channelDiscountValue) > 0
       ? (channelDiscountType === 'percent'
           ? `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *%${channelDiscountValue} Özel İskonto* fiyatlardan otomatik düşülmüştür!\n`
           : `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *Araç Başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim* fiyatlardan otomatik düşülmüştür!\n`)
       : '';
+
+    // 1. SIKMAYAN 2 CÜMLELİK MERAK KANCASI (REKLAM KOKMAYAN / EN YÜKSEK TIKLAMA)
+    if (hookStyle === 'curiosity_short') {
+      if (selectedChannelId === 'wa_durum') {
+        return (
+          `Kimseyi aramadan, telefon trafiğine girmeden 10 saniyede kendi hesabınızı yapın: 👇\n` +
+          `Elinizdeki aracın takas değerini düşüp 2026 sıfır IVECO'nun size ayda kaç TL'ye geleceğini buradan kendiniz görebilirsiniz${discountShortNote}:\n\n` +
+          `👉 ${link}\n\n` +
+          `Satış Sorumlusu Can M. | 0544 622 59 31`
+        );
+      }
+      if (selectedChannelId === 'wa_ozel' || selectedChannelId === 'wa_musteri') {
+        const prefix = vipCompanyName.trim() ? `*${vipCompanyName.trim()}* — ` : '';
+        return (
+          `${prefix}Abi selamlar, hayırlı işler dilerim. 🙏\n\n` +
+          `Seni hiç telefonla bölmeyeyim dedim; beni aramana bile gerek kalmadan elindeki aracın takasını düşüp kalan kredi taksitini ve 2026 şasi fiyatlarını kendi başına görebileceğin bir hesap makinesi hazırladım${discountShortNote}. Lazım oldukça elinin altında bulunsun:\n\n` +
+          `👉 ${link}\n\n` +
+          `*Satış Sorumlusu Can M. — 0544 622 59 31*`
+        );
+      }
+      if (selectedChannelId === 'wa_grup') {
+        return (
+          `Cümleten hayırlı işler, kazasız belasız seferler abilerim. 🙏\n\n` +
+          `Grubu reklamla meşgul etmek için değil, işinize yarayacak canlı bir hesap cetveli bırakmak için yazıyorum: Kimseyi aramadan hangi ehliyetle hangi tonaj taşınır, elinizdeki aracın takasını düşünce ayda kaç TL taksit çıkar 10 saniyede kendiniz bakabilirsiniz${discountShortNote}:\n\n` +
+          `👉 ${link}\n\n` +
+          `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+        );
+      }
+      if (selectedChannelId === 'instagram') {
+        return (
+          `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye kimseye sormayın, 10 saniyede kendiniz hesaplayın! 🚛👇\n\n` +
+          `👉 ${link}\n\n` +
+          `Satış Sorumlusu Can M. | 0544 622 59 31`
+        );
+      }
+      return (
+        `Ticari araç yatırımlarında telefon trafiğine girmeden; tonaj/kasa uyumu, %20 KDV vergi kalkanı ve takas + kredi nakit akışını 30 saniyede kendi ekranınızda simüle edebileceğiniz dijital hesaplama aracımız:${discountShortNote}\n\n` +
+        `🔗 ${link}\n\n` +
+        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 0544 622 59 31`
+      );
+    }
+
+    // 2. TAKAS & 4 RESİM KANCASI ("ARACIM KAÇ PARA EDER?")
+    if (hookStyle === 'tradein_hook') {
+      return (
+        `🔄 *"Elimdeki aracı takasa versem ne kadar sayarlar, üstüne ayda kaç TL öderim?"* diye merak edenler için canlı ekran açtık!${discountShortNote}\n\n` +
+        `İster ekrandaki sürgüden aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle* kalan taksitinizi görün, isterseniz mevcut aracınızın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyin 15 dakikada takas ön fiyatınızı cebinize gönderelim:\n\n` +
+        `👉 ${link}\n\n` +
+        `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+      );
+    }
+
+    // 3. %20 KDV VERGİ KALKANI & MUHASEBE KANCASI
+    if (hookStyle === 'tax_hook') {
+      return (
+        `🧾 *Vergi Ödemek Yerine Filoyu Yenilemek İsteyen İşletmelerimize Not:*\n\n` +
+        `2026 model IVECO şasi ve çekici modellerimizde aracın fatura bedeli içindeki *%20 KDV tutarını doğrudan vergiden düşebileceğiniz* tutarları ve *1M TL %0 Faiz* kredi tablosunu tek ekranda hazırladık${discountShortNote}. Mali müşavirinize tek tuşla gönderebilirsiniz:\n\n` +
+        `👉 ${link}\n\n` +
+        `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+      );
+    }
 
     if (selectedChannelId === 'wa_durum') {
       return (
@@ -302,6 +369,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     );
   }, [
     selectedChannelId,
+    hookStyle,
     channelGeneratedLink,
     vipCompanyName,
     vipTone,
@@ -884,6 +952,42 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   wordBreak: 'break-all'
                 }}>
                   {channelGeneratedLink}
+                </div>
+
+                {/* 🎯 Sıkmayan / Merak Uyandıran Kanca Seçici */}
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fbbf24', marginBottom: '5px' }}>
+                    🎯 Müşteriyi Sıkmadan Tıklatan Mesaj Kancası Seç:
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
+                    {[
+                      { id: 'curiosity_short', label: '⚡ 2 Cümle Merak (Sıfır Reklam)' },
+                      { id: 'tradein_hook', label: '🔄 "Aracım Kaç Para Eder?" Kancası' },
+                      { id: 'tax_hook', label: '🧾 "%20 KDV Vergi Kalkanı" Kancası' },
+                      { id: 'detailed', label: '📋 Detaylı Tanıtım Metni' }
+                    ].map(h => {
+                      const active = hookStyle === h.id;
+                      return (
+                        <button
+                          key={h.id}
+                          type="button"
+                          onClick={() => setHookStyle(h.id)}
+                          style={{
+                            padding: '6px 8px',
+                            borderRadius: '7px',
+                            border: active ? '1.5px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                            background: active ? 'rgba(16, 185, 129, 0.22)' : 'rgba(15, 23, 42, 0.7)',
+                            color: active ? '#4ade80' : '#cbd5e1',
+                            fontSize: '0.7rem',
+                            fontWeight: active ? 900 : 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {h.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Hazır Paylaşım Metni Önizleme */}
