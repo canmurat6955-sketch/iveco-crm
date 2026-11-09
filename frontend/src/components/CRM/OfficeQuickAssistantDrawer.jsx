@@ -807,7 +807,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `🔒 Beğendiğin şasiyi 24 saat ücretsiz adına opsiyonlayabilir veya çay/kahve randevusu seçebilirsin:\n\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_ozel\n\n` +
                         `Kafana yatan bir model olursa ekrandaki tek tuşla doğrudan bana düşüyor. Selamlar!\n` +
-                        `*Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+                        `*Satış Sorumlusu | IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
                     },
                     {
                       id: 'wa_grup',
@@ -824,7 +824,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `🔔 *Takastan Temiz 2. El Habercisi:* Sıfır bütçesini aşanlar kaydolsun, takasa temiz araç düştüğü an ilk size haber verelim!\n\n` +
                         `👇 *Hemen incelemek ve hesap yapmak için tıklayın:*\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_grup\n\n` +
-                        `*Satış Sorumlusu Can M. — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+                        `*Satış Sorumlusu — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
                     },
                     {
                       id: 'wa_durum',
@@ -840,7 +840,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `🔒 Beğendiğiniz şasiyi 24 saat ücretsiz adınıza opsiyonlayın veya\n` +
                         `☕ Showroom kahve / görüntülü araç turu randevunuzu seçin:\n\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_durum\n\n` +
-                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
+                        `Satış Sorumlusu | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
                     },
                     {
                       id: 'linkedin',
@@ -856,7 +856,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, 5 Yıllık TCO Yakıt Avantajı & Amortisman özeti,\n` +
                         `4️⃣ 4 fotoğrafla (dıştan, içten, KM, ruhsat) 15 dakikada takas değerleme ve 24 saatlik ücretsiz şasi/fiyat blokajı oluşturabilirsiniz:\n\n` +
                         `🔗 ${origin}/fiyat-listesi?ref=linkedin\n\n` +
-                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31\n\n` +
+                        `Satış Sorumlusu | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31\n\n` +
                         `#IVECO #Lojistik #FiloYönetimi #TicariAraç #Nakliye #SWay #Daily #Samsun`
                     },
                     {
@@ -874,7 +874,7 @@ export default function OfficeQuickAssistantDrawer() {
                         `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
                         `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
                         `👉 Hemen denemek için profilimdeki / hikayemdeki linke tıklayın:\n${origin}/fiyat-listesi?ref=instagram\n\n` +
-                        `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
+                        `📞 Satış Sorumlusu — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
                     }
                   ];
 

@@ -126,7 +126,7 @@ export default function CustomerSmartActionHub({
   customerPhone = '',
   customerCity = 'Samsun',
   customerId = '',
-  salesRep = { name: 'Satış Sorumlusu Can M.', phoneDisplay: '0544 622 59 31', phoneWhatsapp: '905446225931' },
+  salesRep = { name: 'Satış Sorumlusu', phoneDisplay: '0544 622 59 31', phoneWhatsapp: '905446225931' },
   onTrackFootprint
 }) {
   const [selectedAction, setSelectedAction] = useState('appointment'); // 'appointment' | 'option24h' | 'tradein_photo' | 'tax_summary' | 'body_pkg' | 'second_hand'
@@ -241,7 +241,7 @@ export default function CustomerSmartActionHub({
       notes: `Müşteri Randevu Talebi Oluşturdu!\nTür: ${apptType.title}\nTarih/Saat: ${apptDay} (${apptTime})\nİncelenen Araç: ${activeModelTitle}\nNot/Adres: ${apptAddressOrNote || '-'}`
     });
     setSubmitting(false);
-    setSuccessMsg(`✅ "${apptType.title}" randevu talebiniz (${apptDay}, ${apptTime}) Satış Sorumlusu Can M. ekranına iletildi!`);
+    setSuccessMsg(`✅ "${apptType.title}" randevu talebiniz (${apptDay}, ${apptTime}) Satış Sorumlusu ekranına iletildi!`);
     toast.success('Randevu talebiniz alındı!');
   };
 
@@ -339,7 +339,7 @@ export default function CustomerSmartActionHub({
       `4️⃣ *Araç Ruhsat Resmi (1 Adet)* ${tradeInPhotos.ruhsat ? '✅ (Yüklendi)' : '📷'}\n\n` +
       `Tahmini takas bedelini ve kalan kredi ödeme planını çıkarabilir miyiz?`;
 
-    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can M. ekranına iletildi!`);
+    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu ekranına iletildi!`);
 
     // Bilgisayar (WhatsApp Desktop) ve Mobil cihazlarda popup engelleyiciye takılmadan doğrudan aç
     openWhatsAppChat(cleanWhatsappPhone, msg);
@@ -380,7 +380,7 @@ export default function CustomerSmartActionHub({
       notes: `Müşteri "${activeModelTitle}" şasisi + "${selectedBodyPkg}" üstyapı dahil anahtar teslim fiyat istedi.`
     });
     setSubmitting(false);
-    setSuccessMsg(`📦 "${activeModelTitle} + ${selectedBodyPkg}" anahtar teslim paket talebiniz Satış Sorumlusu Can M.'ye iletildi!`);
+    setSuccessMsg(`📦 "${activeModelTitle} + ${selectedBodyPkg}" anahtar teslim paket talebiniz Satış Sorumlusu'ye iletildi!`);
     toast.success('Üstyapı dahil paket talebiniz alındı!');
   };
 
@@ -693,7 +693,7 @@ export default function CustomerSmartActionHub({
           </button>
           {optionCode && (
             <div style={{ marginTop: '10px', fontSize: '0.8rem', color: '#fde68a', fontWeight: 800, textAlign: 'center' }}>
-              Resmi Opsiyon Kodunuz: #{optionCode} — Satış Sorumlusu Can M. şasinizi 24 saat bloke etmiştir.
+              Resmi Opsiyon Kodunuz: #{optionCode} — Satış Sorumlusu şasinizi 24 saat bloke etmiştir.
             </div>
           )}
         </form>
@@ -895,7 +895,7 @@ export default function CustomerSmartActionHub({
             >
               <FiCamera size={17} />
               {uploadedTradeInCount === 4
-                ? '✅ 4 Resmi Gönder & 15 Dk’da Takas Fiyatı Al (Can M.)'
+                ? '✅ 4 Resmi Gönder & 15 Dk’da Takas Fiyatı Al (Satış Sorumlusu)'
                 : `📸 4 Resmi Tamamla & Takasla Fiyat Al (${uploadedTradeInCount}/4 Resim Eklendi)`}
             </button>
 

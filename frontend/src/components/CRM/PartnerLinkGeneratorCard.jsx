@@ -207,7 +207,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `Kimseyi aramadan, telefon trafiğine girmeden 10 saniyede kendi hesabınızı yapın: 👇\n` +
           `Elinizdeki aracın takas değerini düşüp 2026 sıfır IVECO'nun size ayda kaç TL'ye geleceğini buradan kendiniz görebilirsiniz${discountShortNote}:\n\n` +
           `👉 ${link}\n\n` +
-          `Satış Sorumlusu Can M. | 0544 622 59 31`
+          `Satış Sorumlusu | 0544 622 59 31`
         );
       }
       if (selectedChannelId === 'wa_ozel' || selectedChannelId === 'wa_musteri') {
@@ -216,7 +216,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${prefix}Abi selamlar, hayırlı işler dilerim. 🙏\n\n` +
           `Seni hiç telefonla bölmeyeyim dedim; beni aramana bile gerek kalmadan elindeki aracın takasını düşüp kalan kredi taksitini ve 2026 şasi fiyatlarını kendi başına görebileceğin bir hesap makinesi hazırladım${discountShortNote}. Lazım oldukça elinin altında bulunsun:\n\n` +
           `👉 ${link}\n\n` +
-          `*Satış Sorumlusu Can M. — 0544 622 59 31*`
+          `*Satış Sorumlusu — 0544 622 59 31*`
         );
       }
       if (selectedChannelId === 'wa_grup') {
@@ -224,20 +224,20 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `Cümleten hayırlı işler, kazasız belasız seferler abilerim. 🙏\n\n` +
           `Grubu reklamla meşgul etmek için değil, işinize yarayacak canlı bir hesap cetveli bırakmak için yazıyorum: Kimseyi aramadan hangi ehliyetle hangi tonaj taşınır, elinizdeki aracın takasını düşünce ayda kaç TL taksit çıkar 10 saniyede kendiniz bakabilirsiniz${discountShortNote}:\n\n` +
           `👉 ${link}\n\n` +
-          `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+          `*Satış Sorumlusu | IVECO ERC Samsun — 0544 622 59 31*`
         );
       }
       if (selectedChannelId === 'instagram') {
         return (
           `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye kimseye sormayın, 10 saniyede kendiniz hesaplayın! 🚛👇\n\n` +
           `👉 ${link}\n\n` +
-          `Satış Sorumlusu Can M. | 0544 622 59 31`
+          `Satış Sorumlusu | 0544 622 59 31`
         );
       }
       return (
         `Ticari araç yatırımlarında telefon trafiğine girmeden; tonaj/kasa uyumu, %20 KDV vergi kalkanı ve takas + kredi nakit akışını 30 saniyede kendi ekranınızda simüle edebileceğiniz dijital hesaplama aracımız:${discountShortNote}\n\n` +
         `🔗 ${link}\n\n` +
-        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 0544 622 59 31`
+        `Satış Sorumlusu | IVECO ERC Samsun Otomotiv | 0544 622 59 31`
       );
     }
 
@@ -247,7 +247,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🔄 *"Elimdeki aracı takasa versem ne kadar sayarlar, üstüne ayda kaç TL öderim?"* diye merak edenler için canlı ekran açtık!${discountShortNote}\n\n` +
         `İster ekrandaki sürgüden aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle* kalan taksitinizi görün, isterseniz mevcut aracınızın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyin 15 dakikada takas ön fiyatınızı cebinize gönderelim:\n\n` +
         `👉 ${link}\n\n` +
-        `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+        `*Satış Sorumlusu | IVECO ERC Samsun — 0544 622 59 31*`
       );
     }
 
@@ -257,7 +257,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🧾 *Vergi Ödemek Yerine Filoyu Yenilemek İsteyen İşletmelerimize Not:*\n\n` +
         `2026 model IVECO şasi ve çekici modellerimizde aracın fatura bedeli içindeki *%20 KDV tutarını doğrudan vergiden düşebileceğiniz* tutarları ve *1M TL %0 Faiz* kredi tablosunu tek ekranda hazırladık${discountShortNote}. Mali müşavirinize tek tuşla gönderebilirsiniz:\n\n` +
         `👉 ${link}\n\n` +
-        `*Satış Sorumlusu Can M. | IVECO ERC Samsun — 0544 622 59 31*`
+        `*Satış Sorumlusu | IVECO ERC Samsun — 0544 622 59 31*`
       );
     }
 
@@ -271,21 +271,21 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🔒 Beğendiğiniz şasiyi 24 saat ücretsiz adınıza opsiyonlayın veya\n` +
         `☕ Showroom kahve / görüntülü araç turu randevunuzu seçin:\n\n` +
         `👉 ${link}\n\n` +
-        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
+        `Satış Sorumlusu | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
       );
     }
 
     if (selectedChannelId === 'wa_musteri') {
       return (
         `Merhaba, hayırlı işler dilerim. 🙏\n\n` +
-        `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu* (0544 622 59 31).\n\n` +
         `2026 model IVECO Daily (B ve C Ehliyet), Eurocargo, S-Way ve T-Way güncel fiyat listemizi, anlaşmalı banka kredi oranlarımızı ve takas hesaplama ekranımızı aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n` +
         discountLine +
         `✅ *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya vadeli banka oranlarıyla aylık taksitinizi anında görün,\n` +
         `📸 *4 Resimle 15 Dk'da Takas:* Mevcut aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyip 15 dakikada takas ön fiyatı alın:\n\n` +
         `👉 ${link}\n\n` +
         `Beğendiğiniz modeli ekrandaki tek tuşla 24 saat adınıza opsiyonlayabilir veya doğrudan bana gönderebilirsiniz.\n` +
-        `*Satış Sorumlusu Can M. — 0544 622 59 31*`
+        `*Satış Sorumlusu — 0544 622 59 31*`
       );
     }
 
@@ -300,27 +300,27 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `📸 Mevcut aracının *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takasla fiyat alabilirsin:\n\n` +
           `👉 ${link}\n\n` +
           `Kafana yatan bir model olursa ekrandaki tek tuşla doğrudan bana düşüyor. Selamlar!\n` +
-          `*Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+          `*Satış Sorumlusu | IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
         );
       }
       if (vipTone === 'corporate') {
         return (
           `Sayın *${targetTitle}* Yönetimi,\n\n` +
-          `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
+          `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu* (0544 622 59 31).\n\n` +
           `2026 yılı filo yenileme ve ticari araç yatırımlarınız kapsamında firmanıza özel hazırladığım dijital katalog, %20 KDV vergi kalkanı & amortisman özeti ve ticari kredi simülasyon bağlantınızı bilgilerinize sunarım:\n\n` +
           discountLine +
           `👉 ${link}\n\n` +
           `İhtiyacınıza özel resmi proforma çalışması veya iş yerinizde ziyaret randevusu için bağlantı üzerinden doğrudan talep oluşturabilirsiniz.\n\n` +
-          `Saygılarımla,\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+          `Saygılarımla,\n*Satış Sorumlusu - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
         );
       }
       return (
         `Sayın *${targetTitle}*,\n\n` +
-        `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *Can M.* (0544 622 59 31).\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu* (0544 622 59 31).\n\n` +
         `Firmanız için hazırladığım 2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (1 dıştan, 1 içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
         discountLine +
         `👉 ${link}\n\n` +
-        `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+        `İyi çalışmalar dilerim.\n*Satış Sorumlusu - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
       );
     }
 
@@ -335,7 +335,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🔔 *Takastan Temiz 2. El Habercisi:* Sıfır bütçesini aşanlar kaydolsun, takasa temiz araç düştüğü an ilk size haber verelim!\n\n` +
         `👇 *Hemen incelemek ve hesap yapmak için tıklayın:*\n` +
         `👉 ${link}\n\n` +
-        `*Satış Sorumlusu Can M. — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+        `*Satış Sorumlusu — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
       );
     }
 
@@ -350,7 +350,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
         `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
         `👉 Hemen denemek için profilimdeki / hikayemdeki linke tıklayın:\n${link}\n\n` +
-        `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
+        `📞 Satış Sorumlusu — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
       );
     }
 
@@ -364,7 +364,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, 5 Yıllık TCO Yakıt Avantajı & Amortisman özeti,\n` +
       `4️⃣ 4 fotoğrafla (dıştan, içten, KM, ruhsat) 15 dakikada takas değerleme ve 24 saatlik ücretsiz şasi/fiyat blokajı oluşturabilirsiniz:\n\n` +
       `🔗 ${link}\n\n` +
-      `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31\n\n` +
+      `Satış Sorumlusu | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31\n\n` +
       `#IVECO #Lojistik #FiloYönetimi #TicariAraç #Nakliye #SWay #Daily #Samsun`
     );
   }, [

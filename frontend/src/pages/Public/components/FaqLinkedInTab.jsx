@@ -147,7 +147,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
           textAlign: 'right'
         }}>
           <div style={{ fontSize: '0.70rem', color: '#38bdf8', fontWeight: 700 }}>🔍 ŞEFFAF DANIŞMANLIK</div>
-          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Satış Sorumlusu Can M.</div>
+          <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>Satış Sorumlusu</div>
         </div>
       </div>
 
@@ -293,7 +293,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
                         gap: '6px'
                       }}
                     >
-                      <FiMessageSquare size={13} /> Satış Sorumlusu Can M. Sizinle İletişime Geçsin
+                      <FiMessageSquare size={13} /> Satış Sorumlusu Sizinle İletişime Geçsin
                     </button>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function FaqLinkedInTab({ onDirectWhatsApp, salesRep }) {
           Aklınıza Takılan Başka Bir Soru mu Var?
         </h3>
         <p style={{ fontSize: '0.80rem', color: '#94a3b8', margin: '0 auto 14px', maxWidth: '520px', lineHeight: 1.45 }}>
-          Filo yapınız, rotalarınız, özel kasa projeleriniz veya takas teklifleriniz için <strong>Satış Sorumlusu Can M.</strong> sizinle iletişime geçsin.
+          Filo yapınız, rotalarınız, özel kasa projeleriniz veya takas teklifleriniz için <strong>Satış Sorumlusu</strong> sizinle iletişime geçsin.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>

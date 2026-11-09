@@ -1463,7 +1463,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                       ⭐ {partnerProtocol ? `${partnerProtocol.shortName} ÖZEL ŞANTİYE PROTOKOLÜ` : 'PROJEYE ÖZEL ŞANTİYE FİYATI'}
                     </div>
                     <div style={{ fontSize: isMobileView ? '1.04rem' : '0.98rem', fontWeight: 900, color: '#fef08a', marginTop: '2px' }}>
-                      Satış Sorumlusu Can M. ile Görüşün
+                      Satış Sorumlusu ile Görüşün
                     </div>
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
@@ -1668,7 +1668,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     gap: '4px',
                     whiteSpace: 'nowrap'
                   }}
-                  title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu Can M.'den Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
+                  title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu'den Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
                 >
                   <FiMessageSquare size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
                 </button>

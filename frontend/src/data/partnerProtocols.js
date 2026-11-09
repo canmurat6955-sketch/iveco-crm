@@ -1,6 +1,6 @@
 /**
  * B2B Dernek, Oda, Birlik & Kooperatif Özel İndirim Protokolleri
- * Satış Sorumlusu Can M. (IVECO ERC Samsun Otomotiv)
+ * Satış Sorumlusu (IVECO ERC Samsun Otomotiv)
  *
  * Hem hazır protokolleri (SİMDER, Arıcılar Birliği, Şoförler Odası, Ziraat Odası vb.)
  * hem de Dashboard üzerinden anlık üretilen özel oranlı/tutarlı kampanyaları destekler.
@@ -310,7 +310,7 @@ export function buildPartnerAnnouncementText(origin, config) {
     `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın:\n\n` +
     `👇 *${config.shortName} Üyelerine Özel İndirimli Katalog & Hesaplama Linki:*\n` +
     `👉 ${link}\n\n` +
-    `*Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv*\n` +
+    `*Satış Sorumlusu | IVECO ERC Samsun Otomotiv*\n` +
     `📞 *0544 622 59 31*`
   );
 }

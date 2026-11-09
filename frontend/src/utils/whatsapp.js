@@ -107,7 +107,7 @@ export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverr
       `Aşağıdaki sana özel linkten elindeki aracın takasını seçip 1M TL %0 faizle kalan ödemeyi 10 saniyede kendin hesaplayabilir, istersen 4 resim (dıştan, içten, KM ve ruhsat) yükleyip 15 dk'da takasla fiyat alabilirsin:\n\n` +
       `👉 ${vipLink}\n\n` +
       `Kafana yatan bir model olursa ekrandaki tek tuşla bana düşüyor zaten. Bol kazançlar!\n` +
-      `*Satış Sorumlusu Can M. - 0544 622 59 31*`
+      `*Satış Sorumlusu - 0544 622 59 31*`
     );
   }
 
@@ -118,7 +118,7 @@ export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverr
       `Çoklu araç yatırımlarınız ve 2026 filo yenileme planlarınız kapsamında; ${secLabel}filo iskontosu, mali müşavirinize tek tıkla iletebileceğiniz %20 KDV vergi kalkanı & amortisman özeti, 5 yıllık yakıt (TCO) analizi ve takas + ticari kredi simülasyonunu içeren kurumsal bağlantınızı bilgilerinize sunarım:\n\n` +
       `👉 ${vipLink}\n\n` +
       `İhtiyacınıza özel proforma çalışması veya iş yerinizde/online görüşme randevusu için bağlantı üzerinden doğrudan talep oluşturabilirsiniz.\n\n` +
-      `Saygılarımla,\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+      `Saygılarımla,\n*Satış Sorumlusu - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
     );
   }
 
@@ -129,7 +129,7 @@ export function buildVipPortalMessageByTone(cust, tone = 'new_lead', sectorOverr
     `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (dıştan, içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
     `👉 ${vipLink}\n\n` +
     `Beğendiğiniz modeli 24 saat ücretsiz adınıza opsiyonlayabilir veya bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
-    `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+    `İyi çalışmalar dilerim.\n*Satış Sorumlusu - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
   );
 }
 
