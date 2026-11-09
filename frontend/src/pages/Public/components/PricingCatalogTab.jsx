@@ -14,13 +14,62 @@ const REQUIRED_TRADEIN_PHOTOS = [
 ];
 
 const CATEGORIES = [
-  { id: 'all', title: 'Tüm Araçlar', licenseBadge: '22 Model', label: 'Tüm Araçlar', shortLabel: 'Tümü' },
-  { id: 'daily35_chassis', title: 'Daily 35 Şasi', licenseBadge: '(B Ehliyet)', label: 'Daily 35 Şasi (B Ehliyet)', shortLabel: 'Daily 35 Şasi' },
-  { id: 'daily35_van', title: 'Daily Panelvan', licenseBadge: '(B Ehliyet)', label: 'Daily Panelvan (B Ehliyet)', shortLabel: 'Daily Panelvan' },
-  { id: 'daily70', title: 'Daily 70C / 72C', licenseBadge: '(7 Ton • C Ehliyet)', label: 'Daily 70C / 72C (C Ehliyet)', shortLabel: 'Daily 70C / 72C' },
-  { id: 'eurocargo', title: 'Eurocargo', licenseBadge: '(10–18T • C Ehliyet)', label: 'Eurocargo (C Ehliyet)', shortLabel: 'Eurocargo' },
-  { id: 'sway', title: 'S-Way Çekici', licenseBadge: '(CE Ehliyet)', label: 'S-Way Çekici (CE Ehliyet)', shortLabel: 'S-Way Çekici' },
-  { id: 'tway', title: 'T-Way Şantiye', licenseBadge: '(10–12T • C Ehliyet)', label: 'T-Way Şantiye (C Ehliyet)', shortLabel: 'T-Way Şantiye' }
+  {
+    id: 'all',
+    title: 'Tüm Araçlar',
+    licenseBadge: '22 Model',
+    label: 'Tüm Araçlar',
+    shortLabel: 'Tümü',
+    images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg']
+  },
+  {
+    id: 'daily35_chassis',
+    title: 'Daily 35 Şasi',
+    licenseBadge: '(B Ehliyet)',
+    label: 'Daily 35 Şasi (B Ehliyet)',
+    shortLabel: 'Daily 35 Şasi',
+    image: '/vehicles/daily-35s-sasi.jpg'
+  },
+  {
+    id: 'daily35_van',
+    title: 'Daily Panelvan',
+    licenseBadge: '(B Ehliyet)',
+    label: 'Daily Panelvan (B Ehliyet)',
+    shortLabel: 'Daily Panelvan',
+    image: '/vehicles/daily-panelvan.jpg'
+  },
+  {
+    id: 'daily70',
+    title: 'Daily 70C / 72C',
+    licenseBadge: '(7 Ton • C Ehliyet)',
+    label: 'Daily 70C / 72C (C Ehliyet)',
+    shortLabel: 'Daily 70C / 72C',
+    image: '/vehicles/daily-35c-72c.jpg'
+  },
+  {
+    id: 'eurocargo',
+    title: 'Eurocargo',
+    licenseBadge: '(10–18T • C Ehliyet)',
+    label: 'Eurocargo (C Ehliyet)',
+    shortLabel: 'Eurocargo',
+    image: '/vehicles/eurocargo-100-120.jpg'
+  },
+  {
+    id: 'sway',
+    title: 'S-Way Çekici',
+    licenseBadge: '(CE Ehliyet)',
+    label: 'S-Way Çekici (CE Ehliyet)',
+    shortLabel: 'S-Way Çekici',
+    image: '/vehicles/sway-cekici.jpg'
+  },
+  {
+    id: 'tway',
+    title: 'T-Way Şantiye',
+    licenseBadge: '(10–12T • C Ehliyet)',
+    label: 'T-Way Şantiye (C Ehliyet)',
+    shortLabel: 'T-Way Şantiye',
+    image: '/vehicles/tway-damper.jpg'
+  }
 ];
 
 const SECTOR_FILTERS = [
@@ -910,11 +959,11 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
 
       {/* 1. ANA MODEL & EHLİYET GRUBU SEÇİCİ + İSTEĞE BAĞLI DETAYLI FİLTRE */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: isMobileView ? '12px' : '16px' }}>
-        {/* Category Pills — Mobilde ve Masaüstünde taşmayan 2 satırlı simetrik ızgara */}
+        {/* Category Pills — Araç Görselli, Mobilde ve Masaüstünde Taşmayan Simetrik Izgara */}
         <div style={isMobileView ? {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '6px'
+          gap: '7px'
         } : {
           display: 'grid',
           gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
@@ -922,45 +971,118 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
         }}>
           {CATEGORIES.map(cat => {
             const isSelected = selectedCategory === cat.id;
+            const isAllMobile = isMobileView && cat.id === 'all';
             return (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCategory(cat.id)}
                 style={{
-                  gridColumn: (isMobileView && cat.id === 'all') ? 'span 2' : undefined,
-                  background: isSelected ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(33, 55, 90, 0.88)',
+                  gridColumn: isAllMobile ? 'span 2' : undefined,
+                  background: isSelected
+                    ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)'
+                    : 'rgba(33, 55, 90, 0.92)',
                   color: isSelected ? '#fff' : '#f1f5f9',
-                  border: isSelected ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.28)',
-                  borderRadius: '11px',
-                  padding: isMobileView ? '8px 6px' : '7px 8px',
+                  border: isSelected ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.3)',
+                  borderRadius: '12px',
+                  padding: isAllMobile ? '6px 10px' : (isMobileView ? '6px 6px 7px' : '6px 6px 7px'),
                   cursor: 'pointer',
                   textAlign: 'center',
                   transition: 'all 0.2s',
                   display: 'flex',
-                  flexDirection: (isMobileView && cat.id === 'all') ? 'row' : 'column',
+                  flexDirection: isAllMobile ? 'row' : 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: (isMobileView && cat.id === 'all') ? '6px' : '2px',
-                  minWidth: 0
+                  gap: isAllMobile ? '10px' : '4px',
+                  minWidth: 0,
+                  boxShadow: isSelected ? '0 6px 16px rgba(2, 132, 199, 0.32)' : '0 2px 6px rgba(0, 0, 0, 0.18)'
                 }}
               >
-                <span style={{
-                  fontSize: isMobileView ? '0.78rem' : '0.76rem',
-                  fontWeight: 900,
-                  color: '#ffffff',
-                  lineHeight: 1.2
+                {/* Araç Resmi Kutusu — Beyaz Zeminli, Oranlı ve Telefonda Asla Taşmayan Yapı */}
+                <div style={{
+                  width: isAllMobile ? '114px' : '100%',
+                  height: isAllMobile ? '36px' : (isMobileView ? '44px' : '42px'),
+                  background: '#ffffff',
+                  borderRadius: '8px',
+                  padding: isAllMobile ? '2px 4px' : '2px 6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  boxSizing: 'border-box',
+                  boxShadow: isSelected
+                    ? '0 2px 6px rgba(0, 0, 0, 0.22)'
+                    : 'inset 0 0 0 1px rgba(148, 163, 184, 0.22)'
                 }}>
-                  {cat.title}
-                </span>
-                <span style={{
-                  fontSize: isMobileView ? '0.67rem' : '0.65rem',
-                  fontWeight: 700,
-                  color: isSelected ? '#bae6fd' : '#7dd3fc',
-                  lineHeight: 1.15
+                  {cat.images ? (
+                    cat.images.map((imgSrc, idx) => (
+                      <img
+                        key={idx}
+                        src={imgSrc}
+                        alt={cat.title}
+                        loading="lazy"
+                        style={{
+                          width: '32%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          display: 'block'
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <img
+                      src={cat.image}
+                      alt={cat.title}
+                      loading="lazy"
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        display: 'block'
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Başlık ve Ehliyet Etiketi */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: isAllMobile ? 'row' : 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: isAllMobile ? '6px' : '1px',
+                  minWidth: 0,
+                  width: isAllMobile ? 'auto' : '100%'
                 }}>
-                  {cat.id === 'all' ? `(${IVECO_PRICING_CATALOG.length} Araç)` : cat.licenseBadge}
-                </span>
+                  <span style={{
+                    fontSize: isMobileView ? '0.77rem' : '0.75rem',
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    lineHeight: 1.18,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '100%'
+                  }}>
+                    {cat.title}
+                  </span>
+                  <span style={{
+                    fontSize: isMobileView ? '0.66rem' : '0.64rem',
+                    fontWeight: 700,
+                    color: isSelected ? '#bae6fd' : '#7dd3fc',
+                    lineHeight: 1.15,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '100%'
+                  }}>
+                    {cat.id === 'all' ? `(${IVECO_PRICING_CATALOG.length} Araç)` : cat.licenseBadge}
+                  </span>
+                </div>
               </button>
             );
           })}

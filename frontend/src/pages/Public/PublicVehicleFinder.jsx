@@ -3352,20 +3352,50 @@ IVECO ERC Samsun Otomotiv
             {/* SEÇENEK A: DOĞRUDAN ARAÇ KATALOĞU */}
             {selectorMode === 'catalog' && (
               <div style={{ marginBottom: '18px' }}>
-                {/* Kategori Filtre Çipleri — Mobilde 2x3, Masaüstünde 6 sütunlu 2 satırlı simetrik ızgara */}
+                {/* Kategori Filtre Çipleri — Araç Görselli, Mobilde 2x3, Masaüstünde 6 sütunlu simetrik ızgara */}
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(6, minmax(0, 1fr))',
-                  gap: isMobileView ? '6px' : '7px',
+                  gap: isMobileView ? '7px' : '8px',
                   marginBottom: isMobileView ? '12px' : '14px'
                 }}>
                   {[
-                    { id: 'all', title: 'Tüm Modeller', licenseBadge: '(B / C / CE Ehliyet)' },
-                    { id: 'kamyonet', title: 'Daily 35 Şasi', licenseBadge: '(3.5T • B Ehliyet)' },
-                    { id: 'panelvan', title: 'Daily Panelvan', licenseBadge: '(12–18m³ • B Ehliyet)' },
-                    { id: 'kamyon', title: '72C & Eurocargo', licenseBadge: '(C1 / C Ehliyet)' },
-                    { id: 'cekici', title: 'S-Way Çekici', licenseBadge: '(CE Ehliyet)' },
-                    { id: 'hafriyat', title: 'T-Way Şantiye', licenseBadge: '(6x4 / 8x4 • C Ehliyet)' }
+                    {
+                      id: 'all',
+                      title: 'Tüm Modeller',
+                      licenseBadge: '(B / C / CE Ehliyet)',
+                      images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg']
+                    },
+                    {
+                      id: 'kamyonet',
+                      title: 'Daily 35 Şasi',
+                      licenseBadge: '(3.5T • B Ehliyet)',
+                      image: '/vehicles/daily-35s-sasi.jpg'
+                    },
+                    {
+                      id: 'panelvan',
+                      title: 'Daily Panelvan',
+                      licenseBadge: '(12–18m³ • B Ehliyet)',
+                      image: '/vehicles/daily-panelvan.jpg'
+                    },
+                    {
+                      id: 'kamyon',
+                      title: '72C & Eurocargo',
+                      licenseBadge: '(C1 / C Ehliyet)',
+                      image: '/vehicles/eurocargo-100-120.jpg'
+                    },
+                    {
+                      id: 'cekici',
+                      title: 'S-Way Çekici',
+                      licenseBadge: '(CE Ehliyet)',
+                      image: '/vehicles/sway-cekici.jpg'
+                    },
+                    {
+                      id: 'hafriyat',
+                      title: 'T-Way Şantiye',
+                      licenseBadge: '(6x4 / 8x4 • C Ehliyet)',
+                      image: '/vehicles/tway-damper.jpg'
+                    }
                   ].map(cat => {
                     const isActive = selectedCategoryTab === cat.id;
                     return (
@@ -3375,26 +3405,79 @@ IVECO ERC Samsun Otomotiv
                         onClick={() => setSelectedCategoryTab(cat.id)}
                         style={{
                           minWidth: 0,
-                          background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.85)',
+                          background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.92)',
                           color: isActive ? '#fff' : '#e2e8f0',
                           border: '1.5px solid',
-                          borderColor: isActive ? '#38bdf8' : 'rgba(148, 163, 184, 0.28)',
-                          borderRadius: '10px',
-                          padding: isMobileView ? '8px 6px' : '8px 8px',
+                          borderColor: isActive ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)',
+                          borderRadius: '11px',
+                          padding: '6px 6px 7px',
                           textAlign: 'center',
                           cursor: 'pointer',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '2px'
+                          gap: '4px',
+                          boxShadow: isActive ? '0 6px 16px rgba(2, 132, 199, 0.3)' : '0 2px 6px rgba(0, 0, 0, 0.16)'
                         }}
                       >
+                        <div style={{
+                          width: '100%',
+                          height: isMobileView ? '44px' : '42px',
+                          background: '#ffffff',
+                          borderRadius: '8px',
+                          padding: '2px 6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '2px',
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                          boxSizing: 'border-box',
+                          boxShadow: isActive
+                            ? '0 2px 6px rgba(0, 0, 0, 0.22)'
+                            : 'inset 0 0 0 1px rgba(148, 163, 184, 0.22)'
+                        }}>
+                          {cat.images ? (
+                            cat.images.map((imgSrc, idx) => (
+                              <img
+                                key={idx}
+                                src={imgSrc}
+                                alt={cat.title}
+                                loading="lazy"
+                                style={{
+                                  width: '32%',
+                                  height: '100%',
+                                  objectFit: 'contain',
+                                  display: 'block'
+                                }}
+                              />
+                            ))
+                          ) : (
+                            <img
+                              src={cat.image}
+                              alt={cat.title}
+                              loading="lazy"
+                              style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                width: 'auto',
+                                height: 'auto',
+                                objectFit: 'contain',
+                                display: 'block'
+                              }}
+                            />
+                          )}
+                        </div>
                         <span style={{
-                          fontSize: isMobileView ? '0.78rem' : '0.75rem',
-                          fontWeight: 800,
-                          color: isActive ? '#ffffff' : '#f1f5f9',
-                          lineHeight: 1.15
+                          fontSize: isMobileView ? '0.77rem' : '0.75rem',
+                          fontWeight: 900,
+                          color: '#ffffff',
+                          lineHeight: 1.15,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '100%'
                         }}>
                           {cat.title}
                         </span>
@@ -3402,7 +3485,11 @@ IVECO ERC Samsun Otomotiv
                           fontSize: isMobileView ? '0.65rem' : '0.63rem',
                           fontWeight: 700,
                           color: isActive ? '#bae6fd' : '#38bdf8',
-                          lineHeight: 1.1
+                          lineHeight: 1.1,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '100%'
                         }}>
                           {cat.licenseBadge}
                         </span>
