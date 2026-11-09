@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { IVECO_PRICING_CATALOG, getVehicleSticker } from '../../../data/ivecoPricingCatalog';
 import { fetchTcmbEurRate } from '../../../api/client';
+import { openWhatsAppChat } from '../../../utils/openExternal';
 import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag, FiCamera } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -13,12 +14,12 @@ const REQUIRED_TRADEIN_PHOTOS = [
 
 const CATEGORIES = [
   { id: 'all', label: 'Tüm Araçlar', shortLabel: 'Tümü' },
-  { id: 'daily35_chassis', label: 'Daily 35 Şasi (B Ehliyet)', shortLabel: 'Daily 35 Şasi' },
-  { id: 'daily35_van', label: 'Daily 35 Panelvan', shortLabel: 'Daily Panelvan' },
-  { id: 'daily70', label: 'Daily 70C / 72C (7 Ton Kamyon)', shortLabel: 'Daily 70C / 72C' },
-  { id: 'eurocargo', label: 'Eurocargo Kamyon (10-18 Ton)', shortLabel: 'Eurocargo' },
-  { id: 'sway', label: 'S-Way Çekici', shortLabel: 'S-Way Çekici' },
-  { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10-12 Teker)', shortLabel: 'T-Way Şantiye' }
+  { id: 'daily35_chassis', label: 'Daily 35 Şasi (B Ehliyet)', shortLabel: 'Daily 35 Şasi (B Ehliyet)' },
+  { id: 'daily35_van', label: 'Daily 35 Panelvan (B Ehliyet)', shortLabel: 'Daily Panelvan (B Ehliyet)' },
+  { id: 'daily70', label: 'Daily 70C / 72C (7 Ton • C1 / C Ehliyet)', shortLabel: 'Daily 70C / 72C (C Ehliyet)' },
+  { id: 'eurocargo', label: 'Eurocargo Kamyon (10–18 Ton • C Ehliyet)', shortLabel: 'Eurocargo (C Ehliyet)' },
+  { id: 'sway', label: 'S-Way Çekici (CE Ehliyet)', shortLabel: 'S-Way Çekici (CE Ehliyet)' },
+  { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10–12 Teker • C Ehliyet)', shortLabel: 'T-Way Şantiye (C Ehliyet)' }
 ];
 
 const SECTOR_FILTERS = [
@@ -64,8 +65,8 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
     ruhsat: null
   });
   const [showFleetBox, setShowFleetBox] = useState(false);
-  const [fleetQuantity, setFleetQuantity] = useState('2 - 3 Adet');
-  const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker');
+  const [fleetQuantity, setFleetQuantity] = useState('2 Adet');
+  const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker Şasi');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const [tcmbEurRate, setTcmbEurRate] = useState(38.50);
 
@@ -310,9 +311,12 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
     if (onTrackFootprint) {
       onTrackFootprint('Çoklu Filo İskonto Talebi', fleetTargetModel, `${fleetQuantity} Filo Alımı`);
     }
+    const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, şirketimiz bünyesinde *${fleetQuantity}* *IVECO ${fleetTargetModel}* çoklu filo alımı planlıyoruz. Kurumsal filo özel iskontonuz, teslimat kotası ve finansman koşullarınız hakkında teklif rica ederiz.`;
+    toast.success(`🏢 ${fleetQuantity} ${fleetTargetModel} için Filo Özel İskonto talebiniz hazırlandı, WhatsApp açılıyor...`, { duration: 3500 });
     if (onDirectWhatsApp) {
-      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, şirketimiz bünyesinde *${fleetQuantity}* *IVECO ${fleetTargetModel}* çoklu filo alımı planlıyoruz. Kurumsal filo özel iskontonuz, teslimat kotası ve finansman koşullarınız hakkında teklif rica ederiz.`;
       onDirectWhatsApp(msg);
+    } else {
+      openWhatsAppChat(salesRep?.phoneWhatsapp || '905446225931', msg);
     }
   };
 

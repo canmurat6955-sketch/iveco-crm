@@ -29,3 +29,36 @@ export const buildWhatsAppUrl = (text, phone) => {
     ? `https://api.whatsapp.com/send?phone=${p}&text=${encodeURIComponent(text)}`
     : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 };
+
+/**
+ * Bilgisayar (Windows/Mac WhatsApp Desktop) ve Mobil (iOS/Android WhatsApp App)
+ * üzerinde popup engelleyiciye takılmadan doğrudan WhatsApp sohbetini açar.
+ * Eğer bilgisayarda WhatsApp Masaüstü uygulaması kurulu değilse otomatik olarak
+ * WhatsApp Web / API sayfasına yönlendirir.
+ */
+export const openWhatsAppChat = (phone, text = '') => {
+  const p = toWhatsAppPhone(phone) || '905446225931';
+  const encodedText = text ? encodeURIComponent(text) : '';
+  const nativeUrl = `whatsapp://send?phone=${p}${encodedText ? `&text=${encodedText}` : ''}`;
+  const webUrl = `https://api.whatsapp.com/send?phone=${p}${encodedText ? `&text=${encodedText}` : ''}`;
+
+  let appOpened = false;
+  const onBlur = () => {
+    appOpened = true;
+  };
+  window.addEventListener('blur', onBlur, { once: true });
+
+  try {
+    window.location.href = nativeUrl;
+  } catch {
+    // ignore
+  }
+
+  setTimeout(() => {
+    window.removeEventListener('blur', onBlur);
+    if (!appOpened && !document.hidden) {
+      openExternal(webUrl);
+    }
+  }, 1400);
+};
+

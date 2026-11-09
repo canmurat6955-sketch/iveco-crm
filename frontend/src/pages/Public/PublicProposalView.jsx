@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { crmApi } from '../../api/client';
+import { openWhatsAppChat } from '../../utils/openExternal';
 import { 
   FiTruck, FiFileText, FiMapPin, FiPhoneCall, FiMessageSquare, 
   FiCheckCircle, FiShield, FiCalendar, FiUser, FiAlertCircle
@@ -215,10 +216,9 @@ export default function PublicProposalView() {
             </div>
 
             <div style={{ display: 'flex', gap: '10px', flex: '1 1 240px' }}>
-              <a
-                href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => openWhatsAppChat('905446225931', `Merhaba Can Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}
                 style={{
                   display: 'inline-flex', 
                   alignItems: 'center', 
@@ -228,15 +228,16 @@ export default function PublicProposalView() {
                   color: '#ffffff', 
                   padding: '11px 18px', 
                   borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
                   fontWeight: '700', 
                   fontSize: '13px', 
-                  textDecoration: 'none', 
                   boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                   width: '100%'
                 }}
               >
                 <FiMessageSquare size={16} /> Satış Sorumlusu Can M. ile WhatsApp'tan Görüş
-              </a>
+              </button>
             </div>
           </div>
         </div>

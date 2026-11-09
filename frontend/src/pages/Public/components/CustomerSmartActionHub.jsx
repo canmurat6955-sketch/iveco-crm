@@ -4,6 +4,7 @@ import {
   FiCheckCircle, FiPhone, FiMessageCircle, FiClock, FiMapPin, FiVideo
 } from 'react-icons/fi';
 import { discoveryApi } from '../../../api/client';
+import { openWhatsAppChat } from '../../../utils/openExternal';
 import toast from 'react-hot-toast';
 
 const APPOINTMENT_TYPES = [
@@ -321,8 +322,8 @@ export default function CustomerSmartActionHub({
 
     setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can M. ekranına iletildi!`);
 
-    // Mobil cihazda Web Share API destekleniyorsa ve 4 dosya seçildiyse doğrudan paylaşım seçeneği veya WhatsApp açılışı
-    window.open(`https://wa.me/${cleanWhatsappPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    // Bilgisayar (WhatsApp Desktop) ve Mobil cihazlarda popup engelleyiciye takılmadan doğrudan aç
+    openWhatsAppChat(cleanWhatsappPhone, msg);
   };
 
   // 4. Mali Müşavir %20 KDV & Amortisman Özeti
@@ -342,7 +343,7 @@ export default function CustomerSmartActionHub({
       `• *%20 İndirilecek KDV Tutarı (~${kdvAmount.toLocaleString('tr-TR')} TL)*,\n` +
       `• *Yıllık Amortisman Gideri (~${yearlyDepreciation.toLocaleString('tr-TR')} TL)* ve\n` +
       `• *Resmi Proforma / Finansman Ödeme Planı* tablosunu WhatsApp üzerinden gönderebilir misiniz?`;
-    window.open(`https://wa.me/${cleanWhatsappPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    openWhatsAppChat(cleanWhatsappPhone, msg);
   };
 
   // 5. Üstyapı (Kasa) Dahil Anahtar Teslim Paket

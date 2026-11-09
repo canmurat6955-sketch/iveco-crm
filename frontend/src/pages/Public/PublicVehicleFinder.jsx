@@ -32,6 +32,7 @@ import {
   FiMail
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
+import { openWhatsAppChat } from '../../utils/openExternal';
 import { getVehicleSticker } from '../../data/ivecoPricingCatalog';
 import PricingCatalogTab from './components/PricingCatalogTab';
 import BodyStructureTab from './components/BodyStructureTab';
@@ -1528,9 +1529,11 @@ export default function PublicVehicleFinder() {
   const handleDirectWhatsApp = (customMsg) => {
     const cleanPhone = SALES_REP.phoneWhatsapp;
     if (typeof customMsg === 'string' && customMsg.trim()) {
-      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(customMsg)}`, '_blank');
+      openWhatsAppChat(cleanPhone, customMsg);
       return;
     }
+    recordCustomerFootprint('Üst Bar WhatsApp Tıklandı', matched?.modelTitle || 'Genel Katalog', 'WhatsApp Direkt Mesaj');
+    toast.success('💬 WhatsApp açılıyor... Mesajınız hazırlandı!', { duration: 3000 });
     const clientGreeting = (customerCompany || customerName)
       ? `Merhaba Can Bey, ben ${customerCompany || customerName}. Paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`
       : `Merhaba Can Bey, paylaştığınız IVECO 2026 Model Fiyat ve Şasi Kataloğu üzerinden inceleme yaptım.\n\n`;
@@ -1564,7 +1567,7 @@ export default function PublicVehicleFinder() {
       campaignText +
       `Bu aracın hazır stok teslim durumu ve resmi proforma teklifi hakkında detaylı bilgi almak istiyorum.`
     );
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    openWhatsAppChat(cleanPhone, msg);
   };
 
   // Satış Sorumlusu Can M. Dijital Kartvizit (vCard) İndirme & Rehbere Ekleme
@@ -3079,11 +3082,11 @@ IVECO ERC Samsun Otomotiv
                 }}>
                   {[
                     { id: 'all', label: 'Tüm Modeller', shortLabel: 'Tümü' },
-                    { id: 'kamyonet', label: 'Daily Şasi Kamyonet (3.5 Ton / B Ehliyet)', shortLabel: 'Daily 35 Şasi' },
-                    { id: 'panelvan', label: 'Daily Panelvan (12 - 18 m³)', shortLabel: 'Daily Panelvan' },
-                    { id: 'kamyon', label: 'Eurocargo & Daily Ağır Kamyonlar', shortLabel: '72C & Eurocargo' },
-                    { id: 'cekici', label: 'S-Way Çekici Grubu', shortLabel: 'S-Way Çekici' },
-                    { id: 'hafriyat', label: 'T-Way Hafriyat & Şantiye (6x4 / 8x4)', shortLabel: 'T-Way Şantiye' }
+                    { id: 'kamyonet', label: 'Daily Şasi Kamyonet (3.5 Ton • B Ehliyet)', shortLabel: 'Daily 35 Şasi (B Ehliyet)' },
+                    { id: 'panelvan', label: 'Daily Panelvan (12 - 18 m³ • B Ehliyet)', shortLabel: 'Daily Panelvan (B Ehliyet)' },
+                    { id: 'kamyon', label: 'Eurocargo & Daily 72C Kamyonlar (C1 / C Ehliyet)', shortLabel: '72C & Eurocargo (C Ehliyet)' },
+                    { id: 'cekici', label: 'S-Way Çekici Grubu (CE Ehliyet)', shortLabel: 'S-Way Çekici (CE Ehliyet)' },
+                    { id: 'hafriyat', label: 'T-Way Hafriyat & Şantiye (6x4 / 8x4 • C Ehliyet)', shortLabel: 'T-Way Şantiye (C Ehliyet)' }
                   ].map(cat => (
                     <button
                       key={cat.id}
@@ -3695,10 +3698,9 @@ IVECO ERC Samsun Otomotiv
                       Satış Sorumlusu Can M. · IVECO ERC Samsun (0544 622 59 31)
                     </div>
                   </div>
-                  <a
-                    href={`https://wa.me/905446225931?text=${encodeURIComponent(`Merhaba Can Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}`}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => handleDirectWhatsApp(`Merhaba Can Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}
                     style={{
                       background: '#22c55e',
                       color: '#0f172a',
@@ -3706,7 +3708,8 @@ IVECO ERC Samsun Otomotiv
                       fontSize: '0.82rem',
                       padding: '9px 16px',
                       borderRadius: '8px',
-                      textDecoration: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
@@ -3714,7 +3717,7 @@ IVECO ERC Samsun Otomotiv
                     }}
                   >
                     <FiPhoneCall size={16} /> Fiyat Sor (0544 622 59 31)
-                  </a>
+                  </button>
                 </div>
               ) : matched.currency === 'EUR' ? (
                 <div style={{
