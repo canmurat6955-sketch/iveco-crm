@@ -1907,10 +1907,13 @@ IVECO ERC Samsun Otomotiv
   return (
     <div style={{
       minHeight: '100vh',
+      maxWidth: '100vw',
+      overflowX: 'hidden',
+      boxSizing: 'border-box',
       background: 'radial-gradient(ellipse at 50% 0%, #233d63 0%, #192d4b 48%, #13233b 100%)',
       color: '#f1f5f9',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-      padding: '16px 12px 60px'
+      padding: isMobileView ? '12px 10px 60px' : '16px 12px 60px'
     }}>
       <Toaster position="top-center" />
 
@@ -2729,13 +2732,13 @@ IVECO ERC Samsun Otomotiv
         background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(23, 37, 84, 0.9) 100%)',
         border: '1px solid rgba(56, 189, 248, 0.35)',
         borderRadius: '16px',
-        padding: isMobileView ? '10px' : '12px 16px',
+        padding: isMobileView ? '8px' : '12px 16px',
         boxShadow: '0 8px 24px rgba(2, 6, 23, 0.3)'
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-          gap: '8px'
+          gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
+          gap: isMobileView ? '6px' : '8px'
         }}>
           {/* 1. 2026 Net Fiyatlar & Takas */}
           <button
@@ -2745,8 +2748,9 @@ IVECO ERC Samsun Otomotiv
               recordCustomerFootprint('Başlangıç Kutusu', '2026 Fiyat Listesi', 'Hızlı Başlangıç');
             }}
             style={{
+              minWidth: 0,
               textAlign: 'left',
-              padding: isMobileView ? '10px 10px' : '10px 14px',
+              padding: isMobileView ? '9px 8px' : '10px 14px',
               borderRadius: '12px',
               background: activeMainTab === 'fiyatlar'
                 ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)'
@@ -2756,15 +2760,15 @@ IVECO ERC Samsun Otomotiv
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: isMobileView ? '6px' : '8px'
             }}
           >
-            <span style={{ fontSize: '1.2rem' }}>🏷️</span>
-            <div>
-              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.2 }}>
+            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>🏷️</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.18 }}>
                 2026 Net Fiyat Listesi
               </div>
-              <div style={{ fontSize: '0.67rem', color: '#bae6fd', marginTop: '2px' }}>
+              <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#bae6fd', marginTop: '2px', lineHeight: 1.15 }}>
                 Peşin & kampanya fiyatları
               </div>
             </div>
@@ -2778,8 +2782,9 @@ IVECO ERC Samsun Otomotiv
               recordCustomerFootprint('Başlangıç Kutusu', 'Banka Kredi & Taksit Tablosu', 'Hızlı Başlangıç');
             }}
             style={{
+              minWidth: 0,
               textAlign: 'left',
-              padding: isMobileView ? '10px 10px' : '10px 14px',
+              padding: isMobileView ? '9px 8px' : '10px 14px',
               borderRadius: '12px',
               background: activeMainTab === 'krediler'
                 ? 'linear-gradient(135deg, #059669 0%, #065f46 100%)'
@@ -2789,15 +2794,15 @@ IVECO ERC Samsun Otomotiv
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: isMobileView ? '6px' : '8px'
             }}
           >
-            <span style={{ fontSize: '1.2rem' }}>💳</span>
-            <div>
-              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', fontWeight: 900, color: '#6ee7b7', lineHeight: 1.2 }}>
+            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>💳</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#6ee7b7', lineHeight: 1.18 }}>
                 Kredi & Taksit Hesapla
               </div>
-              <div style={{ fontSize: '0.67rem', color: '#cbd5e1', marginTop: '2px' }}>
+              <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
                 %0 faiz & anlaşmalı bankalar
               </div>
             </div>
@@ -2816,8 +2821,9 @@ IVECO ERC Samsun Otomotiv
               }, 80);
             }}
             style={{
+              minWidth: 0,
               textAlign: 'left',
-              padding: isMobileView ? '10px 10px' : '10px 14px',
+              padding: isMobileView ? '9px 8px' : '10px 14px',
               borderRadius: '12px',
               background: 'rgba(30, 41, 59, 0.85)',
               border: '1px solid rgba(251, 191, 36, 0.42)',
@@ -2825,15 +2831,15 @@ IVECO ERC Samsun Otomotiv
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: isMobileView ? '6px' : '8px'
             }}
           >
-            <span style={{ fontSize: '1.2rem' }}>📸</span>
-            <div>
-              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', fontWeight: 900, color: '#fcd34d', lineHeight: 1.2 }}>
+            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>📸</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#fcd34d', lineHeight: 1.18 }}>
                 4 Resimle Takas Fiyatı
               </div>
-              <div style={{ fontSize: '0.67rem', color: '#cbd5e1', marginTop: '2px' }}>
+              <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
                 15 dk’da ön ekspertiz & fark
               </div>
             </div>
@@ -2844,8 +2850,9 @@ IVECO ERC Samsun Otomotiv
             type="button"
             onClick={() => setShowMoreTabsMobile(prev => !prev)}
             style={{
+              minWidth: 0,
               textAlign: 'left',
-              padding: isMobileView ? '10px 10px' : '10px 14px',
+              padding: isMobileView ? '9px 8px' : '10px 14px',
               borderRadius: '12px',
               background: (showMoreTabsMobile || ['secici', 'ust-yapi', 'tco', 'sss'].includes(activeMainTab))
                 ? 'rgba(56, 189, 248, 0.22)'
@@ -2858,21 +2865,21 @@ IVECO ERC Samsun Otomotiv
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '6px'
+              gap: '4px'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '1.2rem' }}>📚</span>
-              <div>
-                <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobileView ? '6px' : '8px', minWidth: 0 }}>
+              <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>📚</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.18 }}>
                   Detaylar & Rehberler
                 </div>
-                <div style={{ fontSize: '0.67rem', color: '#cbd5e1', marginTop: '2px' }}>
-                  Tonaj, Üstyapı, Kıyaslama, SSS
+                <div style={{ fontSize: isMobileView ? '0.62rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
+                  {isMobileView ? 'Tonaj, Kasa, Kıyas, SSS' : 'Tonaj, Üstyapı, Kıyaslama, SSS'}
                 </div>
               </div>
             </div>
-            <span style={{ color: '#38bdf8', fontWeight: 900, fontSize: '0.85rem' }}>
+            <span style={{ color: '#38bdf8', fontWeight: 900, fontSize: '0.8rem', flexShrink: 0 }}>
               {showMoreTabsMobile ? '▴' : '▾'}
             </span>
           </button>
@@ -3135,47 +3142,63 @@ IVECO ERC Samsun Otomotiv
             {/* SEÇENEK A: DOĞRUDAN ARAÇ KATALOĞU */}
             {selectorMode === 'catalog' && (
               <div style={{ marginBottom: '18px' }}>
-                {/* Kategori Filtre Çipleri — Mobilde kesilmeyen 3x2 net ızgara */}
-                <div style={isMobileView ? {
+                {/* Kategori Filtre Çipleri — Mobilde 2x3, Masaüstünde 6 sütunlu 2 satırlı simetrik ızgara */}
+                <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '6px',
-                  marginBottom: '12px'
-                } : {
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '6px',
-                  marginBottom: '14px'
+                  gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(6, minmax(0, 1fr))',
+                  gap: isMobileView ? '6px' : '7px',
+                  marginBottom: isMobileView ? '12px' : '14px'
                 }}>
                   {[
-                    { id: 'all', label: 'Tüm Modeller', shortLabel: 'Tümü' },
-                    { id: 'kamyonet', label: 'Daily Şasi Kamyonet (3.5 Ton • B Ehliyet)', shortLabel: 'Daily 35 Şasi (B Ehliyet)' },
-                    { id: 'panelvan', label: 'Daily Panelvan (12 - 18 m³ • B Ehliyet)', shortLabel: 'Daily Panelvan (B Ehliyet)' },
-                    { id: 'kamyon', label: 'Eurocargo & Daily 72C Kamyonlar (C1 / C Ehliyet)', shortLabel: '72C & Eurocargo (C Ehliyet)' },
-                    { id: 'cekici', label: 'S-Way Çekici Grubu (CE Ehliyet)', shortLabel: 'S-Way Çekici (CE Ehliyet)' },
-                    { id: 'hafriyat', label: 'T-Way Hafriyat & Şantiye (6x4 / 8x4 • C Ehliyet)', shortLabel: 'T-Way Şantiye (C Ehliyet)' }
-                  ].map(cat => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setSelectedCategoryTab(cat.id)}
-                      style={{
-                        background: selectedCategoryTab === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.85)',
-                        color: selectedCategoryTab === cat.id ? '#fff' : '#e2e8f0',
-                        border: '1.5px solid',
-                        borderColor: selectedCategoryTab === cat.id ? '#38bdf8' : 'rgba(148, 163, 184, 0.28)',
-                        borderRadius: isMobileView ? '10px' : '22px',
-                        padding: isMobileView ? '9px 6px' : '5px 12px',
-                        fontSize: isMobileView ? '0.77rem' : '0.74rem',
-                        fontWeight: selectedCategoryTab === cat.id ? 800 : 700,
-                        whiteSpace: 'nowrap',
-                        textAlign: 'center',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {isMobileView ? cat.shortLabel : cat.label}
-                    </button>
-                  ))}
+                    { id: 'all', title: 'Tüm Modeller', licenseBadge: '(B / C / CE Ehliyet)' },
+                    { id: 'kamyonet', title: 'Daily 35 Şasi', licenseBadge: '(3.5T • B Ehliyet)' },
+                    { id: 'panelvan', title: 'Daily Panelvan', licenseBadge: '(12–18m³ • B Ehliyet)' },
+                    { id: 'kamyon', title: '72C & Eurocargo', licenseBadge: '(C1 / C Ehliyet)' },
+                    { id: 'cekici', title: 'S-Way Çekici', licenseBadge: '(CE Ehliyet)' },
+                    { id: 'hafriyat', title: 'T-Way Şantiye', licenseBadge: '(6x4 / 8x4 • C Ehliyet)' }
+                  ].map(cat => {
+                    const isActive = selectedCategoryTab === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setSelectedCategoryTab(cat.id)}
+                        style={{
+                          minWidth: 0,
+                          background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.85)',
+                          color: isActive ? '#fff' : '#e2e8f0',
+                          border: '1.5px solid',
+                          borderColor: isActive ? '#38bdf8' : 'rgba(148, 163, 184, 0.28)',
+                          borderRadius: '10px',
+                          padding: isMobileView ? '8px 6px' : '8px 8px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '2px'
+                        }}
+                      >
+                        <span style={{
+                          fontSize: isMobileView ? '0.78rem' : '0.75rem',
+                          fontWeight: 800,
+                          color: isActive ? '#ffffff' : '#f1f5f9',
+                          lineHeight: 1.15
+                        }}>
+                          {cat.title}
+                        </span>
+                        <span style={{
+                          fontSize: isMobileView ? '0.65rem' : '0.63rem',
+                          fontWeight: 700,
+                          color: isActive ? '#bae6fd' : '#38bdf8',
+                          lineHeight: 1.1
+                        }}>
+                          {cat.licenseBadge}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Model Kartları Izgarası */}
@@ -4042,31 +4065,34 @@ IVECO ERC Samsun Otomotiv
 
               {/* Para Birimi & Finansman Türü Seçimi (TL vs İhracatçı Euro) */}
               <div style={{
-                display: 'flex',
-                gap: '8px',
+                display: isMobileView ? 'grid' : 'flex',
+                gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : undefined,
+                gap: '6px',
                 marginBottom: '16px',
                 background: 'rgba(2, 6, 23, 0.65)',
                 padding: '4px',
                 borderRadius: '10px',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                width: 'fit-content',
-                flexWrap: 'wrap'
+                width: isMobileView ? '100%' : 'fit-content',
+                boxSizing: 'border-box'
               }}>
                 <button
                   type="button"
                   onClick={() => { setLoanCurrencyMode('TRY'); setShowAllLoansMobile(false); }}
                   style={{
+                    minWidth: 0,
                     background: loanCurrencyMode === 'TRY' ? '#0284c7' : 'transparent',
                     color: loanCurrencyMode === 'TRY' ? '#fff' : '#94a3b8',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '6px 14px',
-                    fontSize: '0.78rem',
+                    padding: isMobileView ? '8px 6px' : '6px 14px',
+                    fontSize: isMobileView ? '0.75rem' : '0.78rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    justifyContent: 'center',
+                    gap: '5px',
                     transition: 'all 0.2s'
                   }}
                 >
@@ -4077,24 +4103,28 @@ IVECO ERC Samsun Otomotiv
                   type="button"
                   onClick={() => { setLoanCurrencyMode('EUR'); setShowAllLoansMobile(false); }}
                   style={{
+                    minWidth: 0,
                     background: loanCurrencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
                     color: loanCurrencyMode === 'EUR' ? '#fff' : '#94a3b8',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '6px 14px',
-                    fontSize: '0.78rem',
+                    padding: isMobileView ? '8px 6px' : '6px 14px',
+                    fontSize: isMobileView ? '0.74rem' : '0.78rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    justifyContent: 'center',
+                    gap: '5px',
                     transition: 'all 0.2s'
                   }}
                 >
-                  <span>💶</span> İhracatçı Euro (EUR) Kredisi
-                  <span style={{ fontSize: '0.64rem', background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
-                    Düşük Döviz Faizi
-                  </span>
+                  <span>💶</span> {isMobileView ? 'Euro (EUR) Kredisi' : 'İhracatçı Euro (EUR) Kredisi'}
+                  {!isMobileView && (
+                    <span style={{ fontSize: '0.64rem', background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
+                      Düşük Döviz Faizi
+                    </span>
+                  )}
                 </button>
               </div>
 
@@ -5488,24 +5518,26 @@ IVECO ERC Samsun Otomotiv
               : 'linear-gradient(135deg, rgba(15, 28, 50, 0.92) 0%, rgba(24, 42, 72, 0.92) 100%)',
             border: showSmartHub ? '1.5px solid #38bdf8' : '1px solid rgba(125, 211, 252, 0.32)',
             borderRadius: '14px',
-            padding: isMobileView ? '12px 14px' : '14px 18px',
+            padding: isMobileView ? '12px' : '14px 18px',
             color: '#f8fafc',
             cursor: 'pointer',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isMobileView ? 'column' : 'row',
+            alignItems: isMobileView ? 'stretch' : 'center',
             justifyContent: 'space-between',
-            gap: '10px',
-            flexWrap: 'wrap',
+            gap: isMobileView ? '8px' : '10px',
             boxShadow: '0 6px 20px rgba(2, 6, 23, 0.25)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textAlign: 'left' }}>
-            <span style={{ fontSize: '1.25rem' }}>🛠️</span>
-            <div>
-              <div style={{ fontSize: isMobileView ? '0.84rem' : '0.9rem', fontWeight: 900, color: '#ffffff' }}>
-                Ekstra Hizmetler: 📸 4 Resimle Takas Ekspertizi • 🔒 24 Saat Fiyat Sabitleme • 📅 Randevu • 🧾 Vergi Kalkanı
+            <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🛠️</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobileView ? '0.8rem' : '0.9rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.25 }}>
+                {isMobileView
+                  ? 'Ekstra Hizmetler: 📸 4 Resimle Takas • 🔒 Fiyat Kilitleme • 📅 Randevu'
+                  : 'Ekstra Hizmetler: 📸 4 Resimle Takas Ekspertizi • 🔒 24 Saat Fiyat Sabitleme • 📅 Randevu • 🧾 Vergi Kalkanı'}
               </div>
-              <div style={{ fontSize: '0.72rem', color: '#7dd3fc', marginTop: '2px', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.7rem', color: '#7dd3fc', marginTop: '2px', fontWeight: 600 }}>
                 İhtiyacınız varsa tıklayarak ilgili işlem aracını açabilirsiniz
               </div>
             </div>
@@ -5515,9 +5547,10 @@ IVECO ERC Samsun Otomotiv
             color: showSmartHub ? '#fca5a5' : '#38bdf8',
             border: showSmartHub ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(56, 189, 248, 0.4)',
             borderRadius: '8px',
-            padding: '6px 12px',
+            padding: '7px 12px',
             fontSize: '0.75rem',
             fontWeight: 800,
+            textAlign: 'center',
             whiteSpace: 'nowrap'
           }}>
             {showSmartHub ? 'Araçları Gizle ▴' : 'İşlem Araçlarını Aç ▾'}

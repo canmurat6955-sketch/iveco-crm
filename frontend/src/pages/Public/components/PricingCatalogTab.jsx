@@ -14,13 +14,13 @@ const REQUIRED_TRADEIN_PHOTOS = [
 ];
 
 const CATEGORIES = [
-  { id: 'all', label: 'Tüm Araçlar', shortLabel: 'Tümü' },
-  { id: 'daily35_chassis', label: 'Daily 35 Şasi (B Ehliyet)', shortLabel: 'Daily 35 Şasi (B Ehliyet)' },
-  { id: 'daily35_van', label: 'Daily 35 Panelvan (B Ehliyet)', shortLabel: 'Daily Panelvan (B Ehliyet)' },
-  { id: 'daily70', label: 'Daily 70C / 72C (7 Ton • C1 / C Ehliyet)', shortLabel: 'Daily 70C / 72C (C Ehliyet)' },
-  { id: 'eurocargo', label: 'Eurocargo Kamyon (10–18 Ton • C Ehliyet)', shortLabel: 'Eurocargo (C Ehliyet)' },
-  { id: 'sway', label: 'S-Way Çekici (CE Ehliyet)', shortLabel: 'S-Way Çekici (CE Ehliyet)' },
-  { id: 'tway', label: 'T-Way Şantiye & Hafriyat (10–12 Teker • C Ehliyet)', shortLabel: 'T-Way Şantiye (C Ehliyet)' }
+  { id: 'all', title: 'Tüm Araçlar', licenseBadge: '22 Model', label: 'Tüm Araçlar', shortLabel: 'Tümü' },
+  { id: 'daily35_chassis', title: 'Daily 35 Şasi', licenseBadge: '(B Ehliyet)', label: 'Daily 35 Şasi (B Ehliyet)', shortLabel: 'Daily 35 Şasi' },
+  { id: 'daily35_van', title: 'Daily Panelvan', licenseBadge: '(B Ehliyet)', label: 'Daily Panelvan (B Ehliyet)', shortLabel: 'Daily Panelvan' },
+  { id: 'daily70', title: 'Daily 70C / 72C', licenseBadge: '(7 Ton • C Ehliyet)', label: 'Daily 70C / 72C (C Ehliyet)', shortLabel: 'Daily 70C / 72C' },
+  { id: 'eurocargo', title: 'Eurocargo', licenseBadge: '(10–18T • C Ehliyet)', label: 'Eurocargo (C Ehliyet)', shortLabel: 'Eurocargo' },
+  { id: 'sway', title: 'S-Way Çekici', licenseBadge: '(CE Ehliyet)', label: 'S-Way Çekici (CE Ehliyet)', shortLabel: 'S-Way Çekici' },
+  { id: 'tway', title: 'T-Way Şantiye', licenseBadge: '(10–12T • C Ehliyet)', label: 'T-Way Şantiye (C Ehliyet)', shortLabel: 'T-Way Şantiye' }
 ];
 
 const SECTOR_FILTERS = [
@@ -459,7 +459,16 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={isMobileView ? {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gap: '6px',
+            width: '100%'
+          } : {
+            display: 'flex',
+            gap: '8px',
+            flexWrap: 'wrap'
+          }}>
             <button
               type="button"
               onClick={() => {
@@ -475,11 +484,11 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 color: showTradeInBox ? '#fff' : '#0f172a',
                 border: 'none',
                 borderRadius: '8px',
-                padding: isMobileView ? '8px 11px' : '8px 13px',
-                fontSize: '0.75rem',
+                padding: isMobileView ? '9px 6px' : '8px 13px',
+                fontSize: isMobileView ? '0.74rem' : '0.75rem',
                 fontWeight: 900,
                 cursor: 'pointer',
-                whiteSpace: 'nowrap'
+                textAlign: 'center'
               }}
             >
               {showTradeInBox ? '✕ Hesaplayıcıyı Kapat' : '🔄 Takas + Kredi Hesapla'}
@@ -493,11 +502,11 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 color: '#ffffff',
                 border: '1px solid #38bdf8',
                 borderRadius: '8px',
-                padding: isMobileView ? '8px 11px' : '8px 13px',
-                fontSize: '0.75rem',
+                padding: isMobileView ? '9px 6px' : '8px 13px',
+                fontSize: isMobileView ? '0.74rem' : '0.75rem',
                 fontWeight: 800,
                 cursor: 'pointer',
-                whiteSpace: 'nowrap'
+                textAlign: 'center'
               }}
             >
               {showFleetBox ? '✕ Kapat' : '🏢 2+ Araç Filo İskontosu'}
@@ -674,7 +683,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))', gap: '8px' }}>
                 {REQUIRED_TRADEIN_PHOTOS.map(slot => {
                   const uploaded = tradeInPhotos[slot.id];
                   return (
@@ -689,7 +698,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
-                        gap: '4px'
+                        gap: '4px',
+                        minWidth: 0
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '4px' }}>
@@ -740,31 +750,40 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
               background: 'rgba(15, 23, 42, 0.88)',
               border: '1px solid rgba(56, 189, 248, 0.38)',
               borderRadius: '10px',
-              padding: isMobileView ? '10px 12px' : '12px 16px',
+              padding: isMobileView ? '10px' : '12px 16px',
               display: 'flex',
-              alignItems: 'center',
+              flexDirection: isMobileView ? 'column' : 'row',
+              alignItems: isMobileView ? 'stretch' : 'center',
               justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px'
+              gap: '10px'
             }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobileView ? '10px' : '18px', alignItems: 'center' }}>
+              <div style={isMobileView ? {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '8px'
+              } : {
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '18px',
+                alignItems: 'center'
+              }}>
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#94a3b8', fontWeight: 700 }}>SIFIR ARAÇ BEDELİ</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fff' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>SIFIR ARAÇ BEDELİ</div>
+                  <div style={{ fontSize: isMobileView ? '0.84rem' : '0.9rem', fontWeight: 800, color: '#fff' }}>
                     {tradeInCalc.vehiclePrice.toLocaleString('tr-TR')} TL
                   </div>
                 </div>
-                <div style={{ color: '#64748b', fontWeight: 900 }}>−</div>
+                {!isMobileView && <div style={{ color: '#64748b', fontWeight: 900 }}>−</div>}
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#fde68a', fontWeight: 700 }}>TAKAS PEŞİNATINIZ</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#fde68a', fontWeight: 700 }}>TAKAS PEŞİNATINIZ</div>
+                  <div style={{ fontSize: isMobileView ? '0.84rem' : '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
                     {tradeInCalc.safeTradeVal.toLocaleString('tr-TR')} TL
                   </div>
                 </div>
-                <div style={{ color: '#64748b', fontWeight: 900 }}>=</div>
+                {!isMobileView && <div style={{ color: '#64748b', fontWeight: 900 }}>=</div>}
                 <div>
-                  <div style={{ fontSize: '0.66rem', color: '#7dd3fc', fontWeight: 700 }}>KREDİLENDİRİLECEK FARK</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 900, color: '#38bdf8' }}>
+                  <div style={{ fontSize: '0.65rem', color: '#7dd3fc', fontWeight: 700 }}>KREDİLENDİRİLECEK FARK</div>
+                  <div style={{ fontSize: isMobileView ? '0.88rem' : '0.95rem', fontWeight: 900, color: '#38bdf8' }}>
                     {tradeInCalc.remainingPrincipal.toLocaleString('tr-TR')} TL
                   </div>
                 </div>
@@ -772,13 +791,13 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   background: 'rgba(16, 185, 129, 0.16)',
                   border: '1px solid rgba(16, 185, 129, 0.45)',
                   borderRadius: '8px',
-                  padding: '6px 12px'
+                  padding: isMobileView ? '5px 8px' : '6px 12px'
                 }}>
-                  <div style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 800 }}>
-                    {tradeInCalc.term} AY TAHMİNİ TAKSİT {tradeInCalc.isZeroInterest ? '(%0 FAİZ!)' : ''}
+                  <div style={{ fontSize: '0.63rem', color: '#6ee7b7', fontWeight: 800 }}>
+                    {tradeInCalc.term} AY TAKSİT {tradeInCalc.isZeroInterest ? '(%0 FAİZ!)' : ''}
                   </div>
-                  <div style={{ fontSize: '1.02rem', fontWeight: 900, color: '#34d399' }}>
-                    {tradeInCalc.remainingPrincipal > 0 ? `~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL / Ay` : 'Kredi Gerekmiyor'}
+                  <div style={{ fontSize: isMobileView ? '0.9rem' : '1.02rem', fontWeight: 900, color: '#34d399' }}>
+                    {tradeInCalc.remainingPrincipal > 0 ? `~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL/Ay` : 'Kredi Yok'}
                   </div>
                 </div>
               </div>
@@ -787,26 +806,27 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 type="button"
                 onClick={handleGeneralTradeInSubmit}
                 style={{
+                  width: isMobileView ? '100%' : 'auto',
                   background: uploadedPhotoCount === 4
                     ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
                     : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                   color: uploadedPhotoCount === 4 ? '#fff' : '#0f172a',
                   border: 'none',
                   borderRadius: '9px',
-                  padding: '10px 16px',
-                  fontSize: '0.8rem',
+                  padding: '10px 14px',
+                  fontSize: '0.78rem',
                   fontWeight: 800,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '6px',
-                  whiteSpace: 'nowrap',
                   boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
                 }}
               >
                 <FiMessageSquare size={14} />
                 {uploadedPhotoCount === 4
-                  ? '4 Resmi & Takas Hesabımı Gönder (Can M.)'
+                  ? '4 Resmi & Takas Hesabımı Gönder'
                   : `4 Resmi Ekle & Takasla Fiyat Al (${uploadedPhotoCount}/4)`}
               </button>
             </div>
@@ -867,6 +887,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
               type="button"
               onClick={handleFleetDiscountSubmit}
               style={{
+                width: isMobileView ? '100%' : 'auto',
                 background: '#22c55e',
                 color: '#fff',
                 border: 'none',
@@ -877,8 +898,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                whiteSpace: 'nowrap'
+                justifyContent: 'center',
+                gap: '6px'
               }}
             >
               <FiMessageSquare size={14} /> Filo Özel İskontosu İste
@@ -889,43 +910,68 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
 
       {/* 1. ANA MODEL & EHLİYET GRUBU SEÇİCİ + İSTEĞE BAĞLI DETAYLI FİLTRE */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: isMobileView ? '12px' : '16px' }}>
-        {/* Category Pills — Mobilde kesilmeyen net ızgara */}
+        {/* Category Pills — Mobilde ve Masaüstünde taşmayan 2 satırlı simetrik ızgara */}
         <div style={isMobileView ? {
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gap: '6px'
         } : {
-          display: 'flex',
-          flexWrap: 'wrap',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
           gap: '8px'
         }}>
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setSelectedCategory(cat.id)}
-              style={{
-                gridColumn: (isMobileView && cat.id === 'all') ? 'span 3' : undefined,
-                background: selectedCategory === cat.id ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(33, 55, 90, 0.88)',
-                color: selectedCategory === cat.id ? '#fff' : '#f1f5f9',
-                border: selectedCategory === cat.id ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.28)',
-                borderRadius: isMobileView ? '10px' : '20px',
-                padding: isMobileView ? '9px 6px' : '6px 14px',
-                fontSize: isMobileView ? '0.78rem' : '0.78rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                textAlign: 'center',
-                transition: 'all 0.2s'
-              }}
-            >
-              {isMobileView ? (cat.id === 'all' ? `Tüm Modeller (${IVECO_PRICING_CATALOG.length} Araç)` : cat.shortLabel) : cat.label}
-            </button>
-          ))}
+          {CATEGORIES.map(cat => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.id)}
+                style={{
+                  gridColumn: (isMobileView && cat.id === 'all') ? 'span 2' : undefined,
+                  background: isSelected ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(33, 55, 90, 0.88)',
+                  color: isSelected ? '#fff' : '#f1f5f9',
+                  border: isSelected ? '1.5px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.28)',
+                  borderRadius: '11px',
+                  padding: isMobileView ? '8px 6px' : '7px 8px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  flexDirection: (isMobileView && cat.id === 'all') ? 'row' : 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: (isMobileView && cat.id === 'all') ? '6px' : '2px',
+                  minWidth: 0
+                }}
+              >
+                <span style={{
+                  fontSize: isMobileView ? '0.78rem' : '0.76rem',
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  lineHeight: 1.2
+                }}>
+                  {cat.title}
+                </span>
+                <span style={{
+                  fontSize: isMobileView ? '0.67rem' : '0.65rem',
+                  fontWeight: 700,
+                  color: isSelected ? '#bae6fd' : '#7dd3fc',
+                  lineHeight: 1.15
+                }}>
+                  {cat.id === 'all' ? `(${IVECO_PRICING_CATALOG.length} Araç)` : cat.licenseBadge}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* İsteğe Bağlı Detaylı Filtre & Kart Detay Görünümü Çubuğu */}
-        <div style={{
+        <div style={isMobileView ? {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+          gap: '6px'
+        } : {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -936,68 +982,72 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           borderRadius: '10px',
           padding: '7px 10px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => setShowDetailedFilters(prev => !prev)}
-              style={{
-                background: (showDetailedFilters || selectedSectorFilter !== 'all' || searchQuery || onlyDoubleWheels)
-                  ? 'rgba(56, 189, 248, 0.2)'
-                  : 'rgba(255, 255, 255, 0.06)',
-                color: (showDetailedFilters || selectedSectorFilter !== 'all' || searchQuery || onlyDoubleWheels)
-                  ? '#7dd3fc'
-                  : '#cbd5e1',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
+          <button
+            type="button"
+            onClick={() => setShowDetailedFilters(prev => !prev)}
+            style={{
+              background: (showDetailedFilters || selectedSectorFilter !== 'all' || searchQuery || onlyDoubleWheels)
+                ? 'rgba(56, 189, 248, 0.22)'
+                : 'rgba(15, 28, 50, 0.85)',
+              color: (showDetailedFilters || selectedSectorFilter !== 'all' || searchQuery || onlyDoubleWheels)
+                ? '#7dd3fc'
+                : '#cbd5e1',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '8px',
+              padding: isMobileView ? '8px 6px' : '6px 11px',
+              fontSize: isMobileView ? '0.73rem' : '0.75rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              minWidth: 0
+            }}
+          >
+            <FiFilter size={12} style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {isMobileView
+                ? (showDetailedFilters ? 'Filtreyi Gizle ▴' : 'Sektör & Ara ▾')
+                : (showDetailedFilters ? 'Detaylı Filtreleri Gizle ▴' : 'Sektöre Göre Süz / Model Ara ▾')}
+            </span>
+            {(selectedSectorFilter !== 'all' || onlyDoubleWheels || searchQuery) && (
+              <span style={{
+                background: '#10b981',
+                color: '#0f172a',
+                padding: '1px 5px',
                 borderRadius: '8px',
-                padding: '6px 11px',
-                fontSize: '0.75rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <FiFilter size={13} />
-              <span>
-                {showDetailedFilters ? 'Detaylı Filtreleri Gizle ▴' : 'Sektöre Göre Süz / Model Ara ▾'}
-              </span>
-              {(selectedSectorFilter !== 'all' || onlyDoubleWheels || searchQuery) && (
-                <span style={{
-                  background: '#10b981',
-                  color: '#0f172a',
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                  fontSize: '0.66rem',
-                  fontWeight: 900
-                }}>
-                  Aktif
-                </span>
-              )}
-            </button>
-
-            {selectedSectorFilter !== 'all' && activeSectorObj && (
-              <span style={{ fontSize: '0.73rem', color: '#4ade80', fontWeight: 800 }}>
-                ✓ {activeSectorObj.label}
+                fontSize: '0.62rem',
+                fontWeight: 900,
+                flexShrink: 0
+              }}>
+                ✓
               </span>
             )}
-          </div>
+          </button>
 
           <button
             type="button"
             onClick={() => setShowAllCardDetails(prev => !prev)}
             style={{
-              background: showAllCardDetails ? 'rgba(16, 185, 129, 0.22)' : 'rgba(255, 255, 255, 0.06)',
+              background: showAllCardDetails ? 'rgba(16, 185, 129, 0.22)' : 'rgba(15, 28, 50, 0.85)',
               color: showAllCardDetails ? '#4ade80' : '#cbd5e1',
               border: showAllCardDetails ? '1px solid rgba(16, 185, 129, 0.5)' : '1px solid rgba(148, 163, 184, 0.28)',
               borderRadius: '8px',
-              padding: '6px 11px',
-              fontSize: '0.74rem',
+              padding: isMobileView ? '8px 6px' : '6px 11px',
+              fontSize: isMobileView ? '0.73rem' : '0.74rem',
               fontWeight: 800,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              textAlign: 'center',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
             }}
           >
-            {showAllCardDetails ? '✓ Tüm Teknik Detaylar Açık (Özet Görünüme Dön)' : '🔍 Tüm Araçların Teknik & KDV Detaylarını Aç'}
+            {isMobileView
+              ? (showAllCardDetails ? '✓ Detaylar Açık' : '🔍 Tüm Detayları Aç')
+              : (showAllCardDetails ? '✓ Tüm Teknik Detaylar Açık (Özet Görünüme Dön)' : '🔍 Tüm Araçların Teknik & KDV Detaylarını Aç')}
           </button>
         </div>
 
@@ -1416,8 +1466,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '6px' }}>
+              {/* Action Buttons — Mobilde taşmayan 3 eşit sütunlu ızgara */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '6px' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -1434,13 +1484,13 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     }
                   }}
                   style={{
-                    flex: 1,
+                    minWidth: 0,
                     background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: isMobileView ? '11px 8px' : '8px 8px',
-                    fontSize: isMobileView ? '0.8rem' : '0.72rem',
+                    padding: isMobileView ? '10px 4px' : '8px 8px',
+                    fontSize: isMobileView ? '0.73rem' : '0.72rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
@@ -1450,25 +1500,26 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <FiTruck size={isMobileView ? 14 : 12} /> Kredi Planı
+                  <FiTruck size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> Kredi Planı
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleVehicleTradeIn(vehicle)}
                   style={{
+                    minWidth: 0,
                     background: 'rgba(245, 158, 11, 0.18)',
                     color: '#fde68a',
                     border: '1px solid rgba(245, 158, 11, 0.45)',
                     borderRadius: '10px',
-                    padding: isMobileView ? '11px 9px' : '8px 9px',
-                    fontSize: isMobileView ? '0.78rem' : '0.71rem',
+                    padding: isMobileView ? '10px 4px' : '8px 9px',
+                    fontSize: isMobileView ? '0.73rem' : '0.71rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '4px',
+                    gap: '3px',
                     whiteSpace: 'nowrap'
                   }}
                   title="Mevcut aracımı takasa verip peşinata saydır"
@@ -1480,22 +1531,24 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   type="button"
                   onClick={() => handleVehicleQuote(vehicle)}
                   style={{
+                    minWidth: 0,
                     background: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#f59e0b' : '#22c55e',
                     color: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#000' : '#fff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: isMobileView ? '11px 10px' : '8px 10px',
-                    fontSize: isMobileView ? '0.8rem' : '0.72rem',
+                    padding: isMobileView ? '10px 4px' : '8px 10px',
+                    fontSize: isMobileView ? '0.73rem' : '0.72rem',
                     fontWeight: 800,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '4px',
                     whiteSpace: 'nowrap'
                   }}
                   title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu Can M.'den Özel Fiyat Al" : "WhatsApp'tan Teklif Al"}
                 >
-                  <FiMessageSquare size={isMobileView ? 14 : 12} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
+                  <FiMessageSquare size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
                 </button>
               </div>
             </div>
