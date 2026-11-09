@@ -794,67 +794,87 @@ export default function OfficeQuickAssistantDrawer() {
                   const origin = getPublicOrigin();
                   const socialCards = [
                     {
+                      id: 'wa_ozel',
+                      badge: '💬 1. WhatsApp Özelden Müşterilerle Paylaşım (Birebir Davet)',
+                      color: '#10b981',
+                      link: `${origin}/fiyat-listesi?ref=wa_ozel`,
+                      desc: 'Özelden gönderdiğin müşteriler tıkladığında "💬 WhatsApp Özel Davet Ziyaretçisi" olarak düşer. (CRM içinden gönderirsen müşterinin adı ve firmasıyla düşer!)',
+                      text:
+                        `Abi merhaba, hayırlı işler, bol kazançlar dilerim. 🙏\n\n` +
+                        `IVECO ERC Samsun Otomotiv’de işini çok kolaylaştıracak yeni bir canlı ekran açtık. Artık 2026 model şasi fiyatlarına bakmak veya takas/kredi hesabı yapmak için beni aramana bile gerek yok:\n\n` +
+                        `🔄 Elindeki aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya diğer banka oranlarıyla kalan taksitini 10 saniyede kendin hesaplayabilirsin,\n` +
+                        `📸 Mevcut aracının *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takas ön fiyatı alabilirsin,\n` +
+                        `🔒 Beğendiğin şasiyi 24 saat ücretsiz adına opsiyonlayabilir veya çay/kahve randevusu seçebilirsin:\n\n` +
+                        `👉 ${origin}/fiyat-listesi?ref=wa_ozel\n\n` +
+                        `Kafana yatan bir model olursa ekrandaki tek tuşla doğrudan bana düşüyor. Selamlar!\n` +
+                        `*Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+                    },
+                    {
+                      id: 'wa_grup',
+                      badge: '🚚 2. Nakliye & Lojistik WhatsApp Grupları',
+                      color: '#f59e0b',
+                      link: `${origin}/fiyat-listesi?ref=wa_grup`,
+                      desc: 'Nakliyeci, kamyoncu ve lojistik WhatsApp gruplarından tıklayanlar "🚚 Nakliye WhatsApp Grubu Ziyaretçisi" olarak düşer.',
+                      text:
+                        `🚛 *Gruptaki tüm nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, kazasız belasız seferler dilerim!*\n\n` +
+                        `IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz *2026 Canlı Fiyat, Takas & Kredi Ekranımızı* açtık:\n\n` +
+                        `✅ *Ehliyet & Tonaja Göre Seçim:* Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici (CE Ehliyet) ve T-Way Damper/Mikser,\n` +
+                        `🔄 *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz veya anlaşmalı banka oranlarıyla aylık taksitinizi anında görün,\n` +
+                        `📸 *4 Resimle 15 Dk'da Takas:* Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım,\n` +
+                        `🔔 *Takastan Temiz 2. El Habercisi:* Sıfır bütçesini aşanlar kaydolsun, takasa temiz araç düştüğü an ilk size haber verelim!\n\n` +
+                        `👇 *Hemen incelemek ve hesap yapmak için tıklayın:*\n` +
+                        `👉 ${origin}/fiyat-listesi?ref=wa_grup\n\n` +
+                        `*Satış Sorumlusu Can M. — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
+                    },
+                    {
                       id: 'wa_durum',
-                      badge: '🟢 WhatsApp Durum (Status) — En Güçlü Kanca',
+                      badge: '🟢 3. WhatsApp Durum (Status) — En Güçlü Kanca',
                       color: '#22c55e',
                       link: `${origin}/fiyat-listesi?ref=wa_durum`,
                       desc: 'Durumdan tıklayanlar Dashboard’a "🟢 WhatsApp Durum Ziyaretçisi" olarak düşer.',
                       text:
-                        `🚛 2026 IVECO Canlı Fiyat, Takas & Randevu Ekranımız Açıldı!\n\n` +
+                        `🚛 2026 IVECO Canlı Fiyat, Takas & Kredi Hesaplama Ekranımız Açıldı!\n\n` +
                         `Kimseyi aramanıza gerek kalmadan tek tıkla:\n` +
                         `🔄 Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz (83.333 TL/Ay) ile kalan taksitinizi hesaplayın,\n` +
-                        `📸 Mevcut aracınızın 4 resmini (dıştan, içten, KM ve ruhsat) gönderip 15 dk'da takas ön fiyatı alın,\n` +
+                        `📸 Mevcut aracınızın 4 resmini (1 dıştan, 1 içten, KM ve ruhsat) gönderip 15 dk'da takas ön fiyatı alın,\n` +
                         `🔒 Beğendiğiniz şasiyi 24 saat ücretsiz adınıza opsiyonlayın veya\n` +
                         `☕ Showroom kahve / görüntülü araç turu randevunuzu seçin:\n\n` +
                         `👉 ${origin}/fiyat-listesi?ref=wa_durum\n\n` +
                         `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv\n📞 0544 622 59 31`
                     },
                     {
-                      id: 'instagram',
-                      badge: '📸 Instagram Biyografi & Reels Lansmanı',
-                      color: '#ec4899',
-                      link: `${origin}/fiyat-listesi?ref=instagram`,
-                      desc: 'Profilinden veya Reels’ten tıklayanlar "📸 Instagram Ziyaretçisi" olarak düşer.',
-                      text:
-                        `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
-                        `Yeni Dijital Showroom ekranımızda neler var?\n` +
-                        `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
-                        `📸 4 Resimle (Dıştan, İçten, KM, Ruhsat) 15 Dakikada Takas Ekspertizi,\n` +
-                        `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
-                        `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
-                        `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
-                        `👉 Hemen denemek için profilimdeki linke tıklayın:\n${origin}/fiyat-listesi?ref=instagram\n\n` +
-                        `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
-                    },
-                    {
                       id: 'linkedin',
-                      badge: '💼 LinkedIn Kurumsal Filo Lansmanı',
+                      badge: '💼 4. LinkedIn Kurumsal Filo & Lojistik Lansmanı',
                       color: '#38bdf8',
                       link: `${origin}/fiyat-listesi?ref=linkedin`,
                       desc: 'LinkedIn’den tıklayan filo yöneticileri "💼 LinkedIn Ziyaretçisi" olarak düşer.',
                       text:
                         `Ticari araç ve filo yatırımlarında telefon trafiğine girmeden, 30 saniyede şeffaf fizibilite çıkarabileceğiniz "IVECO ERC Dijital Showroom & Finansman Merkezi" yayında. 🚛📈\n\n` +
                         `Platform üzerinden doğrudan:\n` +
-                        `1️⃣ Tonaj ve üstyapıya göre 2026 Daily, Eurocargo, S-Way ve T-Way şasi eşleştirmesi,\n` +
-                        `2️⃣ Takas peşinatı + %0 faizli ticari kredi nakit akış simülasyonu,\n` +
-                        `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı & Amortisman özeti,\n` +
-                        `4️⃣ 24 saatlik ücretsiz şasi/fiyat blokajı ve İş Yeri Ziyareti / Online Sunum randevusu oluşturabilirsiniz:\n\n` +
+                        `1️⃣ Tonaj, üstyapı ve ehliyet sınıfına göre 2026 Daily (3.5T - 7T), Eurocargo, S-Way Çekici ve T-Way şasi eşleştirmesi,\n` +
+                        `2️⃣ Takas peşinatı + %0 faizli TL ve EUR ticari kredi nakit akış simülasyonu,\n` +
+                        `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, 5 Yıllık TCO Yakıt Avantajı & Amortisman özeti,\n` +
+                        `4️⃣ 4 fotoğrafla (dıştan, içten, KM, ruhsat) 15 dakikada takas değerleme ve 24 saatlik ücretsiz şasi/fiyat blokajı oluşturabilirsiniz:\n\n` +
                         `🔗 ${origin}/fiyat-listesi?ref=linkedin\n\n` +
-                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31`
+                        `Satış Sorumlusu Can M. | IVECO ERC Samsun Otomotiv | 📞 0544 622 59 31\n\n` +
+                        `#IVECO #Lojistik #FiloYönetimi #TicariAraç #Nakliye #SWay #Daily #Samsun`
                     },
                     {
-                      id: 'facebook',
-                      badge: '📘 Facebook Kamyoncu & Nakliyeci Grupları',
-                      color: '#60a5fa',
-                      link: `${origin}/fiyat-listesi?ref=facebook`,
-                      desc: 'Facebook gruplarından tıklayanlar "📘 Facebook Ziyaretçisi" olarak düşer.',
+                      id: 'instagram',
+                      badge: '📸 5. Instagram Biyografi, Hikaye (Story) & Reels',
+                      color: '#ec4899',
+                      link: `${origin}/fiyat-listesi?ref=instagram`,
+                      desc: 'Profilinden, Hikaye (Link Sticker) veya Reels’ten tıklayanlar "📸 Instagram Ziyaretçisi" olarak düşer.',
                       text:
-                        `Karadeniz bölgesindeki nakliyeci, gıda dağıtım ve hafriyatçı esnafımız için 2026 IVECO Canlı Hesaplama & Takas Ekranımızı açtık! 🚛\n\n` +
-                        `👉 İster elinizdeki aracın takas değerini seçip kalan kredi taksitinizi ekranda görün,\n` +
-                        `👉 İster mevcut aracınızın 4 resmini (dıştan, içten, KM ve ruhsat) gönderip 15 dakikada takasla fiyat alın,\n` +
-                        `👉 Sıfır bütçenizi aşıyorsa "Takastan Temiz 2. El Habercisi"ne kaydolun, takasa temiz araç düştüğü gün ilk size haber verelim:\n\n` +
-                        `🔗 ${origin}/fiyat-listesi?ref=facebook\n\n` +
-                        `Satış Sorumlusu Can M. — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)`
+                        `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
+                        `Yeni Dijital Showroom ekranımızda neler var?\n` +
+                        `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
+                        `📸 4 Resimle (1 Dıştan, 1 İçten, KM, Ruhsat) 15 Dakikada Takas Ekspertizi,\n` +
+                        `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
+                        `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
+                        `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
+                        `👉 Hemen denemek için profilimdeki / hikayemdeki linke tıklayın:\n${origin}/fiyat-listesi?ref=instagram\n\n` +
+                        `📞 Satış Sorumlusu Can M. — 0544 622 59 31 | IVECO ERC Samsun Otomotiv`
                     }
                   ];
 

@@ -1408,6 +1408,8 @@ export default function PublicVehicleFinder() {
 
   const socialSourceLabel = React.useMemo(() => {
     const code = (refCode || '').toLowerCase();
+    if (code.includes('wa_grup') || code.includes('grup') || code.includes('nakliye')) return '🚚 Nakliye WhatsApp Grubu Ziyaretçisi';
+    if (code.includes('wa_ozel') || code.includes('ozel')) return '💬 WhatsApp Özel Davet Ziyaretçisi';
     if (code.includes('insta') || code.includes('reels')) return '📸 Instagram Ziyaretçisi';
     if (code.includes('linkedin')) return '💼 LinkedIn Ziyaretçisi';
     if (code.includes('wa_durum') || code.includes('durum')) return '🟢 WhatsApp Durum Ziyaretçisi';

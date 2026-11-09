@@ -5,6 +5,7 @@
 
 import { getPublicOrigin } from './publicUrl';
 import { crmApi } from '../api/client';
+import { openWhatsAppChat } from './openExternal';
 
 export function getWhatsAppUrl(phone, text = '') {
   if (!phone) return '#';
@@ -16,14 +17,12 @@ export function getWhatsAppUrl(phone, text = '') {
 }
 
 /**
- * Directly launches the native WhatsApp Desktop / Mobile app via deep link.
- * Used internally by WhatsAppActionModal when the user hits 'Gönder / Aç'.
+ * Directly launches the native WhatsApp Desktop / Mobile app via deep link
+ * with automatic fallback to Web WhatsApp if desktop app is not installed.
  */
 export function launchNativeWhatsApp(phone, text = '') {
-  const url = getWhatsAppUrl(phone, text);
-  if (url && url !== '#') {
-    window.location.href = url;
-  }
+  if (!phone) return;
+  openWhatsAppChat(phone, text);
 }
 
 /**
