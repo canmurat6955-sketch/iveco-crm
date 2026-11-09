@@ -3364,7 +3364,7 @@ IVECO ERC Samsun Otomotiv
                       id: 'all',
                       title: 'Tüm Modeller',
                       licenseBadge: '(B / C / CE Ehliyet)',
-                      images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg']
+                      images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg?v=2']
                     },
                     {
                       id: 'kamyonet',
@@ -3388,7 +3388,7 @@ IVECO ERC Samsun Otomotiv
                       id: 'cekici',
                       title: 'S-Way Çekici',
                       licenseBadge: '(CE Ehliyet)',
-                      image: '/vehicles/sway-cekici.jpg'
+                      image: '/vehicles/sway-cekici.jpg?v=2'
                     },
                     {
                       id: 'hafriyat',

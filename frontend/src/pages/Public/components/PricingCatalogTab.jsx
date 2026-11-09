@@ -20,7 +20,7 @@ const CATEGORIES = [
     licenseBadge: '22 Model',
     label: 'Tüm Araçlar',
     shortLabel: 'Tümü',
-    images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg']
+    images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg?v=2']
   },
   {
     id: 'daily35_chassis',
@@ -60,7 +60,7 @@ const CATEGORIES = [
     licenseBadge: '(CE Ehliyet)',
     label: 'S-Way Çekici (CE Ehliyet)',
     shortLabel: 'S-Way Çekici',
-    image: '/vehicles/sway-cekici.jpg'
+    image: '/vehicles/sway-cekici.jpg?v=2'
   },
   {
     id: 'tway',

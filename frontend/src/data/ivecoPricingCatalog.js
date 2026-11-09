@@ -782,7 +782,7 @@ export function getVehicleSticker(vehicleOrKey) {
       return { src: '/vehicles/tway-damper.jpg', label: 'IVECO T-Way Hafriyat' };
     }
     if (k.includes('sway') || k.includes('s-way') || k === 'cekici' || k === 'tractor_sway') {
-      return { src: '/vehicles/sway-cekici.jpg', label: 'IVECO S-Way Çekici' };
+      return { src: '/vehicles/sway-cekici.jpg?v=2', label: 'IVECO S-Way Çekici' };
     }
     if (k.includes('panelvan') || k.includes('van')) {
       return { src: '/vehicles/daily-panelvan.jpg', label: 'IVECO Daily Panelvan' };
@@ -814,7 +814,7 @@ export function getVehicleSticker(vehicleOrKey) {
 
   // 2. S-Way
   if (segment.includes('s-way') || segment.includes('sway') || id.includes('sway') || model.includes('s-way') || id === 'tractor_sway') {
-    return { src: '/vehicles/sway-cekici.jpg', label: 'S-Way Çekici' };
+    return { src: '/vehicles/sway-cekici.jpg?v=2', label: 'S-Way Çekici' };
   }
 
   // 3. Panelvan (Daily 35 Panelvan & Daily 70C18 Panelvan)
