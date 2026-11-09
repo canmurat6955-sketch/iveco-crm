@@ -592,6 +592,9 @@ export default function Dashboard() {
         isMobile={false}
       />
 
+      {/* 🚀 CANLI LİNK, SOSYAL MEDYA (WA DURUM / WA MÜŞTERİ / ÖZEL MÜŞTERİ / INSTAGRAM / LINKEDIN) & DERNEK (SİMDER) ÜRETİCİ */}
+      <PartnerLinkGeneratorCard isMobile={false} />
+
       {/* KPI Stats */}
       <div className="kpi-grid">
         {STAT_CARDS.map((card, idx) => {
@@ -627,9 +630,6 @@ export default function Dashboard() {
           );
         })}
       </div>
-
-      {/* 🏛️ DERNEK, ODA & BİRLİK ÖZEL İNDİRİMLİ LİNK ÜRETİCİ (SİMDER, Arıcılar Birliği vb.) */}
-      <PartnerLinkGeneratorCard isMobile={false} />
 
       {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç & Saha Zekâsı) ── */}
       <TodayOpportunitiesCard

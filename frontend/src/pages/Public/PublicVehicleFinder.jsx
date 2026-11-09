@@ -1409,18 +1409,22 @@ export default function PublicVehicleFinder() {
   }, [matched?.key, matched?.currency]);
 
   const socialSourceLabel = React.useMemo(() => {
-    if (activePartner) {
+    const code = (refCode || '').toLowerCase();
+    if (activePartner && activePartner.id !== 'vip_ozel') {
       return `${activePartner.icon || '🏛️'} ${activePartner.shortName} Üyesi Ziyaretçisi`;
     }
-    const code = (refCode || '').toLowerCase();
     if (code.includes('wa_grup') || code.includes('grup') || code.includes('nakliye')) return '🚚 Nakliye WhatsApp Grubu Ziyaretçisi';
-    if (code.includes('wa_ozel') || code.includes('ozel')) return '💬 WhatsApp Özel Davet Ziyaretçisi';
+    if (code.includes('wa_ozel') || code.includes('ozel')) return '👑 WhatsApp Özel Müşteri Ziyaretçisi';
+    if (code.includes('wa_musteri') || code.includes('musteri')) return '💬 WhatsApp Müşteri Linki Ziyaretçisi';
     if (code.includes('insta') || code.includes('reels')) return '📸 Instagram Ziyaretçisi';
     if (code.includes('linkedin')) return '💼 LinkedIn Ziyaretçisi';
     if (code.includes('wa_durum') || code.includes('durum')) return '🟢 WhatsApp Durum Ziyaretçisi';
     if (code.includes('wa_tanitim')) return '💬 WhatsApp Tanıtım Ziyaretçisi';
     if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
     if (code.includes('sosyal')) return '📱 Sosyal Medya Ziyaretçisi';
+    if (activePartner) {
+      return `${activePartner.icon || '👑'} ${activePartner.shortName} Ziyaretçisi`;
+    }
     return '';
   }, [refCode, activePartner]);
 
