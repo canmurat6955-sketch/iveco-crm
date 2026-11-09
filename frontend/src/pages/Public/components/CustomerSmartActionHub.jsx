@@ -147,6 +147,11 @@ export default function CustomerSmartActionHub({
   const [phoneInput, setPhoneInput] = useState(customerPhone || '');
   const [cityInput, setCityInput] = useState(customerCity || 'Samsun');
 
+  useEffect(() => {
+    if (customerPhone && !phoneInput) setPhoneInput(customerPhone);
+    if (customerCompany && !nameInput) setNameInput(customerCompany);
+  }, [customerPhone, customerCompany]);
+
   // 1. Randevu state
   const [apptType, setApptType] = useState(APPOINTMENT_TYPES[0]);
   const [apptDay, setApptDay] = useState('Yarın');
@@ -180,8 +185,22 @@ export default function CustomerSmartActionHub({
 
   const sendSignalToCrm = async ({ tag, model, campaign, notes, score = 98 }) => {
     const parsedCid = customerId ? parseInt(customerId, 10) : undefined;
+    const effectivePhone = (phoneInput.trim() || customerPhone || '').trim();
+    const effectiveName = (nameInput.trim() || customerCompany || '').trim();
+    if (effectivePhone || effectiveName) {
+      try {
+        window.localStorage.setItem('iveco_visitor_profile_v1', JSON.stringify({
+          phone: effectivePhone,
+          name: effectiveName,
+          company: effectiveName,
+          updatedAt: Date.now()
+        }));
+      } catch {
+        // ignore storage errors
+      }
+    }
     if (onTrackFootprint) {
-      onTrackFootprint(tag, model, campaign);
+      onTrackFootprint(tag, model, campaign, effectivePhone, effectiveName);
     }
     try {
       await discoveryApi.recordIntentSignal({
@@ -189,9 +208,9 @@ export default function CustomerSmartActionHub({
         search_query: `[${tag}]`,
         target_model: model || activeModelTitle,
         target_campaign: campaign,
-        company_name: nameInput.trim() || customerCompany || 'Portal Müşterisi',
+        company_name: effectiveName || 'Portal Müşterisi',
         city: cityInput.trim() || 'Samsun',
-        phone: phoneInput.trim() || customerPhone || '',
+        phone: effectivePhone,
         page_url: window.location.href,
         referrer: document.referrer || 'smart_action_hub',
         duration_seconds: 45,

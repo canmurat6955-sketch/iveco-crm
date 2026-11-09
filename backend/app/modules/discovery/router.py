@@ -275,10 +275,64 @@ def record_intent_signal(
 ):
     """Web sitesi, kampanya linki veya Google üzerinden gelen niyet sinyalini kaydeder (IP Rate Limited)."""
     _check_intent_signal_rate_limit(request)
+    client_ip = (
+        request.headers.get("cf-connecting-ip")
+        or (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
+        or (request.client.host if request.client else None)
+    )
+    if client_ip and not data.ip_address:
+        data.ip_address = client_ip
+
+    # Ziyaretçi WhatsApp Durum / Grup gibi genel bir linkten geldiyse (numarası URL'de yoksa),
+    # daha önce aynı IP adresinden veya müşteri ID'sinden kayıtlı telefon numarası varsa otomatik eşleştir:
+    try:
+        from app.modules.discovery.models import WebIntentSignal
+        from app.modules.crm.models import Customer
+
+        if data.matched_customer_id and (not data.phone or not data.company_name):
+            cust = db.query(Customer).filter(Customer.id == data.matched_customer_id).first()
+            if cust:
+                if not data.phone and cust.phone:
+                    data.phone = cust.phone
+                if (not data.company_name or "Ziyaretçisi" in data.company_name) and cust.company_name:
+                    data.company_name = cust.company_name
+
+        if not data.phone and client_ip and client_ip != "unknown":
+            prev_signal = (
+                db.query(WebIntentSignal)
+                .filter(
+                    WebIntentSignal.ip_address == client_ip,
+                    WebIntentSignal.phone.isnot(None),
+                    WebIntentSignal.phone != "",
+                )
+                .order_by(WebIntentSignal.created_at.desc())
+                .first()
+            )
+            if prev_signal and prev_signal.phone:
+                data.phone = f"{prev_signal.phone} (Cihazdan Tanındı)"
+                if (
+                    prev_signal.company_name
+                    and (not data.company_name or "Ziyaretçisi" in data.company_name)
+                ):
+                    data.company_name = f"{prev_signal.company_name} ({data.company_name or 'Durum/Grup'})"
+    except Exception:
+        pass
+
     res = DiscoveryService(db).create_intent_signal(data)
     try:
-        if (data.intent_score and data.intent_score >= 90) or (
-            data.source in ("crm_existing_customer", "smart_action_hub", "public_pricing_catalog")
+        if (data.intent_score and data.intent_score >= 80) or (
+            data.source in (
+                "crm_existing_customer",
+                "smart_action_hub",
+                "public_pricing_catalog",
+                "wa_durum",
+                "whatsapp_durum",
+                "wa_grup",
+                "wa_musteri",
+                "wa_ozel",
+                "instagram",
+                "linkedin",
+            )
         ):
             from app.modules.whatsapp.service import WhatsAppService
             WhatsAppService(db).notify_rep_portal_footprint(
@@ -287,6 +341,7 @@ def record_intent_signal(
                 vehicle_model=data.target_model or "IVECO 2026",
                 city=data.city,
                 phone=data.phone,
+                source_channel=data.source,
             )
     except Exception:
         pass

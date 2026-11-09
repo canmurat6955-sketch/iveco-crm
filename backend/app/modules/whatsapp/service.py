@@ -283,6 +283,7 @@ class WhatsAppService:
         vehicle_model: str,
         city: Optional[str] = None,
         phone: Optional[str] = None,
+        source_channel: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """
         Sends an instant WhatsApp alert when a customer takes a high-intent action in the portal.
@@ -291,20 +292,56 @@ class WhatsAppService:
         if not session.auto_notify_rep or not self._extract_apikey(session):
             return None
 
+        clean_visitor_phone = "".join(filter(str.isdigit, phone or ""))
+        if clean_visitor_phone.startswith("0"):
+            wa_visitor_phone = "90" + clean_visitor_phone[1:]
+        elif clean_visitor_phone and not clean_visitor_phone.startswith("90") and len(clean_visitor_phone) == 10:
+            wa_visitor_phone = "90" + clean_visitor_phone
+        else:
+            wa_visitor_phone = clean_visitor_phone
+
         now_ts = datetime.now(timezone.utc).timestamp()
-        dedup_key = f"{company_name or 'anon'}:{action_label or ''}"
+        dedup_key = f"{company_name or 'anon'}:{action_label or ''}:{wa_visitor_phone or 'nophone'}"
         last_ts = _LAST_PORTAL_ALERT_TS.get(dedup_key, 0.0)
-        if now_ts - last_ts < 45:
+        if now_ts - last_ts < 40:
             return None
         _LAST_PORTAL_ALERT_TS[dedup_key] = now_ts
 
+        # Kanal etiketini anlaşılır hale getir
+        src_lower = (source_channel or "").lower()
+        if "wa_durum" in src_lower or "durum" in src_lower:
+            channel_label = "🟢 WhatsApp Durum Paylaşımı"
+        elif "wa_grup" in src_lower or "grup" in src_lower or "nakliye" in src_lower:
+            channel_label = "🚚 Nakliye WhatsApp Grubu"
+        elif "wa_ozel" in src_lower or "crm_existing" in src_lower:
+            channel_label = "👑 Kişiye Özel VIP Link"
+        elif "wa_musteri" in src_lower or "musteri" in src_lower:
+            channel_label = "💬 WhatsApp Müşteri Linki"
+        elif "insta" in src_lower or "reels" in src_lower:
+            channel_label = "📸 Instagram Paylaşımı"
+        elif "linkedin" in src_lower:
+            channel_label = "💼 LinkedIn Gönderisi"
+        elif "simder" in src_lower or "partner" in src_lower or "dernek" in src_lower:
+            channel_label = f"🏛️ Dernek / Protokol Linki ({source_channel})"
+        else:
+            channel_label = source_channel or "🌐 Dijital Fiyat & Kredi Portalı"
+
         city_text = f" ({city})" if city else ""
-        phone_text = f"\n📞 Tel: {phone}" if phone else ""
+        if phone and len(clean_visitor_phone) >= 10:
+            phone_block = (
+                f"\n📞 *Tel:* {phone}"
+                f"\n💬 *Tek Tıkla Yaz:* https://wa.me/{wa_visitor_phone}"
+            )
+        else:
+            phone_block = "\n📞 *Tel:* Henüz numara girmedi (İzleyici şu an fiyatları inceliyor)"
+
         alert_text = (
             f"🔥 *MÜŞTERİ ŞU AN PORTALDA!*\n"
-            f"🏢 Firma: *{company_name}*{city_text}{phone_text}\n"
-            f"⚡ İşlem: {action_label}\n"
-            f"🚛 Model: {vehicle_model}"
+            f"📡 *Kanal:* {channel_label}\n"
+            f"🏢 *Ziyaretçi:* *{company_name}*{city_text}"
+            f"{phone_block}\n"
+            f"⚡ *İşlem:* {action_label}\n"
+            f"🚛 *Model:* {vehicle_model}"
         )
         return self.send_message(
             recipient_phone=session.notify_phone or "905446225931",
@@ -312,3 +349,4 @@ class WhatsAppService:
             recipient_name="Can Murat Onay",
             message_type="alert",
         )
+

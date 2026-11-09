@@ -123,9 +123,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 12M3 TEKNİK FÖY.pdf',
-    priceRange: '2.110.000 TL (Peşin) / 2.300.000 TL (Kampanyalı)',
-    campaignPriceText: '2.300.000 TL',
-    cashPriceText: '2.110.000 TL',
+    priceRange: '2.130.000 TL (Peşin) / 2.320.000 TL (Kampanyalı)',
+    campaignPriceText: '2.320.000 TL',
+    cashPriceText: '2.130.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -157,9 +157,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 16M3 TEKNİK FÖY.pdf',
-    priceRange: '2.140.000 TL (Peşin) / 2.330.000 TL (Kampanyalı)',
-    campaignPriceText: '2.330.000 TL',
-    cashPriceText: '2.140.000 TL',
+    priceRange: '2.160.000 TL (Peşin) / 2.350.000 TL (Kampanyalı)',
+    campaignPriceText: '2.350.000 TL',
+    cashPriceText: '2.160.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -191,9 +191,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 18M3 ÇİFT TEKER TEKNİK FÖY.pdf',
-    priceRange: '2.300.000 TL (Peşin) / 2.490.000 TL (Kampanyalı)',
-    campaignPriceText: '2.490.000 TL',
-    cashPriceText: '2.300.000 TL',
+    priceRange: '2.320.000 TL (Peşin) / 2.510.000 TL (Kampanyalı)',
+    campaignPriceText: '2.510.000 TL',
+    cashPriceText: '2.320.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -227,9 +227,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '1.885.000 TL (Peşin) / 2.075.000 TL (Kampanyalı)',
-    campaignPriceText: '2.075.000 TL',
-    cashPriceText: '1.885.000 TL',
+    priceRange: '1.905.000 TL (Peşin) / 2.095.000 TL (Kampanyalı)',
+    campaignPriceText: '2.095.000 TL',
+    cashPriceText: '1.905.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
@@ -261,9 +261,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '2.045.000 TL (3750 Manuel) / 2.120.000 TL (3450 A8) / 2.150.000 TL (3750 A8)',
-    campaignPriceText: '2.150.000 TL (3750 A8) / 2.120.000 TL (3450 A8)',
-    cashPriceText: '2.045.000 TL (3750 Manuel) / 2.150.000 TL (3750 A8)',
+    priceRange: '2.065.000 TL (3750 Manuel) / 2.140.000 TL (3450 A8) / 2.170.000 TL (3750 A8)',
+    campaignPriceText: '2.170.000 TL (3750 A8) / 2.140.000 TL (3450 A8)',
+    cashPriceText: '2.065.000 TL (3750 Manuel) / 2.170.000 TL (3750 A8)',
     cashDiscountText: null,
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
@@ -298,9 +298,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
     pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
-    priceRange: '2.220.000 TL (Peşin) / 2.480.000 TL (Kampanyalı)',
-    campaignPriceText: '2.480.000 TL',
-    cashPriceText: '2.220.000 TL',
+    priceRange: '2.240.000 TL (Peşin) / 2.500.000 TL (Kampanyalı)',
+    campaignPriceText: '2.500.000 TL',
+    cashPriceText: '2.240.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 1500000,
     bodyType: 'frigo'
@@ -332,9 +332,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml100e19.pdf',
     pdfName: 'ML 100 E 19 TEKNİK FÖY .pdf',
-    priceRange: '3.310.000 TL (Peşin) / 3.570.000 TL (Kampanyalı)',
-    campaignPriceText: '3.570.000 TL',
-    cashPriceText: '3.310.000 TL',
+    priceRange: '3.330.000 TL (Peşin) / 3.590.000 TL (Kampanyalı)',
+    campaignPriceText: '3.590.000 TL',
+    cashPriceText: '3.330.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 1500000,
     bodyType: 'kayar_perde'
@@ -366,9 +366,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml120el19.pdf',
     pdfName: 'ML 120 EL 19 TEKNİK FÖY .pdf',
-    priceRange: '3.800.000 TL (Peşin) / 4.060.000 TL (Kampanyalı)',
-    campaignPriceText: '4.060.000 TL',
-    cashPriceText: '3.800.000 TL',
+    priceRange: '3.820.000 TL (Peşin) / 4.080.000 TL (Kampanyalı)',
+    campaignPriceText: '4.080.000 TL',
+    cashPriceText: '3.820.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 2000000,
     bodyType: 'kayar_perde'
@@ -400,9 +400,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml150e21.pdf',
     pdfName: 'ML 150 E 21 TEKNİK FÖY .pdf',
-    priceRange: '4.060.000 TL (Peşin) / 4.320.000 TL (Kampanyalı)',
-    campaignPriceText: '4.320.000 TL',
-    cashPriceText: '4.060.000 TL',
+    priceRange: '4.080.000 TL (Peşin) / 4.340.000 TL (Kampanyalı)',
+    campaignPriceText: '4.340.000 TL',
+    cashPriceText: '4.080.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 2000000,
     bodyType: 'kayar_perde'
@@ -434,9 +434,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
     pdfName: 'ML 160 E 32P TEKNİK FÖY .pdf',
-    priceRange: '4.550.000 TL (Peşin) / 4.810.000 TL (Kampanyalı)',
-    campaignPriceText: '4.810.000 TL',
-    cashPriceText: '4.550.000 TL',
+    priceRange: '4.570.000 TL (Peşin) / 4.830.000 TL (Kampanyalı)',
+    campaignPriceText: '4.830.000 TL',
+    cashPriceText: '4.570.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 2500000,
     bodyType: 'kayar_perde'
@@ -468,9 +468,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/eurocargo-ml160e32p.pdf',
     pdfName: 'ML 160 E 32P 10 TEKER TEKNİK FÖY .pdf',
-    priceRange: '4.550.000 TL (Peşin) / 4.810.000 TL (Kampanyalı)',
-    campaignPriceText: '4.810.000 TL',
-    cashPriceText: '4.550.000 TL',
+    priceRange: '4.570.000 TL (Peşin) / 4.830.000 TL (Kampanyalı)',
+    campaignPriceText: '4.830.000 TL',
+    cashPriceText: '4.570.000 TL',
     cashDiscountText: '260.000 TL',
     defaultLoan: 2500000,
     bodyType: 'kayar_perde'
@@ -650,7 +650,8 @@ const VEHICLE_CATALOG = [
 
 export default function PublicVehicleFinder() {
   const [searchParams] = useSearchParams();
-  const refCode = searchParams.get('ref') || 'whatsapp_durum';
+  const activePartner = useMemo(() => resolvePartnerFromSearchParams(searchParams), [searchParams]);
+  const refCode = searchParams.get('ref') || searchParams.get('src') || searchParams.get('source') || (activePartner ? `partner_${activePartner.id}` : 'wa_durum');
   const customerIdParam = searchParams.get('cid') || searchParams.get('customer_id');
   const companyParam = searchParams.get('company') || searchParams.get('firma') || searchParams.get('comp') || '';
   const nameParam = searchParams.get('name') || searchParams.get('yetkili') || '';
@@ -660,7 +661,6 @@ export default function PublicVehicleFinder() {
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
   const modelParam = searchParams.get('model') || searchParams.get('arac') || '';
-  const activePartner = useMemo(() => resolvePartnerFromSearchParams(searchParams), [searchParams]);
 
   const location = useLocation();
   const isAdminMode = searchParams.get('admin') === 'true';
@@ -858,14 +858,43 @@ export default function PublicVehicleFinder() {
     if (nameParam) setSendContactName(nameParam);
   }, [companyParam, phoneParam, nameParam]);
 
-  // Müşteri İletişim Formu (Mevcut Müşteri Linkinden Otomatik Doldurma)
-  const [customerName, setCustomerName] = useState(nameParam);
-  const [customerCompany, setCustomerCompany] = useState(companyParam);
-  const [customerPhone, setCustomerPhone] = useState(phoneParam);
+  // Müşteri İletişim Formu (URL Linkinden veya Tarayıcı Hafızasından Otomatik Doldurma)
+  const storedVisitorProfile = useMemo(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const raw = window.localStorage.getItem('iveco_visitor_profile_v1');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }, []);
+
+  const [customerName, setCustomerName] = useState(nameParam || storedVisitorProfile.name || '');
+  const [customerCompany, setCustomerCompany] = useState(companyParam || storedVisitorProfile.company || '');
+  const [customerPhone, setCustomerPhone] = useState(phoneParam || storedVisitorProfile.phone || '');
   const [customerCity, setCustomerCity] = useState('Samsun');
   const [customerNotes, setCustomerNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [quickPhoneInput, setQuickPhoneInput] = useState(phoneParam || storedVisitorProfile.phone || '');
+  const [quickNameInput, setQuickNameInput] = useState(companyParam || nameParam || storedVisitorProfile.company || storedVisitorProfile.name || '');
+  const [quickPhoneUnlocked, setQuickPhoneUnlocked] = useState(Boolean(phoneParam || storedVisitorProfile.phone));
+
+  // URL'den veya formdan numara/isim geldiğinde tarayıcı hafızasına kaydet (Bir sonraki WhatsApp Durum tıklamasında otomatik tanınsın)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const cleanP = (customerPhone || '').replace(/\D/g, '');
+    if (cleanP.length >= 10 || customerCompany || customerName) {
+      try {
+        window.localStorage.setItem('iveco_visitor_profile_v1', JSON.stringify({
+          phone: customerPhone || storedVisitorProfile.phone || '',
+          company: customerCompany || storedVisitorProfile.company || '',
+          name: customerName || storedVisitorProfile.name || '',
+          updatedAt: Date.now()
+        }));
+      } catch {}
+    }
+  }, [customerPhone, customerCompany, customerName]);
 
   const [startTime] = useState(Date.now());
 
@@ -878,14 +907,14 @@ export default function PublicVehicleFinder() {
         search_query: `[Kişisel Link Ziyareti]: ${companyParam || nameParam || 'VIP Müşteri'} Araç Seçiciyi Açtı`,
         target_model: 'IVECO Şasi & Kasa Seçici',
         company_name: companyParam || nameParam || 'Kayıtlı Müşteri',
-        phone: phoneParam || undefined,
+        phone: phoneParam || customerPhone || undefined,
         city: 'Samsun',
         page_url: window.location.href,
         referrer: document.referrer || 'whatsapp_chat',
         duration_seconds: 3,
         scroll_depth: 30,
-        intent_score: 92,
-        intent_level: 'high',
+        intent_score: 94,
+        intent_level: 'very_high',
         matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
         notes: `Müşteri WhatsApp üzerinden iletilen kişiselleştirilmiş şasi & kantar seçici bağlantısını tıkladı.`
       }).catch(err => console.debug('Intent signal log error:', err));
@@ -1435,18 +1464,19 @@ export default function PublicVehicleFinder() {
     return '';
   }, [refCode, activePartner]);
 
-  // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e İletir)
+  // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e ve WhatsApp Botuna İletir)
   const sentFootprintsRef = React.useRef(new Set());
-  const recordCustomerFootprint = (actionLabel, modelOverride, campaignOverride) => {
+  const recordCustomerFootprint = (actionLabel, modelOverride, campaignOverride, phoneOverride, nameOverride) => {
     if (isAdminMode || isPreviewMode) return;
-    const key = `${actionLabel}|${modelOverride || ''}|${campaignOverride || ''}`;
+    const effectivePhone = (phoneOverride ?? customerPhone ?? '').trim();
+    const effectiveName = (nameOverride ?? (customerCompany || customerName) ?? '').trim();
+    const key = `${actionLabel}|${modelOverride || ''}|${campaignOverride || ''}|${effectivePhone}`;
     if (sentFootprintsRef.current.has(key)) return;
     sentFootprintsRef.current.add(key);
 
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
-    const baseName = (customerCompany || customerName || '').trim();
-    const visitorLabel = baseName
-      ? (socialSourceLabel ? `${baseName} (${socialSourceLabel})` : baseName)
+    const visitorLabel = effectiveName
+      ? (socialSourceLabel ? `${effectiveName} (${socialSourceLabel})` : effectiveName)
       : (socialSourceLabel || 'Portal Ziyaretçisi');
     const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
 
@@ -1454,34 +1484,70 @@ export default function PublicVehicleFinder() {
       source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
       search_query: `[Canlı Ayak İzi - ${actionLabel}]`,
       target_model: modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog',
-      target_campaign: campaignOverride || (sectorParam ? `Sektör: ${sectorParam}` : '2026 Fiyat & Kredi Portalı'),
+      target_campaign: campaignOverride || (sectorParam ? `Sektör: ${sectorParam}` : (socialSourceLabel || '2026 Fiyat & Kredi Portalı')),
       company_name: visitorLabel,
       city: customerCity || 'Samsun',
-      phone: customerPhone || '',
+      phone: effectivePhone,
       page_url: window.location.href,
       referrer: document.referrer || (refCode || 'whatsapp_vip_link'),
       duration_seconds: durationSeconds,
       scroll_depth: 80,
-      intent_score: (customerCompany || customerIdParam) ? 94 : 85,
-      intent_level: (customerCompany || customerIdParam) ? 'very_high' : 'high',
+      intent_score: (effectiveName || customerIdParam || effectivePhone) ? 95 : 90,
+      intent_level: 'very_high',
       matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
-      notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nKaynak: ${socialSourceLabel || 'Doğrudan / VIP Link'}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
+      notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nKaynak: ${socialSourceLabel || 'Doğrudan / VIP Link'}\nNumara: ${effectivePhone || 'Henüz Tanımlanmadı'}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
     }).catch(() => {});
+  };
+
+  // 📲 WhatsApp Durum / Grup ziyaretçisi 1 dokunuşla numarasını seçtiğinde anında bot bildirimi gönder ve cihaz hafızasına kaydet
+  const handleQuickPhoneIdentify = (rawPhone, rawName, triggerReason = '📲 Ziyaretçi Numarasını Tanımladı (Özel İndirim & Tablo Kilidi)') => {
+    const digits = String(rawPhone || '').replace(/\D/g, '');
+    if (digits.length < 10) {
+      toast.error('Lütfen geçerli bir cep telefonu numarası girin (Örn: 05XX XXX XX XX)');
+      return false;
+    }
+    const cleanPhone = String(rawPhone).trim();
+    const cleanName = String(rawName || customerCompany || customerName || '').trim();
+    setCustomerPhone(cleanPhone);
+    if (cleanName) {
+      setCustomerName(cleanName);
+      if (!customerCompany) setCustomerCompany(cleanName);
+    }
+    setQuickPhoneUnlocked(true);
+    try {
+      window.localStorage.setItem('iveco_visitor_profile_v1', JSON.stringify({
+        phone: cleanPhone,
+        name: cleanName,
+        company: customerCompany || cleanName,
+        updatedAt: Date.now()
+      }));
+    } catch {
+      // ignore storage errors
+    }
+    recordCustomerFootprint(
+      triggerReason,
+      selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
+      socialSourceLabel || 'WhatsApp Durum / Özel İskonto Aktivasyonu',
+      cleanPhone,
+      cleanName
+    );
+    toast.success('✅ Numaranız tanımlandı! Size özel nakit ve kredi avantajları aktif edildi.');
+    return true;
   };
 
   // Müşteri kendisine gönderilen VIP Linki veya Sosyal Medya Linkini açtığında anında CRM'e "Portal Açıldı" sinyali gönder
   useEffect(() => {
-    if ((customerCompany || customerIdParam || socialSourceLabel) && !isAdminMode && !isPreviewMode) {
+    if ((customerCompany || customerIdParam || socialSourceLabel || refCode || customerPhone) && !isAdminMode && !isPreviewMode) {
       const timer = setTimeout(() => {
         recordCustomerFootprint(
           socialSourceLabel ? `${socialSourceLabel} Portala Girdi` : 'VIP Link Açıldı (Katalog İnceleniyor)',
           selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
           sectorParam ? `Sektör Filtresi: ${sectorParam}` : (socialSourceLabel || 'Genel Katalog')
         );
-      }, 2500);
+      }, 2200);
       return () => clearTimeout(timer);
     }
-  }, [customerCompany, customerIdParam, socialSourceLabel]);
+  }, [customerCompany, customerIdParam, socialSourceLabel, refCode]);
 
   // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {
@@ -2951,6 +3017,150 @@ IVECO ERC Samsun Otomotiv
         )}
       </div>
 
+      {/* ── WHATSAPP DURUM / GRUP ZİYARETÇİLERİ İÇİN 1-DOKUNUŞLA NUMARA TANIMA & ÖZEL İSKONTO BARI ── */}
+      {!isAdminMode && !isPreviewMode && !phoneParam && (
+        <div style={{ maxWidth: '1080px', margin: '0 auto 14px' }}>
+          {!quickPhoneUnlocked ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleQuickPhoneIdentify(quickPhoneInput, quickNameInput);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(15, 23, 42, 0.95))',
+                border: '1px solid rgba(16, 185, 129, 0.45)',
+                borderRadius: '14px',
+                padding: isMobileView ? '10px 12px' : '10px 16px',
+                display: 'flex',
+                flexDirection: isMobileView ? 'column' : 'row',
+                alignItems: isMobileView ? 'stretch' : 'center',
+                justifyContent: 'space-between',
+                gap: '10px',
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.22)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 auto' }}>
+                <span style={{ fontSize: '1.15rem', flexShrink: 0 }}>📲</span>
+                <div style={{ fontSize: isMobileView ? '0.76rem' : '0.82rem', color: '#e2e8f0', lineHeight: 1.35 }}>
+                  <strong style={{ color: '#6ee7b7' }}>
+                    {socialSourceLabel ? `${socialSourceLabel} Özel:` : 'WhatsApp Özel İskonto:'}
+                  </strong>{' '}
+                  Numaranıza tanımlı ek nakit indirimi görmek ve hesapladığınız tabloyu WhatsApp&apos;ınıza kaydetmek için dokunun:
+                </div>
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: isMobileView ? 'column' : 'row',
+                gap: '8px',
+                alignItems: 'stretch',
+                flexShrink: 0
+              }}>
+                <div style={{ display: 'flex', gap: '6px', flex: 1 }}>
+                  <input
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="05XX XXX XX XX (Dokun & Seç)"
+                    value={quickPhoneInput}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setQuickPhoneInput(val);
+                      const digits = val.replace(/\D/g, '');
+                      const isValidTrMobile =
+                        (digits.length === 11 && digits.startsWith('05')) ||
+                        (digits.length === 10 && digits.startsWith('5')) ||
+                        (digits.length === 12 && digits.startsWith('905'));
+                      if (isValidTrMobile) {
+                        handleQuickPhoneIdentify(val, quickNameInput, '📲 Ziyaretçi Otomatik Numara Seçimiyle Kendini Tanıttı');
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      minWidth: isMobileView ? '0' : '175px',
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      border: '1px solid rgba(52, 211, 153, 0.5)',
+                      borderRadius: '10px',
+                      padding: '8px 11px',
+                      color: '#fff',
+                      fontSize: '0.84rem',
+                      fontWeight: 700,
+                      outline: 'none'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    name="name"
+                    autoComplete="name"
+                    placeholder="Ad / Firma (Opsiyonel)"
+                    value={quickNameInput}
+                    onChange={(e) => setQuickNameInput(e.target.value)}
+                    style={{
+                      width: isMobileView ? '44%' : '145px',
+                      background: 'rgba(15, 23, 42, 0.75)',
+                      border: '1px solid rgba(148, 163, 184, 0.3)',
+                      borderRadius: '10px',
+                      padding: '8px 10px',
+                      color: '#f8fafc',
+                      fontSize: '0.78rem',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '8px 14px',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  🔓 Özel İskontoyu Aç
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              borderRadius: '12px',
+              padding: '7px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+              flexWrap: 'wrap',
+              fontSize: '0.76rem',
+              color: '#a7f3d0'
+            }}>
+              <span>
+                ✅ <strong>{customerPhone}</strong> {customerCompany || customerName ? `(${customerCompany || customerName})` : ''} numaranıza özel nakit ve kredi avantajları aktif!
+              </span>
+              <button
+                type="button"
+                onClick={() => setQuickPhoneUnlocked(false)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(167, 243, 208, 0.35)',
+                  color: '#d1fae5',
+                  borderRadius: '6px',
+                  padding: '2px 8px',
+                  fontSize: '0.7rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Numarayı Değiştir
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── SEKME 2: 2026 MODEL FİYAT LİSTESİ ── */}
       {activeMainTab === 'fiyatlar' && (
