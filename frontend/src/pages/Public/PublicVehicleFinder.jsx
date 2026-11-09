@@ -3,6 +3,7 @@ import { useSearchParams, useLocation } from 'react-router-dom';
 import { discoveryApi, fetchTcmbEurRate } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
 import { BANK_LIST, AMOUNT_TIERS, getAmountTiersForCategory, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS } from '../../data/bankCampaigns';
+import { resolvePartnerFromSearchParams } from '../../data/partnerProtocols';
 import {
   FiTruck,
   FiCheckCircle,
@@ -659,6 +660,7 @@ export default function PublicVehicleFinder() {
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
   const modelParam = searchParams.get('model') || searchParams.get('arac') || '';
+  const activePartner = useMemo(() => resolvePartnerFromSearchParams(searchParams), [searchParams]);
 
   const location = useLocation();
   const isAdminMode = searchParams.get('admin') === 'true';
@@ -1407,6 +1409,9 @@ export default function PublicVehicleFinder() {
   }, [matched?.key, matched?.currency]);
 
   const socialSourceLabel = React.useMemo(() => {
+    if (activePartner) {
+      return `${activePartner.icon || '🏛️'} ${activePartner.shortName} Üyesi Ziyaretçisi`;
+    }
     const code = (refCode || '').toLowerCase();
     if (code.includes('wa_grup') || code.includes('grup') || code.includes('nakliye')) return '🚚 Nakliye WhatsApp Grubu Ziyaretçisi';
     if (code.includes('wa_ozel') || code.includes('ozel')) return '💬 WhatsApp Özel Davet Ziyaretçisi';
@@ -1417,7 +1422,7 @@ export default function PublicVehicleFinder() {
     if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
     if (code.includes('sosyal')) return '📱 Sosyal Medya Ziyaretçisi';
     return '';
-  }, [refCode]);
+  }, [refCode, activePartner]);
 
   // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e İletir)
   const sentFootprintsRef = React.useRef(new Set());
@@ -1561,8 +1566,13 @@ export default function PublicVehicleFinder() {
           `*Aylık Taksit:* ${activeCampaign.monthly.toLocaleString('tr-TR')} TL / ay (Toplam Geri Ödeme: ${activeCampaign.total.toLocaleString('tr-TR')} TL)\n\n`
         : `*Finansman Tercihi:* ${currentBankMeta.name} (Resmi Bayi Finansman Desteği)\n\n`;
 
+    const partnerProtocolLine = activePartner
+      ? `🏛️ *Kurumsal Protokol:* ${activePartner.fullName} (${activePartner.discountLabel})\n`
+      : '';
+
     const msg = (
       clientGreeting +
+      partnerProtocolLine +
       `*İncelenen Şasi Modeli:* ${matched.modelTitle}\n` +
       `*Taşıma Kapasitesi:* ${payloadKg} kg Net Yük | ${matched.kantarTitle}\n` +
       priceText +
@@ -2597,6 +2607,110 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
+      {/* ── 🏛️ DERNEK / ODA / BİRLİK ÖZEL PROTOKOL BANNER'I (SİMDER, Arıcılar Birliği vb.) ── */}
+      {activePartner && (
+        <div style={{
+          maxWidth: '1080px',
+          margin: '0 auto 16px',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(15, 23, 42, 0.96) 55%, rgba(245, 158, 11, 0.22) 100%)',
+          border: '2px solid rgba(16, 185, 129, 0.65)',
+          borderRadius: '18px',
+          padding: isMobileView ? '14px' : '18px 22px',
+          display: 'flex',
+          flexDirection: isMobileView ? 'column' : 'row',
+          alignItems: isMobileView ? 'flex-start' : 'center',
+          justifyContent: 'space-between',
+          gap: '14px',
+          boxShadow: '0 10px 32px rgba(16, 185, 129, 0.22)',
+          textAlign: 'left'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            {activePartner.logoUrl ? (
+              <div style={{
+                background: '#ffffff',
+                padding: '6px 14px',
+                borderRadius: '12px',
+                border: '2px solid rgba(239, 68, 68, 0.45)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <img
+                  src={activePartner.logoUrl}
+                  alt={activePartner.shortName}
+                  style={{ height: isMobileView ? '34px' : '42px', width: 'auto', objectFit: 'contain' }}
+                />
+              </div>
+            ) : (
+              <div style={{
+                width: isMobileView ? '46px' : '54px',
+                height: isMobileView ? '46px' : '54px',
+                borderRadius: '14px',
+                background: 'rgba(16, 185, 129, 0.22)',
+                border: '1.5px solid #10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobileView ? '1.5rem' : '1.75rem',
+                flexShrink: 0
+              }}>
+                {activePartner.icon || '🏛️'}
+              </div>
+            )}
+
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(16, 185, 129, 0.22)',
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                color: '#6ee7b7',
+                fontSize: '0.7rem',
+                fontWeight: 900,
+                padding: '3px 10px',
+                borderRadius: '999px',
+                marginBottom: '5px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                🤝 RESMİ KURUMSAL PROTOKOL & ÜYE İNDİRİM EKRANI
+              </div>
+              <div style={{ fontSize: isMobileView ? '1.02rem' : '1.16rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.25 }}>
+                {activePartner.fullName} Üyelerine Hoş Geldiniz!
+              </div>
+              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.4 }}>
+                {activePartner.extraPerk} — <strong>Aşağıdaki tüm 2026 model şasi fiyatlarında {activePartner.shortName} üye indiriminiz otomatik olarak düşülmüştür.</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            background: 'rgba(2, 6, 23, 0.85)',
+            border: '1.5px solid #fbbf24',
+            borderRadius: '14px',
+            padding: '10px 16px',
+            textAlign: 'center',
+            flexShrink: 0,
+            width: isMobileView ? '100%' : 'auto'
+          }}>
+            <div style={{ fontSize: '0.68rem', color: '#fde047', fontWeight: 800, textTransform: 'uppercase' }}>
+              AKTİF {activePartner.shortName} AVANTAJI
+            </div>
+            <div style={{ fontSize: isMobileView ? '1.08rem' : '1.15rem', fontWeight: 900, color: '#4ade80', marginTop: '2px' }}>
+              🏷️ {activePartner.discountType === 'percent'
+                ? `%${activePartner.discountValue} Özel İskonto`
+                : `-${activePartner.discountValue.toLocaleString('tr-TR')} ₺ / Araç`}
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '2px' }}>
+              Fiyatlara Otomatik Uygulandı ✓
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 🚀 4 BÜYÜK TERTEMİZ BAŞLANGIÇ KUTUSU ("NE YAPMAK İSTERSİNİZ?") */}
       <div style={{
         maxWidth: '1080px',
@@ -2885,7 +2999,8 @@ IVECO ERC Samsun Otomotiv
       {activeMainTab === 'fiyatlar' && (
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
           <PricingCatalogTab
-            initialSector={sectorParam}
+            initialSector={sectorParam || activePartner?.defaultSector || ''}
+            partnerProtocol={activePartner}
             onSelectVehicle={(vehicle) => {
               recordCustomerFootprint('Kredi Planı İnceleme', vehicle?.model || String(vehicle), '2026 Fiyat Listesinden Seçildi');
               handleSelectVehicle(vehicle);

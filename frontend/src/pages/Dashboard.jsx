@@ -16,6 +16,7 @@ import TodayOpportunitiesCard from '../components/CRM/TodayOpportunitiesCard';
 import QuickVisitModal from '../components/CRM/QuickVisitModal';
 import NearbyRadarModal from '../components/CRM/NearbyRadarModal';
 import FleetRenewalRadarWidget from '../components/FleetRadar/FleetRenewalRadarWidget';
+import PartnerLinkGeneratorCard from '../components/CRM/PartnerLinkGeneratorCard';
 
 
 const STAT_CARDS = [
@@ -269,7 +270,7 @@ export default function Dashboard() {
                 Hoş Geldiniz, <strong>{displayName}</strong>
               </div>
               <div className="mobile-welcome-sub">
-                Saha Satış Yöneticisi · 0544 622 59 31
+                Satış Sorumlusu · 0544 622 59 31
               </div>
             </div>
             <div className="mobile-live-badge">
@@ -308,7 +309,7 @@ export default function Dashboard() {
             type="button"
             onClick={() => {
               const url = `${getPublicOrigin()}/fiyat-listesi?ref=muratonay`;
-              const text = `Merhaba,\n\nIVECO 2026 model Daily, Eurocargo ve S-Way araçlarımızın güncel fiyat listesi ve banka kredi kampanyalarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n${url}\n\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`;
+              const text = `Merhaba,\n\nIVECO 2026 model Daily, Eurocargo ve S-Way araçlarımızın güncel fiyat listesi ve banka kredi kampanyalarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n${url}\n\n*Satış Sorumlusu Can M. - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`;
               openExternal(buildWhatsAppUrl(text));
             }}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', border: '1px solid rgba(37,211,102,0.45)', background: 'rgba(37,211,102,0.14)', color: '#4ade80', fontWeight: 800, fontSize: '0.88rem' }}
@@ -332,6 +333,9 @@ export default function Dashboard() {
             Link Kopyala
           </button>
         </div>
+
+        {/* 🏛️ Dernek, Oda & Birlik Özel İndirimli Link Üretici (Mobil) */}
+        <PartnerLinkGeneratorCard isMobile={true} />
 
         {/* ⚡ Saha Asistanı Hero (Mobil - 6'lı Minimal Matris) */}
         <FieldAssistantHero
@@ -623,6 +627,9 @@ export default function Dashboard() {
           );
         })}
       </div>
+
+      {/* 🏛️ DERNEK, ODA & BİRLİK ÖZEL İNDİRİMLİ LİNK ÜRETİCİ (SİMDER, Arıcılar Birliği vb.) */}
+      <PartnerLinkGeneratorCard isMobile={false} />
 
       {/* ── BUGÜNÜN SATIŞ FIRSATLARI (Araç & Saha Zekâsı) ── */}
       <TodayOpportunitiesCard

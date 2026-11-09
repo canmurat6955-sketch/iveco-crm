@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { IVECO_PRICING_CATALOG, getVehicleSticker } from '../../../data/ivecoPricingCatalog';
+import { calculatePartnerVehiclePricing } from '../../../data/partnerProtocols';
 import { fetchTcmbEurRate } from '../../../api/client';
 import { openWhatsAppChat } from '../../../utils/openExternal';
 import { FiTruck, FiSearch, FiFilter, FiCheck, FiMessageSquare, FiExternalLink, FiDollarSign, FiTag, FiCamera } from 'react-icons/fi';
@@ -47,7 +48,7 @@ function normalizeSectorId(rawSector) {
   return 'all';
 }
 
-export default function PricingCatalogTab({ initialSector = '', onSelectVehicle, onDirectWhatsApp, onTrackFootprint, salesRep }) {
+export default function PricingCatalogTab({ initialSector = '', partnerProtocol = null, onSelectVehicle, onDirectWhatsApp, onTrackFootprint, salesRep }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => normalizeSectorId(initialSector));
   const [searchQuery, setSearchQuery] = useState('');
@@ -190,9 +191,15 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
 
   const tradeInCalc = useMemo(() => {
     const isEur = selectedTradeVehicle?.currency === 'EUR';
-    const vehiclePrice = isEur
-      ? Math.round((selectedTradeVehicle?.eurPrice || selectedTradeVehicle?.cashPrice || 123000) * tcmbEurRate)
-      : (selectedTradeVehicle?.campaignPrice || selectedTradeVehicle?.cashPrice || 1930000);
+    const partnerPricing = partnerProtocol
+      ? calculatePartnerVehiclePricing(selectedTradeVehicle, partnerProtocol, tcmbEurRate)
+      : null;
+
+    const vehiclePrice = partnerPricing
+      ? (partnerPricing.isEur ? partnerPricing.finalTl : partnerPricing.finalCampaign)
+      : isEur
+        ? Math.round((selectedTradeVehicle?.eurPrice || selectedTradeVehicle?.cashPrice || 123000) * tcmbEurRate)
+        : (selectedTradeVehicle?.campaignPrice || selectedTradeVehicle?.cashPrice || 1930000);
     const safeTradeVal = Math.max(0, Number(tradeInValue) || 0);
     const remainingPrincipal = Math.max(0, vehiclePrice - safeTradeVal);
     const term = Number(tradeInTerm) || 24;
@@ -219,26 +226,40 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
       monthlyPayment,
       isZeroInterest
     };
-  }, [selectedTradeVehicle, tradeInValue, tradeInTerm, tcmbEurRate]);
+  }, [selectedTradeVehicle, tradeInValue, tradeInTerm, tcmbEurRate, partnerProtocol]);
 
   const handleVehicleQuote = (vehicle) => {
+    const partnerPricing = partnerProtocol
+      ? calculatePartnerVehiclePricing(vehicle, partnerProtocol, tcmbEurRate)
+      : null;
     if (onTrackFootprint) {
-      onTrackFootprint('Fiyat Kartı Teklif İsteği', vehicle.model, `${(vehicle.cashPrice || vehicle.campaignPrice || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'}`);
+      onTrackFootprint(
+        partnerProtocol ? `${partnerProtocol.shortName} Üye Teklif İsteği` : 'Fiyat Kartı Teklif İsteği',
+        vehicle.model,
+        partnerPricing
+          ? `${(partnerPricing.finalCash || partnerPricing.finalEur || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'} (${partnerProtocol.shortName} İndirimli)`
+          : `${(vehicle.cashPrice || vehicle.campaignPrice || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'}`
+      );
     }
     if (onDirectWhatsApp) {
+      const protocolPrefix = partnerProtocol
+        ? ` [🏛️ *${partnerProtocol.fullName}* — ${partnerProtocol.discountLabel}]`
+        : '';
       if (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) {
-        const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat) için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
+        const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat)${protocolPrefix} için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
         onDirectWhatsApp(msg);
         return;
       }
-      const eurVal = vehicle.eurPrice || vehicle.cashPrice || 0;
+      const eurVal = partnerPricing?.isEur ? partnerPricing.finalEur : (vehicle.eurPrice || vehicle.cashPrice || 0);
       const tryEq = Math.round(eurVal * tcmbEurRate);
       const priceText = vehicle.currency === 'EUR'
         ? `€${eurVal.toLocaleString('tr-TR')} (${tryEq.toLocaleString('tr-TR')} TL - TCMB Kur: ${tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL) + KDV`
-        : (vehicle.cashDiscount > 0
-            ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
-            : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
-      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText}) hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
+        : partnerPricing
+          ? `${partnerPricing.finalCash.toLocaleString('tr-TR')} TL (${partnerProtocol.shortName} Üye İndirimli Net Fiyat)`
+          : (vehicle.cashDiscount > 0
+              ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
+              : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
+      const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText})${protocolPrefix} hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -1071,7 +1092,12 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
       <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '16px' }}>
         {filteredVehicles.map(vehicle => {
           const sticker = getVehicleSticker(vehicle);
-          const effectiveTlPrice = vehicle.cashPrice || vehicle.campaignPrice || 0;
+          const partnerPricing = partnerProtocol
+            ? calculatePartnerVehiclePricing(vehicle, partnerProtocol, tcmbEurRate)
+            : null;
+          const effectiveTlPrice = partnerPricing && !partnerPricing.isEur
+            ? partnerPricing.finalCash
+            : (vehicle.cashPrice || vehicle.campaignPrice || 0);
           const vatShieldTl = effectiveTlPrice > 0 ? Math.round(effectiveTlPrice - (effectiveTlPrice / 1.20)) : 0;
 
           return (
@@ -1079,7 +1105,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
               key={vehicle.id}
               style={{
                 background: 'linear-gradient(165deg, rgba(33, 55, 90, 0.94) 0%, rgba(24, 41, 68, 0.94) 100%)',
-                border: '1.5px solid rgba(125, 211, 252, 0.26)',
+                border: partnerPricing ? '1.5px solid rgba(16, 185, 129, 0.55)' : '1.5px solid rgba(125, 211, 252, 0.26)',
                 boxShadow: '0 8px 24px rgba(8, 15, 30, 0.25)',
                 borderRadius: '14px',
                 padding: isMobileView ? '16px' : '16px',
@@ -1103,7 +1129,19 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                 }}>
                   {vehicle.category}
                 </span>
-                {vehicle.cashDiscount > 0 && vehicle.currency !== 'EUR' ? (
+                {partnerPricing ? (
+                  <span style={{
+                    fontSize: '0.66rem',
+                    fontWeight: 900,
+                    background: 'rgba(16, 185, 129, 0.25)',
+                    color: '#4ade80',
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(16, 185, 129, 0.55)'
+                  }}>
+                    🏷️ {partnerPricing.discountBadgeText}
+                  </span>
+                ) : vehicle.cashDiscount > 0 && vehicle.currency !== 'EUR' ? (
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
@@ -1228,7 +1266,7 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
               {/* Pricing Box + Automatic KDV Shield */}
               <div style={{
                 background: 'rgba(16, 30, 54, 0.65)',
-                border: '1px solid rgba(148, 163, 184, 0.22)',
+                border: partnerPricing ? '1px solid rgba(16, 185, 129, 0.38)' : '1px solid rgba(148, 163, 184, 0.22)',
                 borderRadius: '10px',
                 padding: isMobileView ? '12px 14px' : '10px 12px',
                 marginBottom: '12px'
@@ -1242,20 +1280,22 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                     textAlign: 'center'
                   }}>
                     <div style={{ fontSize: '0.68rem', color: '#fbbf24', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>
-                      ⭐ PROJEYE ÖZEL ŞANTİYE FİYATLANDIRMASI
+                      ⭐ {partnerProtocol ? `${partnerProtocol.shortName} ÖZEL ŞANTİYE PROTOKOLÜ` : 'PROJEYE ÖZEL ŞANTİYE FİYATLANDIRMASI'}
                     </div>
                     <div style={{ fontSize: isMobileView ? '1.08rem' : '1.02rem', fontWeight: 900, color: '#fef08a', marginBottom: '3px' }}>
                       Satış Sorumlusu Can M. ile Görüşün
                     </div>
                     <div style={{ fontSize: '0.70rem', color: '#cbd5e1', lineHeight: 1.35 }}>
-                      T-Way ağır şantiye araçlarımız damper/mikser tipi, takas ve filo kotasına göre özel fiyatlandırılmaktadır.
+                      {partnerProtocol
+                        ? `${partnerProtocol.shortName} üyelerine özel T-Way ağır şantiye protokol iskontosu için doğrudan iletişime geçin.`
+                        : 'T-Way ağır şantiye araçlarımız damper/mikser tipi, takas ve filo kotasına göre özel fiyatlandırılmaktadır.'}
                     </div>
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px', gap: '6px', flexWrap: 'wrap' }}>
                       <span>Resmi Liste Fiyatı:</span>
-                      <span style={{ fontWeight: 700, color: '#ffffff', textAlign: 'right' }}>
+                      <span style={{ fontWeight: 700, color: '#ffffff', textAlign: 'right', textDecoration: partnerPricing ? 'line-through' : 'none' }}>
                         €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}{' '}
                         <span style={{ color: '#fde047', fontWeight: 800 }}>
                           ({Math.round((vehicle.eurPrice || vehicle.cashPrice) * tcmbEurRate).toLocaleString('tr-TR')} TL)
@@ -1263,18 +1303,27 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                         + KDV
                       </span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.74rem' : '0.70rem', color: '#93c5fd', marginBottom: '6px' }}>
-                      <span>🏛️ Merkez Bankası (TCMB) Kur:</span>
-                      <span style={{ fontWeight: 700, color: '#e0f2fe' }}>
-                        1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Günlük)
-                      </span>
-                    </div>
+                    {partnerPricing ? (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.76rem' : '0.72rem', color: '#4ade80', marginBottom: '6px', fontWeight: 800 }}>
+                        <span>🏛️ {partnerProtocol.shortName} Üye İndirimi:</span>
+                        <span>-€{partnerPricing.discountEur.toLocaleString('tr-TR')} (-{partnerPricing.discountTl.toLocaleString('tr-TR')} TL)</span>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.74rem' : '0.70rem', color: '#93c5fd', marginBottom: '6px' }}>
+                        <span>🏛️ Merkez Bankası (TCMB) Kur:</span>
+                        <span style={{ fontWeight: 700, color: '#e0f2fe' }}>
+                          1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL (Günlük)
+                        </span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px', flexWrap: 'wrap', gap: '4px' }}>
-                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#7dd3fc', fontWeight: 800 }}>EURO PROJE FİYATI:</span>
+                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.76rem', color: '#7dd3fc', fontWeight: 800 }}>
+                        {partnerPricing ? `${partnerProtocol.shortName.toUpperCase()} ÜYE FİYATI:` : 'EURO PROJE FİYATI:'}
+                      </span>
                       <span style={{ fontSize: isMobileView ? '1.12rem' : '1.0rem', color: '#38bdf8', fontWeight: 900, textAlign: 'right' }}>
-                        €{(vehicle.eurPrice || vehicle.cashPrice).toLocaleString('tr-TR')}{' '}
+                        €{(partnerPricing ? partnerPricing.finalEur : (vehicle.eurPrice || vehicle.cashPrice)).toLocaleString('tr-TR')}{' '}
                         <span style={{ fontSize: isMobileView ? '0.92rem' : '0.84rem', color: '#4ade80', fontWeight: 800 }}>
-                          ({Math.round((vehicle.eurPrice || vehicle.cashPrice) * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                          ({(partnerPricing ? partnerPricing.finalTl : Math.round((vehicle.eurPrice || vehicle.cashPrice) * tcmbEurRate)).toLocaleString('tr-TR')} TL)
                         </span>
                       </span>
                     </div>
@@ -1292,6 +1341,41 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
                       <span>🧾 Vergi Kalkanı:</span>
                       <span>%20 KDV İndirimi + 5 Yıl Amortisman</span>
                     </div>
+                  </>
+                ) : partnerPricing ? (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#cbd5e1', marginBottom: '4px' }}>
+                      <span>Normal Liste / Peşin:</span>
+                      <span style={{ textDecoration: 'line-through' }}>{partnerPricing.baseCash.toLocaleString('tr-TR')} TL</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.78rem' : '0.74rem', color: '#fbbf24', marginBottom: '6px', fontWeight: 800 }}>
+                      <span>🏛️ {partnerProtocol.shortName} Üye İndirimi:</span>
+                      <span>-{partnerPricing.discountTl.toLocaleString('tr-TR')} TL</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed rgba(255, 255, 255, 0.14)', paddingTop: '6px' }}>
+                      <span style={{ fontSize: isMobileView ? '0.8rem' : '0.75rem', color: '#4ade80', fontWeight: 900 }}>
+                        NET {partnerProtocol.shortName.toUpperCase()} FİYATI:
+                      </span>
+                      <span style={{ fontSize: isMobileView ? '1.22rem' : '1.06rem', color: '#4ade80', fontWeight: 900 }}>
+                        {partnerPricing.finalCash.toLocaleString('tr-TR')} TL
+                      </span>
+                    </div>
+                    {vatShieldTl > 0 && (
+                      <div style={{
+                        marginTop: '6px',
+                        paddingTop: '6px',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                        fontSize: isMobileView ? '0.72rem' : '0.68rem',
+                        color: '#fcd34d',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <span>🧾 Vergi Avantajı (KDV):</span>
+                        <span>~{vatShieldTl.toLocaleString('tr-TR')} TL Vergiden Düşülür</span>
+                      </div>
+                    )}
                   </>
                 ) : vehicle.campaignPrice ? (
                   vehicle.cashDiscount > 0 ? (
@@ -1372,7 +1456,19 @@ export default function PricingCatalogTab({ initialSector = '', onSelectVehicle,
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button
                   type="button"
-                  onClick={() => onSelectVehicle && onSelectVehicle(vehicle)}
+                  onClick={() => {
+                    if (!onSelectVehicle) return;
+                    if (partnerPricing && !partnerPricing.isEur) {
+                      onSelectVehicle({
+                        ...vehicle,
+                        campaignPrice: partnerPricing.finalCampaign,
+                        cashPrice: partnerPricing.finalCash,
+                        cashDiscount: partnerPricing.discountTl
+                      });
+                    } else {
+                      onSelectVehicle(vehicle);
+                    }
+                  }}
                   style={{
                     flex: 1,
                     background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
