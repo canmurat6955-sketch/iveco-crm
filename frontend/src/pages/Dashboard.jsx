@@ -168,7 +168,7 @@ export default function Dashboard() {
               { duration: 8000 }
             );
             if (typeof document !== 'undefined') {
-              document.title = `🔥 (1) ${newest.company_name || 'MÜŞTERİ'} PORTALDA! | IVECO CRM`;
+              document.title = `🔥 (1) ${newest.company_name || 'MÜŞTERİ'} PORTALDA! | ERC Müşteri Portalı`;
             }
           }
           lastSeenFootprintIdRef.current = list[0].id;
@@ -191,7 +191,7 @@ export default function Dashboard() {
     }, 20000);
     const resetTitle = () => {
       if (typeof document !== 'undefined' && document.title.startsWith('🔥')) {
-        document.title = 'IVECO CRM — Müşteri İstihbarat & Satış';
+        document.title = 'ERC Müşteri Portalı — IVECO Yetkili Satış';
       }
     };
     window.addEventListener('focus', resetTitle);

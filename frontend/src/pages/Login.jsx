@@ -150,21 +150,21 @@ export default function Login() {
         </div>
 
         <h1 style={{
-          fontSize: 28,
+          fontSize: 26,
           fontWeight: 800,
           background: 'linear-gradient(135deg, #93c5fd 0%, #3b82f6 50%, #1d4ed8 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           marginBottom: 6,
           letterSpacing: '-0.5px'
-        }}>IVECO CRM</h1>
+        }}>ERC Müşteri Portalı</h1>
         
         <p className="login-subtitle" style={{
           fontSize: 13,
           color: '#94a3b8',
           marginBottom: 24
         }}>
-          Saha Satış İstihbarat Platformu
+          IVECO Yetkili Satış &amp; Yönetim Paneli
         </p>
 
         {/* Kod Giriş Formu */}
@@ -259,6 +259,26 @@ export default function Login() {
               : 'Sisteme Bağlan'}
           </button>
         </form>
+
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid rgba(148, 163, 184, 0.15)' }}>
+          <button
+            type="button"
+            onClick={() => navigate('/fiyat-listesi')}
+            style={{
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 10,
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.38)',
+              color: '#6ee7b7',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            🚛 2026 Fiyat Listesi &amp; Kredi Portalına Geç →
+          </button>
+        </div>
 
         {(loading || isWaking) && (
           <div style={{

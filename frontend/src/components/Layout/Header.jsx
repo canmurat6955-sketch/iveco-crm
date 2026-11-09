@@ -49,7 +49,7 @@ export default function Header() {
 
   const getTitle = () => {
     if (location.pathname.match(/^\/customers\/\d+$/)) return 'Müşteri Detayı';
-    return PAGE_TITLES[location.pathname] || 'Iveco Enterprise CRM';
+    return PAGE_TITLES[location.pathname] || 'ERC Müşteri Portalı';
   };
 
   return (

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { VisitProvider } from './contexts/VisitContext';
 import MainLayout from './components/Layout/MainLayout';
@@ -40,6 +40,7 @@ const page = (Comp) => <Suspense fallback={<PageLoader />}><Comp /></Suspense>;
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-muted)' }}>
@@ -48,6 +49,11 @@ function ProtectedRoute({ children }) {
     );
   }
   if (!user) {
+    // Müşteri LinkedIn / WhatsApp önizleme kartına tıklayıp ana domaine ('/') geldiğinde
+    // yönetici giriş ekranına (/login) atmak yerine doğrudan ERC Müşteri Portalını aç!
+    if (location.pathname === '/' || location.pathname === '') {
+      return page(PublicVehicleFinder);
+    }
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -61,6 +67,8 @@ export default function App() {
           <CallProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/yonetici" element={<Login />} />
+              <Route path="/panel" element={<Login />} />
               <Route path="/p/:token" element={page(PublicProposalView)} />
               <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
               <Route path="/arac-secici" element={page(PublicVehicleFinder)} />

@@ -651,7 +651,15 @@ const VEHICLE_CATALOG = [
 export default function PublicVehicleFinder() {
   const [searchParams] = useSearchParams();
   const activePartner = useMemo(() => resolvePartnerFromSearchParams(searchParams), [searchParams]);
-  const refCode = searchParams.get('ref') || searchParams.get('src') || searchParams.get('source') || (activePartner ? `partner_${activePartner.id}` : 'wa_durum');
+  const detectedReferrerChannel = useMemo(() => {
+    if (typeof document === 'undefined' || !document.referrer) return '';
+    const r = document.referrer.toLowerCase();
+    if (r.includes('linkedin') || r.includes('lnkd.in')) return 'linkedin';
+    if (r.includes('instagram')) return 'instagram';
+    if (r.includes('facebook') || r.includes('fb.')) return 'facebook';
+    return '';
+  }, []);
+  const refCode = searchParams.get('ref') || searchParams.get('src') || searchParams.get('source') || detectedReferrerChannel || (activePartner ? `partner_${activePartner.id}` : 'wa_durum');
   const customerIdParam = searchParams.get('cid') || searchParams.get('customer_id');
   const companyParam = searchParams.get('company') || searchParams.get('firma') || searchParams.get('comp') || '';
   const nameParam = searchParams.get('name') || searchParams.get('yetkili') || '';
@@ -5747,6 +5755,14 @@ IVECO ERC Samsun Otomotiv
         <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.67rem' }}>
           Nihai araç teslim tarihi, anahtar teslim fiyatı, opsiyonel donanımlar ve resmi kredi onay şartları IVECO ERC Samsun Otomotiv ile düzenlenecek resmi satış sözleşmesiyle kesinlik kazanır. Fiyatlar ve stok durumu fabrika/distribütör koşullarına bağlı olarak değişkenlik gösterebilir.
         </p>
+        <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <a
+            href="/login"
+            style={{ color: '#475569', fontSize: '0.64rem', textDecoration: 'none', fontWeight: 600 }}
+          >
+            🔒 ERC Müşteri Portalı • Yetkili Girişi
+          </a>
+        </div>
       </div>
 
       {/* ── 📱 MOBİL SABİT HIZLI İLETİŞİM BARI (STICKY BOTTOM BAR) ── */}
