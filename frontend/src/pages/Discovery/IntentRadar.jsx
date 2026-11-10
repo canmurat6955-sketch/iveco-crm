@@ -1261,13 +1261,13 @@ export default function IntentRadar() {
             }}>
 {`🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇
 
-${getPublicOrigin()}/?ref=wa_durum`}
+${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇\n\n${getPublicOrigin()}/?ref=wa_durum`;
+                  const text = `🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇\n\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

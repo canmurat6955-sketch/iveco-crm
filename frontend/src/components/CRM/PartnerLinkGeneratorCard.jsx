@@ -172,7 +172,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       params.set('picon', '👑');
     }
     params.set('ref', activeChannel.refCode);
-    return `${baseOrigin}/?${params.toString()}`;
+    return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
   }, [
     origin,
     activeChannel,

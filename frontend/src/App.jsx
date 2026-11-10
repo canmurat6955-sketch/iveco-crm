@@ -38,7 +38,14 @@ const PageLoader = () => (
 
 const page = (Comp) => <Suspense fallback={<PageLoader />}><Comp /></Suspense>;
 
+function isPublicCatalogHost() {
+  if (typeof window === 'undefined') return false;
+  const host = (window.location.hostname || '').toLowerCase();
+  return host.includes('fiyat-listesi');
+}
+
 function isSharedPortalVisit(location) {
+  if (isPublicCatalogHost()) return true;
   const search = location?.search || '';
   if (search) {
     const params = new URLSearchParams(search);
@@ -59,19 +66,13 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
   const isRoot = location.pathname === '/' || location.pathname === '';
 
-  // Eğer linkte herhangi bir paylaşım parametresi (?ref=..., ?partner=...) varsa veya
-  // LinkedIn / Instagram / Facebook önizleme kartından tıklandıysa, yönetici oturumu açık olsa bile
-  // doğrudan Müşteri Portalını aç!
+  // Eğer müşteri domainindeyse (iveco-fiyat-listesi.vercel.app) veya paylaşım parametresi (?ref=...) varsa
+  // doğrudan Müşteri Fiyat Listesi Portalını aç!
   if (isRoot && isSharedPortalVisit(location)) {
     return page(PublicVehicleFinder);
   }
 
   if (loading) {
-    // Ana sayfada ('/') oturum kontrol edilirken bile eğer token yoksa hiç bekletmeden müşteri portalını aç
-    const hasToken = typeof window !== 'undefined' && Boolean(localStorage.getItem('token'));
-    if (isRoot && !hasToken) {
-      return page(PublicVehicleFinder);
-    }
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-muted)' }}>
         <div className="loading-pulse"></div>
@@ -79,15 +80,26 @@ function ProtectedRoute({ children }) {
     );
   }
   if (!user) {
-    if (isRoot) {
-      return page(PublicVehicleFinder);
-    }
     return <Navigate to="/login" replace />;
   }
   return children;
 }
 
 export default function App() {
+  const isCatalogDomain = isPublicCatalogHost();
+
+  // Müşteri domaini (iveco-fiyat-listesi.vercel.app) üzerinde YÖNETİCİ GİRİŞİ HİÇBİR ZAMAN AÇILMAZ;
+  // tüm linkler (ana sayfa dahil) doğrudan Müşteri Fiyat Listesi Portalını açar.
+  if (isCatalogDomain) {
+    return (
+      <Routes>
+        <Route path="/p/:token" element={page(PublicProposalView)} />
+        <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
+        <Route path="*" element={page(PublicVehicleFinder)} />
+      </Routes>
+    );
+  }
+
   return (
     <AuthProvider>
       <VisitProvider>

@@ -288,7 +288,7 @@ export function buildPartnerShareUrl(origin, config) {
 
   params.set('ref', `protokol_${slug || partnerId}`);
 
-  return `${baseOrigin}/?${params.toString()}`;
+  return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
 }
 
 /**
