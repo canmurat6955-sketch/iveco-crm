@@ -119,18 +119,24 @@ api.interceptors.response.use(
       if (!isAuthUrl) {
         localStorage.removeItem('token');
         const path = typeof window !== 'undefined' ? window.location.pathname : '';
-        const isPublicPage = (
-          path.startsWith('/login') ||
-          path.startsWith('/ozel-teklif') ||
-          path.startsWith('/arac-secici') ||
-          path.startsWith('/filo-hesaplayici') ||
-          path.startsWith('/akilli-kasa') ||
-          path.startsWith('/iveco-finansman') ||
-          path.startsWith('/test/') ||
-          path.startsWith('/p/') ||
-          path.startsWith('/proformas/view/')
+        const isInternalAdminPage = (
+          path.startsWith('/workbench') ||
+          path.startsWith('/customers') ||
+          path.startsWith('/contacts') ||
+          path.startsWith('/campaigns') ||
+          path.startsWith('/sales') ||
+          path.startsWith('/pipeline') ||
+          path.startsWith('/notifications') ||
+          path.startsWith('/discovery') ||
+          path.startsWith('/intent-radar') ||
+          path.startsWith('/routes') ||
+          path.startsWith('/scan-card') ||
+          path.startsWith('/map') ||
+          path.startsWith('/vehicles') ||
+          path.startsWith('/proforma/') ||
+          (path.startsWith('/proformas/') && !path.startsWith('/proformas/view/'))
         );
-        if (typeof window !== 'undefined' && !isPublicPage) {
+        if (typeof window !== 'undefined' && isInternalAdminPage) {
           window.location.href = '/login';
         }
       }

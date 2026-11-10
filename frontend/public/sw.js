@@ -1,7 +1,5 @@
-const CACHE_NAME = 'iveco-crm-cache-v2';
+const CACHE_NAME = 'erc-portal-cache-v5';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/favicon.ico',
 ];

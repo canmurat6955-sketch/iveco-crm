@@ -38,10 +38,40 @@ const PageLoader = () => (
 
 const page = (Comp) => <Suspense fallback={<PageLoader />}><Comp /></Suspense>;
 
+function isSharedPortalVisit(location) {
+  const search = location?.search || '';
+  if (search) {
+    const params = new URLSearchParams(search);
+    const portalKeys = ['ref', 'src', 'source', 'partner', 'protokol', 'dernek', 'oda', 'cid', 'customer_id', 'company', 'firma', 'phone', 'tel', 'sector', 'model', 'arac', 'tab', 'discount', 'indirim'];
+    if (portalKeys.some(k => params.has(k))) return true;
+  }
+  if (typeof document !== 'undefined' && document.referrer) {
+    const r = document.referrer.toLowerCase();
+    if (r.includes('linkedin') || r.includes('lnkd.in') || r.includes('instagram') || r.includes('facebook') || r.includes('fb.') || r.includes('t.co')) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const isRoot = location.pathname === '/' || location.pathname === '';
+
+  // Eğer linkte herhangi bir paylaşım parametresi (?ref=..., ?partner=...) varsa veya
+  // LinkedIn / Instagram / Facebook önizleme kartından tıklandıysa, yönetici oturumu açık olsa bile
+  // doğrudan Müşteri Portalını aç!
+  if (isRoot && isSharedPortalVisit(location)) {
+    return page(PublicVehicleFinder);
+  }
+
   if (loading) {
+    // Ana sayfada ('/') oturum kontrol edilirken bile eğer token yoksa hiç bekletmeden müşteri portalını aç
+    const hasToken = typeof window !== 'undefined' && Boolean(localStorage.getItem('token'));
+    if (isRoot && !hasToken) {
+      return page(PublicVehicleFinder);
+    }
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-muted)' }}>
         <div className="loading-pulse"></div>
@@ -49,9 +79,7 @@ function ProtectedRoute({ children }) {
     );
   }
   if (!user) {
-    // Müşteri LinkedIn / WhatsApp önizleme kartına tıklayıp ana domaine ('/') geldiğinde
-    // yönetici giriş ekranına (/login) atmak yerine doğrudan ERC Müşteri Portalını aç!
-    if (location.pathname === '/' || location.pathname === '') {
+    if (isRoot) {
       return page(PublicVehicleFinder);
     }
     return <Navigate to="/login" replace />;
