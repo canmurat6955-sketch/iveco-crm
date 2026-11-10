@@ -11,8 +11,15 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [waitSeconds, setWaitSeconds] = useState(0);
   const [isWaking, setIsWaking] = useState(false);
-  const { login, loginPasscode } = useAuth();
+  const { user, login, loginPasscode } = useAuth();
   const navigate = useNavigate();
+
+  // Zaten giriş yapılmışsa /yonetici veya /panel linkine tıklandığında direkt CRM ekranını aç
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   // 1. Sayfa açılır açılmaz Render'ı uyandır (sessiz arka plan pre-warm)
   useEffect(() => {
@@ -58,7 +65,7 @@ export default function Login() {
       // 1. YOL: Doğrudan hızlı passcode endpoint'i
       await loginPasscode(clean);
       toast.success('Giriş başarılı.');
-      navigate('/');
+      navigate('/dashboard');
       return;
     } catch (err1) {
       console.warn('Passcode girişi yanıt vermedi veya reddedildi:', err1);
@@ -78,7 +85,7 @@ export default function Login() {
       try {
         await login(targetEmail, clean);
         toast.success('Giriş başarılı.');
-        navigate('/');
+        navigate('/dashboard');
         return;
       } catch (err2) {
         console.error('Login error:', err2);

@@ -97,6 +97,8 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/yonetici" element={<Login />} />
               <Route path="/panel" element={<Login />} />
+              <Route path="/admin" element={<Login />} />
+              <Route path="/crm" element={<Login />} />
               <Route path="/p/:token" element={page(PublicProposalView)} />
               <Route path="/proformas/view/:token" element={page(PublicProposalView)} />
               <Route path="/arac-secici" element={page(PublicVehicleFinder)} />
@@ -118,6 +120,7 @@ export default function App() {
               <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
 
                 <Route index element={page(Dashboard)} />
+                <Route path="dashboard" element={page(Dashboard)} />
                 <Route path="workbench" element={page(Workbench)} />
                 <Route path="customers" element={page(CustomerList)} />
                 <Route path="customers/:id" element={page(CustomerDetail)} />

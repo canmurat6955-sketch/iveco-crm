@@ -1997,6 +1997,28 @@ IVECO ERC Samsun Otomotiv
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
+        {typeof window !== 'undefined' && Boolean(window.localStorage.getItem('token')) && (
+          <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+            <a
+              href="/dashboard"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#0f172a',
+                padding: '6px 12px',
+                borderRadius: '999px',
+                fontSize: '0.74rem',
+                fontWeight: 900,
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.35)'
+              }}
+            >
+              ⚙️ Yönetim Paneline Geç
+            </a>
+          </div>
+        )}
         
         {/* Can Murat Onay VIP Test & Canlı Simülasyon Dock'u (Sadece ?admin=true olduğunda) */}
         {isAdminMode && showTestPanel && (
@@ -5761,7 +5783,7 @@ IVECO ERC Samsun Otomotiv
         </p>
         <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <a
-            href="/login"
+            href="/yonetici"
             style={{ color: '#475569', fontSize: '0.64rem', textDecoration: 'none', fontWeight: 600 }}
           >
             🔒 ERC Müşteri Portalı • Yetkili Girişi
