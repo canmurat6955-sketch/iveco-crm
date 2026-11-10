@@ -1259,20 +1259,15 @@ export default function IntentRadar() {
               color: '#e2e8f0',
               whiteSpace: 'pre-wrap'
             }}>
-{`IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı
+{`🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇
 
-Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:
-
-${getPublicOrigin()}/fiyat-listesi?ref=muratonay
-
-IVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.
-Can Murat ONAY - 0544 622 59 31`}
+${getPublicOrigin()}/?ref=wa_durum`}
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => {
-                  const text = `IVECO 2026 Model Fiyat Listesi & Resmi Bayi Finansman Portalı\n\nDaily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel anahtar teslim bayi fiyatlarını, yasal istiap kapasitelerini ve resmi banka sübvansiyonlu kredi taksit planlarını aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n${getPublicOrigin()}/fiyat-listesi?ref=muratonay\n\nIVECO Yetkili Satıcısı ERC Samsun Otomotiv A.Ş.\nCan Murat ONAY - 0544 622 59 31`;
+                  const text = `🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇\n\n${getPublicOrigin()}/?ref=wa_durum`;
                   navigator.clipboard.writeText(text);
                   setCopiedStatusText(true);
                   toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');

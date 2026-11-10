@@ -288,7 +288,7 @@ export function buildPartnerShareUrl(origin, config) {
 
   params.set('ref', `protokol_${slug || partnerId}`);
 
-  return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
+  return `${baseOrigin}/?${params.toString()}`;
 }
 
 /**
@@ -307,10 +307,7 @@ export function buildPartnerAnnouncementText(origin, config) {
     `✅ Tüm araçlarda *${config.shortName} Üye İndirimi düşülmüş* net protokol fiyatlarını anında görün,\n` +
     `🔄 Elinizdeki mevcut aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya anlaşmalı banka oranlarıyla kalan taksitinizi 10 saniyede hesaplayın,\n` +
     `📸 Takasa vereceğiniz aracın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takas ön fiyatı alın,\n` +
-    `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın:\n\n` +
-    `👇 *${config.shortName} Üyelerine Özel İndirimli Katalog & Hesaplama Linki:*\n` +
-    `👉 ${link}\n\n` +
-    `*Satış Sorumlusu | IVECO ERC Samsun Otomotiv*\n` +
-    `📞 *0544 622 59 31*`
+    `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın 👇\n\n` +
+    `${link}`
   );
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'erc-portal-cache-v5';
+const CACHE_NAME = 'erc-portal-cache-v6';
 const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/favicon.ico',
