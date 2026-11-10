@@ -888,23 +888,17 @@ export default function PublicVehicleFinder() {
   const [quickNameInput, setQuickNameInput] = useState(companyParam || nameParam || storedVisitorProfile.company || storedVisitorProfile.name || '');
   const [quickPhoneUnlocked, setQuickPhoneUnlocked] = useState(Boolean(phoneParam || storedVisitorProfile.phone));
 
-  // URL'den veya formdan numara/isim geldiğinde tarayıcı hafızasına kaydet (Bir sonraki WhatsApp Durum tıklamasında otomatik tanınsın)
+  // Aktif İnceleme Süresi Sayacı: Sekme arka planda (uykuda) kaldığında sayacı durdurur,
+  // böylece akşamdan açık kalan sekmelerde "1106 dk" gibi gerçek dışı süreler oluşmaz.
+  const activeSecondsRef = React.useRef(5);
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const cleanP = (customerPhone || '').replace(/\D/g, '');
-    if (cleanP.length >= 10 || customerCompany || customerName) {
-      try {
-        window.localStorage.setItem('iveco_visitor_profile_v1', JSON.stringify({
-          phone: customerPhone || storedVisitorProfile.phone || '',
-          company: customerCompany || storedVisitorProfile.company || '',
-          name: customerName || storedVisitorProfile.name || '',
-          updatedAt: Date.now()
-        }));
-      } catch {}
-    }
-  }, [customerPhone, customerCompany, customerName]);
-
-  const [startTime] = useState(Date.now());
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        activeSecondsRef.current = Math.min(activeSecondsRef.current + 2, 540);
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Kişisel VIP Link tıklandığında CRM'e sessizce dijital niyet / ziyaret sinyali kaydet
   useEffect(() => {
@@ -1483,10 +1477,11 @@ export default function PublicVehicleFinder() {
     sentFootprintsRef.current.add(key);
 
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
-    const visitorLabel = effectiveName
-      ? (socialSourceLabel ? `${effectiveName} (${socialSourceLabel})` : effectiveName)
+    const cleanBaseName = effectiveName.replace(/\s*\([^)]*Ziyaretçisi\)\s*/gi, '').trim();
+    const visitorLabel = cleanBaseName
+      ? (socialSourceLabel ? `${cleanBaseName} (${socialSourceLabel})` : cleanBaseName)
       : (socialSourceLabel || 'Portal Ziyaretçisi');
-    const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+    const durationSeconds = Math.max(3, Math.min(activeSecondsRef.current || 12, 540));
 
     discoveryApi.recordIntentSignal({
       source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
@@ -1566,8 +1561,17 @@ export default function PublicVehicleFinder() {
     }
 
     setSubmitting(true);
-    const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+    const durationSeconds = Math.max(5, Math.min(activeSecondsRef.current || 20, 540));
     const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
+
+    try {
+      window.localStorage.setItem('iveco_visitor_profile_v1', JSON.stringify({
+        phone: customerPhone.trim(),
+        name: customerName.trim(),
+        company: customerCompany.trim() || customerName.trim(),
+        updatedAt: Date.now()
+      }));
+    } catch {}
 
     const isEurFinancing = loanCurrencyMode === 'EUR' || (matched.currency === 'EUR' && loanCurrencyMode !== 'TRY');
     const campaignSummary = (isEurFinancing && activeEurCampaign)
@@ -1601,7 +1605,7 @@ export default function PublicVehicleFinder() {
         ...leadPayload,
         timestamp: new Date().toLocaleTimeString('tr-TR')
       });
-      toast.success('🛠️ VIP TEST: Can Murat Onay Simülasyonu çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
+      toast.success('🛠️ VIP TEST: Simülasyon çalıştırıldı! CRM Pipeline kaydı aşağıda gösterilmektedir.', { duration: 5000 });
       return;
     }
 

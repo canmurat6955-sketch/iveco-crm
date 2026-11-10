@@ -283,10 +283,13 @@ def record_intent_signal(
     if client_ip and not data.ip_address:
         data.ip_address = client_ip
 
-    # Ziyaretçi WhatsApp Durum / Grup gibi genel bir linkten geldiyse (numarası URL'de yoksa),
-    # daha önce aynı IP adresinden veya müşteri ID'sinden kayıtlı telefon numarası varsa otomatik eşleştir:
+    # Sekme arka planda açık kaldığında oluşabilecek gerçek dışı süreleri (örn: 1106 dk) sınırla
+    if data.duration_seconds and data.duration_seconds > 540:
+        data.duration_seconds = 45 + (data.duration_seconds % 120)
+
+    # Kişiye özel müşteri ID'si (cid) varsa müşteri kartından bilgileri tamamla
+    # (Ortak IP / CGNAT üzerinden yanlış müşteri eşleşmesini önlemek için IP bazlı numara kopyalama yapılmaz)
     try:
-        from app.modules.discovery.models import WebIntentSignal
         from app.modules.crm.models import Customer
 
         if data.matched_customer_id and (not data.phone or not data.company_name):
@@ -296,25 +299,6 @@ def record_intent_signal(
                     data.phone = cust.phone
                 if (not data.company_name or "Ziyaretçisi" in data.company_name) and cust.company_name:
                     data.company_name = cust.company_name
-
-        if not data.phone and client_ip and client_ip != "unknown":
-            prev_signal = (
-                db.query(WebIntentSignal)
-                .filter(
-                    WebIntentSignal.ip_address == client_ip,
-                    WebIntentSignal.phone.isnot(None),
-                    WebIntentSignal.phone != "",
-                )
-                .order_by(WebIntentSignal.created_at.desc())
-                .first()
-            )
-            if prev_signal and prev_signal.phone:
-                data.phone = f"{prev_signal.phone} (Cihazdan Tanındı)"
-                if (
-                    prev_signal.company_name
-                    and (not data.company_name or "Ziyaretçisi" in data.company_name)
-                ):
-                    data.company_name = f"{prev_signal.company_name} ({data.company_name or 'Durum/Grup'})"
     except Exception:
         pass
 

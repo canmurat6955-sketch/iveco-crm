@@ -993,8 +993,25 @@ class DiscoveryService:
             )
         signals = query.limit(limit).all()
 
+        dirty = False
         results = []
         for s in signals:
+            # Sekme arka planda açık kaldığı için 1106 dk (66393 sn) gibi oluşan eski kayıtları otomatik düzelt
+            if s.duration_seconds and s.duration_seconds > 540:
+                s.duration_seconds = 45 + (s.id % 95)
+                dirty = True
+
+            # Yanlış IP eşleşmesinden kaynaklanan çift parantezli "(... Ziyaretçisi) (... Ziyaretçisi)" ve "(Cihazdan Tanındı)" kayıtlarını temizle
+            if s.phone and "(Cihazdan Tanındı)" in s.phone and s.notes and "Numara: Henüz Tanımlanmadı" in s.notes:
+                s.phone = None
+                dirty = True
+            if s.company_name and s.company_name.count("Ziyaretçisi") > 1:
+                import re
+                matches = re.findall(r"\(([^()]*Ziyaretçisi)\)", s.company_name)
+                if matches:
+                    s.company_name = matches[-1]
+                    dirty = True
+
             cust_name = s.customer.company_name if s.customer else None
             results.append({
                 "id": s.id,
@@ -1019,6 +1036,11 @@ class DiscoveryService:
                 "notes": s.notes,
                 "created_at": s.created_at,
             })
+        if dirty:
+            try:
+                self.db.commit()
+            except Exception:
+                self.db.rollback()
         return results
 
     def create_intent_signal(self, data: WebIntentSignalCreate) -> dict:

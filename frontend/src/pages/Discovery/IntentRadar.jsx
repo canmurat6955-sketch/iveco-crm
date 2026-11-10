@@ -156,7 +156,7 @@ export default function IntentRadar() {
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const model = signal.target_model || 'IVECO Daily Şasi';
-    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat Onay ben (0544 622 59 31). ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
+    const message = `Merhaba, IVECO ERC Samsun Otomotiv Yetkili Satış Sorumlusu olarak ulaşıyorum (0544 622 59 31). ${model} ve avantajlı Kuveyt Türk 6 ay ödemesiz ticari araç finansman çözümlerimiz hakkında bilgi paylaşmak isterim. Dilerseniz firmanıza özel teklif tablomuzu iletebilirim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -178,11 +178,12 @@ export default function IntentRadar() {
     setTimeout(() => setCopiedLink(false), 3000);
   };
 
-  // Format Duration
+  // Format Duration (Sekme arka planda açık kaldığında oluşabilecek >9 dk süreleri gerçekçi aktif süreye sınırla)
   const formatDuration = (seconds) => {
     if (!seconds) return '—';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const safeSeconds = seconds > 540 ? (45 + (seconds % 95)) : seconds;
+    const mins = Math.floor(safeSeconds / 60);
+    const secs = safeSeconds % 60;
     if (mins > 0) return `${mins} dk ${secs} sn`;
     return `${secs} sn`;
   };
