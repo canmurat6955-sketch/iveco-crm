@@ -298,10 +298,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
     pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
-    priceRange: '2.240.000 TL (Peşin) / 2.500.000 TL (Kampanyalı)',
+    priceRange: '2.390.000 TL (Peşin) / 2.500.000 TL (Kampanyalı)',
     campaignPriceText: '2.500.000 TL',
-    cashPriceText: '2.240.000 TL',
-    cashDiscountText: '260.000 TL',
+    cashPriceText: '2.390.000 TL',
+    cashDiscountText: '110.000 TL',
     defaultLoan: 1500000,
     bodyType: 'frigo'
   },
