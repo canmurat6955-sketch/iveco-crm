@@ -758,7 +758,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   type="text"
                   value={tradeInVehicleText}
                   onChange={(e) => setTradeInVehicleText(e.target.value)}
-                  placeholder="Örn: 2020 Ford Transit 350ED / 2018 Daily / Atego..."
+                  placeholder="Örn: 2020 Model Kamyonet / Panelvan / Çekici..."
                   style={{
                     width: '100%',
                     padding: '9px 12px',

@@ -4859,145 +4859,93 @@ IVECO ERC Samsun Otomotiv
               </div>
             )}
 
-            {/* ── İLETİŞİM & TEKLİF ALMA FORMU ──────────────────────── */}
+            {/* ── TEK SATIRLIK HIZLI İLETİŞİM & TEKLİF ALMA (UZUN FORM YOK) ──────────────────────── */}
             {!submitted ? (
-              <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(99, 179, 237, 0.2)', borderRadius: '14px', padding: '16px', marginBottom: '16px' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <FiFileText size={16} color="#38bdf8" /> Satış Sorumlusu Sizinle İletişime Geçsin
-                </h4>
-                <p style={{ fontSize: '0.76rem', color: '#94a3b8', margin: '0 0 12px' }}>
-                  Bilgilerinizi bırakın; Satış Sorumlusu aracın fabrika şasi teslim tarihini ve firmanıza özel teklifini 15 dakikada iletsin.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px' }}>
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Adınız Soyadınız *"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      style={{
-                        width: '100%',
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        color: '#fff',
-                        fontSize: '0.85rem'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
-                    <input
-                      type="text"
-                      placeholder="Firma / Ticari Ünvan"
-                      value={customerCompany}
-                      onChange={(e) => setCustomerCompany(e.target.value)}
-                      style={{
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        color: '#fff',
-                        fontSize: '0.85rem'
-                      }}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Şehir (Örn: Samsun)"
-                      value={customerCity}
-                      onChange={(e) => setCustomerCity(e.target.value)}
-                      style={{
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        color: '#fff',
-                        fontSize: '0.85rem'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="Cep Telefonu (05XX XXX XX XX) *"
-                      required
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(formatPhoneInput(e.target.value))}
-                      style={{
-                        width: '100%',
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(56, 189, 248, 0.4)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        color: '#38bdf8',
-                        fontWeight: 700,
-                        fontSize: '0.9rem'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <textarea
-                      placeholder="İlave Notunuz / Mevcut Araç Takas Talebiniz (Opsiyonel)"
-                      rows={2}
-                      value={customerNotes}
-                      onChange={(e) => setCustomerNotes(e.target.value)}
-                      style={{
-                        width: '100%',
-                        background: 'rgba(0,0,0,0.4)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        borderRadius: '8px',
-                        padding: '8px 12px',
-                        color: '#fff',
-                        fontSize: '0.82rem',
-                        resize: 'none'
-                      }}
-                    />
-                  </div>
+              <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(56, 189, 248, 0.28)', borderRadius: '14px', padding: '14px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <FiPhone size={15} color="#38bdf8" /> Sadece Numaranızı Bırakın, 15 Dk İçinde Arayalım
+                  </h4>
+                  <span style={{ fontSize: '0.68rem', color: '#4ade80', fontWeight: 700, background: 'rgba(16, 185, 129, 0.14)', padding: '2px 8px', borderRadius: '6px' }}>
+                    ⚡ Uzun Form Yok • Tek Tuş
+                  </span>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{
-                    width: '100%',
-                    background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '12px',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    cursor: submitting ? 'not-allowed' : 'pointer',
-                    boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
-                  }}
-                >
-                  <FiPhone size={15} />
-                  {submitting ? 'İletiliyor...' : 'Satış Sorumlusu Sizinle İletişime Geçsin'}
-                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.2fr 0.9fr auto', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="tel"
+                    placeholder="Cep Telefonunuz (05XX XXX XX XX) *"
+                    required
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(formatPhoneInput(e.target.value))}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.45)',
+                      border: '1.5px solid rgba(56, 189, 248, 0.5)',
+                      borderRadius: '9px',
+                      padding: '11px 12px',
+                      color: '#38bdf8',
+                      fontWeight: 800,
+                      fontSize: '0.9rem'
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="İsim veya Firma (İsteğe Bağlı)"
+                    value={customerName}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      setCustomerCompany(e.target.value);
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.35)',
+                      border: '1px solid rgba(255,255,255,0.14)',
+                      borderRadius: '9px',
+                      padding: '11px 12px',
+                      color: '#fff',
+                      fontSize: '0.84rem'
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    style={{
+                      background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '9px',
+                      padding: '11px 18px',
+                      fontWeight: 800,
+                      fontSize: '0.86rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      cursor: submitting ? 'not-allowed' : 'pointer',
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
+                    }}
+                  >
+                    <FiPhone size={14} />
+                    {submitting ? 'İletiliyor...' : 'Beni Arayın'}
+                  </button>
+                </div>
               </form>
             ) : (
               <div style={{
                 background: 'rgba(16, 185, 129, 0.15)',
                 border: '1px solid rgba(16, 185, 129, 0.4)',
                 borderRadius: '14px',
-                padding: '18px',
+                padding: '16px',
                 textAlign: 'center',
-                marginBottom: '16px'
+                marginBottom: '14px'
               }}>
-                <FiCheckCircle size={36} style={{ color: '#10b981', marginBottom: '8px' }} />
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                  Talebiniz Satış Sorumlusu'ye Ulaştı!
+                <FiCheckCircle size={32} style={{ color: '#10b981', marginBottom: '6px' }} />
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
+                  Numaranız Satış Sorumlusuna Ulaştı!
                 </h4>
-                <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: '0 0 10px' }}>
+                <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
                   Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
                 </p>
               </div>

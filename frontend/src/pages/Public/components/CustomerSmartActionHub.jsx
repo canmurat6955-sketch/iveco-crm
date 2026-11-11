@@ -602,48 +602,33 @@ export default function CustomerSmartActionHub({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Adınız / Firma Adı"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem' }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              placeholder="Cep Telefonunuz (05XX...)"
+              placeholder="Cep Telefonunuz (05XX...) *"
               required
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(56, 189, 248, 0.45)', color: '#fff', fontSize: '0.82rem' }}
+              style={{ padding: '11px 12px', borderRadius: '9px', background: '#0f172a', border: '1.5px solid rgba(56, 189, 248, 0.5)', color: '#fff', fontSize: '0.86rem', fontWeight: 700 }}
             />
-            <input
-              type="text"
-              value={apptAddressOrNote}
-              onChange={(e) => setApptAddressOrNote(e.target.value)}
-              placeholder={apptType.id === 'workplace_or_call' ? 'İlçe / İş Yeri Adresi veya Notunuz' : 'Varsa Takas Aracınız / Notunuz'}
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem' }}
-            />
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                borderRadius: '9px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#052e16',
+                border: 'none',
+                fontWeight: 900,
+                fontSize: '0.86rem',
+                cursor: 'pointer'
+              }}
+            >
+              {submitting ? 'Kaydediliyor...' : `📅 Randevumu Oluştur (${apptDay} • ${apptTime})`}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: '#052e16',
-              border: 'none',
-              fontWeight: 900,
-              fontSize: '0.88rem',
-              cursor: 'pointer'
-            }}
-          >
-            {submitting ? 'Kaydediliyor...' : `📅 ${apptType.title} Randevumu Oluştur (${apptDay} • ${apptTime})`}
-          </button>
         </form>
       )}
 
@@ -654,43 +639,35 @@ export default function CustomerSmartActionHub({
             🔒 Ortağınızla veya Muhasebecinizle Görüşene Kadar Bu Fiyatı 24 Saat Adınıza Ayıralım
           </div>
           <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '0 0 12px', lineHeight: 1.45 }}>
-            İncelediğiniz <strong>{activeModelTitle}</strong> modelinin mevcut kampanya fiyatını ve <strong>1.000.000 TL %0 Faiz</strong> kredi kontenjanını hiçbir kapora ödemeden <strong>24 saat boyunca firmanız adına</strong> rezerve edebilirsiniz.
+            İncelediğiniz <strong>{activeModelTitle}</strong> modelinin mevcut kampanya fiyatını ve <strong>1.000.000 TL %0 Faiz</strong> kredi kontenjanını hiçbir kapora ödemeden <strong>24 saat boyunca</strong> rezerve etmek için sadece numaranızı yazın:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Firma Adı veya Adınız Soyadınız"
-              required
-              style={{ padding: '10px 12px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', fontSize: '0.84rem' }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              placeholder="Cep Telefonunuz (Opsiyon Kodu SMS/WA İçin)"
+              placeholder="Cep Telefonunuz (05XX...) *"
               required
-              style={{ padding: '10px 12px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(245, 158, 11, 0.5)', color: '#fff', fontSize: '0.84rem' }}
+              style={{ padding: '11px 12px', borderRadius: '9px', background: '#0f172a', border: '1.5px solid rgba(245, 158, 11, 0.55)', color: '#fff', fontSize: '0.86rem', fontWeight: 700 }}
             />
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                borderRadius: '9px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#0f172a',
+                border: 'none',
+                fontWeight: 900,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              {submitting ? 'Tanımlanıyor...' : '🔒 24 Saat Adıma Opsiyonla (Ücretsiz)'}
+            </button>
           </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: '#0f172a',
-              border: 'none',
-              fontWeight: 900,
-              fontSize: '0.88rem',
-              cursor: 'pointer'
-            }}
-          >
-            {submitting ? 'Opsiyon Tanımlanıyor...' : '🔒 Bu Şasiyi ve Kampanyayı 24 Saat Adıma Opsiyonla (Ücretsiz)'}
-          </button>
           {optionCode && (
             <div style={{ marginTop: '10px', fontSize: '0.8rem', color: '#fde68a', fontWeight: 800, textAlign: 'center' }}>
               Resmi Opsiyon Kodunuz: #{optionCode} — Satış Sorumlusu şasinizi 24 saat bloke etmiştir.
@@ -847,28 +824,14 @@ export default function CustomerSmartActionHub({
             })}
           </div>
 
-          {/* Opsiyonel Araç & İletişim Bilgisi */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              value={tradeInCarInfo}
-              onChange={(e) => setTradeInCarInfo(e.target.value)}
-              placeholder="Takas Aracınız (Örn: 2020 Transit / Daily)"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.16)', color: '#fff', fontSize: '0.8rem' }}
-            />
-            <input
-              type="text"
-              value={tradeInKmInput}
-              onChange={(e) => setTradeInKmInput(e.target.value)}
-              placeholder="Güncel KM (Örn: 185.000 KM)"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.16)', color: '#fff', fontSize: '0.8rem' }}
-            />
+          {/* Tek Kutulu İletişim Bilgisi */}
+          <div style={{ marginBottom: '10px' }}>
             <input
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              placeholder="Cep Telefonunuz (05XX...)"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(56, 189, 248, 0.4)', color: '#fff', fontSize: '0.8rem' }}
+              placeholder="Cep Telefonunuz (05XX... — İsteğe Bağlı)"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(56, 189, 248, 0.4)', color: '#fff', fontSize: '0.84rem' }}
             />
           </div>
 
@@ -929,25 +892,25 @@ export default function CustomerSmartActionHub({
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '10px 12px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>İndirilecek %20 KDV Kalkanı</div>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>İndirilecek %20 KDV Avantajı</div>
               <div style={{ fontSize: '1rem', fontWeight: 900, color: '#34d399', marginTop: '2px' }}>
                 {kdvShield.toLocaleString('tr-TR')} TL
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Fatura kesildiği ay KDV'den düşülür</div>
+              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Fatura kesildiği ay KDV mahsubu</div>
             </div>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '10px 12px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>1. Yıl Amortisman Gideri (~%20)</div>
               <div style={{ fontSize: '1rem', fontWeight: 900, color: '#38bdf8', marginTop: '2px' }}>
                 {firstYearDepr.toLocaleString('tr-TR')} TL
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Kurumlar/Gelir vergisi matrahından düşülür</div>
+              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>Vergi matrahından gider indirimi</div>
             </div>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '10px 12px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Toplam 1. Yıl Vergi Avantajı</div>
               <div style={{ fontSize: '1rem', fontWeight: 900, color: '#fbbf24', marginTop: '2px' }}>
                 {(kdvShield + Math.round(firstYearDepr * 0.25)).toLocaleString('tr-TR')} TL
               </div>
-              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>KDV + Kurumlar Vergisi Kalkanı</div>
+              <div style={{ fontSize: '0.66rem', color: '#64748b' }}>KDV + Amortisman Avantajı</div>
             </div>
           </div>
           <button
@@ -997,40 +960,33 @@ export default function CustomerSmartActionHub({
               </button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Firma Adı / Adınız"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem' }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              placeholder="Cep Telefonunuz"
+              placeholder="Cep Telefonunuz (05XX...) *"
               required
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(56, 189, 248, 0.45)', color: '#fff', fontSize: '0.82rem' }}
+              style={{ padding: '11px 12px', borderRadius: '9px', background: '#0f172a', border: '1.5px solid rgba(56, 189, 248, 0.5)', color: '#fff', fontSize: '0.86rem', fontWeight: 700 }}
             />
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                borderRadius: '9px',
+                background: '#0284c7',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 900,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              📦 {selectedBodyPkg} Fiyatı Gönderin
+            </button>
           </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              background: '#0284c7',
-              color: '#fff',
-              border: 'none',
-              fontWeight: 900,
-              fontSize: '0.86rem',
-              cursor: 'pointer'
-            }}
-          >
-            📦 {selectedBodyPkg} Anahtar Teslim Fiyatı Gönderin
-          </button>
         </form>
       )}
 
@@ -1041,7 +997,7 @@ export default function CustomerSmartActionHub({
             🔔 Sıfır Araç Bütçenizi Aşıyorsa: Takasa Temiz 2. El IVECO Geldiğinde İlk Size Haber Verelim!
           </div>
           <p style={{ fontSize: '0.76rem', color: '#cbd5e1', margin: '0 0 10px' }}>
-            Sıfır araç verdiğimiz müşterilerimizden takasa aldığımız, yetkili servis ekspertizli temiz 2. el araçlar ilana bile çıkmadan satılmaktadır. Aradığınız modeli seçin, takasa düştüğü gün ilk sizi arayalım:
+            Aradığınız modeli seçip sadece telefon numaranızı bırakın; yetkili servis ekspertizli temiz takas aracı geldiği gün ilk sizi arayalım:
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
             {SECOND_HAND_SEGMENTS.map(seg => (
@@ -1064,47 +1020,33 @@ export default function CustomerSmartActionHub({
               </button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-            <input
-              type="text"
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              placeholder="Adınız / Firma Adı"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem' }}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
               onChange={(e) => setPhoneInput(e.target.value)}
-              placeholder="Cep Telefonunuz"
+              placeholder="Cep Telefonunuz (05XX...) *"
               required
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(168, 85, 247, 0.5)', color: '#fff', fontSize: '0.82rem' }}
+              style={{ padding: '11px 12px', borderRadius: '9px', background: '#0f172a', border: '1.5px solid rgba(168, 85, 247, 0.55)', color: '#fff', fontSize: '0.86rem', fontWeight: 700 }}
             />
-            <input
-              type="text"
-              value={secondHandBudget}
-              onChange={(e) => setSecondHandBudget(e.target.value)}
-              placeholder="Yaklaşık Bütçe Aralığınız"
-              style={{ padding: '9px 11px', borderRadius: '8px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem' }}
-            />
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                width: '100%',
+                padding: '11px 14px',
+                borderRadius: '9px',
+                background: 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 900,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              🔔 Temiz Araç Geldiğinde Haber Verin
+            </button>
           </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)',
-              color: '#fff',
-              border: 'none',
-              fontWeight: 900,
-              fontSize: '0.86rem',
-              cursor: 'pointer'
-            }}
-          >
-            🔔 Takasa Temiz Araç Geldiğinde İlk Bana Haber Verin
-          </button>
         </form>
       )}
     </div>

@@ -25,7 +25,8 @@ import {
   FiMapPin,
   FiCalendar,
   FiShield,
-  FiActivity
+  FiActivity,
+  FiDownload
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
 
@@ -46,6 +47,7 @@ export default function IntentRadar() {
   // Smart Link Generator Modal State
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusTemplateIdx, setStatusTemplateIdx] = useState(0);
   const [copiedStatusText, setCopiedStatusText] = useState(false);
   const [generatorModel, setGeneratorModel] = useState('Daily 35C16 Şasi');
   const [generatorCampaign, setGeneratorCampaign] = useState('kuveyt-turk-6-ay');
@@ -188,6 +190,90 @@ export default function IntentRadar() {
     return `${secs} sn`;
   };
 
+  // Excel'e Aktar (UTF-8 BOM + Noktalı Virgül Ayraçlı CSV -> Türkçe Microsoft Excel'de Doğrudan Sütunlu Açılır)
+  const handleExportExcel = () => {
+    const rowsToExport = filteredSignals.length > 0 ? filteredSignals : signals;
+    if (!rowsToExport || rowsToExport.length === 0) {
+      toast.error('Dışa aktarılacak ziyaretçi kaydı bulunamadı.');
+      return;
+    }
+
+    const escapeCsvCell = (val) => {
+      if (val === null || val === undefined) return '""';
+      const cleaned = String(val)
+        .replace(/\|\|TRADEIN_PHOTOS_JSON:[\s\S]*$/g, '')
+        .replace(/\r?\n|\r/g, ' | ')
+        .replace(/"/g, '""')
+        .trim();
+      return `"${cleaned}"`;
+    };
+
+    const headers = [
+      'Tarih / Saat',
+      'Ziyaretçi / Firma Adı',
+      'Telefon',
+      'İl / İlçe',
+      'Giriş Kaynağı',
+      'İncelenen Model / Sekme',
+      'Kampanya / Aksiyon',
+      'Arama Terimi / Etkileşim',
+      'İnceleme Süresi',
+      'Niyet Skoru (%)',
+      'Durum',
+      'IP Adresi',
+      'Detay Notları'
+    ];
+
+    const sourceLabelMap = {
+      whatsapp_link: 'WhatsApp Akıllı Link',
+      google_search: 'Google Organik Arama',
+      google_ads: 'Google Ads',
+      smart_action_hub: 'Portal Hızlı İşlem',
+      crm_existing_customer: 'Kayıtlı CRM Müşterisi'
+    };
+
+    const csvLines = [
+      headers.map(escapeCsvCell).join(';'),
+      ...rowsToExport.map(sig => {
+        const dateStr = sig.created_at
+          ? new Date(sig.created_at).toLocaleString('tr-TR')
+          : new Date().toLocaleDateString('tr-TR');
+        const cityStr = `${sig.city || ''}${sig.district ? ' / ' + sig.district : ''}`.trim() || 'Samsun';
+        const sourceStr = sourceLabelMap[sig.source] || sig.source || 'Dijital Katalog';
+        const statusStr = (sig.status === 'converted' || sig.matched_customer_id) ? 'CRM Müşterisi' : 'Yeni Ziyaretçi';
+
+        return [
+          dateStr,
+          sig.company_name || 'Katalog Ziyaretçisi',
+          sig.phone || '-',
+          cityStr,
+          sourceStr,
+          sig.target_model || '-',
+          sig.target_campaign || '-',
+          sig.search_query || '-',
+          formatDuration(sig.duration_seconds),
+          `%${sig.intent_score || 85}`,
+          statusStr,
+          sig.ip_address || '-',
+          sig.notes || '-'
+        ].map(escapeCsvCell).join(';');
+      })
+    ];
+
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `ERC_Niyet_Radari_Ziyaretciler_${today}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    toast.success(`📊 ${rowsToExport.length} ziyaretçi kaydı Excel formatında indirildi!`);
+  };
+
   return (
     <div style={{ padding: '24px 28px', maxWidth: '1440px', margin: '0 auto', color: 'var(--text-primary)' }}>
       {/* ── HEADER ──────────────────────────────────────────────── */}
@@ -231,7 +317,29 @@ export default function IntentRadar() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleExportExcel}
+            style={{
+              background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 100%)',
+              color: '#fff',
+              border: '1px solid rgba(45, 212, 191, 0.4)',
+              borderRadius: '8px',
+              padding: '10px 16px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(13, 148, 136, 0.3)'
+            }}
+            title="Kimler girmiş, hangi araca ne kadar bakmış Excel tablosu olarak indir"
+          >
+            <FiDownload size={16} />
+            📊 Excel'e Aktar ({filteredSignals.length})
+          </button>
+
           <button
             onClick={() => {
               setIsLinkModalOpen(true);
@@ -1243,80 +1351,129 @@ export default function IntentRadar() {
               </div>
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '16px', lineHeight: 1.5 }}>
-              Aşağıdaki hazır şablonu WhatsApp Durumunuzda paylaşın. Müşterileriniz durumunuzdaki linke tıkladığında istedikleri tonaj ve kasayı seçip anında taksit hesaplayabilir; teklif istediklerinde doğrudan bu radara <strong>🔥 Çok Sıcak</strong> olarak düşerler!
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', marginBottom: '12px', lineHeight: 1.5 }}>
+              Hem <strong>iPhone hem Android</strong> cihazlarda yeşil S-Way resimli kartı ve tıklanabilir linki koruyan kurumsal şablonlardan birini seçip paylaşın:
             </p>
 
-            {/* Metin Kutusu */}
-            <div style={{
-              background: 'var(--bg-primary)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '10px',
-              padding: '16px',
-              marginBottom: '16px',
-              fontSize: '0.84rem',
-              lineHeight: 1.6,
-              color: '#e2e8f0',
-              whiteSpace: 'pre-wrap'
-            }}>
-{`🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇
+            {(() => {
+              const statusTemplates = [
+                {
+                  label: '🎚️ Canlı Peşinat & Taksit (Merak)',
+                  text: `🎚️ Peşinat veya takas tutarınızı seçin; tüm 2026 sıfır IVECO modellerinde kalan kredi ve taksit planınızı canlı hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                },
+                {
+                  label: '🛡️ Şeffaf Liste & Güven',
+                  text: `🛡️ 2026 model sıfır IVECO güncel liste fiyatlarını, kasa ölçülerini ve %0 faizli finansman seçeneklerini şeffafça inceleyin 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                },
+                {
+                  label: '🧾 Kurumsal %20 KDV Avantajı',
+                  text: `🧾 Ticari işletmelere özel %20 indirilebilir KDV avantajı ve peşinatınıza göre net ödeme tablosunu dijital katalogdan inceleyin 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                },
+                {
+                  label: '🔄 Takas & Filo Yenileme',
+                  text: `🔄 Mevcut ticari aracınızı takasa saydırarak sıfır IVECO'ya geçiş maliyetinizi ve 12 ay %0 faiz avantajını hemen hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                }
+              ];
+              const activeTpl = statusTemplates[statusTemplateIdx] || statusTemplates[0];
 
-${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`}
-            </div>
+              return (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '12px' }}>
+                    {statusTemplates.map((tpl, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setStatusTemplateIdx(idx);
+                          setCopiedStatusText(false);
+                        }}
+                        style={{
+                          background: statusTemplateIdx === idx ? 'rgba(34, 197, 94, 0.2)' : 'var(--bg-primary)',
+                          color: statusTemplateIdx === idx ? '#4ade80' : 'var(--text-secondary)',
+                          border: statusTemplateIdx === idx ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '8px',
+                          padding: '8px 10px',
+                          fontSize: '0.76rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {tpl.label}
+                      </button>
+                    ))}
+                  </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={() => {
-                  const text = `🚛 IVECO 2026 Fiyat, Takas & 1M TL %0 Faiz Kredi Hesaplama Portalı 👇\n\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`;
-                  navigator.clipboard.writeText(text);
-                  setCopiedStatusText(true);
-                  toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');
-                  setTimeout(() => setCopiedStatusText(false), 3000);
-                }}
-                style={{
-                  flex: 1,
-                  background: copiedStatusText ? '#10b981' : '#22c55e',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
-                }}
-              >
-                {copiedStatusText ? (
-                  <>
-                    <FiCheck size={18} /> Metin Kopyalandı!
-                  </>
-                ) : (
-                  <>
-                    <FiCopy size={18} /> Durum Metnini & Linki Kopyala
-                  </>
-                )}
-              </button>
+                  {/* Metin Kutusu */}
+                  <div style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '10px',
+                    padding: '14px',
+                    marginBottom: '16px',
+                    fontSize: '0.84rem',
+                    lineHeight: 1.55,
+                    color: '#e2e8f0',
+                    whiteSpace: 'pre-wrap'
+                  }}>
+                    {activeTpl.text}
+                  </div>
 
-              <button
-                onClick={() => window.open('https://web.whatsapp.com', '_blank')}
-                style={{
-                  background: 'rgba(34, 197, 94, 0.15)',
-                  color: '#4ade80',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
-                  borderRadius: '8px',
-                  padding: '12px 16px',
-                  fontWeight: 600,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer'
-                }}
-              >
-                WhatsApp Web'i Aç
-              </button>
-            </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(activeTpl.text);
+                        setCopiedStatusText(true);
+                        toast.success('WhatsApp Durum metni ve linki panoya kopyalandı!');
+                        setTimeout(() => setCopiedStatusText(false), 3000);
+                      }}
+                      style={{
+                        flex: 1,
+                        background: copiedStatusText ? '#10b981' : '#22c55e',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        fontWeight: 700,
+                        fontSize: '0.88rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
+                      }}
+                    >
+                      {copiedStatusText ? (
+                        <>
+                          <FiCheck size={18} /> Metin Kopyalandı!
+                        </>
+                      ) : (
+                        <>
+                          <FiCopy size={18} /> Seçili Şablonu & Linki Kopyala
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => window.open('https://web.whatsapp.com', '_blank')}
+                      style={{
+                        background: 'rgba(34, 197, 94, 0.15)',
+                        color: '#4ade80',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        fontWeight: 600,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      WhatsApp Web'i Aç
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
