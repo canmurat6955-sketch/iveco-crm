@@ -975,7 +975,7 @@ class DiscoveryService:
         intent_level: Optional[str] = None,
         city: Optional[str] = None,
         search: Optional[str] = None,
-        limit: int = 50,
+        limit: int = 1000,
     ) -> List[dict]:
         """Tüm dijital arama ve kampanya niyet sinyallerini listeler."""
         query = self.db.query(WebIntentSignal).order_by(desc(WebIntentSignal.created_at))

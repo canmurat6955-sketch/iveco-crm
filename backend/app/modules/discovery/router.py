@@ -237,7 +237,7 @@ def list_intent_signals(
     intent_level: Optional[str] = Query(None),
     city: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(1000, ge=1, le=5000),
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
