@@ -2788,20 +2788,24 @@ export default function IntentRadar() {
             {(() => {
               const statusTemplates = [
                 {
-                  label: '🎚️ Canlı Peşinat & Taksit (Merak)',
-                  text: `🎚️ Peşinat veya takas tutarınızı seçin; tüm 2026 sıfır IVECO modellerinde kalan kredi ve taksit planınızı canlı hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                  label: '📲 1. Senaryo: Canlı Kılavuz',
+                  text: `📲 Peşinatınızı seçip 5 bankada 2026 IVECO taksit ve KDV planınızı canlı hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum_kilavuz`
                 },
                 {
-                  label: '🛡️ Şeffaf Liste & Güven',
-                  text: `🛡️ 2026 model sıfır IVECO güncel liste fiyatlarını, kasa ölçülerini ve %0 faizli finansman seçeneklerini şeffafça inceleyin 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                  label: '🔄 2. Senaryo: Takas + Kredi',
+                  text: `🔄 Aracınızı takasa verince sıfır IVECO ayda kaç TL'ye gelir? 1M TL %0 Faizle hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum_takas`
                 },
                 {
-                  label: '🧾 Kurumsal %20 KDV Avantajı',
-                  text: `🧾 Ticari işletmelere özel %20 indirilebilir KDV avantajı ve peşinatınıza göre net ödeme tablosunu dijital katalogdan inceleyin 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                  label: '⏳ 3. Senaryo: 3-6 Ay Ödemesiz',
+                  text: `⏳ Şimdi alın, ilk taksiti 3-6 ay sonra ödeyin: 5 bankada %0 faizli kredi tablosu 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum_odemesiz`
                 },
                 {
-                  label: '🔄 Takas & Filo Yenileme',
-                  text: `🔄 Mevcut ticari aracınızı takasa saydırarak sıfır IVECO'ya geçiş maliyetinizi ve 12 ay %0 faiz avantajını hemen hesaplayın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum`
+                  label: '🧾 4. Senaryo: %20 KDV & İndirim',
+                  text: `🧾 Vergi ödemek yerine filoyu yenileyin: %20 KDV avantajı ve 260 Bin TL nakit indirimi 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum_kdv`
+                },
+                {
+                  label: '⚖️ 5. Senaryo: 35C vs 70C Kantar',
+                  text: `⚖️ B ehliyetli 35C mi, 4.8 tonluk 70C mi? Şasi ve net peşin fiyatları karşılaştırın 👇\n${getPublicOrigin()}/fiyat-listesi?ref=wa_durum_kantar`
                 }
               ];
               const activeTpl = statusTemplates[statusTemplateIdx] || statusTemplates[0];

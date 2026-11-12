@@ -19,6 +19,10 @@ const CANVAS_W = 1080;
 const CANVAS_H = 1920;
 
 // ── 5 AKILCI WHATSAPP DURUM VİDEO SENARYOSU ─────────────────────────────────
+// ANDROID WHATSAPP DURUM KURALI:
+// Android'de açıklama + link toplamı ~180 karakteri aşarsa veya yıldız (*), madde imi ve çoklu paragraf
+// kullanılırsa üstteki resimli önizleme kartı kaybolur ve video altında "...devamını oku" çıkıp link gizlenir.
+// Bu yüzden tüm senaryo metinleri tek cümle (~80 krk) + alt satırda tek başına link (~155 krk toplam) olarak sınırlandırılmıştır.
 const VIDEO_SCENARIOS = [
   {
     id: 'kilavuz',
@@ -26,12 +30,9 @@ const VIDEO_SCENARIOS = [
     shortTitle: '📲 10 Sn Kullanım Kılavuzu',
     refCode: 'wa_durum_kilavuz',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Dijital Fiyat & Kredi Kataloğu',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz',
     caption:
-      `📲 *2026 IVECO Dijital Fiyat & Kredi Kataloğu Nasıl Kullanılır? (15 Sn Rehber)*\n\n` +
-      `1️⃣ Sürgüyü kaydırıp peşinat veya takas tutarınızı seçin\n` +
-      `2️⃣ 5 Bankanın (%0 Faiz & 3-6 Ay Ödemesiz) taksitini karşılaştırın\n` +
-      `3️⃣ %20 KDV vergi avantajını görüp tek tuşla muhasebenize gönderin\n\n` +
-      `👇 *Kimseyi aramadan kendi hesabınızı canlı yapmak için tıklayın:*\n\n` +
+      `📲 Peşinatınızı seçip 5 bankada 2026 IVECO taksit ve KDV planınızı canlı hesaplayın 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz`,
     steps: [
       {
@@ -70,12 +71,9 @@ const VIDEO_SCENARIOS = [
     shortTitle: '🔄 Eski Aracı Takasa Ver, Üstünü Kredile',
     refCode: 'wa_durum_takas',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Canlı Takas & Fark Kredisi Hesaplayıcı',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_takas',
     caption:
-      `🔄 *Mevcut Ticari Aracınızı Peşinata Saydırıp Sıfır IVECO'ya Geçmenin Hesabı:*\n\n` +
-      `• Aracınızın tahmini takas değerini sürgüden seçin (Örn: 1.500.000 TL)\n` +
-      `• Sadece üste kalan fark için *1 Milyon TL %0 Faiz* veya *3-6 Ay Ödemesiz* krediyi görün\n` +
-      `• İsterseniz 4 fotoğraf yükleyip anında takas ön ekspertizi alın!\n\n` +
-      `👇 *Kendi aracınızın takas farkını canlı hesaplamak için tıklayın:*\n\n` +
+      `🔄 Aracınızı takasa verince sıfır IVECO ayda kaç TL'ye gelir? 1M TL %0 Faizle hesaplayın 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_takas`,
     steps: [
       {
@@ -114,11 +112,9 @@ const VIDEO_SCENARIOS = [
     shortTitle: '⏳ Şimdi Al, 3-6 Ay Sonra Öde',
     refCode: 'wa_durum_odemesiz',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Kasım 2026 Resmi Banka Tablosu',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_odemesiz',
     caption:
-      `⏳ *Aracı Bugün İşe Koşun, İlk Taksiti 3 veya 6 Ay Sonra Ödeyin!*\n\n` +
-      `🏦 *Kuveyt Türk:* 1 Milyon TL'den 5 Milyon TL'ye kadar *3 ve 6 Ay Ödemesiz Dönem*\n` +
-      `🔥 *Garanti / Akbank / İş Bankası / Yapı Kredi:* 1.000.000 TL 6 Ay *%0 Faiz* (veya 12 Ay %1,79)\n\n` +
-      `👇 *5 bankanın tamamında taksitleri canlı karşılaştırmak için tıklayın:*\n\n` +
+      `⏳ Şimdi alın, ilk taksiti 3-6 ay sonra ödeyin: 5 bankada %0 faizli kredi tablosu 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_odemesiz`,
     steps: [
       {
@@ -157,12 +153,9 @@ const VIDEO_SCENARIOS = [
     shortTitle: '🧾 %20 KDV Avantajı & Nakit İndirimi',
     refCode: 'wa_durum_kdv',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — KDV Kalkanı & Muhasebe Özeti',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kdv',
     caption:
-      `🧾 *Yıl Sonu Vergi Planlaması: ~400.000 TL İndirilebilir %20 KDV Avantajı!*\n\n` +
-      `• Daily 35C serisinde *110.000 TL*, Daily 70C serisinde *260.000 TL* Peşin İskontosu\n` +
-      `• Her aracın altında doğrudan vergiden düşülebilir *%20 KDV tutarı* hazır hesaplı\n` +
-      `• Tek tuşla *"Ortağa / Muhasebeye Gönder"* butonuyla özeti WhatsApp'tan iletin!\n\n` +
-      `👇 *Firmanıza özel KDV ve nakit iskonto tablosunu görmek için tıklayın:*\n\n` +
+      `🧾 Vergi ödemek yerine filoyu yenileyin: %20 KDV avantajı ve 260 Bin TL nakit indirimi 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kdv`,
     steps: [
       {
@@ -201,11 +194,9 @@ const VIDEO_SCENARIOS = [
     shortTitle: '⚖️ B Ehliyet 35C mi, 4.8 Ton 70C mi?',
     refCode: 'wa_durum_kantar',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Akıllı Şasi, Kasa & Kantar Seçici',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar',
     caption:
-      `⚖️ *İşinize Hangi IVECO Daha Uygun? B Ehliyetli 35C mi, 4.8 Tonluk 70C mi?*\n\n` +
-      `🪪 *Daily 35C16:* B Ehliyet • Takograf Muafiyetli • Çift Teker C-Şasi (2.390.000 TL'den başlayan net peşin)\n` +
-      `🚛 *Daily 70C16 / 70C18:* 4.8 Ton Net Yük • 10-12 Palet • 260.000 TL Nakit İndirimi (2.420.000 TL'den başlayan net peşin)\n\n` +
-      `👇 *Yükünüze ve kasa ölçünüze göre tüm şasileri karşılaştırmak için tıklayın:*\n\n` +
+      `⚖️ B ehliyetli 35C mi, 4.8 tonluk 70C mi? Şasi ve net peşin fiyatları karşılaştırın 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar`,
     steps: [
       {
@@ -1524,7 +1515,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
               </button>
             </div>
 
-            {/* Seçili Senaryonun WhatsApp Durum Alt Açıklaması */}
+            {/* Seçili Senaryonun WhatsApp Durum Alt Açıklaması (Android Uyumlu Kısa Format) */}
             <div style={{
               background: 'var(--bg-secondary)',
               border: '1px solid rgba(16, 185, 129, 0.35)',
@@ -1532,34 +1523,66 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
               padding: '13px 16px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
-                <span style={{ fontSize: '0.79rem', fontWeight: 800, color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <FiSmartphone size={14} />
-                  Bu Senaryonun WhatsApp Durum Açıklaması (Özel Takip Linkli):
-                </span>
-                <button
-                  type="button"
-                  onClick={handleCopyCaption}
-                  style={{
-                    background: copiedCaption ? '#10b981' : 'var(--accent-blue)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '5px 12px',
-                    fontSize: '0.76rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px'
-                  }}
-                >
-                  {copiedCaption ? <FiCheck size={13} /> : <FiCopy size={13} />}
-                  {copiedCaption ? 'Kopyalandı!' : 'Metni & Linki Kopyala'}
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '0.79rem', fontWeight: 800, color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiSmartphone size={14} />
+                    Android & iPhone Uyumlu Kısa Durum Metni + Link:
+                  </span>
+                  <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                    ✓ {currentScenario.caption.length} / 180 Karakter — Android'de "...devamını oku" çıkmaz ve önizleme kartı kaybolmaz
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handleCopyCaption}
+                    style={{
+                      background: copiedCaption ? '#10b981' : 'var(--accent-blue)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    {copiedCaption ? <FiCheck size={13} /> : <FiCopy size={13} />}
+                    {copiedCaption ? 'Kopyalandı!' : '📋 Kısa Metin + Link Kopyala'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(currentScenario.onlyLink);
+                      toast.success('🔗 Sadece takip linki kopyalandı! (WhatsApp Bağlantı Etiketi için hazır)');
+                    }}
+                    style={{
+                      background: 'var(--bg-card)',
+                      color: '#34d399',
+                      border: '1px solid rgba(16, 185, 129, 0.45)',
+                      borderRadius: '6px',
+                      padding: '6px 11px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <FiCopy size={12} />
+                    🔗 Sadece Linki Kopyala
+                  </button>
+                </div>
               </div>
               <pre style={{
                 margin: 0,
-                fontSize: '0.76rem',
+                fontSize: '0.79rem',
                 color: 'var(--text-primary)',
                 whiteSpace: 'pre-wrap',
                 fontFamily: 'inherit',
@@ -1567,7 +1590,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                 padding: '10px 12px',
                 borderRadius: '8px',
                 border: '1px solid var(--border-color)',
-                lineHeight: 1.42
+                lineHeight: 1.45
               }}>
                 {currentScenario.caption}
               </pre>
