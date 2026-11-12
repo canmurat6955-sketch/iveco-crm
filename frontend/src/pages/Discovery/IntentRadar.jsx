@@ -43,6 +43,11 @@ const SOURCE_META = {
   vip_portal_footprint: { label: 'WhatsApp Özel Müşteri Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   wa_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
   whatsapp_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
+  wa_durum_kilavuz: { label: 'WA Durum (Kılavuz Videosu)', short: 'WA Durum (Kılavuz)', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_durum_takas: { label: 'WA Durum (Takas & Kredi)', short: 'WA Durum (Takas)', color: '#fb923c', bg: 'rgba(249, 115, 22, 0.16)', border: 'rgba(249, 115, 22, 0.35)' },
+  wa_durum_odemesiz: { label: 'WA Durum (3-6 Ay Ödemesiz)', short: 'WA Durum (Ödemesiz)', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.16)', border: 'rgba(59, 130, 246, 0.35)' },
+  wa_durum_kdv: { label: 'WA Durum (%20 KDV & İndirim)', short: 'WA Durum (KDV)', color: '#34d399', bg: 'rgba(16, 185, 129, 0.16)', border: 'rgba(16, 185, 129, 0.35)' },
+  wa_durum_kantar: { label: 'WA Durum (35C vs 70C Kantar)', short: 'WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
   wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: 'WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
   wa_musteri: { label: 'WhatsApp Müşteri Linki', short: 'WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
@@ -54,7 +59,13 @@ const SOURCE_META = {
 };
 
 function getSourceMeta(source, notesOrCampaign = '') {
+  if (source && SOURCE_META[source]) return SOURCE_META[source];
   const combined = `${source || ''} ${notesOrCampaign || ''}`.toLowerCase();
+  if (combined.includes('wa_durum_takas')) return SOURCE_META.wa_durum_takas;
+  if (combined.includes('wa_durum_odemesiz')) return SOURCE_META.wa_durum_odemesiz;
+  if (combined.includes('wa_durum_kdv')) return SOURCE_META.wa_durum_kdv;
+  if (combined.includes('wa_durum_kantar')) return SOURCE_META.wa_durum_kantar;
+  if (combined.includes('wa_durum_kilavuz')) return SOURCE_META.wa_durum_kilavuz;
   if (combined.includes('özel müşteri') || source === 'wa_ozel' || source === 'crm_existing_customer') {
     return SOURCE_META.wa_ozel;
   }
