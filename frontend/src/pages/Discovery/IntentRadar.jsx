@@ -28,30 +28,50 @@ import {
   FiChevronUp,
   FiLayers,
   FiList,
-  FiFilter
+  FiFilter,
+  FiGrid
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
+import { downloadStyledWorkbook } from '../../utils/excelWorkbookBuilder';
 
 // Kaynak kanal etiket haritası
 const SOURCE_META = {
   whatsapp_link: { label: 'WhatsApp VIP / Akıllı Link', short: 'WhatsApp VIP Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  whatsapp_personalized_link: { label: 'WhatsApp Özel Müşteri Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  vip_portal_footprint: { label: 'WhatsApp Özel Müşteri Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   wa_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
   whatsapp_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
-  wa_grup: { label: 'WhatsApp Grup Paylaşımı', short: 'WhatsApp Grup', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
+  wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: 'WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
   wa_musteri: { label: 'WhatsApp Müşteri Linki', short: 'WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: 'WhatsApp Özel', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   public_pricing_catalog: { label: '2026 Dijital Fiyat Kataloğu', short: 'Fiyat Kataloğu', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
   smart_action_hub: { label: 'Portal Hızlı Teklif / Takas / Kredi', short: 'Hızlı İşlem Merkezi', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' },
-  crm_existing_customer: { label: 'Kayıtlı CRM Müşterisi', short: 'CRM Müşterisi', color: '#a78bfa', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.35)' },
+  crm_existing_customer: { label: 'Kayıtlı CRM Müşterisi (Özel Link)', short: 'WhatsApp Özel Link', color: '#a78bfa', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.35)' },
   google_search: { label: 'Google Organik Arama', short: 'Google Organik', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
   google_ads: { label: 'Google Ads Kampanyası', short: 'Google Ads', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)' }
 };
 
-function getSourceMeta(source) {
+function getSourceMeta(source, notesOrCampaign = '') {
+  const combined = `${source || ''} ${notesOrCampaign || ''}`.toLowerCase();
+  if (combined.includes('özel müşteri') || source === 'wa_ozel' || source === 'crm_existing_customer') {
+    return SOURCE_META.wa_ozel;
+  }
+  if (combined.includes('nakliye') || combined.includes('grubu') || source === 'wa_grup') {
+    return SOURCE_META.wa_grup;
+  }
+  if (combined.includes('durum') || source === 'wa_durum' || source === 'whatsapp_durum') {
+    return SOURCE_META.wa_durum;
+  }
+  if (combined.includes('partner') || combined.includes('protokol') || combined.includes('oda')) {
+    return { label: 'Kurumsal Oda / Protokol Linki', short: 'Kurumsal Protokol', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' };
+  }
+  if (combined.includes('müşteri linki') || source === 'wa_musteri' || source === 'whatsapp_link') {
+    return SOURCE_META.wa_musteri;
+  }
   if (!source) return { label: 'Dijital Katalog', short: 'Dijital Katalog', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)', border: 'rgba(148, 163, 184, 0.3)' };
   return SOURCE_META[source] || {
-    label: source,
-    short: source,
+    label: 'Doğrudan / VIP Katalog Linki',
+    short: 'VIP Katalog Linki',
     color: '#60a5fa',
     bg: 'rgba(59, 130, 246, 0.15)',
     border: 'rgba(59, 130, 246, 0.35)'
@@ -65,17 +85,141 @@ function normalizePhoneKey(phone) {
   return digits;
 }
 
+// Telefon numarasını "0552 123 45 67" şeklinde okunaklı metne çevirir (Excel'de 5,52E+09 olmasını kesin engeller)
+function formatTurkishPhone(phone) {
+  if (!phone) return '';
+  const digits = String(phone).replace(/\D/g, '');
+  if (digits.length < 10) return String(phone).trim();
+  const last10 = digits.slice(-10);
+  return `0${last10.slice(0, 3)} ${last10.slice(3, 6)} ${last10.slice(6, 8)} ${last10.slice(8, 10)}`;
+}
+
+// Müşteri adındaki "(👑 WhatsApp Özel Müşteri Ziyaretçisi)" gibi kanal eklerini ve emojileri temizler
+function cleanVisitorName(rawName) {
+  if (!rawName) return '';
+  return String(rawName)
+    .replace(/\s*\([^)]*(?:Ziyaretçi|Ziyaretci|Link|Durum|Grup|Portal|Katalog)[^)]*\)/gi, '')
+    .replace(/^[👑💬🚚📡📲🏛️🔥✨👤🏢]+\s*/gu, '')
+    .trim();
+}
+
 function isGenericVisitorName(name) {
-  if (!name) return true;
-  const lower = String(name).toLowerCase().trim();
+  const cleaned = cleanVisitorName(name);
+  if (!cleaned) return true;
+  const lower = cleaned.toLowerCase();
   return (
     lower.includes('ziyaretçi') ||
     lower.includes('ziyaretci') ||
     lower === 'portal ziyaretçisi' ||
     lower === 'katalog ziyaretçisi' ||
     lower === 'mobil ziyaretçi' ||
-    lower === 'tespit edilen kurumsal ziyaretçi'
+    lower === 'tespit edilen kurumsal ziyaretçi' ||
+    lower === 'kayıtlı müşteri' ||
+    lower === 'kayitli musteri' ||
+    lower === 'vip müşteri' ||
+    lower === 'whatsapp ziyaretçisi'
   );
+}
+
+// Müşterinin tüm ham sinyallerini inceleyip Gerçek Araç Modeli, Peşinat/Kredi ve Net Türkçe İşlem Özeti olarak ayrıştırır
+function classifyVisitorSignals(events) {
+  const realModels = new Set();
+  const budgetItems = new Set();
+  const actionSummary = new Set();
+
+  (events || []).forEach(ev => {
+    const rawModel = String(ev.target_model || '').trim();
+    const rawCamp = String(ev.target_campaign || '').trim();
+    const rawQuery = String(ev.search_query || '').trim();
+    const rawNotes = String(ev.notes || '').trim();
+    const combinedText = `${rawModel} ${rawCamp} ${rawQuery} ${rawNotes}`;
+
+    // 1. Model Sütunu Ayrıştırması (Peşinat rakamlarını veya genel sayfa başlıklarını model sanmasın!)
+    if (rawModel) {
+      const mLower = rawModel.toLowerCase();
+      if (mLower.includes('peşinat') || mLower.includes('pesinat') || mLower.includes('takas')) {
+        budgetItems.add(rawModel);
+      } else if (
+        !mLower.includes('fiyat katalo') &&
+        !mLower.includes('fiyat listesi') &&
+        !mLower.includes('fiyat & kredi') &&
+        !mLower.includes('2026 katalog') &&
+        !mLower.includes('genel katalog') &&
+        !mLower.includes('şasi & kasa seçici') &&
+        !mLower.includes('banka kredi') &&
+        !mLower.includes('4 resimle takas') &&
+        !mLower.includes('tüm araç')
+      ) {
+        realModels.add(rawModel);
+      }
+    }
+
+    // 2. Kampanya / Peşinat / Kredi Sütunu Ayrıştırması
+    if (rawCamp) {
+      const cLower = rawCamp.toLowerCase();
+      const isNoiseChannel =
+        cLower.includes('ziyaretçi') ||
+        cLower.includes('ziyaretci') ||
+        cLower === 'tüm araç kartları' ||
+        cLower === 'tüm araçlar' ||
+        cLower === 'genel katalog' ||
+        cLower === 'hızlı başlangıç' ||
+        cLower === 'üst bar' ||
+        cLower.includes('2026 fiyat');
+      if (!isNoiseChannel) {
+        budgetItems.add(rawCamp);
+      }
+    }
+
+    // 3. Net Türkçe Satış Aksiyonu Özeti
+    const qLower = combinedText.toLowerCase();
+    if (qLower.includes('whatsapp tıklandı') || qLower.includes('whatsapp görüşme') || qLower.includes('direkt mesaj')) {
+      actionSummary.add('💬 WhatsApp Mesaj Butonuna Tıkladı');
+    }
+    if (qLower.includes('telefonla ara')) {
+      actionSummary.add('📞 Telefonla Arama Butonuna Bastı');
+    }
+    if (qLower.includes('fiyat kartı teklif') || qLower.includes('teklif iste') || qLower.includes('üye teklif')) {
+      actionSummary.add('📝 Araç Teklifi / Proforma İstedi');
+    }
+    if (qLower.includes('4 resimli') || qLower.includes('takas + kredi teklif')) {
+      actionSummary.add('📸 4 Resimli Takas + Kredi Talebi');
+    } else if (qLower.includes('takas + kredi') || qLower.includes('takas peşinat') || qLower.includes('4 resimle takas')) {
+      actionSummary.add('🔄 Takas + Kredi Hesaplama Aracını Kullandı');
+    }
+    if (qLower.includes('peşinat/takas sürgüsü') || qLower.includes('peşinat/takas seçildi')) {
+      actionSummary.add('💰 Canlı Peşinat / Takas Hesabı Yaptı');
+    }
+    if (qLower.includes('kredi planı inceleme') || qLower.includes('banka kredi & taksit')) {
+      actionSummary.add('🏦 Kredi & Taksit Tablosunu İnceledi');
+    }
+    if (qLower.includes('ortağa / muhasebeye')) {
+      actionSummary.add('📤 Araç Özetini Ortağına / Muhasebeye İletti');
+    }
+    if (qLower.includes('filo iskonto') || qLower.includes('filo alımı')) {
+      actionSummary.add('🏢 Çoklu Filo İskontosu İnceledi');
+    }
+    if (qLower.includes('numarasını tanımladı')) {
+      actionSummary.add('📲 Numarasını Girerek Özel İndirimi Açtı');
+    }
+  });
+
+  if (actionSummary.size === 0) {
+    actionSummary.add('👀 2026 Fiyat & Kredi Kataloğunu İnceledi');
+  }
+
+  const realModelsList = Array.from(realModels);
+  const budgetList = Array.from(budgetItems);
+  const actionsList = Array.from(actionSummary);
+
+  return {
+    realModelsList,
+    displayModel: realModelsList.length > 0 ? realModelsList.join(', ') : 'Genel Fiyat Listesi (Tüm Araçlar)',
+    budgetList,
+    displayBudget: budgetList.length > 0 ? budgetList.join(' | ') : 'Standart Liste / Katalog İnceleme',
+    actionsList,
+    displayActions: actionsList.join(' • ')
+  };
 }
 
 export default function IntentRadar() {
@@ -87,8 +231,9 @@ export default function IntentRadar() {
 
   // Sistematik Görünüm & Filtre State'leri
   const [viewMode, setViewMode] = useState('grouped'); // 'grouped' (Tekil Müşteri Özeti) | 'raw' (Tüm Ham Loglar)
+  const [layoutMode, setLayoutMode] = useState('table'); // 'table' (Akıllı Özet Tablo) | 'cards' (Detaylı Kartlar)
   const [showReportPanel, setShowReportPanel] = useState(true);
-  const [visitorSegment, setVisitorSegment] = useState('all'); // 'all' | 'identified' | 'high_intent' | 'repeat' | 'anonymous' | 'converted'
+  const [visitorSegment, setVisitorSegment] = useState('identified'); // İlk açılışta doğrudan Kimliği/Telefonu Belli müşterileri göster
   const [dateRange, setDateRange] = useState('all'); // 'all' | 'today' | 'yesterday' | '7d' | '30d'
   const [sourceFilter, setSourceFilter] = useState('all');
   const [selectedCity, setSelectedCity] = useState('all');
@@ -180,65 +325,74 @@ export default function IntentRadar() {
     });
   }, [signals, dateRange]);
 
-  // 2. ADIM: AKILLI TEKİLLEŞTİRME MOTORU (Aynı müşterinin tüm hareketlerini tek profilde birleştirir)
+  // 2. ADIM: ÇOK ANAHTARLI AKILLI TEKİLLEŞTİRME MOTORU
+  // (Aynı müşterinin farklı günlerdeki, farklı linklerdeki veya farklı telefon/ID ile yaptığı tüm girişlerini TEK satırda birleştirir)
   const groupedVisitors = useMemo(() => {
-    // Önce IP -> Telefon/Müşteri köprüsü kur (Aynı gün aynı IP'den önce numarasız girip sonra numara yazanları eşleştir)
-    const ipDayToIdentity = {};
+    const custIdToCanonical = {};
+    const phoneToCanonical = {};
+    const nameToCanonical = {};
+    const ipDayToCanonical = {};
+
+    // 1. Geçiş: Kimliği belli sinyallerden Kanonik Müşteri Anahtarı (canonicalKey) haritası oluştur
     dateFilteredSignals.forEach(s => {
+      const custId = s.matched_customer_id ? String(s.matched_customer_id) : '';
       const pKey = normalizePhoneKey(s.phone);
+      const rawCleanName = cleanVisitorName(s.matched_customer_name || s.company_name);
+      const nameKey = !isGenericVisitorName(rawCleanName) ? rawCleanName.toLowerCase().replace(/\s+/g, ' ') : '';
       const dayStr = s.created_at ? String(s.created_at).slice(0, 10) : 'today';
-      if (s.ip_address && (s.matched_customer_id || pKey || !isGenericVisitorName(s.company_name))) {
-        const ipDayKey = `${s.ip_address}_${dayStr}`;
-        if (!ipDayToIdentity[ipDayKey]) {
-          ipDayToIdentity[ipDayKey] = {
-            customerId: s.matched_customer_id || null,
-            phoneKey: pKey || null,
-            companyName: !isGenericVisitorName(s.company_name) ? s.company_name.trim() : null
-          };
-        }
+      const ipDayKey = s.ip_address ? `${s.ip_address}_${dayStr}` : '';
+
+      if (!custId && !pKey && !nameKey) return;
+
+      // Mevcut eşleşmiş bir canonicalKey var mı kontrol et
+      const existingKey =
+        (nameKey && nameToCanonical[nameKey]) ||
+        (pKey && phoneToCanonical[pKey]) ||
+        (custId && custIdToCanonical[custId]) ||
+        (nameKey ? `id_name_${nameKey}` : pKey ? `id_phone_${pKey}` : `id_cust_${custId}`);
+
+      if (nameKey) nameToCanonical[nameKey] = existingKey;
+      if (pKey) phoneToCanonical[pKey] = existingKey;
+      if (custId) custIdToCanonical[custId] = existingKey;
+      if (ipDayKey && !ipDayToCanonical[ipDayKey]) {
+        ipDayToCanonical[ipDayKey] = existingKey;
       }
     });
 
     const groupsMap = new Map();
 
+    // 2. Geçiş: Tüm sinyalleri kanonik müşteri profilinde topla
     dateFilteredSignals.forEach(s => {
+      const custId = s.matched_customer_id ? String(s.matched_customer_id) : '';
       const pKey = normalizePhoneKey(s.phone);
+      const rawCleanName = cleanVisitorName(s.matched_customer_name || s.company_name);
+      const nameKey = !isGenericVisitorName(rawCleanName) ? rawCleanName.toLowerCase().replace(/\s+/g, ' ') : '';
       const dayStr = s.created_at ? String(s.created_at).slice(0, 10) : 'today';
-      const ipDayBridge = s.ip_address ? ipDayToIdentity[`${s.ip_address}_${dayStr}`] : null;
+      const ipDayKey = s.ip_address ? `${s.ip_address}_${dayStr}` : '';
 
-      const effectiveCustId = s.matched_customer_id || ipDayBridge?.customerId || null;
-      const effectivePhoneKey = pKey || ipDayBridge?.phoneKey || '';
-      const effectiveNamedComp = !isGenericVisitorName(s.company_name)
-        ? s.company_name.trim()
-        : (ipDayBridge?.companyName || '');
-
-      let visitorKey = '';
-      if (effectiveCustId) {
-        visitorKey = `cust_${effectiveCustId}`;
-      } else if (effectivePhoneKey) {
-        visitorKey = `phone_${effectivePhoneKey}`;
-      } else if (effectiveNamedComp) {
-        visitorKey = `name_${effectiveNamedComp.toLowerCase()}`;
-      } else if (s.ip_address) {
-        visitorKey = `ip_${s.ip_address}_${dayStr}`;
-      } else {
-        visitorKey = `sig_${s.id}`;
-      }
+      const visitorKey =
+        (nameKey && nameToCanonical[nameKey]) ||
+        (pKey && phoneToCanonical[pKey]) ||
+        (custId && custIdToCanonical[custId]) ||
+        (ipDayKey && ipDayToCanonical[ipDayKey]) ||
+        (ipDayKey ? `anon_ip_${ipDayKey}` : `anon_sig_${s.id}`);
 
       if (!groupsMap.has(visitorKey)) {
         groupsMap.set(visitorKey, {
           visitorKey,
           primarySignal: s,
           id: s.id,
-          company_name: effectiveNamedComp || s.company_name || 'Portal Ziyaretçisi',
-          matched_customer_id: effectiveCustId,
+          company_name: !isGenericVisitorName(rawCleanName) ? rawCleanName : 'Anonim Katalog Ziyaretçisi',
+          matched_customer_id: s.matched_customer_id || null,
           matched_customer_name: s.matched_customer_name || null,
-          phone: s.phone || null,
+          phone: s.phone ? formatTurkishPhone(s.phone) : null,
+          phonesSet: new Set(s.phone ? [formatTurkishPhone(s.phone)] : []),
           city: s.city || 'Samsun',
           district: s.district || null,
           ip_address: s.ip_address || null,
           source: s.source || 'public_pricing_catalog',
           sourcesSet: new Set([s.source || 'public_pricing_catalog']),
+          visitDaysSet: new Set([dayStr]),
           modelsSet: new Set(),
           campaignsSet: new Set(),
           queriesSet: new Set(),
@@ -256,16 +410,15 @@ export default function IntentRadar() {
 
       const grp = groupsMap.get(visitorKey);
       grp.events.push(s);
+      grp.visitDaysSet.add(dayStr);
 
-      // Daha iyi isim veya telefon varsa güncelle
-      if (!isGenericVisitorName(s.company_name) && isGenericVisitorName(grp.company_name)) {
-        grp.company_name = s.company_name.trim();
+      if (!isGenericVisitorName(rawCleanName) && isGenericVisitorName(grp.company_name)) {
+        grp.company_name = rawCleanName;
       }
-      if (s.matched_customer_name && isGenericVisitorName(grp.company_name)) {
-        grp.company_name = s.matched_customer_name;
-      }
-      if (!grp.phone && s.phone) {
-        grp.phone = s.phone;
+      if (s.phone) {
+        const fmtPhone = formatTurkishPhone(s.phone);
+        grp.phonesSet.add(fmtPhone);
+        if (!grp.phone) grp.phone = fmtPhone;
       }
       if (!grp.matched_customer_id && s.matched_customer_id) {
         grp.matched_customer_id = s.matched_customer_id;
@@ -295,7 +448,7 @@ export default function IntentRadar() {
 
       const safeDur = s.duration_seconds
         ? (s.duration_seconds > 540 ? (45 + (s.duration_seconds % 95)) : s.duration_seconds)
-        : 35;
+        : 20;
       grp.total_duration_seconds += safeDur;
       grp.max_scroll_depth = Math.max(grp.max_scroll_depth, s.scroll_depth || 75);
 
@@ -306,7 +459,6 @@ export default function IntentRadar() {
         grp.intent_level = 'very_high';
       }
 
-      // İlk ve son görülme zamanı
       if (s.created_at) {
         if (!grp.last_seen_at || new Date(s.created_at) > new Date(grp.last_seen_at)) {
           grp.last_seen_at = s.created_at;
@@ -317,40 +469,82 @@ export default function IntentRadar() {
       }
     });
 
-    // Diziye çevir ve türetilmiş alanları ekle
+    // Diziye çevir, akıllı sınıflandırmayı uygula ve sırala
     return Array.from(groupsMap.values()).map(grp => {
-      const modelsList = Array.from(grp.modelsSet);
-      const campaignsList = Array.from(grp.campaignsSet);
-      const queriesList = Array.from(grp.queriesSet);
+      const classified = classifyVisitorSignals(grp.events);
+      const phonesList = Array.from(grp.phonesSet);
+      const allPhonesText = phonesList.join(' / ');
       const sourcesList = Array.from(grp.sourcesSet);
-      const isIdentified = Boolean(grp.phone || grp.matched_customer_id || !isGenericVisitorName(grp.company_name));
-      const hasHighAction = queriesList.some(q => {
-        const ql = q.toLowerCase();
-        return ql.includes('teklif') || ql.includes('takas') || ql.includes('kredi') || ql.includes('whatsapp') || ql.includes('numara');
-      }) || grp.intent_score >= 90 || grp.events.length >= 2;
+      const isIdentified = Boolean(phonesList.length > 0 || grp.matched_customer_id || !isGenericVisitorName(grp.company_name));
+
+      // Telefonu var ama ismi hala genel ise "Kayıtlı Müşteri (05XX...)" olarak adlandır
+      let finalDisplayName = grp.company_name;
+      if (isGenericVisitorName(finalDisplayName)) {
+        finalDisplayName = phonesList.length > 0
+          ? `Numarası Kayıtlı Müşteri`
+          : 'Anonim Katalog Ziyaretçisi';
+      }
+
+      const hasMeaningfulAction =
+        classified.budgetList.length > 0 ||
+        classified.realModelsList.length > 0 ||
+        classified.actionsList.some(a => !a.includes('Kataloğunu İnceledi')) ||
+        grp.events.length >= 2;
+
+      const hasHighAction =
+        (isIdentified && hasMeaningfulAction) ||
+        classified.budgetList.length > 0 ||
+        classified.actionsList.some(a => a.includes('WhatsApp') || a.includes('Teklif') || a.includes('Takas') || a.includes('Peşinat') || a.includes('Kredi') || a.includes('Muhasebe')) ||
+        grp.events.length >= 3;
+
+      const srcMeta = getSourceMeta(grp.source, `${Array.from(grp.campaignsSet).join(' ')} ${grp.notesList.join(' ')}`);
+
+      // Öncelik Etiketi
+      let priorityBadge = '👀 Katalog İnceleme';
+      if (phonesList.length > 0 && hasHighAction) {
+        priorityBadge = '🔥 Çok Sıcak (Hemen Ara)';
+      } else if (phonesList.length > 0) {
+        priorityBadge = '📞 Telefonu Belli Müşteri';
+      } else if (isIdentified) {
+        priorityBadge = '🏢 İsim / Firma Belli';
+      } else if (hasMeaningfulAction) {
+        priorityBadge = '⚡ Numarasız Ama Ciddi İnceleme';
+      }
 
       return {
         ...grp,
-        modelsList,
-        campaignsList,
-        queriesList,
+        company_name: finalDisplayName,
+        phone: phonesList[0] || null,
+        allPhonesText: allPhonesText || '—',
+        visitDaysCount: grp.visitDaysSet.size,
+        channelLabel: srcMeta.short,
+        channelMeta: srcMeta,
+        priorityBadge,
+        modelsList: classified.realModelsList.length > 0 ? classified.realModelsList : ['Genel Fiyat Listesi'],
+        realModelsList: classified.realModelsList,
+        displayModel: classified.displayModel,
+        campaignsList: classified.budgetList,
+        displayBudget: classified.displayBudget,
+        queriesList: classified.actionsList,
+        displayActions: classified.displayActions,
         sourcesList,
-        target_model: modelsList[0] || grp.primarySignal.target_model || 'IVECO 2026 Katalog',
-        target_campaign: campaignsList[0] || grp.primarySignal.target_campaign || null,
-        search_query: queriesList[0] || grp.primarySignal.search_query || null,
+        target_model: classified.displayModel,
+        target_campaign: classified.displayBudget,
+        search_query: classified.displayActions,
         duration_seconds: grp.total_duration_seconds,
         scroll_depth: grp.max_scroll_depth,
         created_at: grp.last_seen_at,
         notes: grp.notesList[0] || null,
         eventCount: grp.events.length,
         isIdentified,
+        hasMeaningfulAction,
         hasHighAction,
         isConverted: grp.status === 'converted' || Boolean(grp.matched_customer_id)
       };
     }).sort((a, b) => new Date(b.last_seen_at || 0) - new Date(a.last_seen_at || 0));
   }, [dateFilteredSignals]);
 
-  // 3. ADIM: Raporlama Özeti Metrikleri (Model, Kanal, Şehir ve Huni Dağılımı)
+  // 3. ADIM: Raporlama Özeti Metrikleri (Sadece Gerçek Modeller ve Temiz Kanallar)
   const reportAnalytics = useMemo(() => {
     const totalRaw = dateFilteredSignals.length;
     const totalUnique = groupedVisitors.length;
@@ -361,28 +555,21 @@ export default function IntentRadar() {
     const anonymousCount = groupedVisitors.filter(v => !v.isIdentified).length;
     const convertedCount = groupedVisitors.filter(v => v.isConverted).length;
 
-    // Ortalama inceleme süresi (tekil ziyaretçi başına)
     const totalSec = groupedVisitors.reduce((acc, v) => acc + (v.total_duration_seconds || 0), 0);
     const avgDurationSec = totalUnique > 0 ? Math.round(totalSec / totalUnique) : 0;
 
-    // Araç Modeli Bazlı Dağılım (Tekil ziyaretçi ve toplam etkileşim)
+    // Araç Modeli Bazlı Dağılım (Peşinat rakamlarından arındırılmış gerçek modeller)
     const modelMap = {};
     groupedVisitors.forEach(v => {
-      const models = v.modelsList.length > 0 ? v.modelsList : ['Genel Katalog / Fiyat Listesi'];
+      const models = v.realModelsList.length > 0 ? v.realModelsList : ['Genel Fiyat Listesi (Tüm Araçlar)'];
       models.forEach(m => {
         const cleanM = m.trim();
         if (!modelMap[cleanM]) {
           modelMap[cleanM] = { model: cleanM, uniqueVisitors: 0, totalClicks: 0, withPhone: 0 };
         }
         modelMap[cleanM].uniqueVisitors += 1;
+        modelMap[cleanM].totalClicks += v.eventCount;
         if (v.phone) modelMap[cleanM].withPhone += 1;
-      });
-      v.events.forEach(ev => {
-        const m = (ev.target_model || 'Genel Katalog / Fiyat Listesi').trim();
-        if (!modelMap[m]) {
-          modelMap[m] = { model: m, uniqueVisitors: 0, totalClicks: 0, withPhone: 0 };
-        }
-        modelMap[m].totalClicks += 1;
       });
     });
     const topModels = Object.values(modelMap)
@@ -392,21 +579,20 @@ export default function IntentRadar() {
     // Giriş Kanalı Bazlı Dağılım
     const channelMap = {};
     groupedVisitors.forEach(v => {
-      const src = v.source || 'public_pricing_catalog';
-      const meta = getSourceMeta(src);
-      if (!channelMap[src]) {
-        channelMap[src] = {
-          sourceKey: src,
-          label: meta.short,
-          color: meta.color,
+      const chLabel = v.channelLabel || 'Dijital Katalog';
+      if (!channelMap[chLabel]) {
+        channelMap[chLabel] = {
+          sourceKey: chLabel,
+          label: chLabel,
+          color: v.channelMeta?.color || '#60a5fa',
           uniqueVisitors: 0,
           identified: 0,
           totalEvents: 0
         };
       }
-      channelMap[src].uniqueVisitors += 1;
-      if (v.isIdentified) channelMap[src].identified += 1;
-      channelMap[src].totalEvents += v.eventCount;
+      channelMap[chLabel].uniqueVisitors += 1;
+      if (v.isIdentified) channelMap[chLabel].identified += 1;
+      channelMap[chLabel].totalEvents += v.eventCount;
     });
     const channelBreakdown = Object.values(channelMap).sort((a, b) => b.uniqueVisitors - a.uniqueVisitors);
 
@@ -436,64 +622,74 @@ export default function IntentRadar() {
     };
   }, [dateFilteredSignals, groupedVisitors]);
 
-  // 4. ADIM: Aktif Filtrelere Göre Gösterilecek Liste (Gruplanmış veya Ham)
+  // 4. ADIM: Aktif Filtrelere Göre Gösterilecek Liste
   const displayedItems = useMemo(() => {
     const baseList = viewMode === 'grouped'
       ? groupedVisitors
-      : dateFilteredSignals.map(s => ({
-          ...s,
-          visitorKey: `raw_${s.id}`,
-          modelsList: s.target_model ? [s.target_model] : [],
-          campaignsList: s.target_campaign ? [s.target_campaign] : [],
-          queriesList: s.search_query ? [s.search_query] : [],
-          sourcesList: s.source ? [s.source] : [],
-          eventCount: 1,
-          events: [s],
-          isIdentified: Boolean(s.phone || s.matched_customer_id || !isGenericVisitorName(s.company_name)),
-          hasHighAction: (s.intent_score || 0) >= 90,
-          isConverted: s.status === 'converted' || Boolean(s.matched_customer_id)
-        }));
+      : dateFilteredSignals.map(s => {
+          const classified = classifyVisitorSignals([s]);
+          const srcMeta = getSourceMeta(s.source, `${s.target_campaign || ''} ${s.notes || ''}`);
+          const cleanedName = cleanVisitorName(s.matched_customer_name || s.company_name);
+          const isId = Boolean(s.phone || s.matched_customer_id || !isGenericVisitorName(cleanedName));
+          return {
+            ...s,
+            visitorKey: `raw_${s.id}`,
+            company_name: !isGenericVisitorName(cleanedName) ? cleanedName : (s.phone ? 'Numarası Kayıtlı Müşteri' : 'Anonim Ziyaretçi'),
+            phone: s.phone ? formatTurkishPhone(s.phone) : null,
+            allPhonesText: s.phone ? formatTurkishPhone(s.phone) : '—',
+            visitDaysCount: 1,
+            channelLabel: srcMeta.short,
+            channelMeta: srcMeta,
+            priorityBadge: s.phone ? '📞 Telefonu Belli' : (isId ? '🏢 Firma Belli' : '👀 Katalog'),
+            modelsList: classified.realModelsList.length > 0 ? classified.realModelsList : ['Genel Fiyat Listesi'],
+            realModelsList: classified.realModelsList,
+            displayModel: classified.displayModel,
+            campaignsList: classified.budgetList,
+            displayBudget: classified.displayBudget,
+            queriesList: classified.actionsList,
+            displayActions: classified.displayActions,
+            sourcesList: s.source ? [s.source] : [],
+            eventCount: 1,
+            events: [s],
+            isIdentified: isId,
+            hasMeaningfulAction: classified.budgetList.length > 0 || classified.realModelsList.length > 0,
+            hasHighAction: (s.intent_score || 0) >= 90,
+            isConverted: s.status === 'converted' || Boolean(s.matched_customer_id)
+          };
+        });
 
     return baseList.filter(item => {
-      // Segment filtresi
       if (visitorSegment === 'identified' && !item.isIdentified) return false;
       if (visitorSegment === 'high_intent' && !item.hasHighAction) return false;
       if (visitorSegment === 'repeat' && item.eventCount < 2) return false;
       if (visitorSegment === 'anonymous' && item.isIdentified) return false;
       if (visitorSegment === 'converted' && !item.isConverted) return false;
 
-      // Kaynak kanal filtresi
       if (sourceFilter !== 'all') {
         if (sourceFilter === 'whatsapp_all') {
-          const hasWa = item.sourcesList.some(src =>
-            ['whatsapp_link', 'wa_durum', 'whatsapp_durum', 'wa_grup', 'wa_musteri', 'wa_ozel'].includes(src)
-          );
+          const hasWa = (item.channelLabel || '').toLowerCase().includes('whatsapp');
           if (!hasWa) return false;
-        } else if (!item.sourcesList.includes(sourceFilter) && item.source !== sourceFilter) {
+        } else if (item.channelLabel !== sourceFilter && !item.sourcesList.includes(sourceFilter) && item.source !== sourceFilter) {
           return false;
         }
       }
 
-      // Şehir filtresi
       if (selectedCity !== 'all' && item.city !== selectedCity) return false;
 
-      // Araç modeli filtresi
       if (selectedModelFilter) {
-        const matchModel = item.modelsList.includes(selectedModelFilter) || item.target_model === selectedModelFilter;
+        const matchModel = item.modelsList.includes(selectedModelFilter) || item.displayModel.includes(selectedModelFilter);
         if (!matchModel) return false;
       }
 
-      // Arama kutusu filtresi
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const textMatch =
           (item.company_name && item.company_name.toLowerCase().includes(q)) ||
-          (item.phone && item.phone.toLowerCase().includes(q)) ||
-          item.modelsList.some(m => m.toLowerCase().includes(q)) ||
-          item.queriesList.some(qr => qr.toLowerCase().includes(q)) ||
-          item.campaignsList.some(c => c.toLowerCase().includes(q)) ||
-          (item.notes && item.notes.toLowerCase().includes(q)) ||
-          (item.city && item.city.toLowerCase().includes(q));
+          (item.allPhonesText && item.allPhonesText.toLowerCase().includes(q)) ||
+          (item.displayModel && item.displayModel.toLowerCase().includes(q)) ||
+          (item.displayBudget && item.displayBudget.toLowerCase().includes(q)) ||
+          (item.displayActions && item.displayActions.toLowerCase().includes(q)) ||
+          (item.channelLabel && item.channelLabel.toLowerCase().includes(q));
         if (!textMatch) return false;
       }
 
@@ -558,7 +754,7 @@ export default function IntentRadar() {
       return;
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
-    const model = (signal.modelsList && signal.modelsList[0]) || signal.target_model || 'IVECO 2026 Ticari Araç';
+    const model = (signal.realModelsList && signal.realModelsList[0]) || 'IVECO 2026 Ticari Araç';
     const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu olarak ulaşıyorum (0544 622 59 31). Dijital kataloğumuzda incelediğiniz ${model} ve Kasım 2026 dönemine özel %0 faizli / ödemesiz ticari finansman seçeneklerimiz hakkında firmanıza özel ödeme tablosunu paylaşmak isterim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -581,156 +777,276 @@ export default function IntentRadar() {
     setTimeout(() => setCopiedLink(false), 3000);
   };
 
-  // Excel'e Aktar (Hem "Tekil Müşteri Özeti" hem "Detaylı Ham Hareket Dökümü" destekli)
-  const handleExportExcel = (exportMode = 'summary') => {
-    const escapeCsvCell = (val) => {
-      if (val === null || val === undefined) return '""';
-      const cleaned = String(val)
-        .replace(/\|\|TRADEIN_PHOTOS_JSON:[\s\S]*$/g, '')
-        .replace(/\r?\n|\r/g, ' | ')
-        .replace(/"/g, '""')
-        .trim();
-      return `"${cleaned}"`;
-    };
-
-    const today = new Date().toISOString().slice(0, 10);
-
-    if (exportMode === 'summary') {
-      const rows = viewMode === 'grouped' ? displayedItems : groupedVisitors;
-      if (!rows || rows.length === 0) {
-        toast.error('Dışa aktarılacak müşteri özeti bulunamadı.');
-        return;
-      }
-
-      const headers = [
-        'Son Giriş Tarihi',
-        'İlk Giriş Tarihi',
-        'Müşteri / Firma Adı',
-        'Telefon Numarası',
-        'Kimlik Durumu',
-        'İl / İlçe',
-        'Giriş Kanalı',
-        'Toplam Etkileşim Sayısı',
-        'İncelediği Araç Modelleri',
-        'İlgilendiği Kampanya / Finansman',
-        'Yaptığı İşlemler / Aksiyonlar',
-        'Toplam İnceleme Süresi',
-        'Niyet Skoru (%)',
-        'CRM Durumu',
-        'IP Adresi',
-        'Detay Notları'
-      ];
-
-      const csvLines = [
-        headers.map(escapeCsvCell).join(';'),
-        ...rows.map(v => {
-          const lastStr = v.last_seen_at ? new Date(v.last_seen_at).toLocaleString('tr-TR') : '-';
-          const firstStr = v.first_seen_at ? new Date(v.first_seen_at).toLocaleString('tr-TR') : '-';
-          const cityStr = `${v.city || ''}${v.district ? ' / ' + v.district : ''}`.trim() || 'Samsun';
-          const channelsStr = (v.sourcesList || [v.source]).map(s => getSourceMeta(s).short).join(', ');
-          const modelsStr = (v.modelsList && v.modelsList.length > 0) ? v.modelsList.join(' | ') : (v.target_model || '-');
-          const campStr = (v.campaignsList && v.campaignsList.length > 0) ? v.campaignsList.join(' | ') : (v.target_campaign || '-');
-          const queriesStr = (v.queriesList && v.queriesList.length > 0) ? v.queriesList.join(' -> ') : (v.search_query || '-');
-          const idStatus = v.phone ? 'Telefonu Belli' : (v.isIdentified ? 'İsim/Firma Belli' : 'Anonim Ziyaretçi');
-          const crmStatus = v.isConverted ? 'CRM Müşterisi / Adayı' : 'Yeni Ziyaretçi';
-
-          return [
-            lastStr,
-            firstStr,
-            v.company_name || 'Portal Ziyaretçisi',
-            v.phone || '-',
-            idStatus,
-            cityStr,
-            channelsStr,
-            `${v.eventCount || 1} İşlem`,
-            modelsStr,
-            campStr,
-            queriesStr,
-            formatDuration(v.duration_seconds),
-            `%${v.intent_score || 85}`,
-            crmStatus,
-            v.ip_address || '-',
-            v.notes || '-'
-          ].map(escapeCsvCell).join(';');
-        })
-      ];
-
-      const bom = '\uFEFF';
-      const blob = new Blob([bom + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ERC_Niyet_Radari_Tekil_Musteri_Raporu_${today}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      toast.success(`📊 ${rows.length} tekil müşterinin özet raporu Excel formatında indirildi!`);
+  // ── AKILLI EXCEL (.XLSX) RAPORU OLUŞTURUCU (3 AYRI SEKME, GENİŞ SÜTUNLAR, BOZULMAYAN TELEFONLAR) ──
+  const handleExportExcel = () => {
+    if (!groupedVisitors || groupedVisitors.length === 0) {
+      toast.error('Dışa aktarılacak ziyaretçi kaydı bulunamadı.');
       return;
     }
 
-    // Detaylı Ham Hareket Dökümü
-    const rawRows = dateFilteredSignals;
-    if (!rawRows || rawRows.length === 0) {
-      toast.error('Dışa aktarılacak hareket kaydı bulunamadı.');
-      return;
-    }
+    const nowStr = new Date().toLocaleString('tr-TR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const todayFile = new Date().toISOString().slice(0, 10);
 
-    const headers = [
-      'Tarih / Saat',
-      'Ziyaretçi / Firma Adı',
-      'Telefon',
-      'İl / İlçe',
-      'Giriş Kaynağı',
-      'İncelenen Model / Sekme',
-      'Kampanya / Aksiyon',
-      'İşlem / Etkileşim',
-      'İnceleme Süresi',
-      'Niyet Skoru (%)',
-      'Durum',
-      'IP Adresi',
-      'Detay Notları'
-    ];
+    // 1. SEKME VERİSİ: Sadece Kimliği / Telefonu Belli Müşteriler (Öncelikli Arama Listesi)
+    const identifiedVisitors = groupedVisitors.filter(v => v.isIdentified);
+    // 3. SEKME VERİSİ: Anonim Ziyaretçiler (Önce bütçe/model hesaplayan ciddi anonimler, sonra hızlı bakıp çıkanlar)
+    const anonymousVisitors = groupedVisitors
+      .filter(v => !v.isIdentified)
+      .sort((a, b) => (b.hasMeaningfulAction ? 1 : 0) - (a.hasMeaningfulAction ? 1 : 0) || b.eventCount - a.eventCount);
 
-    const csvLines = [
-      headers.map(escapeCsvCell).join(';'),
-      ...rawRows.map(sig => {
-        const dateStr = sig.created_at
-          ? new Date(sig.created_at).toLocaleString('tr-TR')
-          : new Date().toLocaleDateString('tr-TR');
-        const cityStr = `${sig.city || ''}${sig.district ? ' / ' + sig.district : ''}`.trim() || 'Samsun';
-        const sourceStr = getSourceMeta(sig.source).label;
-        const statusStr = (sig.status === 'converted' || sig.matched_customer_id) ? 'CRM Müşterisi' : 'Yeni Ziyaretçi';
+    // ── SAYFA 1: 1-Aranacak Musteriler ───────────────────────────────────────
+    const sheet1Rows = [
+      {
+        height: 30,
+        cells: [
+          { v: 'IVECO ERC SAMSUN — NİYET RADARI: ARANACAK MÜŞTERİLER & KİMLİĞİ BELLİ ZİYARETÇİLER', s: 1 },
+          { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          {
+            v: `Rapor Tarihi: ${nowStr}   |   Kimliği / Telefonu Belli: ${identifiedVisitors.length} Müşteri   |   Doğrudan Telefonu Olan: ${reportAnalytics.withPhoneCount} Kişi   |   (Anonim ziyaretçiler 3. sekmede ayrılmıştır)`,
+            s: 2
+          },
+          { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }
+        ]
+      },
+      {
+        height: 26,
+        cells: [
+          { v: 'Öncelik Durumu', s: 3 },
+          { v: 'Müşteri / Firma Adı', s: 3 },
+          { v: 'Telefon Numarası', s: 3 },
+          { v: 'İncelediği Araç Modeli', s: 3 },
+          { v: 'Peşinat / Takas / Kredi Tercihi', s: 3 },
+          { v: 'Müşteri Ne Yaptı? (Net Özet)', s: 3 },
+          { v: 'Ziyaret & Süre', s: 3 },
+          { v: 'Geliş Kanalı & Son Tarih', s: 3 }
+        ]
+      },
+      ...identifiedVisitors.map((v, idx) => {
+        const lastDateStr = v.last_seen_at
+          ? new Date(v.last_seen_at).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '-';
+        const visitSummary = v.visitDaysCount > 1
+          ? `${v.visitDaysCount} Farklı Gün • ${v.eventCount} İşlem (${formatDuration(v.duration_seconds)})`
+          : `${v.eventCount} İşlem (${formatDuration(v.duration_seconds)})`;
+        const hasSpecialBudget = v.campaignsList && v.campaignsList.length > 0;
+        const baseCellStyle = idx % 2 === 1 ? 13 : 4;
 
-        return [
-          dateStr,
-          sig.company_name || 'Katalog Ziyaretçisi',
-          sig.phone || '-',
-          cityStr,
-          sourceStr,
-          sig.target_model || '-',
-          sig.target_campaign || '-',
-          sig.search_query || '-',
-          formatDuration(sig.duration_seconds),
-          `%${sig.intent_score || 85}`,
-          statusStr,
-          sig.ip_address || '-',
-          sig.notes || '-'
-        ].map(escapeCsvCell).join(';');
+        return {
+          height: 24,
+          cells: [
+            { v: v.priorityBadge, s: v.phone && v.hasHighAction ? 9 : 10 },
+            { v: v.company_name, s: 5 },
+            { v: v.allPhonesText, s: v.phone ? 6 : 11 },
+            { v: v.displayModel, s: v.realModelsList.length > 0 ? 7 : baseCellStyle },
+            { v: v.displayBudget, s: hasSpecialBudget ? 8 : baseCellStyle },
+            { v: v.displayActions, s: baseCellStyle },
+            { v: visitSummary, s: 11 },
+            { v: `${v.channelLabel} (${lastDateStr})`, s: baseCellStyle }
+          ]
+        };
       })
     ];
 
-    const bom = '\uFEFF';
-    const blob = new Blob([bom + csvLines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ERC_Niyet_Radari_Detayli_Hareket_Logu_${today}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    toast.success(`📋 ${rawRows.length} detaylı hareket kaydı Excel formatında indirildi!`);
+    // ── SAYFA 2: 2-Yonetici ve Model Ozeti ───────────────────────────────────
+    const sheet2Rows = [
+      {
+        height: 30,
+        cells: [
+          { v: 'IVECO ERC SAMSUN — YÖNETİCİ ÖZETİ, İNCELENEN MODELLER VE KANAL PERFORMANSI', s: 1 },
+          { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          { v: `Rapor Tarihi: ${nowStr}   |   Toplam Tekil Ziyaretçi: ${reportAnalytics.totalUnique} Kişi   |   Toplam Tıklama: ${reportAnalytics.totalRaw} Hareket`, s: 2 },
+          { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }
+        ]
+      },
+      { height: 14, cells: [] },
+      {
+        height: 25,
+        cells: [
+          { v: '1. GENEL MÜŞTERİ HUNİSİ ÖZETİ', s: 12 },
+          { v: 'Kişi Sayısı', s: 12 },
+          { v: 'Oran (%)', s: 12 },
+          { v: 'Açıklama', s: 12 },
+          { v: '', s: 12 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          { v: 'Toplam Tekil Ziyaretçi', s: 5 },
+          { v: reportAnalytics.totalUnique, t: 'num', s: 11 },
+          { v: '%100', s: 11 },
+          { v: 'Aynı kişinin çoklu tıklamaları birleştirilmiş net kişi sayısı', s: 4 },
+          { v: '', s: 4 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          { v: 'Kimliği / Telefonu Belli Müşteriler', s: 5 },
+          { v: reportAnalytics.identifiedCount, t: 'num', s: 6 },
+          { v: `%${reportAnalytics.totalUnique > 0 ? Math.round((reportAnalytics.identifiedCount / reportAnalytics.totalUnique) * 100) : 0}`, s: 6 },
+          { v: `Doğrudan aranabilir (${reportAnalytics.withPhoneCount} telefon numarası kayıtlı)`, s: 4 },
+          { v: '', s: 4 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          { v: 'Kredi / Peşinat / Takas Hesaplayan Sıcak Adaylar', s: 5 },
+          { v: reportAnalytics.highIntentCount, t: 'num', s: 9 },
+          { v: `%${reportAnalytics.totalUnique > 0 ? Math.round((reportAnalytics.highIntentCount / reportAnalytics.totalUnique) * 100) : 0}`, s: 9 },
+          { v: 'Canlı peşinat sürgüsü, kredi planı veya WhatsApp butonu kullananlar', s: 4 },
+          { v: '', s: 4 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          { v: 'Anonim Katalog Ziyaretçileri (Numarasız)', s: 5 },
+          { v: reportAnalytics.anonymousCount, t: 'num', s: 11 },
+          { v: `%${reportAnalytics.totalUnique > 0 ? Math.round((reportAnalytics.anonymousCount / reportAnalytics.totalUnique) * 100) : 0}`, s: 11 },
+          { v: 'WhatsApp Durum / Grup linkinden girip henüz numara yazmayanlar', s: 4 },
+          { v: '', s: 4 }
+        ]
+      },
+      { height: 16, cells: [] },
+      {
+        height: 25,
+        cells: [
+          { v: '2. İNCELENEN ARAÇ MODELLERİ DAĞILIMI', s: 3 },
+          { v: 'Bakan Tekil Kişi', s: 3 },
+          { v: 'Toplam Tıklama', s: 3 },
+          { v: 'Telefonu Belli Olan', s: 3 },
+          { v: 'Durum Notu', s: 3 }
+        ]
+      },
+      ...reportAnalytics.topModels.map(m => ({
+        height: 22,
+        cells: [
+          { v: m.model, s: 7 },
+          { v: m.uniqueVisitors, t: 'num', s: 11 },
+          { v: m.totalClicks, t: 'num', s: 11 },
+          { v: m.withPhone, t: 'num', s: m.withPhone > 0 ? 6 : 11 },
+          { v: m.withPhone > 0 ? `${m.withPhone} müşterinin telefonu hazır` : 'Katalog üzerinden incelendi', s: 4 }
+        ]
+      })),
+      { height: 16, cells: [] },
+      {
+        height: 25,
+        cells: [
+          { v: '3. GİRİŞ KANALI & PAYLAŞIM PERFORMANSI', s: 3 },
+          { v: 'Gelen Tekil Kişi', s: 3 },
+          { v: 'Kimliği Belli Olan', s: 3 },
+          { v: 'Kimlik Dönüşüm Oranı', s: 3 },
+          { v: 'Toplam Etkileşim', s: 3 }
+        ]
+      },
+      ...reportAnalytics.channelBreakdown.map(ch => {
+        const pct = ch.uniqueVisitors > 0 ? Math.round((ch.identified / ch.uniqueVisitors) * 100) : 0;
+        return {
+          height: 22,
+          cells: [
+            { v: ch.label, s: 5 },
+            { v: ch.uniqueVisitors, t: 'num', s: 11 },
+            { v: ch.identified, t: 'num', s: ch.identified > 0 ? 6 : 11 },
+            { v: `%${pct}`, s: pct >= 50 ? 6 : 11 },
+            { v: `${ch.totalEvents} İşlem`, s: 11 }
+          ]
+        };
+      })
+    ];
+
+    // ── SAYFA 3: 3-Anonim Ziyaretciler ───────────────────────────────────────
+    const sheet3Rows = [
+      {
+        height: 30,
+        cells: [
+          { v: 'ANONİM PORTAL ZİYARETÇİLERİ (HENÜZ NUMARA BIRAKMAYANLAR — ÖNCELİK SIRALI)', s: 1 },
+          { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }, { v: '', s: 1 }
+        ]
+      },
+      {
+        height: 22,
+        cells: [
+          {
+            v: `Toplam ${anonymousVisitors.length} Anonim Ziyaretçi   |   En üstte Peşinat/Kredi hesaplayan veya spesifik araç inceleyen ciddi ziyaretçiler yer alır.`,
+            s: 2
+          },
+          { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }, { v: '', s: 2 }
+        ]
+      },
+      {
+        height: 26,
+        cells: [
+          { v: 'Ziyaretçi Tipi', s: 3 },
+          { v: 'Geliş Kanalı', s: 3 },
+          { v: 'İncelediği Araç Modeli', s: 3 },
+          { v: 'Hesapladığı Peşinat / Kredi', s: 3 },
+          { v: 'Yaptığı İşlem Özeti', s: 3 },
+          { v: 'Ziyaret Tarihi & Süresi', s: 3 }
+        ]
+      },
+      ...anonymousVisitors.map((v, idx) => {
+        const lastDateStr = v.last_seen_at
+          ? new Date(v.last_seen_at).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : '-';
+        const baseStyle = idx % 2 === 1 ? 13 : 4;
+        return {
+          height: 22,
+          cells: [
+            { v: v.hasMeaningfulAction ? '⚡ Ciddi İnceleme (Numarasız)' : '👀 Hızlı Katalog Bakışı', s: v.hasMeaningfulAction ? 9 : baseStyle },
+            { v: v.channelLabel, s: 5 },
+            { v: v.displayModel, s: v.realModelsList.length > 0 ? 7 : baseStyle },
+            { v: v.displayBudget, s: v.campaignsList.length > 0 ? 8 : baseStyle },
+            { v: v.displayActions, s: baseStyle },
+            { v: `${lastDateStr} • ${v.eventCount} İşlem (${formatDuration(v.duration_seconds)})`, s: 11 }
+          ]
+        };
+      })
+    ];
+
+    downloadStyledWorkbook(`IVECO_Niyet_Radari_Akilli_Rapor_${todayFile}.xlsx`, [
+      {
+        name: '1-Aranacak Musteriler',
+        colWidths: [26, 28, 19, 30, 32, 42, 24, 30],
+        rows: sheet1Rows,
+        merges: ['A1:H1', 'A2:H2'],
+        freezeRow: 3,
+        autoFilterRef: `A3:H${Math.max(4, sheet1Rows.length)}`
+      },
+      {
+        name: '2-Yonetici ve Model Ozeti',
+        colWidths: [38, 18, 18, 22, 42],
+        rows: sheet2Rows,
+        merges: ['A1:E1', 'A2:E2']
+      },
+      {
+        name: '3-Anonim Ziyaretciler',
+        colWidths: [28, 24, 30, 32, 42, 28],
+        rows: sheet3Rows,
+        merges: ['A1:F1', 'A2:F2'],
+        freezeRow: 3,
+        autoFilterRef: `A3:F${Math.max(4, sheet3Rows.length)}`
+      }
+    ]);
+
+    toast.success(`📊 Akıllı Excel Raporu (.xlsx) 3 ayrı sekme ve düzenlenmiş sütunlarla indirildi!`);
   };
 
   const toggleExpandVisitor = (key) => {
@@ -782,46 +1098,25 @@ export default function IntentRadar() {
 
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button
-            onClick={() => handleExportExcel('summary')}
+            onClick={() => handleExportExcel()}
             style={{
               background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 100%)',
               color: '#fff',
-              border: '1px solid rgba(45, 212, 191, 0.4)',
+              border: '1px solid rgba(45, 212, 191, 0.45)',
               borderRadius: '8px',
-              padding: '9px 14px',
-              fontWeight: 700,
-              fontSize: '0.84rem',
+              padding: '9px 16px',
+              fontWeight: 800,
+              fontSize: '0.86rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '7px',
+              gap: '8px',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(13, 148, 136, 0.3)'
+              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)'
             }}
-            title="Her müşteriyi tek satırda özetleyen yönetici Excel raporunu indir"
+            title="3 Ayrı Sekmeli (1-Aranacak Müşteriler, 2-Yönetici Özeti, 3-Anonim Ziyaretçiler) Düzenli Excel (.xlsx) İndir"
           >
-            <FiDownload size={15} />
-            📊 Müşteri Özeti Excel ({groupedVisitors.length} Kişi)
-          </button>
-
-          <button
-            onClick={() => handleExportExcel('raw')}
-            style={{
-              background: 'var(--bg-card)',
-              color: '#2dd4bf',
-              border: '1px solid rgba(45, 212, 191, 0.35)',
-              borderRadius: '8px',
-              padding: '9px 13px',
-              fontWeight: 600,
-              fontSize: '0.82rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer'
-            }}
-            title="Saat saat tüm tıklamaları içeren ham hareket logunu Excel olarak indir"
-          >
-            <FiList size={15} />
-            📋 Tüm Loglar ({dateFilteredSignals.length})
+            <FiDownload size={16} />
+            📊 Akıllı Excel Raporu İndir (.xlsx)
           </button>
 
           <button
@@ -937,6 +1232,54 @@ export default function IntentRadar() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {/* Tablo / Kart Görünüm Seçici */}
+          <div style={{
+            display: 'inline-flex',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            padding: '3px'
+          }}>
+            <button
+              onClick={() => setLayoutMode('table')}
+              style={{
+                background: layoutMode === 'table' ? '#0d9488' : 'transparent',
+                color: layoutMode === 'table' ? '#fff' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '5px 12px',
+                fontSize: '0.79rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <FiList size={13} />
+              📊 Akıllı Tablo Görünümü
+            </button>
+            <button
+              onClick={() => setLayoutMode('cards')}
+              style={{
+                background: layoutMode === 'cards' ? '#0d9488' : 'transparent',
+                color: layoutMode === 'cards' ? '#fff' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '5px 12px',
+                fontSize: '0.79rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <FiGrid size={13} />
+              🪪 Detaylı Kartlar
+            </button>
+          </div>
+
           <div style={{
             display: 'inline-flex',
             background: 'var(--bg-card)',
@@ -961,7 +1304,7 @@ export default function IntentRadar() {
               }}
             >
               <FiUsers size={13} />
-              Tekil Müşteri Özeti ({groupedVisitors.length})
+              Tekil Müşteri ({groupedVisitors.length})
             </button>
             <button
               onClick={() => setViewMode('raw')}
@@ -980,7 +1323,7 @@ export default function IntentRadar() {
               }}
             >
               <FiLayers size={13} />
-              Tüm Ham Hareketler ({dateFilteredSignals.length})
+              Ham Hareketler ({dateFilteredSignals.length})
             </button>
           </div>
 
@@ -1002,7 +1345,7 @@ export default function IntentRadar() {
             }}
           >
             <FiBarChart2 size={14} />
-            {showReportPanel ? 'Rapor Tablosunu Gizle' : 'Rapor Tablosunu Göster'}
+            {showReportPanel ? 'Özet Paneli Gizle' : 'Özet Paneli Göster'}
             {showReportPanel ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
           </button>
         </div>
@@ -1341,14 +1684,14 @@ export default function IntentRadar() {
         {/* Sol: Müşteri Segment Sekmeleri */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
           <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
-            <FiFilter size={13} /> GRUP:
+            <FiFilter size={13} /> MÜŞTERİ GRUBU:
           </span>
           {[
-            { id: 'all', label: `Tümü (${reportAnalytics.totalUnique})`, color: 'var(--accent-blue)' },
-            { id: 'identified', label: `📞 Telefonu / Kimliği Belli (${reportAnalytics.identifiedCount})`, color: '#10b981' },
+            { id: 'identified', label: `📞 Aranacak / Kimliği Belli (${reportAnalytics.identifiedCount})`, color: '#10b981' },
             { id: 'high_intent', label: `🔥 Yüksek Niyet (${reportAnalytics.highIntentCount})`, color: '#ef4444' },
             { id: 'repeat', label: `🔄 Çoklu Giriş (${reportAnalytics.repeatVisitorCount})`, color: '#f59e0b' },
             { id: 'anonymous', label: `🕵️ Anonim (${reportAnalytics.anonymousCount})`, color: '#64748b' },
+            { id: 'all', label: `Tüm Ziyaretçiler (${reportAnalytics.totalUnique})`, color: 'var(--accent-blue)' },
             { id: 'converted', label: `✅ CRM'de (${reportAnalytics.convertedCount})`, color: '#8b5cf6' }
           ].map(seg => (
             <button
@@ -1388,35 +1731,11 @@ export default function IntentRadar() {
           >
             <option value="all">Tüm Kanallar</option>
             <option value="whatsapp_all">Tüm WhatsApp Kanalları</option>
-            <option value="wa_durum">WhatsApp Durum</option>
-            <option value="whatsapp_link">WhatsApp VIP Link</option>
-            <option value="public_pricing_catalog">2026 Fiyat Kataloğu</option>
-            <option value="smart_action_hub">Portal Hızlı İşlem</option>
-            <option value="crm_existing_customer">Kayıtlı CRM Müşterisi</option>
-            <option value="google_search">Google Organik</option>
-            <option value="google_ads">Google Ads</option>
+            <option value="WhatsApp Özel Link">WhatsApp Özel Müşteri Linki</option>
+            <option value="WhatsApp Durum">WhatsApp Durum</option>
+            <option value="WhatsApp Grubu">WhatsApp Nakliye Grubu</option>
+            <option value="Kurumsal Protokol">Kurumsal Oda Protokolü</option>
           </select>
-
-          {uniqueCities.length > 0 && (
-            <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-              style={{
-                background: 'var(--bg-secondary)',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '7px 10px',
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-              }}
-            >
-              <option value="all">Tüm İller</option>
-              {uniqueCities.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          )}
 
           <div style={{ position: 'relative' }}>
             <FiSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
@@ -1439,7 +1758,7 @@ export default function IntentRadar() {
         </div>
       </div>
 
-      {/* ── LİSTELEME ALANI (TEKİL MÜŞTERİ PROFİLLERİ VEYA HAM LOGLAR) ──── */}
+      {/* ── LİSTELEME ALANI (AKILLI TABLO VEYA DETAYLI KARTLAR) ──── */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
           <div className="loading-pulse" style={{ margin: '0 auto 16px' }}></div>
@@ -1456,7 +1775,7 @@ export default function IntentRadar() {
           <FiTarget size={40} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
           <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '6px' }}>Seçili Filtrelere Uygun Ziyaretçi Kaydı Bulunamadı</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '14px' }}>
-            Filtreleri sıfırlayarak tüm ziyaretçi ve müşteri kayıtlarını görüntüleyebilirsiniz.
+            Tüm ziyaretçileri (anonimler dahil) görmek için aşağıdaki butona tıklayabilirsiniz.
           </p>
           <button
             onClick={() => {
@@ -1478,15 +1797,230 @@ export default function IntentRadar() {
               cursor: 'pointer'
             }}
           >
-            Tüm Filtreleri Sıfırla
+            Tüm Ziyaretçileri Göster ({reportAnalytics.totalUnique} Kişi)
           </button>
+        </div>
+      ) : layoutMode === 'table' ? (
+        /* ── YENİ: 8 SÜTUNLU TERTEMİZ AKILLI RAPOR TABLOSU ───────────────── */
+        <div style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          boxShadow: 'var(--shadow-card)'
+        }}>
+          <div style={{
+            padding: '12px 18px',
+            background: 'rgba(15, 23, 42, 0.6)',
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
+            <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+              📋 Akıllı Müşteri Rapor Tablosu ({displayedItems.length} Kayıt Gösteriliyor)
+            </div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+              Aynı müşterinin farklı günlerdeki girişleri birleştirilmiştir • Telefon numaraları ve bütçe hesapları ayrıştırılmıştır
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: '1080px' }}>
+              <thead>
+                <tr style={{ background: 'rgba(30, 58, 138, 0.35)', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Öncelik / Durum</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Müşteri / Firma Adı</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Telefon Numarası</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>İncelediği Araç Modeli</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Peşinat / Takas / Kredi</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Müşteri Ne Yaptı? (Özet)</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Ziyaret & Kanal</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', textAlign: 'right', whiteSpace: 'nowrap' }}>Hızlı İşlem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedItems.map((signal, idx) => {
+                  const timeInfo = formatDateTime(signal.created_at);
+                  const hasSpecialBudget = signal.campaignsList && signal.campaignsList.length > 0;
+                  const hasSpecificVehicle = signal.realModelsList && signal.realModelsList.length > 0;
+                  return (
+                    <tr
+                      key={signal.visitorKey}
+                      style={{
+                        borderBottom: '1px solid var(--border-color)',
+                        background: idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent'
+                      }}
+                    >
+                      <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '4px 9px',
+                          borderRadius: '6px',
+                          fontSize: '0.74rem',
+                          fontWeight: 800,
+                          background: signal.phone && signal.hasHighAction
+                            ? 'rgba(239, 68, 68, 0.16)'
+                            : signal.phone
+                            ? 'rgba(16, 185, 129, 0.15)'
+                            : signal.hasMeaningfulAction
+                            ? 'rgba(245, 158, 11, 0.16)'
+                            : 'rgba(148, 163, 184, 0.12)',
+                          color: signal.phone && signal.hasHighAction
+                            ? '#f87171'
+                            : signal.phone
+                            ? '#34d399'
+                            : signal.hasMeaningfulAction
+                            ? '#fbbf24'
+                            : '#94a3b8'
+                        }}>
+                          {signal.priorityBadge}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '11px 14px', fontWeight: 800, color: 'var(--text-heading)' }}>
+                        <div>{signal.company_name}</div>
+                        {signal.isConverted && (
+                          <span style={{ fontSize: '0.68rem', color: '#a78bfa', fontWeight: 700 }}>✓ CRM Kayıtlı</span>
+                        )}
+                      </td>
+
+                      <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
+                        {signal.phone ? (
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.14)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.35)',
+                            padding: '4px 9px',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            📞 {signal.allPhonesText}
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>Numarasız</span>
+                        )}
+                      </td>
+
+                      <td style={{ padding: '11px 14px' }}>
+                        <span style={{
+                          color: hasSpecificVehicle ? '#60a5fa' : 'var(--text-secondary)',
+                          fontWeight: hasSpecificVehicle ? 800 : 500
+                        }}>
+                          {signal.displayModel}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: '11px 14px' }}>
+                        {hasSpecialBudget ? (
+                          <span style={{
+                            background: 'rgba(245, 158, 11, 0.14)',
+                            color: '#fbbf24',
+                            border: '1px solid rgba(245, 158, 11, 0.3)',
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontWeight: 700,
+                            fontSize: '0.76rem',
+                            display: 'inline-block'
+                          }}>
+                            💰 {signal.displayBudget}
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>Standart Katalog</span>
+                        )}
+                      </td>
+
+                      <td style={{ padding: '11px 14px', color: 'var(--text-primary)', fontWeight: 600, maxWidth: '290px' }}>
+                        {signal.displayActions}
+                      </td>
+
+                      <td style={{ padding: '11px 14px', whiteSpace: 'nowrap', fontSize: '0.76rem' }}>
+                        <div style={{ fontWeight: 700, color: signal.channelMeta?.color || '#60a5fa' }}>
+                          {signal.channelLabel}
+                        </div>
+                        <div style={{ color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          <strong>{signal.eventCount} İşlem</strong> ({formatDuration(signal.duration_seconds)})
+                          {signal.visitDaysCount > 1 ? ` • ${signal.visitDaysCount} Gün` : ''}
+                        </div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.71rem' }}>
+                          {timeInfo.full}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '11px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                          {signal.phone && (
+                            <>
+                              <a
+                                href={`tel:${signal.phone.replace(/\s+/g, '')}`}
+                                style={{
+                                  background: 'rgba(16, 185, 129, 0.15)',
+                                  color: '#34d399',
+                                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                                  padding: '5px 9px',
+                                  borderRadius: '6px',
+                                  fontWeight: 700,
+                                  fontSize: '0.75rem',
+                                  textDecoration: 'none'
+                                }}
+                                title="Hemen Ara"
+                              >
+                                📞 Ara
+                              </a>
+                              <button
+                                onClick={() => handleOpenWhatsApp(signal)}
+                                style={{
+                                  background: '#25D366',
+                                  color: '#fff',
+                                  border: 'none',
+                                  padding: '5px 9px',
+                                  borderRadius: '6px',
+                                  fontWeight: 700,
+                                  fontSize: '0.75rem',
+                                  cursor: 'pointer'
+                                }}
+                                title="WhatsApp Mesajı Gönder"
+                              >
+                                💬 WA
+                              </button>
+                            </>
+                          )}
+                          {signal.matched_customer_id && (
+                            <button
+                              onClick={() => navigate(`/customers/${signal.matched_customer_id}`)}
+                              style={{
+                                background: 'rgba(139, 92, 246, 0.16)',
+                                color: '#c4b5fd',
+                                border: '1px solid rgba(139, 92, 246, 0.35)',
+                                padding: '5px 8px',
+                                borderRadius: '6px',
+                                fontWeight: 700,
+                                fontSize: '0.74rem',
+                                cursor: 'pointer'
+                              }}
+                              title="CRM Müşteri Kartını Aç"
+                            >
+                              Kart ↗
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {displayedItems.map((signal) => {
             const isVeryHot = signal.intent_level === 'very_high' || signal.intent_score >= 90 || signal.hasHighAction;
             const isConverted = signal.isConverted;
-            const srcMeta = getSourceMeta(signal.source);
+            const srcMeta = signal.channelMeta || getSourceMeta(signal.source);
             const timeInfo = formatDateTime(signal.created_at);
             const isExpanded = Boolean(expandedVisitorKeys[signal.visitorKey]);
 
