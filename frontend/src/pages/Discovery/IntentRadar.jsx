@@ -29,10 +29,12 @@ import {
   FiLayers,
   FiList,
   FiFilter,
-  FiGrid
+  FiGrid,
+  FiVideo
 } from 'react-icons/fi';
 import { getPublicOrigin } from '../../utils/publicUrl';
 import { downloadStyledWorkbook } from '../../utils/excelWorkbookBuilder';
+import WhatsAppGuideVideoModal from './components/WhatsAppGuideVideoModal';
 
 // Kaynak kanal etiket haritası
 const SOURCE_META = {
@@ -244,6 +246,7 @@ export default function IntentRadar() {
   // Smart Link Generator & WhatsApp Status Modal State
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isGuideVideoModalOpen, setIsGuideVideoModalOpen] = useState(false);
   const [statusTemplateIdx, setStatusTemplateIdx] = useState(0);
   const [copiedStatusText, setCopiedStatusText] = useState(false);
   const [generatorModel, setGeneratorModel] = useState('Daily 35C16 Şasi');
@@ -1141,6 +1144,28 @@ export default function IntentRadar() {
           >
             <FiZap size={15} />
             Takip Linki Üret
+          </button>
+
+          <button
+            onClick={() => setIsGuideVideoModalOpen(true)}
+            style={{
+              background: 'linear-gradient(135deg, #d97706 0%, #ea580c 100%)',
+              color: '#fff',
+              border: '1px solid rgba(251, 191, 36, 0.45)',
+              borderRadius: '8px',
+              padding: '9px 14px',
+              fontWeight: 800,
+              fontSize: '0.84rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '7px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)'
+            }}
+            title="WhatsApp Durum için 16 saniyelik geçişli Dijital Katalog Kullanım Kılavuzu Videosu üret ve indir"
+          >
+            <FiVideo size={15} />
+            🎬 WA Kılavuz Videosu
           </button>
 
           <button
@@ -2849,6 +2874,28 @@ export default function IntentRadar() {
                     </button>
 
                     <button
+                      onClick={() => {
+                        setIsStatusModalOpen(false);
+                        setIsGuideVideoModalOpen(true);
+                      }}
+                      style={{
+                        background: 'linear-gradient(135deg, #d97706 0%, #ea580c 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        fontWeight: 700,
+                        fontSize: '0.86rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <FiVideo size={16} /> 🎬 Kullanım Kılavuzu Videosu İndir
+                    </button>
+
+                    <button
                       onClick={() => window.open('https://web.whatsapp.com', '_blank')}
                       style={{
                         background: 'rgba(34, 197, 94, 0.15)',
@@ -2870,6 +2917,12 @@ export default function IntentRadar() {
           </div>
         </div>
       )}
+
+      {/* 🎬 WhatsApp Durum 9:16 Dijital Katalog Kullanım Kılavuzu Video Stüdyosu */}
+      <WhatsAppGuideVideoModal
+        isOpen={isGuideVideoModalOpen}
+        onClose={() => setIsGuideVideoModalOpen(false)}
+      />
     </div>
   );
 }
