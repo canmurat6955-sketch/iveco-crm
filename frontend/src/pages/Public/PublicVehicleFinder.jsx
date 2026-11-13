@@ -1538,16 +1538,16 @@ export default function PublicVehicleFinder() {
     return true;
   };
 
-  // Müşteri kendisine gönderilen VIP Linki veya Sosyal Medya Linkini açtığında anında CRM'e "Portal Açıldı" sinyali gönder
+  // Müşteri kendisine gönderilen VIP Linki, Sosyal Medya Linkini veya doğrudan Fiyat Listesini açtığında anında CRM'e "Portal Açıldı" sinyali gönder
   useEffect(() => {
-    if ((customerCompany || customerIdParam || socialSourceLabel || refCode || customerPhone) && !isAdminMode && !isPreviewMode) {
+    if (!isAdminMode && !isPreviewMode) {
       const timer = setTimeout(() => {
         recordCustomerFootprint(
-          socialSourceLabel ? `${socialSourceLabel} Portala Girdi` : 'VIP Link Açıldı (Katalog İnceleniyor)',
+          socialSourceLabel ? `${socialSourceLabel} Linkine Tıkladı` : 'Fiyat & Kampanya Linki Açıldı',
           selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
-          sectorParam ? `Sektör Filtresi: ${sectorParam}` : (socialSourceLabel || 'Genel Katalog')
+          activePartner ? `Kurum Protokolü: ${activePartner.shortTitle || activePartner.name}` : (sectorParam ? `Sektör Filtresi: ${sectorParam}` : (socialSourceLabel || 'Doğrudan Fiyat Listesi Girişi'))
         );
-      }, 2200);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [customerCompany, customerIdParam, socialSourceLabel, refCode]);

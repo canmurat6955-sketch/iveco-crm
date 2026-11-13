@@ -1298,9 +1298,36 @@ class CRMService:
             sent_at=now,
         )
         self.db.add(notif)
+
+        # Niyet Radarı Link Girişlerine de kaydet
+        try:
+            from app.modules.discovery.models import WebIntentSignal
+            sig = WebIntentSignal(
+                source="proforma_link",
+                search_query=f"Resmi Proforma Teklifi Açıldı ({proforma.invoice_number})",
+                target_model=proforma.vehicle_model or "IVECO Şasi",
+                target_campaign=f"Proforma #{proforma.invoice_number}",
+                company_name=company_label,
+                city=customer.city if customer and customer.city else "Samsun",
+                district=customer.district if customer else None,
+                phone=customer.phone if customer else None,
+                ip_address=ip_address,
+                page_url=f"/p/{tracking.token}",
+                duration_seconds=45,
+                scroll_depth=90,
+                intent_score=98,
+                intent_level="very_high",
+                matched_customer_id=customer.id if customer else None,
+                status="converted" if customer else "new",
+                notes=f"Resmi Proforma Teklif Linki (/p/{tracking.token}) görüntülendi. Toplam: {proforma.grand_total:,.0f} TL",
+            )
+            self.db.add(sig)
+        except Exception:
+            pass
+
         self.db.commit()
 
-        # WhatsApp üzerinden Can Murat Onay'a anlık istihbarat bildirimi gönder
+        # WhatsApp üzerinden Satış Sorumlusu Can Murat'a anlık istihbarat bildirimi gönder
         try:
             from app.modules.whatsapp.service import WhatsAppService
             wa_service = WhatsAppService(self.db)

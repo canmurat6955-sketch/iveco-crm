@@ -38,29 +38,36 @@ import WhatsAppGuideVideoModal from './components/WhatsAppGuideVideoModal';
 
 // Kaynak kanal etiket haritası
 const SOURCE_META = {
-  whatsapp_link: { label: 'WhatsApp VIP / Akıllı Link', short: 'WhatsApp VIP Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  whatsapp_personalized_link: { label: 'WhatsApp Özel Müşteri Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  vip_portal_footprint: { label: 'WhatsApp Özel Müşteri Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  wa_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
-  whatsapp_durum: { label: 'WhatsApp Durum Paylaşımı', short: 'WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
-  wa_durum_kilavuz: { label: 'WA Durum (Kılavuz Videosu)', short: 'WA Durum (Kılavuz)', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.35)' },
-  wa_durum_takas: { label: 'WA Durum (Takas & Kredi)', short: 'WA Durum (Takas)', color: '#fb923c', bg: 'rgba(249, 115, 22, 0.16)', border: 'rgba(249, 115, 22, 0.35)' },
-  wa_durum_odemesiz: { label: 'WA Durum (3-6 Ay Ödemesiz)', short: 'WA Durum (Ödemesiz)', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.16)', border: 'rgba(59, 130, 246, 0.35)' },
-  wa_durum_kdv: { label: 'WA Durum (%20 KDV & İndirim)', short: 'WA Durum (KDV)', color: '#34d399', bg: 'rgba(16, 185, 129, 0.16)', border: 'rgba(16, 185, 129, 0.35)' },
-  wa_durum_kantar: { label: 'WA Durum (35C vs 70C Kantar)', short: 'WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
-  wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: 'WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
-  wa_musteri: { label: 'WhatsApp Müşteri Linki', short: 'WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: 'WhatsApp Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
-  public_pricing_catalog: { label: '2026 Dijital Fiyat Kataloğu', short: 'Fiyat Kataloğu', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
-  smart_action_hub: { label: 'Portal Hızlı Teklif / Takas / Kredi', short: 'Hızlı İşlem Merkezi', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' },
-  crm_existing_customer: { label: 'Kayıtlı CRM Müşterisi (Özel Link)', short: 'WhatsApp Özel Link', color: '#a78bfa', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.35)' },
-  google_search: { label: 'Google Organik Arama', short: 'Google Organik', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
-  google_ads: { label: 'Google Ads Kampanyası', short: 'Google Ads', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)' }
+  proforma_link: { label: 'Resmi Proforma Teklif Linki (/p/)', short: '📄 Proforma Teklif Linki', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.16)', border: 'rgba(56, 189, 248, 0.4)' },
+  whatsapp_link: { label: 'WhatsApp VIP / Akıllı Link', short: '👑 WhatsApp VIP Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  whatsapp_personalized_link: { label: 'WhatsApp Özel Müşteri Linki', short: '👑 Kişiye Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  vip_portal_footprint: { label: 'WhatsApp Özel Müşteri Linki', short: '👑 Kişiye Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_durum: { label: 'WhatsApp Durum Paylaşımı', short: '📲 WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
+  whatsapp_durum: { label: 'WhatsApp Durum Paylaşımı', short: '📲 WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
+  wa_durum_kilavuz: { label: 'WA Durum (Kılavuz Videosu)', short: '📲 WA Durum (Kılavuz)', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_durum_takas: { label: 'WA Durum (Takas & Kredi)', short: '📲 WA Durum (Takas)', color: '#fb923c', bg: 'rgba(249, 115, 22, 0.16)', border: 'rgba(249, 115, 22, 0.35)' },
+  wa_durum_odemesiz: { label: 'WA Durum (3-6 Ay Ödemesiz)', short: '📲 WA Durum (Ödemesiz)', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.16)', border: 'rgba(59, 130, 246, 0.35)' },
+  wa_durum_kdv: { label: 'WA Durum (%20 KDV & İndirim)', short: '📲 WA Durum (KDV)', color: '#34d399', bg: 'rgba(16, 185, 129, 0.16)', border: 'rgba(16, 185, 129, 0.35)' },
+  wa_durum_kantar: { label: 'WA Durum (35C vs 70C Kantar)', short: '📲 WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
+  wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: '👥 WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
+  wa_musteri: { label: 'WhatsApp Müşteri Linki', short: '💬 WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: '👑 Özel Teklif Linki', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
+  public_pricing_catalog: { label: '2026 Dijital Fiyat Kataloğu', short: '📘 Fiyat Kataloğu Linki', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
+  smart_action_hub: { label: 'Portal Hızlı Teklif / Takas / Kredi', short: '⚡ Hızlı İşlem Merkezi', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' },
+  crm_existing_customer: { label: 'Kayıtlı CRM Müşterisi (Özel Link)', short: '👑 Kişiye Özel Link', color: '#a78bfa', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.35)' },
+  google_search: { label: 'Google Organik Arama', short: '🔍 Google Organik', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
+  google_ads: { label: 'Google Ads Kampanyası', short: '📢 Google Ads', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)' }
 };
 
-function getSourceMeta(source, notesOrCampaign = '') {
+function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
+  const combined = `${source || ''} ${notesOrCampaign || ''} ${pageUrl || ''}`.toLowerCase();
+  if (source === 'proforma_link' || combined.includes('/p/')) {
+    return SOURCE_META.proforma_link;
+  }
+  if (combined.includes('partner=') || combined.includes('protokol') || combined.includes('ziraat') || combined.includes('esob') || combined.includes('kooperatif') || combined.includes('odası') || combined.includes('odasi')) {
+    return { label: 'Özel Kampanya / Oda Protokol Linki', short: '🏛️ Özel Kampanya / Oda Linki', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.4)' };
+  }
   if (source && SOURCE_META[source]) return SOURCE_META[source];
-  const combined = `${source || ''} ${notesOrCampaign || ''}`.toLowerCase();
   if (combined.includes('wa_durum_takas')) return SOURCE_META.wa_durum_takas;
   if (combined.includes('wa_durum_odemesiz')) return SOURCE_META.wa_durum_odemesiz;
   if (combined.includes('wa_durum_kdv')) return SOURCE_META.wa_durum_kdv;
@@ -75,19 +82,85 @@ function getSourceMeta(source, notesOrCampaign = '') {
   if (combined.includes('durum') || source === 'wa_durum' || source === 'whatsapp_durum') {
     return SOURCE_META.wa_durum;
   }
-  if (combined.includes('partner') || combined.includes('protokol') || combined.includes('oda')) {
-    return { label: 'Kurumsal Oda / Protokol Linki', short: 'Kurumsal Protokol', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.35)' };
-  }
   if (combined.includes('müşteri linki') || source === 'wa_musteri' || source === 'whatsapp_link') {
     return SOURCE_META.wa_musteri;
   }
-  if (!source) return { label: 'Dijital Katalog', short: 'Dijital Katalog', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)', border: 'rgba(148, 163, 184, 0.3)' };
+  if (!source) return { label: 'Dijital Katalog', short: '📘 Fiyat Kataloğu Linki', color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)', border: 'rgba(148, 163, 184, 0.3)' };
   return SOURCE_META[source] || {
     label: 'Doğrudan / VIP Katalog Linki',
-    short: 'VIP Katalog Linki',
+    short: '🔗 VIP Katalog Linki',
     color: '#60a5fa',
     bg: 'rgba(59, 130, 246, 0.15)',
     border: 'rgba(59, 130, 246, 0.35)'
+  };
+}
+
+// Girilen linkin URL'sinden ve parametrelerinden sade, anlaşılır açıklama üretir
+function describeClickedLink(signal) {
+  const rawUrl = String(signal.page_url || '').trim();
+  const shortPath = rawUrl ? rawUrl.replace(/^https?:\/\/[^/]+/i, '') : '/fiyat-listesi';
+  const lowerUrl = shortPath.toLowerCase();
+  const camp = String(signal.target_campaign || '').trim();
+
+  let partnerSlug = '';
+  const partnerMatch = shortPath.match(/[?&]partner=([^&#]+)/i);
+  if (partnerMatch && partnerMatch[1]) {
+    try {
+      partnerSlug = decodeURIComponent(partnerMatch[1]).replace(/[-_]/g, ' ').toUpperCase();
+    } catch {
+      partnerSlug = partnerMatch[1];
+    }
+  }
+
+  let companyInUrl = '';
+  const compMatch = shortPath.match(/[?&]company=([^&#]+)/i);
+  if (compMatch && compMatch[1]) {
+    try {
+      companyInUrl = decodeURIComponent(compMatch[1]);
+    } catch {
+      companyInUrl = compMatch[1];
+    }
+  }
+
+  if (signal.source === 'proforma_link' || lowerUrl.startsWith('/p/')) {
+    return {
+      linkTitle: camp || 'Resmi Proforma Teklifi',
+      linkSub: shortPath || '/p/teklif',
+      isPartner: false
+    };
+  }
+  if (partnerSlug) {
+    return {
+      linkTitle: `Kurum Özel Kampanya: ${partnerSlug}`,
+      linkSub: shortPath.split('?')[0] === '/ozel-teklif' ? '/ozel-teklif (Özel Kampanya Tablosu)' : '/fiyat-listesi (Kurum İndirimli)',
+      isPartner: true
+    };
+  }
+  if (camp && camp.toLowerCase().includes('protokol')) {
+    return {
+      linkTitle: camp,
+      linkSub: shortPath.split('?')[0] || '/ozel-teklif',
+      isPartner: true
+    };
+  }
+  if (companyInUrl) {
+    return {
+      linkTitle: `Özel Müşteri Linki (${companyInUrl})`,
+      linkSub: shortPath.split('?')[0] || '/fiyat-listesi',
+      isPartner: false
+    };
+  }
+  if (lowerUrl.includes('/ozel-teklif')) {
+    return {
+      linkTitle: 'Özel Kampanya & Şasi Seçici Linki',
+      linkSub: '/ozel-teklif',
+      isPartner: true
+    };
+  }
+  return {
+    linkTitle: '2026 Dijital Fiyat & Kredi Listesi',
+    linkSub: shortPath.split('?')[0] || '/fiyat-listesi',
+    isPartner: false
   };
 }
 
@@ -242,11 +315,11 @@ export default function IntentRadar() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
 
-  // Sistematik Görünüm & Filtre State'leri
-  const [viewMode, setViewMode] = useState('grouped'); // 'grouped' (Tekil Müşteri Özeti) | 'raw' (Tüm Ham Loglar)
-  const [layoutMode, setLayoutMode] = useState('table'); // 'table' (Akıllı Özet Tablo) | 'cards' (Detaylı Kartlar)
-  const [showReportPanel, setShowReportPanel] = useState(true);
-  const [visitorSegment, setVisitorSegment] = useState('identified'); // İlk açılışta doğrudan Kimliği/Telefonu Belli müşterileri göster
+  // Sistematik Görünüm & Filtre State'leri (Varsayılan: Komple Tüm Link Girişleri açık ve gizlenmemiş)
+  const [viewMode, setViewMode] = useState('raw'); // 'raw' (Komple Link Girişleri - Tek Tek) | 'grouped' (Kişi Bazlı Birleştirilmiş Özet)
+  const [layoutMode, setLayoutMode] = useState('table'); // 'table' (Tablo Görünümü) | 'cards' (Detaylı Kartlar)
+  const [showReportPanel, setShowReportPanel] = useState(false); // Grafikleri varsayılan gizle, kafa karıştırmasın
+  const [visitorSegment, setVisitorSegment] = useState('all'); // İlk açılışta hiçbir kaydı gizleme, komple tüm link girişlerini göster
   const [dateRange, setDateRange] = useState('all'); // 'all' | 'today' | 'yesterday' | '7d' | '30d'
   const [sourceFilter, setSourceFilter] = useState('all');
   const [selectedCity, setSelectedCity] = useState('all');
@@ -639,22 +712,27 @@ export default function IntentRadar() {
   // 4. ADIM: Aktif Filtrelere Göre Gösterilecek Liste
   const displayedItems = useMemo(() => {
     const baseList = viewMode === 'grouped'
-      ? groupedVisitors
+      ? groupedVisitors.map(g => ({
+          ...g,
+          clickedLinkInfo: describeClickedLink(g.primarySignal || g)
+        }))
       : dateFilteredSignals.map(s => {
           const classified = classifyVisitorSignals([s]);
-          const srcMeta = getSourceMeta(s.source, `${s.target_campaign || ''} ${s.notes || ''}`);
+          const srcMeta = getSourceMeta(s.source, `${s.target_campaign || ''} ${s.notes || ''}`, s.page_url || '');
           const cleanedName = cleanVisitorName(s.matched_customer_name || s.company_name);
           const isId = Boolean(s.phone || s.matched_customer_id || !isGenericVisitorName(cleanedName));
+          const linkInfo = describeClickedLink(s);
           return {
             ...s,
             visitorKey: `raw_${s.id}`,
-            company_name: !isGenericVisitorName(cleanedName) ? cleanedName : (s.phone ? 'Numarası Kayıtlı Müşteri' : 'Anonim Ziyaretçi'),
+            company_name: !isGenericVisitorName(cleanedName) ? cleanedName : (s.phone ? 'Numarası Kayıtlı Müşteri' : 'Anonim Link Ziyaretçisi'),
             phone: s.phone ? formatTurkishPhone(s.phone) : null,
             allPhonesText: s.phone ? formatTurkishPhone(s.phone) : '—',
             visitDaysCount: 1,
             channelLabel: srcMeta.short,
             channelMeta: srcMeta,
-            priorityBadge: s.phone ? '📞 Telefonu Belli' : (isId ? '🏢 Firma Belli' : '👀 Katalog'),
+            clickedLinkInfo: linkInfo,
+            priorityBadge: s.phone ? '📞 Telefonu Belli' : (isId ? '🏢 Firma Belli' : '👀 Link Girişi'),
             modelsList: classified.realModelsList.length > 0 ? classified.realModelsList : ['Genel Fiyat Listesi'],
             realModelsList: classified.realModelsList,
             displayModel: classified.displayModel,
@@ -674,15 +752,22 @@ export default function IntentRadar() {
 
     return baseList.filter(item => {
       if (visitorSegment === 'identified' && !item.isIdentified) return false;
+      if (visitorSegment === 'with_phone' && !item.phone) return false;
       if (visitorSegment === 'high_intent' && !item.hasHighAction) return false;
       if (visitorSegment === 'repeat' && item.eventCount < 2) return false;
       if (visitorSegment === 'anonymous' && item.isIdentified) return false;
       if (visitorSegment === 'converted' && !item.isConverted) return false;
 
       if (sourceFilter !== 'all') {
+        const chText = `${item.channelLabel || ''} ${item.source || ''} ${item.clickedLinkInfo?.linkTitle || ''} ${item.page_url || ''}`.toLowerCase();
         if (sourceFilter === 'whatsapp_all') {
-          const hasWa = (item.channelLabel || '').toLowerCase().includes('whatsapp');
-          if (!hasWa) return false;
+          if (!chText.includes('whatsapp') && !chText.includes('wa_')) return false;
+        } else if (sourceFilter === 'partner_only') {
+          if (!item.clickedLinkInfo?.isPartner && !chText.includes('oda') && !chText.includes('protokol') && !chText.includes('partner=')) return false;
+        } else if (sourceFilter === 'wa_durum_only') {
+          if (!chText.includes('durum')) return false;
+        } else if (sourceFilter === 'personal_only') {
+          if (!chText.includes('özel') && !chText.includes('proforma') && !chText.includes('crm_existing')) return false;
         } else if (item.channelLabel !== sourceFilter && !item.sourcesList.includes(sourceFilter) && item.source !== sourceFilter) {
           return false;
         }
@@ -703,7 +788,9 @@ export default function IntentRadar() {
           (item.displayModel && item.displayModel.toLowerCase().includes(q)) ||
           (item.displayBudget && item.displayBudget.toLowerCase().includes(q)) ||
           (item.displayActions && item.displayActions.toLowerCase().includes(q)) ||
-          (item.channelLabel && item.channelLabel.toLowerCase().includes(q));
+          (item.channelLabel && item.channelLabel.toLowerCase().includes(q)) ||
+          (item.clickedLinkInfo?.linkTitle && item.clickedLinkInfo.linkTitle.toLowerCase().includes(q)) ||
+          (item.page_url && item.page_url.toLowerCase().includes(q));
         if (!textMatch) return false;
       }
 
@@ -1087,7 +1174,7 @@ export default function IntentRadar() {
               <FiTarget size={22} />
             </div>
             <h1 style={{ fontSize: '1.65rem', fontWeight: 800, letterSpacing: '-0.02em', margin: 0 }}>
-              Dijital Niyet Radarı & Ziyaretçi Raporlama Merkezi
+              Niyet Radarı & Komple Link Girişleri
             </h1>
             <span style={{
               background: 'rgba(16, 185, 129, 0.15)',
@@ -1102,11 +1189,11 @@ export default function IntentRadar() {
               gap: '6px'
             }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              Tekilleştirilmiş Müşteri Takibi Aktif
+              Canlı Link Takibi Aktif ({dateFilteredSignals.length} Giriş)
             </span>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: 0 }}>
-            Aynı müşterinin yaptığı çoklu tıklamaları tek profilde birleştirir; hangi araca kimin kaç kez baktığını, telefon bırakanları ve kanal performansını sistematik raporlar.
+            Paylaştığınız tüm linklere (Fiyat Listesi, Özel Kampanya, Oda/Kooperatif, WhatsApp Durum, Proforma) yapılan girişlerin tamamını tek ekranda sade ve net görün.
           </p>
         </div>
 
@@ -1130,7 +1217,7 @@ export default function IntentRadar() {
             title="3 Ayrı Sekmeli (1-Aranacak Müşteriler, 2-Yönetici Özeti, 3-Anonim Ziyaretçiler) Düzenli Excel (.xlsx) İndir"
           >
             <FiDownload size={16} />
-            📊 Akıllı Excel Raporu İndir (.xlsx)
+            📊 Excel İndir (.xlsx)
           </button>
 
           <button
@@ -1223,299 +1310,280 @@ export default function IntentRadar() {
         </div>
       </div>
 
-      {/* ── DÖNEM (TARİH) SEÇİCİ & GÖRÜNÜM MODU BARI ───────────────────── */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '12px',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-color)',
-        borderRadius: '12px',
-        padding: '10px 16px',
-        marginBottom: '18px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px', marginRight: '4px' }}>
-            <FiCalendar size={14} /> RAPOR DÖNEMİ:
-          </span>
-          {[
-            { id: 'all', label: 'Tüm Zamanlar' },
-            { id: 'today', label: 'Bugün' },
-            { id: 'yesterday', label: 'Dün' },
-            { id: '7d', label: 'Son 7 Gün' },
-            { id: '30d', label: 'Son 30 Gün' }
-          ].map(d => (
-            <button
-              key={d.id}
-              onClick={() => setDateRange(d.id)}
-              style={{
-                background: dateRange === d.id ? 'var(--accent-blue)' : 'var(--bg-card)',
-                color: dateRange === d.id ? '#fff' : 'var(--text-secondary)',
-                border: '1px solid',
-                borderColor: dateRange === d.id ? 'var(--accent-blue-light)' : 'var(--border-color)',
-                padding: '5px 12px',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: dateRange === d.id ? 700 : 500,
-                cursor: 'pointer'
-              }}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          {/* Tablo / Kart Görünüm Seçici */}
-          <div style={{
-            display: 'inline-flex',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-            padding: '3px'
-          }}>
-            <button
-              onClick={() => setLayoutMode('table')}
-              style={{
-                background: layoutMode === 'table' ? '#0d9488' : 'transparent',
-                color: layoutMode === 'table' ? '#fff' : 'var(--text-secondary)',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '5px 12px',
-                fontSize: '0.79rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <FiList size={13} />
-              📊 Akıllı Tablo Görünümü
-            </button>
-            <button
-              onClick={() => setLayoutMode('cards')}
-              style={{
-                background: layoutMode === 'cards' ? '#0d9488' : 'transparent',
-                color: layoutMode === 'cards' ? '#fff' : 'var(--text-secondary)',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '5px 12px',
-                fontSize: '0.79rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <FiGrid size={13} />
-              🪪 Detaylı Kartlar
-            </button>
-          </div>
-
-          <div style={{
-            display: 'inline-flex',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-            padding: '3px'
-          }}>
-            <button
-              onClick={() => setViewMode('grouped')}
-              style={{
-                background: viewMode === 'grouped' ? 'var(--accent-blue)' : 'transparent',
-                color: viewMode === 'grouped' ? '#fff' : 'var(--text-secondary)',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '5px 12px',
-                fontSize: '0.79rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <FiUsers size={13} />
-              Tekil Müşteri ({groupedVisitors.length})
-            </button>
-            <button
-              onClick={() => setViewMode('raw')}
-              style={{
-                background: viewMode === 'raw' ? 'var(--accent-blue)' : 'transparent',
-                color: viewMode === 'raw' ? '#fff' : 'var(--text-secondary)',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '5px 12px',
-                fontSize: '0.79rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <FiLayers size={13} />
-              Ham Hareketler ({dateFilteredSignals.length})
-            </button>
-          </div>
-
-          <button
-            onClick={() => setShowReportPanel(prev => !prev)}
-            style={{
-              background: showReportPanel ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-card)',
-              color: showReportPanel ? '#60a5fa' : 'var(--text-secondary)',
-              border: '1px solid',
-              borderColor: showReportPanel ? 'rgba(59, 130, 246, 0.4)' : 'var(--border-color)',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <FiBarChart2 size={14} />
-            {showReportPanel ? 'Özet Paneli Gizle' : 'Özet Paneli Göster'}
-            {showReportPanel ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
-          </button>
-        </div>
-      </div>
-
-      {/* ── 5 ANA KPI KARTI (NET VE ANLAŞILIR ÖZET) ───────────────────── */}
+      {/* ── BÜYÜK VE NET 2 ANA GÖRÜNÜM SEÇİCİ (VARSAYILAN: KOMPLE LİNK GİRİŞLERİ) ── */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-        gap: '14px',
-        marginBottom: '20px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '12px',
+        marginBottom: '16px'
       }}>
-        {/* 1. Tekil Ziyaretçi vs Ham Hareket */}
-        <div
-          onClick={() => setVisitorSegment('all')}
+        <button
+          type="button"
+          onClick={() => {
+            setViewMode('raw');
+            setLayoutMode('table');
+          }}
           style={{
-            background: 'var(--bg-card)',
-            border: visitorSegment === 'all' ? '1px solid #3b82f6' : '1px solid var(--border-color)',
+            background: viewMode === 'raw'
+              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(15, 23, 42, 0.9) 100%)'
+              : 'var(--bg-card)',
+            border: viewMode === 'raw' ? '2px solid #10b981' : '1px solid var(--border-color)',
             borderRadius: '12px',
-            padding: '16px 18px',
-            boxShadow: 'var(--shadow-card)',
-            cursor: 'pointer'
+            padding: '14px 18px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            boxShadow: viewMode === 'raw' ? '0 4px 18px rgba(16, 185, 129, 0.18)' : 'none'
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', fontWeight: 700 }}>TEKİL ZİYARETÇİ / KİŞİ</span>
-            <span style={{ color: '#3b82f6', background: 'rgba(59, 130, 246, 0.12)', padding: '6px', borderRadius: '8px' }}><FiUsers size={16} /></span>
+          <div>
+            <div style={{ fontSize: '1.02rem', fontWeight: 800, color: viewMode === 'raw' ? '#34d399' : 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              🔗 1. Komple Link Girişleri (Tüm Kayıtlar)
+              {viewMode === 'raw' && (
+                <span style={{ background: '#10b981', color: '#052e16', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', fontWeight: 900 }}>
+                  AÇIK
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: '0.79rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Hiçbir giriş gizlenmez; atılan linklere yapılan tüm girişleri saat saat alt alta gösterir.
+            </div>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-            {reportAnalytics.totalUnique} <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-muted)' }}>Kişi</span>
+          <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '1.55rem', fontWeight: 900, color: '#34d399' }}>{dateFilteredSignals.length}</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>Toplam Giriş</div>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', marginTop: '4px' }}>
-            Toplam <strong>{reportAnalytics.totalRaw}</strong> tıklama / sayfa hareketi
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setViewMode('grouped');
+            setLayoutMode('table');
+          }}
+          style={{
+            background: viewMode === 'grouped'
+              ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(15, 23, 42, 0.9) 100%)'
+              : 'var(--bg-card)',
+            border: viewMode === 'grouped' ? '2px solid #3b82f6' : '1px solid var(--border-color)',
+            borderRadius: '12px',
+            padding: '14px 18px',
+            textAlign: 'left',
+            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+            boxShadow: viewMode === 'grouped' ? '0 4px 18px rgba(59, 130, 246, 0.18)' : 'none'
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '1.02rem', fontWeight: 800, color: viewMode === 'grouped' ? '#60a5fa' : 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              👥 2. Kişi Bazlı Birleştirilmiş Özet
+              {viewMode === 'grouped' && (
+                <span style={{ background: '#3b82f6', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', fontWeight: 900 }}>
+                  AÇIK
+                </span>
+              )}
+            </div>
+            <div style={{ fontSize: '0.79rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Aynı müşterinin farklı zamanlardaki çoklu tıklamalarını tek müşteri satırında birleştirir.
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: '1.55rem', fontWeight: 900, color: '#60a5fa' }}>{groupedVisitors.length}</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>Tekil Kişi</div>
+          </div>
+        </button>
+      </div>
+
+      {/* ── TEK SATIRLIK SADE HIZLI FİLTRE & ARAMA KUTUSU ───────────────── */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '12px',
+        padding: '14px 16px',
+        marginBottom: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px'
+      }}>
+        {/* Üst Satır: Hızlı Kanal / Müşteri Filtre Butonları */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--text-muted)', marginRight: '4px' }}>
+              HIZLI FİLTRE:
+            </span>
+            {[
+              {
+                id: 'all_entries',
+                label: `🌐 Komple Tümü (${viewMode === 'raw' ? dateFilteredSignals.length : groupedVisitors.length})`,
+                active: visitorSegment === 'all' && sourceFilter === 'all',
+                color: '#10b981',
+                onClick: () => { setVisitorSegment('all'); setSourceFilter('all'); setSelectedModelFilter(''); }
+              },
+              {
+                id: 'identified_only',
+                label: `📞 İsim / Telefonu Belli Olanlar (${reportAnalytics.identifiedCount} Kişi)`,
+                active: visitorSegment === 'identified' && sourceFilter === 'all',
+                color: '#059669',
+                onClick: () => { setVisitorSegment('identified'); setSourceFilter('all'); }
+              },
+              {
+                id: 'partner_links',
+                label: `🏛️ Özel Kampanya / Oda Linkleri`,
+                active: sourceFilter === 'partner_only',
+                color: '#f59e0b',
+                onClick: () => { setVisitorSegment('all'); setSourceFilter(sourceFilter === 'partner_only' ? 'all' : 'partner_only'); }
+              },
+              {
+                id: 'wa_durum_links',
+                label: `📲 WhatsApp Durum Girişleri`,
+                active: sourceFilter === 'wa_durum_only',
+                color: '#34d399',
+                onClick: () => { setVisitorSegment('all'); setSourceFilter(sourceFilter === 'wa_durum_only' ? 'all' : 'wa_durum_only'); }
+              },
+              {
+                id: 'personal_links',
+                label: `👑 Kişiye Özel / Proforma Linkler`,
+                active: sourceFilter === 'personal_only',
+                color: '#38bdf8',
+                onClick: () => { setVisitorSegment('all'); setSourceFilter(sourceFilter === 'personal_only' ? 'all' : 'personal_only'); }
+              },
+              {
+                id: 'anonymous_only',
+                label: `🕵️ Numarasız (Anonim) Girişler`,
+                active: visitorSegment === 'anonymous' && sourceFilter === 'all',
+                color: '#64748b',
+                onClick: () => { setVisitorSegment('anonymous'); setSourceFilter('all'); }
+              }
+            ].map(btn => (
+              <button
+                key={btn.id}
+                type="button"
+                onClick={btn.onClick}
+                style={{
+                  background: btn.active ? btn.color : 'var(--bg-secondary)',
+                  color: btn.active ? '#fff' : 'var(--text-secondary)',
+                  border: '1px solid',
+                  borderColor: btn.active ? btn.color : 'var(--border-color)',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: btn.active ? 800 : 600,
+                  cursor: 'pointer'
+                }}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setLayoutMode(layoutMode === 'table' ? 'cards' : 'table')}
+              style={{
+                background: 'var(--bg-secondary)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '6px 11px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              {layoutMode === 'table' ? <FiGrid size={13} /> : <FiList size={13} />}
+              {layoutMode === 'table' ? 'Kart Görünümü' : 'Tablo Görünümü'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowReportPanel(prev => !prev)}
+              style={{
+                background: showReportPanel ? 'rgba(59, 130, 246, 0.16)' : 'var(--bg-secondary)',
+                color: showReportPanel ? '#60a5fa' : 'var(--text-secondary)',
+                border: '1px solid',
+                borderColor: showReportPanel ? 'rgba(59, 130, 246, 0.4)' : 'var(--border-color)',
+                borderRadius: '8px',
+                padding: '6px 11px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <FiBarChart2 size={13} />
+              {showReportPanel ? 'Grafikleri Gizle' : '📊 Kanal & Araç Grafikleri'}
+            </button>
           </div>
         </div>
 
-        {/* 2. Telefonu / Kimliği Belli Olanlar */}
-        <div
-          onClick={() => setVisitorSegment('identified')}
-          style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%)',
-            border: visitorSegment === 'identified' ? '1px solid #10b981' : '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: '12px',
-            padding: '16px 18px',
-            boxShadow: 'var(--shadow-card)',
-            cursor: 'pointer'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: '#10b981', fontSize: '0.78rem', fontWeight: 800 }}>KİMLİĞİ / NUMARASI BELLİ</span>
-            <span style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.15)', padding: '6px', borderRadius: '8px' }}><FiPhoneCall size={16} /></span>
+        {/* Alt Satır: Tarih Seçimi + Arama Kutusu */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <FiCalendar size={13} /> TARİH:
+            </span>
+            {[
+              { id: 'all', label: 'Tüm Zamanlar' },
+              { id: 'today', label: 'Bugün' },
+              { id: 'yesterday', label: 'Dün' },
+              { id: '7d', label: 'Son 7 Gün' },
+              { id: '30d', label: 'Son 30 Gün' }
+            ].map(d => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => setDateRange(d.id)}
+                style={{
+                  background: dateRange === d.id ? 'var(--accent-blue)' : 'var(--bg-secondary)',
+                  color: dateRange === d.id ? '#fff' : 'var(--text-secondary)',
+                  border: '1px solid',
+                  borderColor: dateRange === d.id ? 'var(--accent-blue-light)' : 'var(--border-color)',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.77rem',
+                  fontWeight: dateRange === d.id ? 700 : 500,
+                  cursor: 'pointer'
+                }}
+              >
+                {d.label}
+              </button>
+            ))}
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#34d399' }}>
-            {reportAnalytics.identifiedCount} <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#6ee7b7' }}>Müşteri</span>
-          </div>
-          <div style={{ color: '#6ee7b7', fontSize: '0.76rem', marginTop: '4px', fontWeight: 600 }}>
-            📞 {reportAnalytics.withPhoneCount} kişinin direkt telefonu kayıtlı
-          </div>
-        </div>
 
-        {/* 3. Yüksek Satın Alma Niyeti / Aksiyon Alanlar */}
-        <div
-          onClick={() => setVisitorSegment('high_intent')}
-          style={{
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)',
-            border: visitorSegment === 'high_intent' ? '1px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.28)',
-            borderRadius: '12px',
-            padding: '16px 18px',
-            boxShadow: 'var(--shadow-card)',
-            cursor: 'pointer'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: '#f87171', fontSize: '0.78rem', fontWeight: 800 }}>YÜKSEK NİYET & AKSİYON</span>
-            <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '6px', borderRadius: '8px' }}><FiTrendingUp size={16} /></span>
-          </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f87171' }}>
-            {reportAnalytics.highIntentCount} <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Sıcak Aday</span>
-          </div>
-          <div style={{ color: '#fca5a5', fontSize: '0.76rem', marginTop: '4px', fontWeight: 600 }}>
-            Kredi / takas / teklif hesaplayanlar
-          </div>
-        </div>
-
-        {/* 4. Çoklu Etkileşim (Tekrar Girenler) */}
-        <div
-          onClick={() => setVisitorSegment('repeat')}
-          style={{
-            background: 'var(--bg-card)',
-            border: visitorSegment === 'repeat' ? '1px solid #f59e0b' : '1px solid var(--border-color)',
-            borderRadius: '12px',
-            padding: '16px 18px',
-            boxShadow: 'var(--shadow-card)',
-            cursor: 'pointer'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', fontWeight: 700 }}>ÇOKLU İNCELEME (2+ İŞLEM)</span>
-            <span style={{ color: '#f59e0b', background: 'rgba(245, 158, 11, 0.12)', padding: '6px', borderRadius: '8px' }}><FiActivity size={16} /></span>
-          </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#fbbf24' }}>
-            {reportAnalytics.repeatVisitorCount} <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-muted)' }}>Kişi</span>
-          </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', marginTop: '4px' }}>
-            Ort. İnceleme: <strong>{formatDuration(reportAnalytics.avgDurationSec)}</strong>
-          </div>
-        </div>
-
-        {/* 5. Henüz Numara Bırakmayan (Anonim) */}
-        <div
-          onClick={() => setVisitorSegment('anonymous')}
-          style={{
-            background: 'var(--bg-card)',
-            border: visitorSegment === 'anonymous' ? '1px solid #94a3b8' : '1px solid var(--border-color)',
-            borderRadius: '12px',
-            padding: '16px 18px',
-            boxShadow: 'var(--shadow-card)',
-            cursor: 'pointer'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', fontWeight: 700 }}>ANONİM KATALOG ZİYARETÇİSİ</span>
-            <span style={{ color: '#94a3b8', background: 'rgba(148, 163, 184, 0.12)', padding: '6px', borderRadius: '8px' }}><FiGlobe size={16} /></span>
-          </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-            {reportAnalytics.anonymousCount} <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-muted)' }}>Ziyaretçi</span>
-          </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', marginTop: '4px' }}>
-            Linke tıklayıp numara bırakmayanlar
+          <div style={{ position: 'relative', flex: '1', maxWidth: '340px', minWidth: '220px' }}>
+            <FiSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              placeholder="Firma, telefon, oda adı veya araç ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '7px 12px 7px 32px',
+                color: 'var(--text-primary)',
+                fontSize: '0.82rem'
+              }}
+            />
           </div>
         </div>
       </div>
 
-      {/* ── SİSTEMATİK YÖNETİCİ RAPORU & DAĞILIM PANELİ ───────────────── */}
+      {/* ── İSTEĞE BAĞLI YÖNETİCİ RAPORU & DAĞILIM PANELİ (VARSAYILAN GİZLİ) ── */}
       {showReportPanel && (
         <div style={{
           display: 'grid',
@@ -1704,101 +1772,11 @@ export default function IntentRadar() {
         </div>
       )}
 
-      {/* ── MÜŞTERİ SEGMENT SEKMELERİ & ARAMA FİLTRESİ ────────────────── */}
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '12px',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'var(--bg-card)',
-        padding: '14px 18px',
-        borderRadius: '12px',
-        border: '1px solid var(--border-color)',
-        marginBottom: '18px'
-      }}>
-        {/* Sol: Müşteri Segment Sekmeleri */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
-            <FiFilter size={13} /> MÜŞTERİ GRUBU:
-          </span>
-          {[
-            { id: 'identified', label: `📞 Aranacak / Kimliği Belli (${reportAnalytics.identifiedCount})`, color: '#10b981' },
-            { id: 'high_intent', label: `🔥 Yüksek Niyet (${reportAnalytics.highIntentCount})`, color: '#ef4444' },
-            { id: 'repeat', label: `🔄 Çoklu Giriş (${reportAnalytics.repeatVisitorCount})`, color: '#f59e0b' },
-            { id: 'anonymous', label: `🕵️ Anonim (${reportAnalytics.anonymousCount})`, color: '#64748b' },
-            { id: 'all', label: `Tüm Ziyaretçiler (${reportAnalytics.totalUnique})`, color: 'var(--accent-blue)' },
-            { id: 'converted', label: `✅ CRM'de (${reportAnalytics.convertedCount})`, color: '#8b5cf6' }
-          ].map(seg => (
-            <button
-              key={seg.id}
-              onClick={() => setVisitorSegment(seg.id)}
-              style={{
-                background: visitorSegment === seg.id ? seg.color : 'var(--bg-secondary)',
-                color: visitorSegment === seg.id ? '#fff' : 'var(--text-secondary)',
-                border: '1px solid',
-                borderColor: visitorSegment === seg.id ? seg.color : 'var(--border-color)',
-                padding: '6px 11px',
-                borderRadius: '8px',
-                fontSize: '0.79rem',
-                fontWeight: visitorSegment === seg.id ? 700 : 500,
-                cursor: 'pointer'
-              }}
-            >
-              {seg.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Sağ: Kanal, Şehir ve Metin Arama */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <select
-            value={sourceFilter}
-            onChange={(e) => setSourceFilter(e.target.value)}
-            style={{
-              background: 'var(--bg-secondary)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '6px',
-              padding: '7px 10px',
-              fontSize: '0.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="all">Tüm Kanallar</option>
-            <option value="whatsapp_all">Tüm WhatsApp Kanalları</option>
-            <option value="WhatsApp Özel Link">WhatsApp Özel Müşteri Linki</option>
-            <option value="WhatsApp Durum">WhatsApp Durum</option>
-            <option value="WhatsApp Grubu">WhatsApp Nakliye Grubu</option>
-            <option value="Kurumsal Protokol">Kurumsal Oda Protokolü</option>
-          </select>
-
-          <div style={{ position: 'relative' }}>
-            <FiSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              placeholder="Firma, telefon, model ara..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '7px 12px 7px 32px',
-                color: 'var(--text-primary)',
-                fontSize: '0.8rem',
-                minWidth: '210px'
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── LİSTELEME ALANI (AKILLI TABLO VEYA DETAYLI KARTLAR) ──── */}
+      {/* ── LİSTELEME ALANI (KOMPLE LİNK GİRİŞLERİ VEYA KİŞİ BAZLI TABLO) ──── */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
           <div className="loading-pulse" style={{ margin: '0 auto 16px' }}></div>
-          <p>Dijital niyet sinyalleri ve müşteri profilleri analiz ediliyor...</p>
+          <p>Link girişleri yükleniyor...</p>
         </div>
       ) : displayedItems.length === 0 ? (
         <div style={{
@@ -1809,9 +1787,9 @@ export default function IntentRadar() {
           border: '1px dashed var(--border-color)'
         }}>
           <FiTarget size={40} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '6px' }}>Seçili Filtrelere Uygun Ziyaretçi Kaydı Bulunamadı</h3>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '6px' }}>Seçili Filtreye Uygun Link Girişi Bulunamadı</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '14px' }}>
-            Tüm ziyaretçileri (anonimler dahil) görmek için aşağıdaki butona tıklayabilirsiniz.
+            Tüm link girişlerini görmek için aşağıdaki butona tıklayabilirsiniz.
           </p>
           <button
             onClick={() => {
@@ -1823,21 +1801,20 @@ export default function IntentRadar() {
               setSearchQuery('');
             }}
             style={{
-              background: 'var(--accent-blue)',
+              background: '#10b981',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
               padding: '8px 16px',
               fontSize: '0.84rem',
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer'
             }}
           >
-            Tüm Ziyaretçileri Göster ({reportAnalytics.totalUnique} Kişi)
+            🌐 Komple Tüm Link Girişlerini Göster ({dateFilteredSignals.length} Giriş)
           </button>
         </div>
       ) : layoutMode === 'table' ? (
-        /* ── YENİ: 8 SÜTUNLU TERTEMİZ AKILLI RAPOR TABLOSU ───────────────── */
         <div style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
@@ -1855,25 +1832,29 @@ export default function IntentRadar() {
             flexWrap: 'wrap',
             gap: '10px'
           }}>
-            <div style={{ fontSize: '0.86rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-              📋 Akıllı Müşteri Rapor Tablosu ({displayedItems.length} Kayıt Gösteriliyor)
+            <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {viewMode === 'raw' ? (
+                <>🔗 Komple Link Girişleri Listesi ({displayedItems.length} Giriş Gösteriliyor)</>
+              ) : (
+                <>👥 Kişi Bazlı Birleştirilmiş Özet Tablo ({displayedItems.length} Kişi Gösteriliyor)</>
+              )}
             </div>
             <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
-              Aynı müşterinin farklı günlerdeki girişleri birleştirilmiştir • Telefon numaraları ve bütçe hesapları ayrıştırılmıştır
+              {viewMode === 'raw'
+                ? 'En son yapılan link girişi en üstte yer alır • Hiçbir giriş gizlenmemiştir'
+                : 'Aynı müşterinin farklı günlerdeki girişleri tek satırda birleştirilmiştir'}
             </div>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: '1080px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: '1040px' }}>
               <thead>
                 <tr style={{ background: 'rgba(30, 58, 138, 0.35)', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Öncelik / Durum</th>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Müşteri / Firma Adı</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Tarih & Saat</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Hangi Linke Girildi? (Kanal & Link)</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Giren Kişi / Firma & Konum</th>
                   <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Telefon Numarası</th>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>İncelediği Araç Modeli</th>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Peşinat / Takas / Kredi</th>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Müşteri Ne Yaptı? (Özet)</th>
-                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', whiteSpace: 'nowrap' }}>Ziyaret & Kanal</th>
+                  <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd' }}>Baktığı Araç & Ne Yaptı?</th>
                   <th style={{ padding: '11px 14px', fontWeight: 800, color: '#93c5fd', textAlign: 'right', whiteSpace: 'nowrap' }}>Hızlı İşlem</th>
                 </tr>
               </thead>
@@ -1882,110 +1863,153 @@ export default function IntentRadar() {
                   const timeInfo = formatDateTime(signal.created_at);
                   const hasSpecialBudget = signal.campaignsList && signal.campaignsList.length > 0;
                   const hasSpecificVehicle = signal.realModelsList && signal.realModelsList.length > 0;
+                  const srcMeta = signal.channelMeta || getSourceMeta(signal.source);
+                  const linkInfo = signal.clickedLinkInfo || describeClickedLink(signal);
+
                   return (
                     <tr
                       key={signal.visitorKey}
                       style={{
                         borderBottom: '1px solid var(--border-color)',
-                        background: idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent'
+                        background: signal.phone
+                          ? 'rgba(16, 185, 129, 0.04)'
+                          : idx % 2 === 1
+                          ? 'rgba(255,255,255,0.015)'
+                          : 'transparent'
                       }}
                     >
+                      {/* 1. SÜTUN: Tarih & Saat */}
                       <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '4px 9px',
-                          borderRadius: '6px',
-                          fontSize: '0.74rem',
-                          fontWeight: 800,
-                          background: signal.phone && signal.hasHighAction
-                            ? 'rgba(239, 68, 68, 0.16)'
-                            : signal.phone
-                            ? 'rgba(16, 185, 129, 0.15)'
-                            : signal.hasMeaningfulAction
-                            ? 'rgba(245, 158, 11, 0.16)'
-                            : 'rgba(148, 163, 184, 0.12)',
-                          color: signal.phone && signal.hasHighAction
-                            ? '#f87171'
-                            : signal.phone
-                            ? '#34d399'
-                            : signal.hasMeaningfulAction
-                            ? '#fbbf24'
-                            : '#94a3b8'
-                        }}>
-                          {signal.priorityBadge}
-                        </span>
+                        <div style={{ fontWeight: 800, color: 'var(--text-heading)', fontSize: '0.82rem' }}>
+                          {timeInfo.full}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                          {timeInfo.relative && (
+                            <span style={{
+                              background: timeInfo.relative.includes('Az önce') || timeInfo.relative.includes('dk')
+                                ? 'rgba(16, 185, 129, 0.18)'
+                                : 'rgba(148, 163, 184, 0.14)',
+                              color: timeInfo.relative.includes('Az önce') || timeInfo.relative.includes('dk')
+                                ? '#34d399'
+                                : 'var(--text-muted)',
+                              padding: '1px 7px',
+                              borderRadius: '4px',
+                              fontSize: '0.7rem',
+                              fontWeight: 700
+                            }}>
+                              🕒 {timeInfo.relative}
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.71rem', color: 'var(--text-muted)' }}>
+                            ⏱️ {formatDuration(signal.duration_seconds)}
+                          </span>
+                        </div>
                       </td>
 
-                      <td style={{ padding: '11px 14px', fontWeight: 800, color: 'var(--text-heading)' }}>
-                        <div>{signal.company_name}</div>
-                        {signal.isConverted && (
-                          <span style={{ fontSize: '0.68rem', color: '#a78bfa', fontWeight: 700 }}>✓ CRM Kayıtlı</span>
-                        )}
+                      {/* 2. SÜTUN: Hangi Linke Girildi? (Kanal & Link Detayı) */}
+                      <td style={{ padding: '11px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '3px 9px',
+                            borderRadius: '6px',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            background: srcMeta.bg,
+                            color: srcMeta.color,
+                            border: `1px solid ${srcMeta.border}`
+                          }}>
+                            {signal.channelLabel}
+                          </span>
+                          {viewMode === 'grouped' && signal.eventCount > 1 && (
+                            <span style={{
+                              background: 'rgba(245, 158, 11, 0.16)',
+                              color: '#fbbf24',
+                              padding: '2px 7px',
+                              borderRadius: '5px',
+                              fontSize: '0.7rem',
+                              fontWeight: 800
+                            }}>
+                              {signal.eventCount} Giriş
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.8rem' }}>
+                          {linkInfo.linkTitle}
+                        </div>
+                        <div style={{ fontSize: '0.71rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                          🔗 {linkInfo.linkSub}
+                        </div>
                       </td>
 
+                      {/* 3. SÜTUN: Giren Kişi / Firma & Konum */}
+                      <td style={{ padding: '11px 14px' }}>
+                        <div style={{ fontWeight: 800, color: signal.isIdentified ? 'var(--text-heading)' : 'var(--text-secondary)', fontSize: '0.84rem' }}>
+                          {signal.company_name}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px', fontSize: '0.72rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                          <span>📍 {signal.city || 'Samsun'}{signal.district ? ` / ${signal.district}` : ''}</span>
+                          {signal.ip_address && <span>• IP: {signal.ip_address}</span>}
+                          {signal.isConverted && (
+                            <span style={{ color: '#a78bfa', fontWeight: 700 }}>• ✓ CRM Kayıtlı</span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* 4. SÜTUN: Telefon Numarası */}
                       <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
                         {signal.phone ? (
                           <span style={{
-                            background: 'rgba(16, 185, 129, 0.14)',
+                            background: 'rgba(16, 185, 129, 0.15)',
                             color: '#34d399',
-                            border: '1px solid rgba(16, 185, 129, 0.35)',
-                            padding: '4px 9px',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            padding: '5px 10px',
                             borderRadius: '6px',
                             fontWeight: 800,
-                            fontSize: '0.8rem'
+                            fontSize: '0.82rem',
+                            display: 'inline-block'
                           }}>
                             📞 {signal.allPhonesText}
                           </span>
                         ) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>Numarasız</span>
+                          <span style={{
+                            color: 'var(--text-muted)',
+                            fontSize: '0.75rem',
+                            background: 'rgba(148, 163, 184, 0.1)',
+                            padding: '3px 8px',
+                            borderRadius: '5px'
+                          }}>
+                            Numara Bırakmadı
+                          </span>
                         )}
                       </td>
 
-                      <td style={{ padding: '11px 14px' }}>
-                        <span style={{
-                          color: hasSpecificVehicle ? '#60a5fa' : 'var(--text-secondary)',
-                          fontWeight: hasSpecificVehicle ? 800 : 500
+                      {/* 5. SÜTUN: Baktığı Araç & Linkte Ne Yaptı? */}
+                      <td style={{ padding: '11px 14px', maxWidth: '330px' }}>
+                        <div style={{
+                          color: hasSpecificVehicle ? '#60a5fa' : 'var(--text-primary)',
+                          fontWeight: 800,
+                          fontSize: '0.82rem',
+                          marginBottom: '3px'
                         }}>
-                          {signal.displayModel}
-                        </span>
-                      </td>
-
-                      <td style={{ padding: '11px 14px' }}>
-                        {hasSpecialBudget ? (
-                          <span style={{
-                            background: 'rgba(245, 158, 11, 0.14)',
+                          🚛 {signal.displayModel}
+                        </div>
+                        {hasSpecialBudget && (
+                          <div style={{
                             color: '#fbbf24',
-                            border: '1px solid rgba(245, 158, 11, 0.3)',
-                            padding: '3px 8px',
-                            borderRadius: '6px',
                             fontWeight: 700,
-                            fontSize: '0.76rem',
-                            display: 'inline-block'
+                            fontSize: '0.75rem',
+                            marginBottom: '3px'
                           }}>
                             💰 {signal.displayBudget}
-                          </span>
-                        ) : (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>Standart Katalog</span>
+                          </div>
                         )}
-                      </td>
-
-                      <td style={{ padding: '11px 14px', color: 'var(--text-primary)', fontWeight: 600, maxWidth: '290px' }}>
-                        {signal.displayActions}
-                      </td>
-
-                      <td style={{ padding: '11px 14px', whiteSpace: 'nowrap', fontSize: '0.76rem' }}>
-                        <div style={{ fontWeight: 700, color: signal.channelMeta?.color || '#60a5fa' }}>
-                          {signal.channelLabel}
-                        </div>
-                        <div style={{ color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          <strong>{signal.eventCount} İşlem</strong> ({formatDuration(signal.duration_seconds)})
-                          {signal.visitDaysCount > 1 ? ` • ${signal.visitDaysCount} Gün` : ''}
-                        </div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.71rem' }}>
-                          {timeInfo.full}
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.76rem', fontWeight: 600 }}>
+                          {signal.displayActions}
                         </div>
                       </td>
 
+                      {/* 6. SÜTUN: Hızlı İşlem */}
                       <td style={{ padding: '11px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                         <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                           {signal.phone && (
@@ -2024,7 +2048,7 @@ export default function IntentRadar() {
                               </button>
                             </>
                           )}
-                          {signal.matched_customer_id && (
+                          {signal.matched_customer_id ? (
                             <button
                               onClick={() => navigate(`/customers/${signal.matched_customer_id}`)}
                               style={{
@@ -2040,6 +2064,24 @@ export default function IntentRadar() {
                               title="CRM Müşteri Kartını Aç"
                             >
                               Kart ↗
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleConvertToLead(signal)}
+                              disabled={actionLoading === signal.id}
+                              style={{
+                                background: 'rgba(59, 130, 246, 0.15)',
+                                color: '#60a5fa',
+                                border: '1px solid rgba(59, 130, 246, 0.35)',
+                                padding: '5px 8px',
+                                borderRadius: '6px',
+                                fontWeight: 700,
+                                fontSize: '0.73rem',
+                                cursor: 'pointer'
+                              }}
+                              title="CRM Müşteri Havuzuna Ekle"
+                            >
+                              + CRM
                             </button>
                           )}
                         </div>
