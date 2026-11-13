@@ -1499,7 +1499,18 @@ export default function PublicVehicleFinder() {
       intent_level: 'very_high',
       matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
       notes: `📡 Canlı Portal Hareketi: ${actionLabel}\nKaynak: ${socialSourceLabel || 'Doğrudan / VIP Link'}\nNumara: ${effectivePhone || 'Henüz Tanımlanmadı'}\nİncelenen Araç: ${modelOverride || matched?.modelTitle || '-'}\nDetay: ${campaignOverride || '-'}`
-    }).catch(() => {});
+    }).catch(() => {
+      // Sunucu uykudaysa doğrudan ücretsiz cep bildirim kanalına (ntfy) ilet
+      fetch('https://ntfy.sh/iveco_can_murat_5931', {
+        method: 'POST',
+        headers: {
+          'Title': 'IVECO Canli Niyet Radari - Can Murat',
+          'Priority': 'high',
+          'Tags': 'truck,fire'
+        },
+        body: `🔥 MÜŞTERİ ŞU AN PORTALDA!\n🏢 Ziyaretçi: ${visitorLabel}\n📞 Tel: ${effectivePhone || 'Henüz numara girmedi'}\n⚡ İşlem: ${actionLabel}\n🚛 Model: ${modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog'}`
+      }).catch(() => {});
+    });
   };
 
   // 📲 WhatsApp Durum / Grup ziyaretçisi 1 dokunuşla numarasını seçtiğinde anında bot bildirimi gönder ve cihaz hafızasına kaydet

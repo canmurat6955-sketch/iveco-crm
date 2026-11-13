@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.modules.whatsapp.models import WhatsAppSession, WhatsAppMessageLog
 
 DEFAULT_CALLMEBOT_APIKEY = "6810148"
+DEFAULT_NTFY_TOPIC = "iveco_can_murat_5931"
 _LAST_PORTAL_ALERT_TS: Dict[str, float] = {}
 
 
@@ -36,7 +37,7 @@ class WhatsAppService:
                 session_id="default",
                 status="connected",
                 phone_number="0544 622 59 31",
-                display_name="Can Murat Onay",
+                display_name="Satış Sorumlusu Can Murat",
                 qr_data=f"callmebot:{DEFAULT_CALLMEBOT_APIKEY}",
                 notify_phone="905446225931",
                 auto_notify_rep=True,
@@ -84,7 +85,7 @@ class WhatsAppService:
         existing_key = self._extract_apikey(session)
         session.status = "connected"
         session.phone_number = phone or "0544 622 59 31"
-        session.display_name = display_name or "Can Murat Onay"
+        session.display_name = display_name or "Satış Sorumlusu Can Murat"
         if not existing_key:
             session.qr_data = None
         session.connected_at = datetime.now(timezone.utc)
@@ -148,6 +149,8 @@ class WhatsAppService:
             "auto_notify_rep": session.auto_notify_rep,
             "callmebot_apikey": apikey,
             "has_callmebot_key": bool(apikey),
+            "ntfy_topic": DEFAULT_NTFY_TOPIC,
+            "ntfy_url": f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}",
             "connected_at": session.connected_at.isoformat() if session.connected_at else None,
             "recent_messages": logs_data,
         }
@@ -183,7 +186,34 @@ class WhatsAppService:
             "auto_notify_rep": session.auto_notify_rep,
             "callmebot_apikey": apikey,
             "has_callmebot_key": bool(apikey),
+            "ntfy_topic": DEFAULT_NTFY_TOPIC,
+            "ntfy_url": f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}",
         }
+
+    def _send_ntfy_push(self, content: str) -> bool:
+        """
+        Sends an instant, unlimited, 100% free push notification via ntfy.sh
+        to Satış Sorumlusu Can Murat's dedicated topic channel.
+        """
+        try:
+            clean_text = content.replace("*", "")
+            ntfy_url = f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}"
+            headers = {
+                "Title": "IVECO Canli Niyet Radari - Can Murat",
+                "Priority": "high",
+                "Tags": "truck,fire",
+                "User-Agent": "IVECO-CRM-Notifier/2.0",
+            }
+            req = urllib.request.Request(
+                ntfy_url,
+                data=clean_text.encode("utf-8"),
+                headers=headers,
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                return resp.status in (200, 201, 202)
+        except Exception:
+            return False
 
     def send_message(
         self,
@@ -193,7 +223,10 @@ class WhatsAppService:
         message_type: str = "text"
     ) -> Dict[str, Any]:
         """
-        Dispatches an automated WhatsApp message through CallMeBot API (if configured) and logs it.
+        Dispatches an automated notification through:
+        1) Unlimited Free Mobile Push Bridge (ntfy.sh/iveco_can_murat_5931)
+        2) CallMeBot Telegram (if apikey starts with '@' or 'tg:')
+        3) CallMeBot WhatsApp (if numeric apikey is configured and quota remains)
         """
         session = self.get_or_create_session()
         apikey = self._extract_apikey(session)
@@ -205,24 +238,64 @@ class WhatsAppService:
             clean_phone = "90" + clean_phone
 
         delivery_status = "local_only"
-        delivery_detail = "CallMeBot API şifresi girilmediği için yalnızca CRM günlüğüne kaydedildi."
+        delivery_detail = "Yalnızca CRM günlüğüne kaydedildi."
+        callmebot_quota_exceeded = False
 
+        # 1. Her durumda ücretsiz ve sınırsız ntfy cep bildirim kanalına anında ilet!
+        ntfy_ok = self._send_ntfy_push(content)
+
+        # 2. Telegram veya CallMeBot WhatsApp kanalını dene
         if apikey:
             try:
                 encoded_text = urllib.parse.quote(content)
-                url = f"https://api.callmebot.com/whatsapp.php?phone={clean_phone}&text={encoded_text}&apikey={urllib.parse.quote(apikey)}"
-                req = urllib.request.Request(url, headers={"User-Agent": "IVECO-CRM-Notifier/1.0"})
+                if apikey.startswith("@") or apikey.lower().startswith("tg:"):
+                    tg_user = apikey[3:].strip() if apikey.lower().startswith("tg:") else apikey.strip()
+                    if not tg_user.startswith("@"):
+                        tg_user = "@" + tg_user
+                    url = f"https://api.callmebot.com/text.php?user={urllib.parse.quote(tg_user)}&text={encoded_text}"
+                else:
+                    url = f"https://api.callmebot.com/whatsapp.php?phone={clean_phone}&text={encoded_text}&apikey={urllib.parse.quote(apikey)}"
+
+                req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (IVECO-CRM-Notifier)"})
                 with urllib.request.urlopen(req, timeout=10) as resp:
                     body = resp.read().decode("utf-8", errors="ignore")
-                    if resp.status == 200 and ("Message queued" in body or "Message sent" in body or "queued" in body.lower()):
+                    body_lower = body.lower()
+                    if resp.status == 200 and (
+                        "message queued" in body_lower
+                        or "message sent" in body_lower
+                        or "queued" in body_lower
+                        or "successful" in body_lower
+                    ):
                         delivery_status = "delivered"
-                        delivery_detail = "WhatsApp mesajı CallMeBot üzerinden cep telefonunuza iletildi!"
+                        delivery_detail = "Bildirim hem WhatsApp/Telegram hem de Ücretsiz Cep Kanalına (ntfy) iletildi!"
+                    elif "0</b> messages left" in body_lower or "0 messages left" in body_lower or "subscribe" in body_lower:
+                        callmebot_quota_exceeded = True
+                        if ntfy_ok:
+                            delivery_status = "delivered"
+                            delivery_detail = (
+                                "⚠️ CallMeBot ücretsiz WhatsApp kotası (Salı günü itibarıyla) dolmuş! "
+                                "Ancak bildirim Ücretsiz Sınırsız Cep Kanalına (ntfy: iveco_can_murat_5931) başarıyla iletildi!"
+                            )
+                        else:
+                            delivery_status = "quota_exceeded"
+                            delivery_detail = "CallMeBot ücretsiz WhatsApp mesaj kotanız dolmuş (0 messages left)."
                     else:
-                        delivery_status = "api_error"
-                        delivery_detail = f"CallMeBot yanıtı: {body[:120]}"
+                        if ntfy_ok:
+                            delivery_status = "delivered"
+                            delivery_detail = "Bildirim Ücretsiz Sınırsız Cep Kanalına (ntfy: iveco_can_murat_5931) iletildi!"
+                        else:
+                            delivery_status = "api_error"
+                            delivery_detail = f"CallMeBot yanıtı: {body[:120]}"
             except Exception as exc:
-                delivery_status = "api_error"
-                delivery_detail = f"CallMeBot bağlantı hatası: {str(exc)[:100]}"
+                if ntfy_ok:
+                    delivery_status = "delivered"
+                    delivery_detail = "Bildirim Ücretsiz Sınırsız Cep Kanalına (ntfy: iveco_can_murat_5931) iletildi!"
+                else:
+                    delivery_status = "api_error"
+                    delivery_detail = f"Bağlantı hatası: {str(exc)[:100]}"
+        elif ntfy_ok:
+            delivery_status = "delivered"
+            delivery_detail = "Bildirim Ücretsiz Sınırsız Cep Kanalına (ntfy: iveco_can_murat_5931) iletildi!"
 
         log = WhatsAppMessageLog(
             recipient_phone=clean_phone,
@@ -238,6 +311,10 @@ class WhatsAppService:
         return {
             "success": delivery_status == "delivered",
             "has_callmebot_key": bool(apikey),
+            "callmebot_quota_exceeded": callmebot_quota_exceeded,
+            "ntfy_delivered": ntfy_ok,
+            "ntfy_topic": DEFAULT_NTFY_TOPIC,
+            "ntfy_url": f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}",
             "delivery_status": delivery_status,
             "delivery_detail": delivery_detail,
             "message_id": log.id,
@@ -254,7 +331,7 @@ class WhatsAppService:
         city: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        Sends an instant WhatsApp lead alert to Can Murat Onay when a customer views a proposal.
+        Sends an instant WhatsApp lead alert to Satış Sorumlusu Can Murat when a customer views a proposal.
         """
         session = self.get_or_create_session()
         if not session.auto_notify_rep:
@@ -263,7 +340,7 @@ class WhatsAppService:
         city_text = f" ({city})" if city else ""
         alert_text = (
             f"🔔 *TEKLİFİNİZ İNCELENİYOR! (Canlı Radar)*\n\n"
-            f"Sayın Can Murat Onay,\n"
+            f"Sayın Satış Sorumlusu Can Murat,\n"
             f"*{company_name}*{city_text} az önce *{vehicle_model}* teklifinizi açtı ve incelemeye başladı.\n\n"
             f"📍 Sıcak temas için tam arama anı!\n"
             f"🔗 Teklif: https://iveco-fiyat-listesi.vercel.app/p/{token}"
@@ -272,7 +349,7 @@ class WhatsAppService:
         return self.send_message(
             recipient_phone=session.notify_phone or "905446225931",
             content=alert_text,
-            recipient_name="Can Murat Onay",
+            recipient_name="Satış Sorumlusu Can Murat",
             message_type="alert",
         )
 
@@ -286,10 +363,10 @@ class WhatsAppService:
         source_channel: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """
-        Sends an instant WhatsApp alert when a customer takes a high-intent action in the portal.
+        Sends an instant alert when a customer takes a high-intent action in the portal.
         """
         session = self.get_or_create_session()
-        if not session.auto_notify_rep or not self._extract_apikey(session):
+        if not session.auto_notify_rep:
             return None
 
         clean_visitor_phone = "".join(filter(str.isdigit, phone or ""))
@@ -346,7 +423,8 @@ class WhatsAppService:
         return self.send_message(
             recipient_phone=session.notify_phone or "905446225931",
             content=alert_text,
-            recipient_name="Can Murat Onay",
+            recipient_name="Satış Sorumlusu Can Murat",
             message_type="alert",
         )
+
 

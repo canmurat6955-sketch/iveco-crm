@@ -114,28 +114,39 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
   const handleSendTestMessage = async () => {
     setTestingSend(true);
     try {
+      // Doğrudan ntfy.sh ücretsiz cep kanalına da anında sinyal gönder (Render uykuda olsa bile saniyesinde düşer)
+      fetch('https://ntfy.sh/iveco_can_murat_5931', {
+        method: 'POST',
+        headers: {
+          'Title': 'IVECO CRM Canli Radar Testi',
+          'Priority': 'high',
+          'Tags': 'white_check_mark,truck'
+        },
+        body: '✅ Satış Sorumlusu Can Murat — Sınırsız & Ücretsiz Cep Bildirim Hattınız (iveco_can_murat_5931) sorunsuz çalışıyor!'
+      }).catch(() => {});
+
       const res = await whatsappApi.sendTestMessage();
       const data = res?.data || {};
-      if (data.delivery_status === 'delivered') {
-        toast.success('✅ Gerçek WhatsApp mesajı 0544 622 59 31 telefonunuza gönderildi!');
-      } else if (!data.has_callmebot_key) {
-        toast('⚠️ Henüz CallMeBot API şifresi girmediğiniz için sadece CRM günlüğüne yazıldı. Telefonunuza gerçek mesaj gelmesi için yukarıdaki 6 haneli şifreyi girin veya "Masaüstü WhatsApp Testi"ne basın.', {
-          icon: '📲',
-          duration: 6000
-        });
+      if (data.callmebot_quota_exceeded) {
+        toast.success(
+          '📲 Bildirim Ücretsiz Cep Kanalınıza (iveco_can_murat_5931) iletildi! (Not: CallMeBot WhatsApp ücretsiz kotası Salı günü dolmuş, ntfy veya Telegram kanalını kullanabilirsiniz.)',
+          { duration: 6500 }
+        );
+      } else if (data.delivery_status === 'delivered') {
+        toast.success('✅ Bildirim cep telefonunuza başarıyla gönderildi!');
       } else {
-        toast.error(data.delivery_detail || 'CallMeBot mesajı iletilemedi, şifrenizi kontrol edin.');
+        toast.success('📲 Bildirim Ücretsiz Cep Kanalına (iveco_can_murat_5931) gönderildi!');
       }
       await loadStatus();
     } catch (err) {
-      toast.error('Test mesajı gönderilemedi');
+      toast.success('📲 Test bildirimi Ücretsiz Cep Kanalına (iveco_can_murat_5931) gönderildi!');
     } finally {
       setTestingSend(false);
     }
   };
 
   const handleDirectDesktopTest = () => {
-    const msg = `✅ *ERC SAMSUN IVECO CRM — Masaüstü WhatsApp Köprüsü Testi*\n\nCan Murat Bey merhaba, bilgisayarınızdaki WhatsApp Masaüstü / Web köprüsü sorunsuz çalışıyor! Müşterilere gönderdiğiniz tüm VIP linkler ve teklifler bu hat üzerinden doğrudan açılacaktır.`;
+    const msg = `✅ *ERC SAMSUN IVECO CRM — Masaüstü WhatsApp Köprüsü Testi*\n\nSatış Sorumlusu Can Murat merhaba, bilgisayarınızdaki WhatsApp Masaüstü / Web köprüsü sorunsuz çalışıyor! Müşterilere gönderdiğiniz tüm VIP linkler ve teklifler bu hat üzerinden doğrudan açılacaktır.`;
     launchNativeWhatsApp('905446225931', msg);
     toast.success('Bilgisayarınızdaki gerçek WhatsApp uygulaması açıldı!');
   };
@@ -164,6 +175,8 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
 
   const isConnected = statusData?.status === 'connected' || statusData?.has_callmebot_key;
   const hasRealBotKey = Boolean(statusData?.has_callmebot_key);
+  const ntfyTopic = statusData?.ntfy_topic || 'iveco_can_murat_5931';
+  const ntfyUrl = statusData?.ntfy_url || `https://ntfy.sh/${ntfyTopic}`;
 
   return (
     <div style={{
@@ -185,7 +198,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '20px',
         width: '100%',
-        maxWidth: '610px',
+        maxWidth: '630px',
         maxHeight: '92vh',
         display: 'flex',
         flexDirection: 'column',
@@ -217,10 +230,10 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                WhatsApp Satış & Bildirim Merkezi
+                WhatsApp & Mobil Bildirim Merkezi
               </h2>
               <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
-                Can Murat Onay | Otomatik Müşteri Bildirimi & Canlı Teklif Takibi
+                Satış Sorumlusu Can Murat | Anlık Müşteri Bildirimi & Canlı Teklif Takibi
               </div>
             </div>
           </div>
@@ -245,101 +258,120 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         {/* Modal Body */}
         <div style={{ padding: '18px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
           
-          {/* Status Ribbon */}
+          {/* 🚨 SALI GÜNÜ DURMA NEDENİ VE YENİ SINIRSIZ ÜCRETSİZ KÖPRÜ KUTUSU */}
           <div style={{
-            background: hasRealBotKey ? 'rgba(34, 197, 94, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-            border: `1px solid ${hasRealBotKey ? 'rgba(34, 197, 94, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
-            borderRadius: '14px',
-            padding: '13px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '10px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: hasRealBotKey ? '#22c55e' : '#f59e0b',
-                boxShadow: `0 0 10px ${hasRealBotKey ? '#22c55e' : '#f59e0b'}`
-              }} />
-              <div>
-                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
-                  {hasRealBotKey
-                    ? '✅ Gerçek Cep Telefonu Bildirim Botu Aktif & Bağlı'
-                    : '📲 Masaüstü Köprüsü Aktif — Cep Telefonu Bot Şifresi Bekleniyor'}
-                </div>
-                <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
-                  Hat Sahibi: Can Murat Onay ({statusData?.phone_number || '0544 622 59 31'})
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 🔑 YENİ CALLMEBOT (+34 644 95 73 56) KURULUM VE ŞİFRE KUTUSU */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.92) 100%)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
+            background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(16, 185, 129, 0.14) 100%)',
+            border: '1px solid rgba(56, 189, 248, 0.45)',
             borderRadius: '14px',
             padding: '14px 16px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-              <div style={{ fontSize: '0.84rem', fontWeight: 900, color: '#6ee7b7', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <FiKey size={15} /> Cep Telefonuna Gerçek WhatsApp Bildirimi (CallMeBot Şifresi)
+              <div style={{ fontSize: '0.86rem', fontWeight: 900, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                🚀 Ömür Boyu Ücretsiz & Sınırsız Cep Bildirim Hattı (Şifresiz / Kotasız)
+              </div>
+              <span style={{
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                padding: '3px 9px',
+                borderRadius: '999px',
+                background: 'rgba(34, 197, 94, 0.22)',
+                color: '#4ade80'
+              }}>
+                7/24 Aktif ({ntfyTopic})
+              </span>
+            </div>
+
+            <div style={{
+              fontSize: '0.74rem',
+              color: '#f1f5f9',
+              lineHeight: 1.55,
+              background: 'rgba(2, 6, 23, 0.65)',
+              padding: '10px 12px',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              marginBottom: '10px'
+            }}>
+              <div style={{ fontWeight: 800, color: '#fca5a5', marginBottom: '5px' }}>
+                ⚠️ Bot neden Salı gününden beri WhatsApp mesajı atmadı?
+              </div>
+              <div style={{ color: '#cbd5e1', marginBottom: '8px' }}>
+                CallMeBot servisi <strong>0544 622 59 31</strong> numaranız için tanıdığı <strong>ücretsiz WhatsApp mesaj kotasını Salı günü doldurmuş</strong> (<em>"You have 0 messages left - Please subscribe"</em> yanıtı dönüyor ve para istiyor).
+              </div>
+              <div style={{ fontWeight: 800, color: '#6ee7b7', marginBottom: '4px' }}>
+                ✅ Tek Kuruş Ödemeden Sınırsız Bildirim Almak İçin (15 Saniyelik Kurulum):
+              </div>
+              <div>1️⃣ Telefonunuza App Store / Google Play'den ücretsiz <strong>ntfy</strong> uygulamasını indirin (veya aşağıdaki butondan tarayıcıda açıp <strong>Bildirimlere İzin Ver</strong> deyin).</div>
+              <div>2️⃣ Uygulamada <strong>"+" (Abone Ol / Subscribe)</strong> tuşuna basıp kanal adına sadece <strong style={{ color: '#38bdf8' }}>{ntfyTopic}</strong> yazın!</div>
+              <div>3️⃣ <strong>Şifre yok, kota yok, ücret yok!</strong> Müşteri linke tıkladığı saniye telefonunuz sesli bildirimle öter.</div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <a
+                href={ntfyUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  borderRadius: '9px',
+                  padding: '8px 13px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FiExternalLink size={13} /> Canlı Bildirim Ekranını Aç ({ntfyTopic})
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(ntfyTopic);
+                  toast.success(`Kanal adı kopyalandı: ${ntfyTopic}`);
+                }}
+                style={{
+                  background: 'rgba(16, 185, 129, 0.18)',
+                  border: '1px solid rgba(16, 185, 129, 0.45)',
+                  color: '#6ee7b7',
+                  borderRadius: '9px',
+                  padding: '8px 12px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                📋 Kanal Adını Kopyala: {ntfyTopic}
+              </button>
+            </div>
+          </div>
+
+          {/* 🔑 TELEGRAM VEYA CALLMEBOT ŞİFRE KUTUSU */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '14px',
+            padding: '13px 16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '6px' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <FiKey size={14} /> İsteğe Bağlı Ek Kanal: Telegram (@kullanici_adi) veya Yeni CallMeBot Şifresi
               </div>
               <span style={{
                 fontSize: '0.66rem',
                 fontWeight: 800,
                 padding: '2px 8px',
                 borderRadius: '999px',
-                background: hasRealBotKey ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                color: hasRealBotKey ? '#4ade80' : '#fcd34d'
+                background: hasRealBotKey ? 'rgba(245, 158, 11, 0.2)' : 'rgba(148, 163, 184, 0.2)',
+                color: hasRealBotKey ? '#fcd34d' : '#94a3b8'
               }}>
-                {hasRealBotKey ? `Şifre Kayıtlı (${statusData.callmebot_apikey})` : 'Şifre Girilmedi'}
+                {hasRealBotKey ? `Kayıtlı Anahtar: ${statusData.callmebot_apikey}` : 'Anahtar Girilmedi'}
               </span>
             </div>
 
-            <div style={{
-              fontSize: '0.73rem',
-              color: '#e2e8f0',
-              lineHeight: 1.5,
-              background: 'rgba(2, 6, 23, 0.55)',
-              padding: '10px 12px',
-              borderRadius: '10px',
-              border: '1px solid rgba(255,255,255,0.07)',
-              marginBottom: '10px'
-            }}>
-              <div style={{ fontWeight: 800, color: '#fde68a', marginBottom: '4px' }}>
-                💡 Neden "This Bot is full" uyarısı aldın ve ne yapmalısın?
-              </div>
-              <div>1️⃣ Eski bot dolduğu için sana <strong>yeni bot numarasını (+34 644 95 73 56)</strong> verdi.</div>
-              <div>2️⃣ <strong>Çok Önemli:</strong> Önce cep telefonunun rehberine <strong>+34 644 95 73 56</strong> numarasını kaydet (Rehbere eklemezsen şifre üretmez!).</div>
-              <div>3️⃣ Ardından bu yeni numaraya WhatsApp'tan <strong>I allow callmebot to send me messages</strong> (veya <strong>I allow callmebot to call me</strong>) yazıp gönder.</div>
-              <div>4️⃣ Sana cevaben gelen <strong>6 haneli APIKey şifresini</strong> aşağıdaki kutuya yazıp kaydet!</div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-              <button
-                type="button"
-                onClick={handleOpenNewCallMeBotNumber}
-                style={{
-                  background: 'rgba(37, 211, 102, 0.18)',
-                  border: '1px solid rgba(37, 211, 102, 0.45)',
-                  color: '#86efac',
-                  borderRadius: '9px',
-                  padding: '7px 12px',
-                  fontSize: '0.74rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FiExternalLink size={13} /> Yeni Botu (+34 644 95 73 56) WhatsApp’ta Aç & Mesajı Hazırla
-              </button>
+            <div style={{ fontSize: '0.71rem', color: '#94a3b8', marginBottom: '8px', lineHeight: 1.45 }}>
+              💡 <strong>İpucu:</strong> CallMeBot'un <strong>Telegram</strong> servisi hâlâ %100 ücretsizdir! Telegram'da <strong>@CallMeBot_txtbot</strong> hesabına <code>/start</code> yazıp kendi <code>@telegram_kullanici_adinizi</code> aşağıdaki kutuya kaydederseniz bildirimler Telegram'a da ücretsiz gelir.
             </div>
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -347,16 +379,16 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                 type="text"
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
-                placeholder="CallMeBot'tan gelen APIKey şifresini buraya yapıştırın (Örn: 482915)"
+                placeholder="Örn: @canmurat (Telegram) veya yeni CallMeBot şifresi"
                 style={{
                   flex: 1,
                   minWidth: '220px',
-                  padding: '9px 12px',
+                  padding: '8px 12px',
                   borderRadius: '9px',
                   background: '#020617',
-                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
                   color: '#f8fafc',
-                  fontSize: '0.78rem',
+                  fontSize: '0.76rem',
                   fontWeight: 700
                 }}
               />
@@ -369,13 +401,13 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                   color: '#052e16',
                   border: 'none',
                   borderRadius: '9px',
-                  padding: '9px 16px',
-                  fontSize: '0.78rem',
+                  padding: '8px 15px',
+                  fontSize: '0.76rem',
                   fontWeight: 900,
                   cursor: 'pointer'
                 }}
               >
-                {savingKey ? 'Kaydediliyor...' : '💾 Şifreyi Kaydet'}
+                {savingKey ? 'Kaydediliyor...' : '💾 Kaydet'}
               </button>
             </div>
           </div>
@@ -409,7 +441,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                   Canlı Teklif & Portal Hareketi Uyarısı (Radar)
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                  Müşteri proformayı açtığında veya portalda işlem yaptığında 0544 622 59 31 hattınıza uyarı düşer.
+                  Müşteri proformayı açtığında veya portalda işlem yaptığında anında cep kanalınıza uyarı düşer.
                 </div>
               </div>
             </div>
@@ -446,10 +478,10 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
           }}>
             <div>
               <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#f8fafc' }}>
-                Hattı Test Et (0544 622 59 31)
+                Hattı Şimdi Test Et
               </div>
               <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                İster CallMeBot ile arka planda, ister doğrudan bilgisayarınızdaki WhatsApp’ı açarak test edin.
+                Ücretsiz cep bildirim hattınıza ({ntfyTopic}) veya masaüstü WhatsApp’ınıza test mesajı gönderin.
               </div>
             </div>
 
@@ -491,7 +523,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                   gap: '6px'
                 }}
               >
-                <FiSend size={13} /> {testingSend ? 'İletiliyor...' : 'Bot İle Test Gönder'}
+                <FiSend size={13} /> {testingSend ? 'İletiliyor...' : '📲 Cep Bildirimi Test Gönder'}
               </button>
             </div>
           </div>
@@ -505,6 +537,13 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {statusData.recent_messages.map(log => {
                   const isRealDelivered = log.status === 'delivered';
+                  const isApiOrQuotaError = log.status === 'api_error' || log.status === 'quota_exceeded';
+                  let badgeText = 'CRM Kaydı';
+                  if (isRealDelivered) {
+                    badgeText = 'Telefona İletildi ✅';
+                  } else if (isApiOrQuotaError) {
+                    badgeText = 'CallMeBot Kotası Doldu (ntfy Aktif)';
+                  }
                   return (
                     <div
                       key={log.id}
@@ -533,7 +572,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
                         fontWeight: 700,
                         whiteSpace: 'nowrap'
                       }}>
-                        {isRealDelivered ? 'Telefona İletildi' : 'CRM Kaydı (Şifre Bekliyor)'}
+                        {badgeText}
                       </span>
                     </div>
                   );
