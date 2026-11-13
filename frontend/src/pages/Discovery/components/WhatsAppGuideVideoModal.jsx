@@ -16,7 +16,8 @@ import {
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const DURATION_SEC = 16; // 4 adım x 4 saniye = 16 saniye
+const STEP_DURATION_SEC = 4.5; // Her sahne 4.5 saniye (Ahmet Neural erkek spiker sesinin doğal hızda 1.0x okunması için)
+const DURATION_SEC = STEP_DURATION_SEC * 4; // 4 adım x 4.5 saniye = 18 saniye
 const FPS = 30;
 const CANVAS_W = 1080;
 const CANVAS_H = 1920;
@@ -309,7 +310,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordProgress, setRecordProgress] = useState(0);
   const [copiedCaption, setCopiedCaption] = useState(false);
-  const [voiceMode, setVoiceMode] = useState('female_studio'); // 'female_studio' | 'male_warm' | 'muted'
+  const [voiceMode, setVoiceMode] = useState('male_ahmet'); // 'male_ahmet' | 'male_baritone' | 'muted'
   const [bgMusicEnabled, setBgMusicEnabled] = useState(true);
   const [liveAudioPreview, setLiveAudioPreview] = useState(false);
 
@@ -1039,8 +1040,8 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   // Ana Canvas Çizim Motoru
   const renderFrame = (ctx, tSec, activeScenario = currentScenario) => {
     const clampedT = Math.max(0, Math.min(DURATION_SEC - 0.001, tSec));
-    const stepIdx = Math.min(3, Math.floor(clampedT / 4));
-    const stepLocalT = (clampedT % 4) / 4;
+    const stepIdx = Math.min(3, Math.floor(clampedT / STEP_DURATION_SEC));
+    const stepLocalT = (clampedT % STEP_DURATION_SEC) / STEP_DURATION_SEC;
     const stepMeta = activeScenario.steps[stepIdx] || activeScenario.steps[0];
 
     // 1. Arka Plan
@@ -1147,7 +1148,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ctx.textAlign = 'left';
   };
 
-  // ── WEB AUDIO API: YAPAY ZEKA SPİKER & KURUMSAL FON MÜZİĞİ MOTORU ──────────
+  // ── WEB AUDIO API: GERÇEK TÜRKÇE ERKEK SPİKER (AHMET NEURAL) & FON MÜZİĞİ ──
   const getAudioContext = () => {
     if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1159,19 +1160,56 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     return audioCtxRef.current;
   };
 
+  // MP3 başındaki ve sonundaki boş sessizlikleri temizle (böylece hız artırmaya gerek kalmaz, 1.0x doğal erkek sesi korunur)
+  const trimAudioBufferSilence = (ctx, buffer) => {
+    try {
+      const raw = buffer.getChannelData(0);
+      const len = raw.length;
+      const threshold = 0.008;
+      let startSample = 0;
+      let endSample = len - 1;
+
+      while (startSample < len && Math.abs(raw[startSample]) < threshold) {
+        startSample++;
+      }
+      while (endSample > startSample && Math.abs(raw[endSample]) < threshold) {
+        endSample--;
+      }
+
+      const padSamples = Math.floor(buffer.sampleRate * 0.04);
+      startSample = Math.max(0, startSample - padSamples);
+      endSample = Math.min(len - 1, endSample + padSamples);
+
+      const trimmedLen = endSample - startSample + 1;
+      if (trimmedLen <= 0 || trimmedLen >= len * 0.96) return buffer;
+
+      const trimmed = ctx.createBuffer(buffer.numberOfChannels, trimmedLen, buffer.sampleRate);
+      for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+        const srcData = buffer.getChannelData(ch);
+        const dstData = trimmed.getChannelData(ch);
+        dstData.set(srcData.subarray(startSample, endSample + 1));
+      }
+      return trimmed;
+    } catch (_) {
+      return buffer;
+    }
+  };
+
   const loadStepAudioBuffer = async (audioUrl) => {
     if (!audioUrl) return null;
-    if (audioBufferCacheRef.current[audioUrl]) {
-      return audioBufferCacheRef.current[audioUrl];
+    const cacheKey = `${audioUrl}?v=ahmet_male_v3`;
+    if (audioBufferCacheRef.current[cacheKey]) {
+      return audioBufferCacheRef.current[cacheKey];
     }
     try {
       const ctx = getAudioContext();
-      const res = await fetch(audioUrl);
+      const res = await fetch(cacheKey, { cache: 'reload' });
       if (!res.ok) return null;
       const arrBuf = await res.arrayBuffer();
       const decoded = await ctx.decodeAudioData(arrBuf);
-      audioBufferCacheRef.current[audioUrl] = decoded;
-      return decoded;
+      const trimmed = trimAudioBufferSilence(ctx, decoded);
+      audioBufferCacheRef.current[cacheKey] = trimmed;
+      return trimmed;
     } catch (err) {
       console.warn('Voiceover yüklenemedi:', audioUrl, err);
       return null;
@@ -1197,37 +1235,37 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Tek bir sahnenin yapay zeka spiker sesini stüdyo EQ profiliyle çal / zamanla
+  // Tek bir sahnenin gerçek erkek spiker sesini (tr-TR-AhmetNeural) 1.0x doğal hız ve tok bariton tonla çal
   const scheduleVoiceClip = (ctx, destination, buffer, startAtTime, mode = voiceMode) => {
     if (!buffer || mode === 'muted') return null;
     const source = ctx.createBufferSource();
     source.buffer = buffer;
 
-    // Her sahne 4.0 saniye olduğu için konuşmanın 3.68 saniye içinde net bitmesini garantile
-    const maxAllowedSec = 3.68;
-    const baseRate = mode === 'male_warm' ? 1.22 : 1.14;
-    const rate = Math.max(baseRate, buffer.duration / maxAllowedSec);
-    source.playbackRate.setValueAtTime(rate, startAtTime);
+    // ASLA playbackRate > 1.0 yapmıyoruz! 1.00x doğal hızda çalar ki ses kesinlikle incelmesin.
+    source.playbackRate.setValueAtTime(1.0, startAtTime);
 
-    if (mode === 'male_warm') {
-      // Tok kurumsal spiker tonu için -230 cent rezonans
-      source.detune.setValueAtTime(-230, startAtTime);
+    if (mode === 'male_baritone') {
+      // Ekstra tok radyo spikeri isteyenler için hafif derin bariton (-95 cent)
+      source.detune.setValueAtTime(-95, startAtTime);
+    } else {
+      // Doğal Ahmet Neural Erkek Sesi (0 detune)
+      source.detune.setValueAtTime(0, startAtTime);
     }
 
-    // Stüdyo EQ filtresi (telefon hoparlöründe netlik + tok gövde)
+    // Stüdyo EQ filtresi (tok göğüs sesi + net diksiyon)
     const bassFilter = ctx.createBiquadFilter();
     bassFilter.type = 'lowshelf';
-    bassFilter.frequency.setValueAtTime(160, startAtTime);
-    bassFilter.gain.setValueAtTime(mode === 'male_warm' ? 5.5 : 2.5, startAtTime);
+    bassFilter.frequency.setValueAtTime(145, startAtTime);
+    bassFilter.gain.setValueAtTime(mode === 'male_baritone' ? 5.0 : 3.0, startAtTime);
 
     const presenceFilter = ctx.createBiquadFilter();
     presenceFilter.type = 'peaking';
-    presenceFilter.frequency.setValueAtTime(3100, startAtTime);
+    presenceFilter.frequency.setValueAtTime(2800, startAtTime);
     presenceFilter.Q.setValueAtTime(1.0, startAtTime);
-    presenceFilter.gain.setValueAtTime(3.2, startAtTime);
+    presenceFilter.gain.setValueAtTime(2.2, startAtTime);
 
     const voiceGain = ctx.createGain();
-    voiceGain.gain.setValueAtTime(1.05, startAtTime);
+    voiceGain.gain.setValueAtTime(1.1, startAtTime);
 
     source.connect(bassFilter);
     bassFilter.connect(presenceFilter);
@@ -1238,7 +1276,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     return source;
   };
 
-  // Sahne geçişlerinde hafif modern kurumsal chime + 16 sn arka plan ritmi
+  // Sahne geçişlerinde hafif modern kurumsal chime + arka plan ritmi
   const scheduleTransitionChime = (ctx, destination, startAtTime, stepIdx = 0) => {
     if (!bgMusicEnabled) return;
     const freqs = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
@@ -1252,7 +1290,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       osc.frequency.setValueAtTime(freq, startAtTime + i * 0.055);
 
       gain.gain.setValueAtTime(0.0001, startAtTime + i * 0.055);
-      gain.gain.exponentialRampToValueAtTime(0.045, startAtTime + i * 0.055 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.04, startAtTime + i * 0.055 + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.0001, startAtTime + i * 0.055 + 0.42);
 
       osc.connect(gain);
@@ -1274,7 +1312,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ];
 
     for (let s = 0; s < 4; s++) {
-      const sceneStart = startAtTime + s * 4;
+      const sceneStart = startAtTime + s * STEP_DURATION_SEC;
       scheduleTransitionChime(ctx, destination, sceneStart + 0.02, s);
 
       const chord = chords[s];
@@ -1290,21 +1328,21 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         filter.frequency.setValueAtTime(520, sceneStart);
 
         gain.gain.setValueAtTime(0.0001, sceneStart);
-        gain.gain.linearRampToValueAtTime(0.016, sceneStart + 0.35);
-        gain.gain.setValueAtTime(0.014, sceneStart + 3.5);
-        gain.gain.linearRampToValueAtTime(0.0001, sceneStart + 3.98);
+        gain.gain.linearRampToValueAtTime(0.015, sceneStart + 0.35);
+        gain.gain.setValueAtTime(0.013, sceneStart + STEP_DURATION_SEC - 0.5);
+        gain.gain.linearRampToValueAtTime(0.0001, sceneStart + STEP_DURATION_SEC - 0.02);
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(destination);
 
         osc.start(sceneStart);
-        osc.stop(sceneStart + 4.0);
+        osc.stop(sceneStart + STEP_DURATION_SEC);
         nodes.push(osc);
       });
 
-      // Hafif kurumsal tempo nabzı (her saniye yumuşak bas vuruşu)
-      for (let beat = 0; beat < 4; beat++) {
+      // Hafif kurumsal tempo nabzı
+      for (let beat = 0; beat < Math.floor(STEP_DURATION_SEC); beat++) {
         const bTime = sceneStart + beat * 1.0;
         if (bTime >= startAtTime + totalSec) break;
         const pulseOsc = ctx.createOscillator();
@@ -1314,7 +1352,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         pulseOsc.frequency.exponentialRampToValueAtTime(52, bTime + 0.14);
 
         pulseGain.gain.setValueAtTime(0.0001, bTime);
-        pulseGain.gain.linearRampToValueAtTime(0.032, bTime + 0.015);
+        pulseGain.gain.linearRampToValueAtTime(0.03, bTime + 0.015);
         pulseGain.gain.exponentialRampToValueAtTime(0.0001, bTime + 0.18);
 
         pulseOsc.connect(pulseGain);
@@ -1328,7 +1366,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   };
 
   // Tek bir sahneyi canlı önizlemede seslendir
-  const playSingleStepPreview = async (stepIdx) => {
+  const playSingleStepPreview = async (stepIdx, overrideMode = voiceMode) => {
     try {
       const ctx = getAudioContext();
       if (activePreviewSourceRef.current) {
@@ -1340,10 +1378,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       const st = currentScenario.steps[stepIdx];
       if (!st) return;
       scheduleTransitionChime(ctx, ctx.destination, ctx.currentTime + 0.01, stepIdx);
-      if (voiceMode !== 'muted' && st.audioUrl) {
+      if (overrideMode !== 'muted' && st.audioUrl) {
         const buf = await loadStepAudioBuffer(st.audioUrl);
         if (buf) {
-          activePreviewSourceRef.current = scheduleVoiceClip(ctx, ctx.destination, buf, ctx.currentTime + 0.08, voiceMode);
+          activePreviewSourceRef.current = scheduleVoiceClip(ctx, ctx.destination, buf, ctx.currentTime + 0.06, overrideMode);
         }
       }
     } catch (e) {
@@ -1368,7 +1406,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
     const tick = (now) => {
       const elapsedSec = ((now - startTimeRef.current) / 1000) % DURATION_SEC;
-      const stepNow = Math.min(3, Math.floor(elapsedSec / 4));
+      const stepNow = Math.min(3, Math.floor(elapsedSec / STEP_DURATION_SEC));
       if (liveAudioPreview && stepNow !== lastSpokenStepRef.current) {
         lastSpokenStepRef.current = stepNow;
         playSingleStepPreview(stepNow);
@@ -1384,7 +1422,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     };
   }, [isOpen, isPlaying, isRecording, scenarioIdx, liveAudioPreview, voiceMode, bgMusicEnabled]);
 
-  // Tek Tuşla 16 Saniyelik Yapay Zeka Seslendirmeli Video Kaydet & İndir
+  // Tek Tuşla Yapay Zeka Erkek Spiker Seslendirmeli Video Kaydet & İndir
   const handleDownloadVideo = async () => {
     const canvas = canvasRef.current;
     if (!canvas || isRecording) return;
@@ -1408,7 +1446,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     const ctx = canvas.getContext('2d');
     const videoStream = canvas.captureStream(FPS);
 
-    // Web Audio API üzerinden AI Spiker + Kurumsal Fon Müziği kanalını hazırla
+    // Web Audio API üzerinden Ahmet Neural Erkek Spiker + Kurumsal Fon Müziği kanalını hazırla
     let combinedStream = videoStream;
     let scheduledNodes = [];
     const includeAudio = voiceMode !== 'muted' || bgMusicEnabled;
@@ -1418,9 +1456,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         const audioCtx = getAudioContext();
         const audioDest = audioCtx.createMediaStreamDestination();
 
-        // Kayıt sırasında kullanıcının da kısık sesle duyması için monitör çıkışı
+        // Kayıt sırasında kullanıcının da duyması için monitör çıkışı
         const monitorGain = audioCtx.createGain();
-        monitorGain.gain.value = 0.5;
+        monitorGain.gain.value = 0.55;
         monitorGain.connect(audioCtx.destination);
 
         const masterMix = audioCtx.createGain();
@@ -1441,7 +1479,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
         stepBuffers.forEach((buf, idx) => {
           if (buf && voiceMode !== 'muted') {
-            const clipStart = baseAudioTime + idx * 4 + 0.12;
+            const clipStart = baseAudioTime + idx * STEP_DURATION_SEC + 0.08;
             const srcNode = scheduleVoiceClip(audioCtx, masterMix, buf, clipStart, voiceMode);
             if (srcNode) scheduledNodes.push(srcNode);
           }
@@ -1487,7 +1525,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const audioTag = voiceMode === 'muted' ? 'Sessiz' : 'AI_Sesli';
+      const audioTag = voiceMode === 'muted' ? 'Sessiz' : 'Erkek_Spiker_Sesli';
       a.download = `IVECO_WA_Durum_${currentScenario.id}_${audioTag}_${new Date().toISOString().slice(0, 10)}.${ext}`;
       document.body.appendChild(a);
       a.click();
@@ -1495,7 +1533,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       URL.revokeObjectURL(url);
       setIsRecording(false);
       setIsPlaying(true);
-      toast.success(`🎬 "${currentScenario.shortTitle}" (${voiceMode === 'muted' ? 'Sessiz' : 'Yapay Zeka Seslendirmeli'}) videosu indirildi!`);
+      toast.success(`🎬 "${currentScenario.shortTitle}" (${voiceMode === 'muted' ? 'Sessiz' : 'Tok Erkek Spiker Sesli'}) videosu indirildi!`);
     };
 
     recorder.start();
@@ -1521,7 +1559,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const sampleTimes = [2.2, 6.2, 10.2, 14.2];
+    const sampleTimes = [0, 1, 2, 3].map(i => i * STEP_DURATION_SEC + 2.2);
 
     sampleTimes.forEach((t, idx) => {
       renderFrame(ctx, t, currentScenario);
@@ -1547,7 +1585,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const activeStepIdx = Math.min(3, Math.floor(currentTime / 4));
+  const activeStepIdx = Math.min(3, Math.floor(currentTime / STEP_DURATION_SEC));
 
   return (
     <div style={{
@@ -1589,10 +1627,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.18rem', fontWeight: 800 }}>
-                🎬 5 Akılcı Senaryolu & Yapay Zeka Seslendirmeli WhatsApp Durum Stüdyosu
+                🎬 5 Akılcı Senaryolu & Tok Erkek Spiker Sesli WhatsApp Durum Stüdyosu
               </h2>
               <p style={{ margin: 0, fontSize: '0.79rem', color: 'var(--text-secondary)' }}>
-                Her senaryoya özel Türkçe Yapay Zeka Spiker Sesi, hafif kurumsal fon müziği ve Android uyumlu takip linki
+                Gerçek Türkçe Erkek Spiker Sesi (Microsoft Ahmet Neural), hafif kurumsal fon müziği ve Android uyumlu takip linki
               </p>
             </div>
           </div>
@@ -1717,12 +1755,12 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                   const nextState = !liveAudioPreview;
                   setLiveAudioPreview(nextState);
                   if (nextState) {
-                    if (voiceMode === 'muted') setVoiceMode('female_studio');
+                    if (voiceMode === 'muted') setVoiceMode('male_ahmet');
                     lastSpokenStepRef.current = -1;
                     setCurrentTime(0);
                     startTimeRef.current = performance.now();
                     setIsPlaying(true);
-                    toast.success('🔊 Sesli önizleme açıldı! Sahne geçişlerinde AI spiker konuşacak.');
+                    toast.success('🔊 Sesli önizleme açıldı! Tok erkek spiker (Ahmet AI) konuşuyor.');
                   } else if (activePreviewSourceRef.current) {
                     try {
                       activePreviewSourceRef.current.stop();
@@ -1755,7 +1793,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                   disabled={isRecording}
                   onClick={() => {
                     setIsPlaying(false);
-                    const targetT = idx * 4 + 1.8;
+                    const targetT = idx * STEP_DURATION_SEC + 1.8;
                     setCurrentTime(targetT);
                     if (canvasRef.current) {
                       renderFrame(canvasRef.current.getContext('2d'), targetT, currentScenario);
@@ -1796,12 +1834,12 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <FiVolume2 size={15} />
-                  Yapay Zeka Spiker Sesi:
+                  Erkek Spiker Tonu:
                 </span>
 
                 {[
-                  { id: 'female_studio', label: '👩 Kurumsal Kadın AI (Net Ton)' },
-                  { id: 'male_warm', label: '👨 Tok Kurumsal AI (Derin Ton)' },
+                  { id: 'male_ahmet', label: '👨 Doğal Erkek Spiker (Ahmet AI)' },
+                  { id: 'male_baritone', label: '🎙️ Ekstra Tok Radyo Spikeri (Bariton)' },
                   { id: 'muted', label: '🔇 Spiker Kapalı' }
                 ].map(opt => (
                   <button
@@ -1811,7 +1849,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                     onClick={() => {
                       setVoiceMode(opt.id);
                       if (opt.id !== 'muted') {
-                        setTimeout(() => playSingleStepPreview(activeStepIdx), 60);
+                        setTimeout(() => playSingleStepPreview(activeStepIdx, opt.id), 40);
                       }
                     }}
                     style={{
@@ -1875,7 +1913,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                     key={idx}
                     onClick={() => {
                       setIsPlaying(false);
-                      const targetT = idx * 4 + 1.8;
+                      const targetT = idx * STEP_DURATION_SEC + 1.8;
                       setCurrentTime(targetT);
                       if (canvasRef.current) {
                         renderFrame(canvasRef.current.getContext('2d'), targetT, currentScenario);
