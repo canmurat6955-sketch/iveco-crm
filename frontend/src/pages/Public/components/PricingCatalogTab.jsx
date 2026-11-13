@@ -318,7 +318,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           : (vehicle.cashDiscount > 0
               ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
               : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
-      const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText})${protocolPrefix} hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
+      const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText})${protocolPrefix} hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
       onDirectWhatsApp(msg);
     }
   };
@@ -374,7 +374,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
     const text =
       `📋 *2026 IVECO Araç & Muhasebe Özeti*\n` +
       `🚛 *Model:* ${vehicle.model} (${vehicle.category})\n` +
-      `${priceLine}${vatLine}${loanLine}\n\n` +
+      `${priceLine}${vatLine}${loanLine}\n` +
+      `👤 *Not / Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n\n` +
       `👇 Canlı kredi, kasa ve kantar detaylarını buradan inceleyebilirsin:\n\n` +
       `${shareUrl}`;
 
@@ -1635,7 +1636,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                       ⭐ {partnerProtocol ? `${partnerProtocol.shortName} ÖZEL ŞANTİYE PROTOKOLÜ` : 'PROJEYE ÖZEL ŞANTİYE FİYATI'}
                     </div>
                     <div style={{ fontSize: isMobileView ? '1.04rem' : '0.98rem', fontWeight: 900, color: '#fef08a', marginTop: '2px' }}>
-                      Satış Sorumlusu ile Görüşün
+                      Satış Sorumlusu Can Murat ile Görüşün
                     </div>
                   </div>
                 ) : vehicle.currency === 'EUR' ? (
@@ -1861,7 +1862,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                       gap: '4px',
                       whiteSpace: 'nowrap'
                     }}
-                    title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu ile Özel Fiyat Görüş" : "WhatsApp'tan Teklif Al"}
+                    title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu Can Murat ile Özel Fiyat Görüş" : "WhatsApp'tan Teklif Al"}
                   >
                     <FiMessageSquare size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
                   </button>

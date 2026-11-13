@@ -308,6 +308,7 @@ export function buildPartnerAnnouncementText(origin, config) {
     `🔄 Elinizdeki mevcut aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya anlaşmalı banka oranlarıyla kalan taksitinizi 10 saniyede hesaplayın,\n` +
     `📸 Takasa vereceğiniz aracın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takas ön fiyatı alın,\n` +
     `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın 👇\n\n` +
+    `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
     `${link}`
   );
 }

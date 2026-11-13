@@ -36,9 +36,7 @@ export default function CustomerDetail() {
   const navigate = useNavigate();
   const { startVisit } = useVisit();
   const { user } = useAuth();
-  const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
-    ? user.full_name
-    : 'Can Murat Onay';
+  const salesRepName = 'Can Murat';
   const [customer, setCustomer] = useState(null);
 
   const [interactions, setInteractions] = useState([]);
@@ -187,11 +185,11 @@ export default function CustomerDetail() {
 
     const msg = (
       `Sayın *${contactName}*,\n\n` +
-      `Ben IVECO ERC Samsun Otomotiv Satış Sorumlusu *${salesRepName}* (0544 622 59 31).\n\n` +
+      `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
       `Firmanız için hazırladığım ${secLabel}2026 model IVECO şasi fiyat listesini, %20 KDV vergi kalkanı hesabını, takas peşinat desteğini ve %0 faizli banka kredi seçeneklerini aşağıdaki size özel bağlantıdan inceleyebilirsiniz:\n\n` +
       `👉 ${vipLink}\n\n` +
       `Beğendiğiniz model veya takas/kredi hesaplaması için bu mesaj üzerinden bana doğrudan ulaşabilirsiniz.\n\n` +
-      `İyi çalışmalar dilerim.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
+      `İyi çalışmalar dilerim.\n*Satış Sorumlusu Can Murat - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv*`
     );
 
     openWhatsApp(customer.phone, msg, { customer });
@@ -907,7 +905,7 @@ export default function CustomerDetail() {
                     {customer.pipeline_note}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                    Can Murat Onay tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
+                    Satış Sorumlusu Can Murat tarafından WhatsApp üzerinden Kuveyt Türk 6 Ay Ödemesiz Bayi Katkılı resmi taksit tablosu iletildi ve müşteri tarafından çift tık ile okundu.
                   </div>
                 </div>
               </div>
@@ -1440,7 +1438,7 @@ export default function CustomerDetail() {
                 const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
                 const recipientPhone = cleanPhone ? (cleanPhone.startsWith('90') ? cleanPhone : `90${cleanPhone.replace(/^0/, '')}`) : '';
                 const catalogUrl = `${getPublicOrigin()}/fiyat-listesi?company=${encodeURIComponent(customer.company_name || '')}&phone=${cleanPhone}&ref=muratonay`;
-                const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv bünyesindeki 2026 model Daily, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyat listesini ve anlaşmalı banka kredi olanaklarını aşağıdaki resmi portalımızdan inceleyebilirsiniz:\n\n${catalogUrl}\n\nİhtiyacınız olan şasi modeli, hazır stok teslim süreleri ve özel filo iskontoları için dilediğiniz an iletişime geçebilirsiniz.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
+                const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv bünyesindeki 2026 model Daily, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyat listesini ve anlaşmalı banka kredi olanaklarını aşağıdaki resmi portalımızdan inceleyebilirsiniz:\n\n${catalogUrl}\n\nİhtiyacınız olan şasi modeli, hazır stok teslim süreleri ve özel filo iskontoları için dilediğiniz an iletişime geçebilirsiniz.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Satış Sorumlusu Can Murat - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
                 const wp = recipientPhone
                   ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(msg)}`
                   : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
@@ -1554,7 +1552,7 @@ export default function CustomerDetail() {
                         className="btn btn-sm"
                         onClick={() => {
                           const cleanPhone = customer?.phone ? customer.phone.replace(/\D/g, '') : '';
-                          const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv adına firmanız için hazırlanan ${p.invoice_number} referans numaralı ${p.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantı üzerinden canlı olarak inceleyebilirsiniz:\n\n${trackingUrl}\n\nTeklif içeriğinde anahtar teslim bedel, net peşin alım indirimi, teknik şasi verileri ve resmi banka kredi ödeme planı yer almaktadır.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
+                          const msg = `Sayın Yetkili (${customer?.company_name || ''}),\n\nIVECO ERC Samsun Otomotiv adına firmanız için hazırlanan ${p.invoice_number} referans numaralı ${p.vehicle_model} resmi teklifinizi aşağıdaki güvenli bağlantı üzerinden canlı olarak inceleyebilirsiniz:\n\n${trackingUrl}\n\nTeklif içeriğinde anahtar teslim bedel, net peşin alım indirimi, teknik şasi verileri ve resmi banka kredi ödeme planı yer almaktadır.\n\nBilgilerinize sunar, iyi çalışmalar dileriz.\n*Satış Sorumlusu Can Murat - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`;
                           const wp = recipientPhone
                             ? `https://api.whatsapp.com/send?phone=${recipientPhone}&text=${encodeURIComponent(msg)}`
                             : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;

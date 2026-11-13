@@ -44,8 +44,8 @@ import CustomerSmartActionHub from './components/CustomerSmartActionHub';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
-  name: 'Satış Sorumlusu ile İletişime Geç',
-  title: 'Satış Sorumlusu',
+  name: 'Satış Sorumlusu Can Murat',
+  title: 'IVECO ERC Samsun Otomotiv',
   dealership: 'IVECO ERC Samsun Otomotiv',
   dealershipShort: 'IVECO ERC Samsun',
   phoneDisplay: '0544 622 59 31',
@@ -53,7 +53,7 @@ const SALES_REP = {
   phoneWhatsapp: '905446225931',
   email: 'murat.onay@ercsamsunotomotiv.com',
   city: 'Samsun',
-  initials: '📞'
+  initials: 'CM'
 };
 
 // Sektör Seçenekleri
@@ -1676,30 +1676,30 @@ export default function PublicVehicleFinder() {
     const vcard = 
 `BEGIN:VCARD
 VERSION:3.0
-N:M.;Can;;;
-FN:Satış Sorumlusu (IVECO ERC)
+N:Murat;Can;;;
+FN:Satış Sorumlusu Can Murat (IVECO ERC)
 ORG:IVECO ERC Samsun Otomotiv
-TITLE:Satış Sorumlusu
+TITLE:Satış Sorumlusu Can Murat
 TEL;TYPE=CELL,VOICE;VALUE=uri:tel:+905446225931
 EMAIL;TYPE=WORK,INTERNET:murat.onay@ercsamsunotomotiv.com
 URL:https://erc-iveco.com/ozel-teklif
-NOTE:IVECO ERC Samsun Otomotiv Ticari Araçlar Satış Sorumlusu
+NOTE:IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat
 END:VCARD`;
     const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'IVECO_ERC_Satis_Sorumlusu_Can_M.vcf');
+    link.setAttribute('download', 'IVECO_ERC_Satis_Sorumlusu_Can_Murat.vcf');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('📇 Satış Sorumlusu dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
+    toast.success('📇 Satış Sorumlusu Can Murat dijital kartviziti indirildi! Telefon rehberinize kaydedebilirsiniz.', { duration: 4000 });
   };
 
   // Doğrudan E-Posta Gönderme
   const handleDirectEmail = () => {
     const subject = `IVECO Araç & Finansman Teklifi Talebi — ${customerCompany || customerName || 'Ticari Müşteri'}`;
-    const body = `Merhaba Can Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
+    const body = `Merhaba Can Murat Bey,\n\nIVECO ERC Samsun Otomotiv üzerinden hazırlanan Akıllı Şasi ve Kredi Portalı'nı inceledim.\n\n` +
       `Seçilen Model: ${matched.modelTitle}\n` +
       `Yük İhtiyacı: ${payloadKg} kg (${matched.kantarTitle})\n` +
       `Finansman: ${currentBankMeta.name} — ${activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL (${activeCampaign.term} Ay)` : 'Resmi Kredi'}\n\n` +
@@ -1733,7 +1733,7 @@ END:VCARD`;
     }
   };
 
-  // VIP Test Paneli Fonksiyonları (Can M. - Satış Sorumlusu)
+  // VIP Test Paneli Fonksiyonları (Satış Sorumlusu Can Murat)
   const handleApplyPreset = (type) => {
     if (type === 'panelvan_12') {
       handleSelectVehicle('panelvan_12');
@@ -1792,7 +1792,7 @@ END:VCARD`;
   const handleCopyVipWhatsAppTemplate = () => {
     const link = getGeneratedVipLink(false);
     const cleanCompany = (testGenCompany || 'Değerli İş Ortağımız').trim();
-    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nSatış Sorumlusu\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
+    const text = `Sayın ${cleanCompany} Yetkilisi,\n\nIVECO ERC Samsun Otomotiv olarak filonuza ve taşıma operasyonunuza özel hazırladığımız dijital şasi, kasa boyutu ve 2026 güncel anlaşmalı banka kredi simülatörünü (%0 Faiz ve Yüksek Limitli Ticari Kredi Seçenekleri) incelemeniz için aşağıdaki bağlantıyı hazırladık:\n\n🔗 ${link}\n\nİnceledikten sonra dilediğiniz şasi konfigürasyonunu doğrudan bana iletebilirsiniz.\n\nSaygılarımla,\nSatış Sorumlusu Can Murat\nIVECO ERC Samsun Otomotiv\n📞 0544 622 59 31\n✉️ murat.onay@ercsamsunotomotiv.com`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success('📲 VIP WhatsApp Metni & Linki Kopyalandı!');
@@ -1819,7 +1819,7 @@ IVECO ERC Samsun Otomotiv olarak hazırladığımız dijital müşteri ve bilgi 
 Aşağıdaki bağlantıdan doğrudan inceleyebilir, aklınıza takılan her konuyu bana sorabilirsiniz:
 👉 ${link}
 
-📞 İletişim: Satış Sorumlusu | 0544 622 59 31
+📞 İletişim: Satış Sorumlusu Can Murat | 0544 622 59 31
 IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
 
 #IVECO #Daily35 #Eurocargo #Kamyonet #TicariAraç #Lojistik #FiloYönetimi #Taşıma #Samsun #ERCSamsun #Kredi #Finansman`;
@@ -1884,7 +1884,7 @@ IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.
 • Net Taşıma: ~${targetPayload} Ton
 • Kantar Güvencesi: ${targetKantar}
 • Kredi: 12-48 Ay Resmi Banka Taksit Seçenekleri
-• İletişim: Satış Sorumlusu | 0544 622 59 31
+• İletişim: Satış Sorumlusu Can Murat | 0544 622 59 31
 • E-Posta: murat.onay@ercsamsunotomotiv.com`
       );
     }
@@ -1905,7 +1905,7 @@ Detaylı teknik föyü ve banka ödeme planını buradan anında görüntüleyeb
 🔗 ${link}
 
 Saygılarımla,
-*Satış Sorumlusu*
+*Satış Sorumlusu Can Murat*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -1930,7 +1930,7 @@ ${link}
 Seçtiğiniz şasinin stok ve fabrika teslim tarihleri için bu mesaja yanıt vermeniz yeterlidir.
 
 Saygılarımla,
-*Satış Sorumlusu*
+*Satış Sorumlusu Can Murat*
 IVECO ERC Samsun Otomotiv
 📞 0544 622 59 31
 ✉️ murat.onay@ercsamsunotomotiv.com`
@@ -2297,7 +2297,7 @@ IVECO ERC Samsun Otomotiv
                   Sayın {customerCompany || customerName || 'Değerli Müşterimiz'}, Hoş Geldiniz!
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
-                  Satış Sorumlunuz <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> operasyonunuza özel teknik şasi ve kantar simülasyonunu hazırladı.
+                  <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> operasyonunuza özel teknik şasi ve kantar simülasyonunu hazırladı.
                 </div>
               </div>
             </div>
@@ -2356,7 +2356,7 @@ IVECO ERC Samsun Otomotiv
               gap: '8px',
               boxShadow: '0 6px 20px rgba(8, 15, 30, 0.25)'
             }}>
-              {/* Üst Satır: IVECO Logosu + Can Murat Onay Bilgisi */}
+              {/* Üst Satır: IVECO Logosu + Satış Sorumlusu Can Murat Bilgisi */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textAlign: 'left' }}>
                   <div style={{
@@ -2474,7 +2474,7 @@ IVECO ERC Samsun Otomotiv
               Daily 35, Daily 70C, Eurocargo ve S-Way şasi modellerimizin güncel bayi fiyatlarını, yasal istiap kapasitelerini ve <strong>anlaşmalı banka resmi sübvansiyonlu kredi kampanyalarını</strong> inceleyebilirsiniz.
             </p>
 
-            {/* Can Murat Onay Temsilci Rozeti (Satış Sorumlusu) & Hızlı İletişim Butonları */}
+            {/* Satış Sorumlusu Can Murat Temsilci Rozeti & Hızlı İletişim Butonları */}
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -2577,12 +2577,12 @@ IVECO ERC Samsun Otomotiv
                   gap: '4px',
                   cursor: 'pointer'
                 }}
-                title="Satış Sorumlusu İletişim Kartını Telefona İndir & Rehbere Kaydet"
+                title="Satış Sorumlusu Can Murat İletişim Kartını Telefona İndir & Rehbere Kaydet"
               >
                 <FiDownload size={12} /> Rehbere Ekle
               </button>
 
-              {/* Yalnızca Can Murat Onay ?admin=true parametresiyle açtığında görünen dahili araçlar */}
+              {/* Yalnızca ?admin=true parametresiyle açtığında görünen dahili araçlar */}
               {isAdminMode && (
                 <>
                   {/* 📤 Müşteriye Gönder */}
@@ -2643,7 +2643,7 @@ IVECO ERC Samsun Otomotiv
                       gap: '4px',
                       cursor: 'pointer'
                     }}
-                    title="Can Murat Onay VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
+                    title="Satış Sorumlusu Can Murat VIP Test Paneli ve Müşteri Link Üreticisini Aç/Kapat"
                   >
                     <span>🛠️</span> {showTestPanel ? 'Test Paneli Açık' : 'Test Paneli'}
                   </button>
@@ -2692,7 +2692,7 @@ IVECO ERC Samsun Otomotiv
                 IVECO ERC Samsun Otomotiv Müşteri & Bilgi Merkezine Hoş Geldiniz!
               </div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
-                Satış Sorumlumuz <strong>{SALES_REP.name}</strong> tarafından hazırlanan güncel araç fiyatlarını, kasa çözümlerini, kredi simülatörünü ve merak ettiğiniz soruların yanıtlarını aşağıdaki sekmelerden inceleyebilirsiniz.
+                <strong>{SALES_REP.name}</strong> tarafından hazırlanan güncel araç fiyatlarını, kasa çözümlerini, kredi simülatörünü ve merak ettiğiniz soruların yanıtlarını aşağıdaki sekmelerden inceleyebilirsiniz.
               </div>
             </div>
           </div>
@@ -2776,6 +2776,9 @@ IVECO ERC Samsun Otomotiv
               <div style={{ fontSize: isMobileView ? '0.78rem' : '0.82rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.4 }}>
                 {activePartner.extraPerk} — <strong>Aşağıdaki tüm 2026 model şasi fiyatlarında {activePartner.shortName} üye indiriminiz otomatik olarak düşülmüştür.</strong>
               </div>
+              <div style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 800, marginTop: '5px' }}>
+                👤 Yetkili: Satış Sorumlusu Can Murat • 📞 0544 622 59 31 (IVECO ERC Samsun Otomotiv)
+              </div>
             </div>
           </div>
 
@@ -2797,7 +2800,7 @@ IVECO ERC Samsun Otomotiv
                 : `-${activePartner.discountValue.toLocaleString('tr-TR')} ₺ / Araç`}
             </div>
             <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '2px' }}>
-              Fiyatlara Otomatik Uygulandı ✓
+              Satış Sorumlusu Can Murat Notu ✓
             </div>
           </div>
         </div>
@@ -3509,10 +3512,10 @@ IVECO ERC Samsun Otomotiv
                                 🚜 ŞANTİYE & HAFRİYAT ÖZEL FİYATI
                               </div>
                               <div style={{ fontSize: isMobileView ? '0.94rem' : '0.84rem', fontWeight: 900, color: '#fef08a', marginTop: '3px' }}>
-                                Fiyatlandırma İçin Satış Sorumlusu ile Görüşün
+                                Fiyatlandırma İçin Satış Sorumlusu Can Murat ile Görüşün
                               </div>
                               <div style={{ fontSize: isMobileView ? '0.74rem' : '0.66rem', color: '#cbd5e1', marginTop: '2px' }}>
-                                Satış Sorumlusu • 0544 622 59 31
+                                Satış Sorumlusu Can Murat • 0544 622 59 31
                               </div>
                             </div>
                           ) : v.currency === 'EUR' ? (
@@ -3946,15 +3949,15 @@ IVECO ERC Samsun Otomotiv
                       🚜 T-WAY ŞANTİYE & HAFRİYAT ÖZEL FİYATLANDIRMA
                     </div>
                     <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fef08a', marginTop: '4px' }}>
-                      Fiyatlandırma İçin Satış Sorumlusu ile Görüşün
+                      Fiyatlandırma İçin Satış Sorumlusu Can Murat ile Görüşün
                     </div>
                     <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '3px' }}>
-                      Satış Sorumlusu · IVECO ERC Samsun (0544 622 59 31)
+                      Satış Sorumlusu Can Murat · IVECO ERC Samsun (0544 622 59 31)
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => handleDirectWhatsApp(`Merhaba Can Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}
+                    onClick={() => handleDirectWhatsApp(`Merhaba Can Murat Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}
                     style={{
                       background: '#22c55e',
                       color: '#0f172a',
@@ -4806,6 +4809,9 @@ IVECO ERC Samsun Otomotiv
                     marginTop: '4px'
                   }}>
                     🛡️ <em>Resmi IVECO anlaşmalı ticari finansman tablosudur. Özel kampanya oranları uygulanmış olup ilave masraf veya gizli komisyon yansıtılmaz.</em>
+                    <div style={{ marginTop: '4px', color: '#38bdf8', fontWeight: 800 }}>
+                      👤 Not: Satış Sorumlusu Can Murat • 📞 0544 622 59 31 (IVECO ERC Samsun Otomotiv)
+                    </div>
                   </div>
                 </div>
               )}
@@ -4972,7 +4978,7 @@ IVECO ERC Samsun Otomotiv
                 marginBottom: '12px'
               }}
             >
-              <FiMessageSquare size={18} /> Satış Sorumlusu ile WhatsApp'tan Hemen Görüş
+              <FiMessageSquare size={18} /> Satış Sorumlusu Can Murat ile WhatsApp'tan Hemen Görüş
             </button>
 
             <button
@@ -4997,7 +5003,7 @@ IVECO ERC Samsun Otomotiv
       </>
       )}
 
-      {/* ── CAN MURAT ONAY VIP TEST SİMÜLASYON RAPOR MODALI ── */}
+      {/* ── SATIŞ SORUMLUSU CAN MURAT VIP TEST SİMÜLASYON RAPOR MODALI ── */}
       {testSimulationResult && (
         <div style={{
           position: 'fixed',
@@ -5029,7 +5035,7 @@ IVECO ERC Samsun Otomotiv
                     CRM PIPELINE SİMÜLASYONU BAŞARILI
                   </h3>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                    Satış Sorumlusu: Can Murat Onay Test Önizleme Raporu ({testSimulationResult.timestamp})
+                    Satış Sorumlusu Can Murat Test Önizleme Raporu ({testSimulationResult.timestamp})
                   </div>
                 </div>
               </div>
@@ -5162,7 +5168,7 @@ IVECO ERC Samsun Otomotiv
                     </span>
                   </h3>
                   <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
-                    Satış Sorumlusu: <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> • {SALES_REP.dealership} (📞 {SALES_REP.phoneDisplay} • ✉️ {SALES_REP.email})
+                    <strong style={{ color: '#e2e8f0' }}>{SALES_REP.name}</strong> • {SALES_REP.dealership} (📞 {SALES_REP.phoneDisplay} • ✉️ {SALES_REP.email})
                   </div>
                 </div>
               </div>
@@ -5771,7 +5777,7 @@ IVECO ERC Samsun Otomotiv
               boxShadow: '0 3px 10px rgba(34, 197, 94, 0.35)'
             }}
           >
-            <FiMessageSquare size={14} /> Satış Sorumlusu (WhatsApp)
+            <FiMessageSquare size={14} /> Satış Sorumlusu Can Murat
           </button>
 
           <button

@@ -769,7 +769,7 @@ export default function IntentRadar() {
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const model = (signal.realModelsList && signal.realModelsList[0]) || 'IVECO 2026 Ticari Araç';
-    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu olarak ulaşıyorum (0544 622 59 31). Dijital kataloğumuzda incelediğiniz ${model} ve Kasım 2026 dönemine özel %0 faizli / ödemesiz ticari finansman seçeneklerimiz hakkında firmanıza özel ödeme tablosunu paylaşmak isterim.`;
+    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat olarak ulaşıyorum (0544 622 59 31). Dijital kataloğumuzda incelediğiniz ${model} ve Kasım 2026 dönemine özel %0 faizli / ödemesiz ticari finansman seçeneklerimiz hakkında firmanıza özel ödeme tablosunu paylaşmak isterim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };

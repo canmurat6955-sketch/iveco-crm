@@ -126,7 +126,7 @@ export default function CustomerSmartActionHub({
   customerPhone = '',
   customerCity = 'Samsun',
   customerId = '',
-  salesRep = { name: 'Satış Sorumlusu', phoneDisplay: '0544 622 59 31', phoneWhatsapp: '905446225931' },
+  salesRep = { name: 'Satış Sorumlusu Can Murat', phoneDisplay: '0544 622 59 31', phoneWhatsapp: '905446225931' },
   onTrackFootprint
 }) {
   const [selectedAction, setSelectedAction] = useState('appointment'); // 'appointment' | 'option24h' | 'tradein_photo' | 'tax_summary' | 'body_pkg' | 'second_hand'
@@ -241,7 +241,7 @@ export default function CustomerSmartActionHub({
       notes: `Müşteri Randevu Talebi Oluşturdu!\nTür: ${apptType.title}\nTarih/Saat: ${apptDay} (${apptTime})\nİncelenen Araç: ${activeModelTitle}\nNot/Adres: ${apptAddressOrNote || '-'}`
     });
     setSubmitting(false);
-    setSuccessMsg(`✅ "${apptType.title}" randevu talebiniz (${apptDay}, ${apptTime}) Satış Sorumlusu ekranına iletildi!`);
+    setSuccessMsg(`✅ "${apptType.title}" randevu talebiniz (${apptDay}, ${apptTime}) Satış Sorumlusu Can Murat ekranına iletildi!`);
     toast.success('Randevu talebiniz alındı!');
   };
 
@@ -330,7 +330,7 @@ export default function CustomerSmartActionHub({
     const carDesc = tradeInCarInfo.trim() ? `*${tradeInCarInfo.trim()}*` : 'mevcut ticari aracım';
     const kmDesc = tradeInKmInput.trim() ? ` (*${tradeInKmInput.trim()} KM*)` : '';
     const msg =
-      `Merhaba Can Bey,\n\n` +
+      `Merhaba Can Murat Bey,\n\n` +
       `2026 model *${activeModelTitle}* için elimdeki ${carDesc}${kmDesc} adına *Takasla Fiyat Almak* istiyorum.\n\n` +
       `📸 *Takas Ekspertizi İçin Gerekli 4 Resim:*\n` +
       `1️⃣ *Dışarıdan Görünüm Resmi (1 Adet)* ${tradeInPhotos.dis_gorunum ? '✅ (Yüklendi)' : '📷'}\n` +
@@ -339,7 +339,7 @@ export default function CustomerSmartActionHub({
       `4️⃣ *Araç Ruhsat Resmi (1 Adet)* ${tradeInPhotos.ruhsat ? '✅ (Yüklendi)' : '📷'}\n\n` +
       `Tahmini takas bedelini ve kalan kredi ödeme planını çıkarabilir miyiz?`;
 
-    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu ekranına iletildi!`);
+    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can Murat ekranına iletildi!`);
 
     // Bilgisayar (WhatsApp Desktop) ve Mobil cihazlarda popup engelleyiciye takılmadan doğrudan aç
     openWhatsAppChat(cleanWhatsappPhone, msg);
@@ -357,7 +357,7 @@ export default function CustomerSmartActionHub({
       notes: `Müşteri mali müşavirine göndermek üzere %20 KDV ve Amortisman vergi özeti talep etti.`
     });
     const msg =
-      `Merhaba Can Bey,\n\n` +
+      `Merhaba Can Murat Bey,\n\n` +
       `*${activeModelTitle}* yatırımı için mali müşavirime / muhasebeme iletmek üzere;\n` +
       `• *%20 İndirilecek KDV Tutarı (~${kdvAmount.toLocaleString('tr-TR')} TL)*,\n` +
       `• *Yıllık Amortisman Gideri (~${yearlyDepreciation.toLocaleString('tr-TR')} TL)* ve\n` +
@@ -380,7 +380,7 @@ export default function CustomerSmartActionHub({
       notes: `Müşteri "${activeModelTitle}" şasisi + "${selectedBodyPkg}" üstyapı dahil anahtar teslim fiyat istedi.`
     });
     setSubmitting(false);
-    setSuccessMsg(`📦 "${activeModelTitle} + ${selectedBodyPkg}" anahtar teslim paket talebiniz Satış Sorumlusu'ye iletildi!`);
+    setSuccessMsg(`📦 "${activeModelTitle} + ${selectedBodyPkg}" anahtar teslim paket talebiniz Satış Sorumlusu Can Murat ekranına iletildi!`);
     toast.success('Üstyapı dahil paket talebiniz alındı!');
   };
 
@@ -670,7 +670,7 @@ export default function CustomerSmartActionHub({
           </div>
           {optionCode && (
             <div style={{ marginTop: '10px', fontSize: '0.8rem', color: '#fde68a', fontWeight: 800, textAlign: 'center' }}>
-              Resmi Opsiyon Kodunuz: #{optionCode} — Satış Sorumlusu şasinizi 24 saat bloke etmiştir.
+              Resmi Opsiyon Kodunuz: #{optionCode} — Satış Sorumlusu Can Murat şasinizi 24 saat bloke etmiştir.
             </div>
           )}
         </form>
@@ -858,7 +858,7 @@ export default function CustomerSmartActionHub({
             >
               <FiCamera size={17} />
               {uploadedTradeInCount === 4
-                ? '✅ 4 Resmi Gönder & 15 Dk’da Takas Fiyatı Al (Satış Sorumlusu)'
+                ? '✅ 4 Resmi Gönder & 15 Dk’da Takas Fiyatı Al (Satış Sorumlusu Can Murat)'
                 : `📸 4 Resmi Tamamla & Takasla Fiyat Al (${uploadedTradeInCount}/4 Resim Eklendi)`}
             </button>
 

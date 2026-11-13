@@ -51,9 +51,7 @@ export default function WhatsAppActionModal({
 }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const salesRepName = (user?.full_name && !user.full_name.includes('Sistem') && !user.full_name.includes('King'))
-    ? user.full_name
-    : 'Can Murat Onay';
+  const salesRepName = 'Can Murat';
 
   // Adım kontrolü: 'compose' (WhatsApp Mesajı & Hazırlık) | 'post_action' (Bilgi Kartı & Pipeline Onayı)
   const [step, setStep] = useState('compose');
@@ -244,7 +242,7 @@ export default function WhatsAppActionModal({
         `Taşımacılık operasyonunuza uygun 2026 model IVECO şasilerimizin güncel bayi fiyat listesi, resmi banka sübvansiyonlu kredi kampanyaları ve teknik istiap verileri aşağıdaki resmi portalımızda yer almaktadır:\n\n` +
         `${catalogUrl}\n\n` +
         `Firmanıza özel resmi bayi proforma teklifimiz ve hazır şasi teslim durumları hakkında bilgi almak için dilediğiniz an iletişime geçebilirsiniz.\n\n` +
-        `Bilgilerinize sunar, iyi çalışmalar dileriz.\n*Can Murat ONAY - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`
+        `Bilgilerinize sunar, iyi çalışmalar dileriz.\n*Satış Sorumlusu Can Murat - 0544 622 59 31*\n*IVECO ERC Samsun Otomotiv San. ve Tic. A.Ş.*`
       );
       setInternalNote('Müşteriye 2026 şasi fiyat listesi ve finansman teklif bilgilendirmesi iletildi.');
     }
@@ -273,7 +271,7 @@ export default function WhatsAppActionModal({
     }
     const graceText = activeTerm.grace_months ? `ilk ${activeTerm.grace_months} ay ödemesiz, ` : '';
     const rateText = activeTerm.rate ? ` (${activeTerm.rate} oran)` : '';
-    const financeSnippet = `\n\n📌 ${activeMatrix.bank_name} Çatı Kampanyası (${activeMatrix.campaign_name}):\n${activeTier.formatted_principal} kredi için ${graceText}${activeTerm.months} ay boyunca aylık ${Number(activeTerm.monthly_payment).toLocaleString('tr-TR')} TL taksit fırsatıyla hemen teslim.${rateText}`;
+    const financeSnippet = `\n\n📌 ${activeMatrix.bank_name} Çatı Kampanyası (${activeMatrix.campaign_name}):\n${activeTier.formatted_principal} kredi için ${graceText}${activeTerm.months} ay boyunca aylık ${Number(activeTerm.monthly_payment).toLocaleString('tr-TR')} TL taksit fırsatıyla hemen teslim.${rateText}\n👤 *Satış Sorumlusu Can Murat — 0544 622 59 31*`;
     setMessage(prev => prev.trim() + financeSnippet);
     toast.success(`${activeMatrix.bank_name} taksit teklifi mesaja eklendi! 🏦`);
   };

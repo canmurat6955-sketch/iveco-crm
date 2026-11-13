@@ -668,13 +668,16 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
                               <strong style={{ color: '#f1f5f9' }}>{(camp.total || (camp.monthly * camp.term) || 0).toLocaleString('tr-TR')} TL</strong>
                             </div>
                           </div>
+                          <div style={{ fontSize: '0.67rem', color: '#7dd3fc', fontWeight: 700, marginTop: '6px' }}>
+                            👤 Not: Satış Sorumlusu Can Murat • 0544 622 59 31
+                          </div>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => {
                             if (onDirectWhatsApp) {
-                              const msg = `Merhaba ${salesRep?.name || 'Can Murat Bey'}, IVECO portalından *${activeBank.name}* bünyesindeki *${camp.title || (camp.principal + ' TL')}* kampanyası (Aylık ${(camp.monthly || 0).toLocaleString('tr-TR')} TL) için ön onay ve başvuru şartlarını öğrenmek istiyorum.`;
+                              const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, IVECO portalından *${activeBank.name}* bünyesindeki *${camp.title || (camp.principal + ' TL')}* kampanyası (Aylık ${(camp.monthly || 0).toLocaleString('tr-TR')} TL) için ön onay ve başvuru şartlarını öğrenmek istiyorum.`;
                               onDirectWhatsApp(msg);
                             }
                           }}
@@ -706,7 +709,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
 
             {realCampaigns.length === 0 && (
               <div style={{ fontSize: '0.8rem', color: '#94a3b8', padding: '14px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '10px' }}>
-                Bu banka için seçili araç grubunda resmi kampanya tablosu bulunmuyor. Size özel teklif için satış temsilcimizle iletişime geçin.
+                Bu banka için seçili araç grubunda resmi kampanya tablosu bulunmuyor. Size özel teklif için Satış Sorumlusu Can Murat (0544 622 59 31) ile iletişime geçin.
               </div>
             )}
           </div>

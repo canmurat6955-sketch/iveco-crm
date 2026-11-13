@@ -210,7 +210,7 @@ export default function PublicProposalView() {
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 700 }}>Satış & Filo Danışmanınız</div>
-                <div style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff' }}>{proposal.sales_rep_name ? proposal.sales_rep_name.replace(/Can Murat\s*ONAY/i, 'Satış Sorumlusu') : 'Satış Sorumlusu'}</div>
+                <div style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff' }}>{proposal.sales_rep_name ? proposal.sales_rep_name.replace(/Can Murat\s*ONAY/i, 'Satış Sorumlusu Can Murat') : 'Satış Sorumlusu Can Murat'}</div>
                 <div style={{ fontSize: '12px', color: '#7dd3fc', fontWeight: 600, marginTop: 1 }}>IVECO ERC Samsun Otomotiv • 0544 622 59 31</div>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function PublicProposalView() {
             <div style={{ display: 'flex', gap: '10px', flex: '1 1 240px' }}>
               <button
                 type="button"
-                onClick={() => openWhatsAppChat('905446225931', `Merhaba Can Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}
+                onClick={() => openWhatsAppChat('905446225931', `Merhaba Can Murat Bey, ${proposal.invoice_number} numaralı ${proposal.vehicle_model} teklifinizi inceledim. Detayları görüşmek isterim.`)}
                 style={{
                   display: 'inline-flex', 
                   alignItems: 'center', 
@@ -236,7 +236,7 @@ export default function PublicProposalView() {
                   width: '100%'
                 }}
               >
-                <FiMessageSquare size={16} /> Satış Sorumlusu ile WhatsApp'tan Görüş
+                <FiMessageSquare size={16} /> Satış Sorumlusu Can Murat ile WhatsApp'tan Görüş
               </button>
             </div>
           </div>
