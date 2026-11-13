@@ -41,6 +41,7 @@ import LoanFinanceTab from './components/LoanFinanceTab';
 import FaqLinkedInTab from './components/FaqLinkedInTab';
 import TcoCompetitorTab from './components/TcoCompetitorTab';
 import CustomerSmartActionHub from './components/CustomerSmartActionHub';
+import BodyworkExamplesGallery from '../../components/Portal/BodyworkExamplesGallery';
 
 // ── RESMİ SATIŞ SORUMLUSU BİLGİLERİ ─────────────────────────────
 const SALES_REP = {
@@ -2989,7 +2990,7 @@ IVECO ERC Samsun Otomotiv
           }}>
             {[
               { id: 'secici', label: '🚛 Şasi, Tonaj & Kantar Sihirbazı' },
-              { id: 'ust-yapi', label: '🏗️ Üst Yapı & Kasa Ölçü Rehberi' },
+              { id: 'ust-yapi', label: '📸 Şasi Üzeri Örnek Kasa Fotoğrafları (24)' },
               { id: 'tco', label: '⚔️ Neden IVECO? (Rakip & TCO Analizi)' },
               { id: 'sss', label: '❓ Sıkça Sorulan Sorular' }
             ].map((tab) => {
@@ -3065,6 +3066,17 @@ IVECO ERC Samsun Otomotiv
       {/* ── SEKME 3: ÜST YAPI & KASA REHBERİ ── */}
       {activeMainTab === 'ust-yapi' && (
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
+          <BodyworkExamplesGallery
+            selectedModelHint={selectedModelKey || matched?.modelTitle || ''}
+            selectedBodyHint={selectedBody}
+            onInspectExample={(item) =>
+              recordCustomerFootprint(
+                `📸 Örnek Üstyapı İnceledi: ${item.title}`,
+                item.seriesLabel,
+                item.bodyTypeLabel
+              )
+            }
+          />
           <BodyStructureTab
             onSelectBody={(bodyId) => {
               setSelectedBody(bodyId);
@@ -5632,6 +5644,23 @@ IVECO ERC Samsun Otomotiv
 
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 📸 ŞASİ ÜZERİ ÖRNEK ÜSTYAPI (KASA) UYGULAMALARI GALERİSİ */}
+      {activeMainTab !== 'ust-yapi' && (
+        <div id="bodywork-examples-gallery" style={{ maxWidth: '1080px', margin: '0 auto 18px' }}>
+          <BodyworkExamplesGallery
+            selectedModelHint={selectedModelKey || matched?.modelTitle || ''}
+            selectedBodyHint={selectedBody}
+            onInspectExample={(item) =>
+              recordCustomerFootprint(
+                `📸 Örnek Üstyapı İnceledi: ${item.title}`,
+                item.seriesLabel,
+                item.bodyTypeLabel
+              )
+            }
+          />
         </div>
       )}
 

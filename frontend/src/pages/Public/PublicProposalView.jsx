@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { crmApi } from '../../api/client';
 import { openWhatsAppChat } from '../../utils/openExternal';
+import BodyworkExamplesGallery from '../../components/Portal/BodyworkExamplesGallery';
 import { 
   FiTruck, FiFileText, FiMapPin, FiPhoneCall, FiMessageSquare, 
   FiCheckCircle, FiShield, FiCalendar, FiUser, FiAlertCircle
@@ -240,6 +241,12 @@ export default function PublicProposalView() {
               </button>
             </div>
           </div>
+
+          {/* Şasi Üzerine Yapılabilecek Örnek Üstyapı (Kasa) Uygulamaları */}
+          <BodyworkExamplesGallery
+            selectedModelHint={proposal.vehicle_model || ''}
+            compact
+          />
         </div>
 
         {/* Kurumsal Alt Bilgi */}
