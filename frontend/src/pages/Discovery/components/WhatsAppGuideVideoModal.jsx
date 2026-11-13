@@ -9,7 +9,10 @@ import {
   FiX,
   FiImage,
   FiSmartphone,
-  FiLayers
+  FiLayers,
+  FiVolume2,
+  FiVolumeX,
+  FiMusic
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -39,6 +42,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 1 / 4 • CANLI BÜTÇE SÜRGÜSÜ',
         title: 'Peşinat veya Takas Tutarınızı Kaydırarak Seçin',
         subtitle: 'Form doldurmadan sürgüyü kaydırın; tüm araçların kalan kredisi anında düşsün.',
+        voiceover: 'Sürgüyü kaydırıp peşinat veya takas tutarınızı kolayca seçin.',
+        audioUrl: '/audio/wa-scenarios/kilavuz_1.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
@@ -46,6 +51,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 2 / 4 • 5 BANKA KREDİ KIYASLAMA',
         title: "'Kredi Planı'na Basıp 5 Bankayı Karşılaştırın",
         subtitle: '1 Milyon TL %0 faiz ve Kuveyt Türk 3-6 ay ödemesiz taksit tablolarını canlı açın.',
+        voiceover: 'Beş bankanın sıfır faizli ve ödemesiz taksitlerini anında karşılaştırın.',
+        audioUrl: '/audio/wa-scenarios/kilavuz_2.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
       },
@@ -53,6 +60,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 3 / 4 • KDV VERGİ KALKANI & MUHASEBE',
         title: '%20 KDV Avantajını Görün & Muhasebeye Atın',
         subtitle: 'Vergiden düşeceğiniz KDV tutarını görün, tek tuşla ortağınıza veya muhasebenize iletin.',
+        voiceover: 'Yüzde yirmi KDV vergi avantajınızı görüp muhasebenize gönderin.',
+        audioUrl: '/audio/wa-scenarios/kilavuz_3.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
@@ -60,6 +69,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 4 / 4 • ŞİMDİ KENDİ TELEFONUNUZDA DENEYİN',
         title: 'Aşağıdaki Linke Dokunun, Hesabınızı Canlı Yapın!',
         subtitle: 'Kayıt yok, bekleme yok! Linke tıklayıp 10 saniyede kendi ödeme planınızı oluşturun.',
+        voiceover: 'Aşağıdaki linke dokunun, kendi hesabınızı on saniyede canlı yapın!',
+        audioUrl: '/audio/wa-scenarios/kilavuz_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
       }
@@ -80,6 +91,8 @@ const VIDEO_SCENARIOS = [
         badge: 'TAKAS ADIM 1 / 4 • ARACINIZ PEŞİNAT OLSUN',
         title: 'Mevcut Aracınızın Değerini Sürgüden Seçin',
         subtitle: 'Cebinizden nakit çıkarmadan, elinizdeki aracın değerini peşinat olarak girin.',
+        voiceover: "Mevcut ticari aracınızı peşinata saydırıp sıfır İveco'ya geçin.",
+        audioUrl: '/audio/wa-scenarios/takas_1.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
@@ -87,6 +100,8 @@ const VIDEO_SCENARIOS = [
         badge: 'TAKAS ADIM 2 / 4 • SADECE FARKI KREDİLENDİRİN',
         title: 'Sıfır Araçtan Takas Düşer, Kalan Fark Çıkar!',
         subtitle: 'Örn: 2.390.000 TL araçtan 1.500.000 TL takas düşüldüğünde sadece 890.000 TL kalır.',
+        voiceover: 'Sıfır araçtan takas bedelini düşüp sadece kalan farkı ödeyin.',
+        audioUrl: '/audio/wa-scenarios/takas_2.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
@@ -94,6 +109,8 @@ const VIDEO_SCENARIOS = [
         badge: 'TAKAS ADIM 3 / 4 • 4 RESİMLE HIZLI EKSPERTİZ',
         title: "Kalan Farka %0 Faiz + 4 Resimle Ekspertiz",
         subtitle: 'Aracınızın dış, iç, KM ve ruhsat fotoğrafını seçip WhatsApp üzerinden fiyat alın.',
+        voiceover: 'Kalan farka sıfır faiz kullanın, dört fotoğrafla ekspertiz alın.',
+        audioUrl: '/audio/wa-scenarios/takas_3.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
       },
@@ -101,6 +118,8 @@ const VIDEO_SCENARIOS = [
         badge: 'TAKAS ADIM 4 / 4 • CANLI TAKAS SİMÜLATÖRÜ',
         title: 'Kendi Aracınızla Üste Ne Çıkıyor Hemen Görün!',
         subtitle: 'Aşağıdaki linke dokunun, takas sürgüsüyle kendi fark taksitinizi 10 saniyede hesaplayın.',
+        voiceover: 'Aşağıdaki linke tıklayın, aracınızın takas farkını hemen hesaplayın!',
+        audioUrl: '/audio/wa-scenarios/takas_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
       }
@@ -121,6 +140,8 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 1 / 4 • NAKİT AKIŞINIZI KORUYUN',
         title: 'Aracı Şimdi Alın, İlk Taksiti 3-6 Ay Sonra Ödeyin!',
         subtitle: 'Araç hemen para kazanmaya başlasın; ödemeniz 3 veya 6 ay sonra başlasın.',
+        voiceover: 'Aracınızı bugün işe koşun, ilk taksiti altı ay sonra ödeyin!',
+        audioUrl: '/audio/wa-scenarios/odemesiz_1.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
       },
@@ -128,6 +149,8 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 2 / 4 • KUVEYT TÜRK 1M - 5M TL PAKETİ',
         title: '5 Milyon TL’ye Kadar 3 ve 6 Ay Ödemesiz Kredi',
         subtitle: 'Kuveyt Türk Katılım Finansmanı ile 6 aydan 36 aya kadar esnek vade tablosu.',
+        voiceover: "Kuveyt Türk'te beş milyon liraya kadar ödemesiz krediyi inceleyin.",
+        audioUrl: '/audio/wa-scenarios/odemesiz_2.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
@@ -135,6 +158,8 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 3 / 4 • 4 BANKADA 1 MİLYON TL %0 FAİZ',
         title: 'Garanti, Akbank, İş Bankası ve Yapı Kredi Tablosu',
         subtitle: '1.000.000 TL 6 Ay %0 Faiz (166.667 TL/Ay) veya 2M - 3M TL ticari kredi paketleri.',
+        voiceover: 'Dört büyük bankada bir milyon lira sıfır faiz fırsatını görün.',
+        audioUrl: '/audio/wa-scenarios/odemesiz_3.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
@@ -142,6 +167,8 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 4 / 4 • TÜM BANKALAR TEK EKRANDA',
         title: 'Şubeye Gitmeden 5 Bankayı Telefonunuzda Kıyaslayın!',
         subtitle: 'Aşağıdaki linke tıklayın, istediğiniz kredi tutarını seçip taksitleri canlı görün.',
+        voiceover: 'Şubeye gitmeden beş bankayı kıyaslamak için aşağıdaki linke dokunun!',
+        audioUrl: '/audio/wa-scenarios/odemesiz_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
       }
@@ -162,6 +189,8 @@ const VIDEO_SCENARIOS = [
         badge: 'MUHASEBE 1 / 4 • YIL SONU VERGİ KALKANI',
         title: 'Hangi Araçta Ne Kadar KDV Vergiden Düşüyor?',
         subtitle: 'Katalogdaki her aracın üzerinde indirilebilir %20 KDV tutarı kuruşu kuruşuna yazar.',
+        voiceover: 'Vergi ödemek yerine yüzde yirmi KDV avantajıyla filonuzu yenileyin.',
+        audioUrl: '/audio/wa-scenarios/kdv_1.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
@@ -169,6 +198,8 @@ const VIDEO_SCENARIOS = [
         badge: 'MUHASEBE 2 / 4 • 260.000 TL’YE VARAN NAKİT İNDİRİMİ',
         title: '35C’de 110 Bin TL, 70C’de 260 Bin TL Peşin İndirimi!',
         subtitle: 'Kredili kampanya fiyatı ile net nakit indirimli fiyatı aynı kartta şeffaf görün.',
+        voiceover: 'Daily serisinde iki yüz altmış bin lira nakit indirimini yakalayın.',
+        audioUrl: '/audio/wa-scenarios/kdv_2.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
       },
@@ -176,6 +207,8 @@ const VIDEO_SCENARIOS = [
         badge: 'MUHASEBE 3 / 4 • TEK TUŞLA ORTAĞA / MUHASEBEYE ATIN',
         title: "'Ortağa / Muhasebeye Gönder' Tuşuna Dokunun",
         subtitle: 'Aracın net fiyatını, KDV kalkanını ve kredi taksitini tek tıkla mali müşavirinize iletin.',
+        voiceover: 'Tek tuşla araç ve KDV özetini mali müşavirinize gönderin.',
+        audioUrl: '/audio/wa-scenarios/kdv_3.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
@@ -183,6 +216,8 @@ const VIDEO_SCENARIOS = [
         badge: 'MUHASEBE 4 / 4 • ŞİRKETİNİZ İÇİN CANLI HESAPLAYIN',
         title: 'Aşağıdaki Linkten KDV ve Nakit Tablosunu Açın!',
         subtitle: 'Hemen linke dokunun, yıl sonu vergi avantajınızı kendi telefonunuzda inceleyin.',
+        voiceover: 'Şirketinize özel vergi ve indirim tablosu için linke tıklayın!',
+        audioUrl: '/audio/wa-scenarios/kdv_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
       }
@@ -203,6 +238,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ŞASİ SEÇİMİ 1 / 4 • B EHLİYET & TAKOGRAF MUAFİYETİ',
         title: 'Daily 35C16: B Ehliyetle Kullanılan Çift Teker Gücü',
         subtitle: 'Takograf muafiyetli, B sınıfı ehliyetle şehir içi dağıtım için 2.390.000 TL net peşin.',
+        voiceover: 'B ehliyetle kullanılan takograf muafiyetli Daily otuz beş C mi?',
+        audioUrl: '/audio/wa-scenarios/kantar_1.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
       },
@@ -210,6 +247,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ŞASİ SEÇİMİ 2 / 4 • 4.8 TON RESMİ KANTAR KAPASİTESİ',
         title: 'Daily 70C16 & 70C18: 4.8 Ton Yük & 260 Bin İndirim!',
         subtitle: '10-12 Euro Palet kapasiteli ağır şasi; 260.000 TL nakit indirimiyle 2.420.000 TL net peşin.',
+        voiceover: 'Yoksa beş tona yakın yük taşıyan indirimli yetmiş C mi?',
+        audioUrl: '/audio/wa-scenarios/kantar_2.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
@@ -217,6 +256,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ŞASİ SEÇİMİ 3 / 4 • EUROCARGO & S-WAY / T-WAY FİLO',
         title: '3.5 Tondan 40 Ton Çekiciye Tüm 2026 Fiyatları',
         subtitle: 'Frigo, tente, sac kasa, kurtarıcı veya damper; işinize uygun şasiyi tek tıkla süzün.',
+        voiceover: 'Üç buçuk tondan kırk tona tüm şasi fiyatlarını inceleyin.',
+        audioUrl: '/audio/wa-scenarios/kantar_3.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
@@ -224,6 +265,8 @@ const VIDEO_SCENARIOS = [
         badge: 'ŞASİ SEÇİMİ 4 / 4 • KENDİ ŞASİNİZİ KARŞILAŞTIRIN',
         title: 'Aşağıdaki Linke Dokunun, Şasi ve Fiyatları Kıyaslayın!',
         subtitle: '3750, 4100 ve 4750 şasi fiyat farklarını ve kredi tablosunu canlı inceleyin.',
+        voiceover: 'Aşağıdaki linke dokunun, işinize en uygun şasiyi canlı karşılaştırın!',
+        audioUrl: '/audio/wa-scenarios/kantar_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
       }
@@ -255,6 +298,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   const canvasRef = useRef(null);
   const animFrameRef = useRef(null);
   const startTimeRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const audioBufferCacheRef = useRef({});
+  const activePreviewSourceRef = useRef(null);
+  const lastSpokenStepRef = useRef(-1);
 
   const [scenarioIdx, setScenarioIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -262,6 +309,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordProgress, setRecordProgress] = useState(0);
   const [copiedCaption, setCopiedCaption] = useState(false);
+  const [voiceMode, setVoiceMode] = useState('female_studio'); // 'female_studio' | 'male_warm' | 'muted'
+  const [bgMusicEnabled, setBgMusicEnabled] = useState(true);
+  const [liveAudioPreview, setLiveAudioPreview] = useState(false);
 
   const currentScenario = VIDEO_SCENARIOS[scenarioIdx] || VIDEO_SCENARIOS[0];
 
@@ -1097,6 +1147,210 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ctx.textAlign = 'left';
   };
 
+  // ── WEB AUDIO API: YAPAY ZEKA SPİKER & KURUMSAL FON MÜZİĞİ MOTORU ──────────
+  const getAudioContext = () => {
+    if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      audioCtxRef.current = new AudioCtx();
+    }
+    if (audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+    return audioCtxRef.current;
+  };
+
+  const loadStepAudioBuffer = async (audioUrl) => {
+    if (!audioUrl) return null;
+    if (audioBufferCacheRef.current[audioUrl]) {
+      return audioBufferCacheRef.current[audioUrl];
+    }
+    try {
+      const ctx = getAudioContext();
+      const res = await fetch(audioUrl);
+      if (!res.ok) return null;
+      const arrBuf = await res.arrayBuffer();
+      const decoded = await ctx.decodeAudioData(arrBuf);
+      audioBufferCacheRef.current[audioUrl] = decoded;
+      return decoded;
+    } catch (err) {
+      console.warn('Voiceover yüklenemedi:', audioUrl, err);
+      return null;
+    }
+  };
+
+  // Seçili senaryonun 4 sahne sesini önceden belleğe yükle
+  useEffect(() => {
+    if (!isOpen) return;
+    currentScenario.steps.forEach((st) => {
+      if (st.audioUrl) loadStepAudioBuffer(st.audioUrl);
+    });
+  }, [isOpen, scenarioIdx]);
+
+  // Modal kapanınca aktif sesleri durdur
+  useEffect(() => {
+    if (!isOpen && activePreviewSourceRef.current) {
+      try {
+        activePreviewSourceRef.current.stop();
+      } catch (_) {}
+      activePreviewSourceRef.current = null;
+      setLiveAudioPreview(false);
+    }
+  }, [isOpen]);
+
+  // Tek bir sahnenin yapay zeka spiker sesini stüdyo EQ profiliyle çal / zamanla
+  const scheduleVoiceClip = (ctx, destination, buffer, startAtTime, mode = voiceMode) => {
+    if (!buffer || mode === 'muted') return null;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    // Her sahne 4.0 saniye olduğu için konuşmanın 3.68 saniye içinde net bitmesini garantile
+    const maxAllowedSec = 3.68;
+    const baseRate = mode === 'male_warm' ? 1.22 : 1.14;
+    const rate = Math.max(baseRate, buffer.duration / maxAllowedSec);
+    source.playbackRate.setValueAtTime(rate, startAtTime);
+
+    if (mode === 'male_warm') {
+      // Tok kurumsal spiker tonu için -230 cent rezonans
+      source.detune.setValueAtTime(-230, startAtTime);
+    }
+
+    // Stüdyo EQ filtresi (telefon hoparlöründe netlik + tok gövde)
+    const bassFilter = ctx.createBiquadFilter();
+    bassFilter.type = 'lowshelf';
+    bassFilter.frequency.setValueAtTime(160, startAtTime);
+    bassFilter.gain.setValueAtTime(mode === 'male_warm' ? 5.5 : 2.5, startAtTime);
+
+    const presenceFilter = ctx.createBiquadFilter();
+    presenceFilter.type = 'peaking';
+    presenceFilter.frequency.setValueAtTime(3100, startAtTime);
+    presenceFilter.Q.setValueAtTime(1.0, startAtTime);
+    presenceFilter.gain.setValueAtTime(3.2, startAtTime);
+
+    const voiceGain = ctx.createGain();
+    voiceGain.gain.setValueAtTime(1.05, startAtTime);
+
+    source.connect(bassFilter);
+    bassFilter.connect(presenceFilter);
+    presenceFilter.connect(voiceGain);
+    voiceGain.connect(destination);
+
+    source.start(startAtTime);
+    return source;
+  };
+
+  // Sahne geçişlerinde hafif modern kurumsal chime + 16 sn arka plan ritmi
+  const scheduleTransitionChime = (ctx, destination, startAtTime, stepIdx = 0) => {
+    if (!bgMusicEnabled) return;
+    const freqs = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+    const f1 = freqs[stepIdx % freqs.length];
+    const f2 = f1 * 1.25;
+
+    [f1, f2].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startAtTime + i * 0.055);
+
+      gain.gain.setValueAtTime(0.0001, startAtTime + i * 0.055);
+      gain.gain.exponentialRampToValueAtTime(0.045, startAtTime + i * 0.055 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startAtTime + i * 0.055 + 0.42);
+
+      osc.connect(gain);
+      gain.connect(destination);
+      osc.start(startAtTime + i * 0.055);
+      osc.stop(startAtTime + i * 0.055 + 0.45);
+    });
+  };
+
+  const scheduleCorporateBackgroundBed = (ctx, destination, startAtTime, totalSec = DURATION_SEC) => {
+    if (!bgMusicEnabled) return [];
+    const nodes = [];
+    // 4 sahne için sıcak kurumsal akor yürüyüşü (Am9 -> Fmaj7 -> Cmaj7 -> G6)
+    const chords = [
+      [110.0, 164.81, 220.0, 261.63],
+      [87.31, 130.81, 174.61, 220.0],
+      [130.81, 196.0, 246.94, 329.63],
+      [98.0, 146.83, 196.0, 246.94]
+    ];
+
+    for (let s = 0; s < 4; s++) {
+      const sceneStart = startAtTime + s * 4;
+      scheduleTransitionChime(ctx, destination, sceneStart + 0.02, s);
+
+      const chord = chords[s];
+      chord.forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, sceneStart);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(520, sceneStart);
+
+        gain.gain.setValueAtTime(0.0001, sceneStart);
+        gain.gain.linearRampToValueAtTime(0.016, sceneStart + 0.35);
+        gain.gain.setValueAtTime(0.014, sceneStart + 3.5);
+        gain.gain.linearRampToValueAtTime(0.0001, sceneStart + 3.98);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(destination);
+
+        osc.start(sceneStart);
+        osc.stop(sceneStart + 4.0);
+        nodes.push(osc);
+      });
+
+      // Hafif kurumsal tempo nabzı (her saniye yumuşak bas vuruşu)
+      for (let beat = 0; beat < 4; beat++) {
+        const bTime = sceneStart + beat * 1.0;
+        if (bTime >= startAtTime + totalSec) break;
+        const pulseOsc = ctx.createOscillator();
+        const pulseGain = ctx.createGain();
+        pulseOsc.type = 'sine';
+        pulseOsc.frequency.setValueAtTime(110, bTime);
+        pulseOsc.frequency.exponentialRampToValueAtTime(52, bTime + 0.14);
+
+        pulseGain.gain.setValueAtTime(0.0001, bTime);
+        pulseGain.gain.linearRampToValueAtTime(0.032, bTime + 0.015);
+        pulseGain.gain.exponentialRampToValueAtTime(0.0001, bTime + 0.18);
+
+        pulseOsc.connect(pulseGain);
+        pulseGain.connect(destination);
+        pulseOsc.start(bTime);
+        pulseOsc.stop(bTime + 0.2);
+        nodes.push(pulseOsc);
+      }
+    }
+    return nodes;
+  };
+
+  // Tek bir sahneyi canlı önizlemede seslendir
+  const playSingleStepPreview = async (stepIdx) => {
+    try {
+      const ctx = getAudioContext();
+      if (activePreviewSourceRef.current) {
+        try {
+          activePreviewSourceRef.current.stop();
+        } catch (_) {}
+        activePreviewSourceRef.current = null;
+      }
+      const st = currentScenario.steps[stepIdx];
+      if (!st) return;
+      scheduleTransitionChime(ctx, ctx.destination, ctx.currentTime + 0.01, stepIdx);
+      if (voiceMode !== 'muted' && st.audioUrl) {
+        const buf = await loadStepAudioBuffer(st.audioUrl);
+        if (buf) {
+          activePreviewSourceRef.current = scheduleVoiceClip(ctx, ctx.destination, buf, ctx.currentTime + 0.08, voiceMode);
+        }
+      }
+    } catch (e) {
+      console.warn('Önizleme sesi çalınamadı:', e);
+    }
+  };
+
   // Canlı Önizleme Döngüsü
   useEffect(() => {
     if (!isOpen || isRecording) return;
@@ -1114,6 +1368,11 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
     const tick = (now) => {
       const elapsedSec = ((now - startTimeRef.current) / 1000) % DURATION_SEC;
+      const stepNow = Math.min(3, Math.floor(elapsedSec / 4));
+      if (liveAudioPreview && stepNow !== lastSpokenStepRef.current) {
+        lastSpokenStepRef.current = stepNow;
+        playSingleStepPreview(stepNow);
+      }
       setCurrentTime(elapsedSec);
       renderFrame(ctx, elapsedSec, currentScenario);
       animFrameRef.current = requestAnimationFrame(tick);
@@ -1123,9 +1382,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isOpen, isPlaying, isRecording, scenarioIdx]);
+  }, [isOpen, isPlaying, isRecording, scenarioIdx, liveAudioPreview, voiceMode, bgMusicEnabled]);
 
-  // Tek Tuşla 16 Saniyelik Video Kaydet & İndir
+  // Tek Tuşla 16 Saniyelik Yapay Zeka Seslendirmeli Video Kaydet & İndir
   const handleDownloadVideo = async () => {
     const canvas = canvasRef.current;
     if (!canvas || isRecording) return;
@@ -1135,25 +1394,81 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       return;
     }
 
+    if (activePreviewSourceRef.current) {
+      try {
+        activePreviewSourceRef.current.stop();
+      } catch (_) {}
+      activePreviewSourceRef.current = null;
+    }
+
     setIsPlaying(false);
     setIsRecording(true);
     setRecordProgress(0);
 
     const ctx = canvas.getContext('2d');
-    const stream = canvas.captureStream(FPS);
+    const videoStream = canvas.captureStream(FPS);
+
+    // Web Audio API üzerinden AI Spiker + Kurumsal Fon Müziği kanalını hazırla
+    let combinedStream = videoStream;
+    let scheduledNodes = [];
+    const includeAudio = voiceMode !== 'muted' || bgMusicEnabled;
+
+    if (includeAudio) {
+      try {
+        const audioCtx = getAudioContext();
+        const audioDest = audioCtx.createMediaStreamDestination();
+
+        // Kayıt sırasında kullanıcının da kısık sesle duyması için monitör çıkışı
+        const monitorGain = audioCtx.createGain();
+        monitorGain.gain.value = 0.5;
+        monitorGain.connect(audioCtx.destination);
+
+        const masterMix = audioCtx.createGain();
+        masterMix.gain.value = 1.0;
+        masterMix.connect(audioDest);
+        masterMix.connect(monitorGain);
+
+        // 4 sahnenin ses dosyalarını belleğe hazırla
+        const stepBuffers = await Promise.all(
+          currentScenario.steps.map(st => (voiceMode !== 'muted' ? loadStepAudioBuffer(st.audioUrl) : Promise.resolve(null)))
+        );
+
+        const baseAudioTime = audioCtx.currentTime + 0.08;
+        if (bgMusicEnabled) {
+          const bgNodes = scheduleCorporateBackgroundBed(audioCtx, masterMix, baseAudioTime, DURATION_SEC);
+          scheduledNodes.push(...bgNodes);
+        }
+
+        stepBuffers.forEach((buf, idx) => {
+          if (buf && voiceMode !== 'muted') {
+            const clipStart = baseAudioTime + idx * 4 + 0.12;
+            const srcNode = scheduleVoiceClip(audioCtx, masterMix, buf, clipStart, voiceMode);
+            if (srcNode) scheduledNodes.push(srcNode);
+          }
+        });
+
+        const audioTracks = audioDest.stream.getAudioTracks();
+        if (audioTracks.length > 0) {
+          combinedStream = new MediaStream([...videoStream.getVideoTracks(), ...audioTracks]);
+        }
+      } catch (audioErr) {
+        console.warn('Ses kanalı birleştirilemedi, sadece görüntü kaydediliyor:', audioErr);
+      }
+    }
 
     const mimeTypes = [
+      'video/mp4;codecs=avc1,mp4a.40.2',
       'video/mp4;codecs=avc1',
       'video/mp4',
-      'video/webm;codecs=vp9',
-      'video/webm;codecs=vp8',
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
       'video/webm'
     ];
     const selectedMime = mimeTypes.find(m => window.MediaRecorder.isTypeSupported(m)) || 'video/webm';
     const ext = selectedMime.includes('mp4') ? 'mp4' : 'webm';
 
     const chunks = [];
-    const recorder = new window.MediaRecorder(stream, {
+    const recorder = new window.MediaRecorder(combinedStream, {
       mimeType: selectedMime,
       videoBitsPerSecond: 6000000
     });
@@ -1163,31 +1478,41 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     };
 
     recorder.onstop = () => {
+      scheduledNodes.forEach(n => {
+        try {
+          n.stop();
+        } catch (_) {}
+      });
       const blob = new Blob(chunks, { type: selectedMime });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `IVECO_WA_Durum_${currentScenario.id}_${new Date().toISOString().slice(0, 10)}.${ext}`;
+      const audioTag = voiceMode === 'muted' ? 'Sessiz' : 'AI_Sesli';
+      a.download = `IVECO_WA_Durum_${currentScenario.id}_${audioTag}_${new Date().toISOString().slice(0, 10)}.${ext}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       setIsRecording(false);
       setIsPlaying(true);
-      toast.success(`🎬 "${currentScenario.shortTitle}" videosu indirildi!`);
+      toast.success(`🎬 "${currentScenario.shortTitle}" (${voiceMode === 'muted' ? 'Sessiz' : 'Yapay Zeka Seslendirmeli'}) videosu indirildi!`);
     };
 
     recorder.start();
 
-    const totalFrames = DURATION_SEC * FPS;
-    for (let f = 0; f < totalFrames; f++) {
-      const tSec = f / FPS;
-      renderFrame(ctx, tSec, currentScenario);
-      setCurrentTime(tSec);
-      setRecordProgress(Math.round(((f + 1) / totalFrames) * 100));
+    // Gerçek zamanlı saat ile görüntü ve sesi milisaniyesi milisaniyesine senkronize kaydet
+    const startWallMs = performance.now();
+    while (true) {
+      const elapsedSec = (performance.now() - startWallMs) / 1000;
+      if (elapsedSec >= DURATION_SEC) break;
+      renderFrame(ctx, elapsedSec, currentScenario);
+      setCurrentTime(elapsedSec);
+      setRecordProgress(Math.min(99, Math.round((elapsedSec / DURATION_SEC) * 100)));
       await new Promise(r => setTimeout(r, 1000 / FPS));
     }
 
+    renderFrame(ctx, DURATION_SEC - 0.01, currentScenario);
+    setRecordProgress(100);
     recorder.stop();
   };
 
@@ -1264,10 +1589,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.18rem', fontWeight: 800 }}>
-                🎬 5 Akılcı Senaryolu WhatsApp Durum Video & Kılavuz Stüdyosu
+                🎬 5 Akılcı Senaryolu & Yapay Zeka Seslendirmeli WhatsApp Durum Stüdyosu
               </h2>
               <p style={{ margin: 0, fontSize: '0.79rem', color: 'var(--text-secondary)' }}>
-                Her gün farklı bir müşteri ihtiyacına (Genel Kılavuz, Takas, 3-6 Ay Ödemesiz, %20 KDV, 35C vs 70C) odaklanan geçişli video ve takip linki
+                Her senaryoya özel Türkçe Yapay Zeka Spiker Sesi, hafif kurumsal fon müziği ve Android uyumlu takip linki
               </p>
             </div>
           </div>
@@ -1308,6 +1633,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                 onClick={() => {
                   setScenarioIdx(idx);
                   setCurrentTime(0);
+                  lastSpokenStepRef.current = -1;
                   setIsPlaying(true);
                   setCopiedCaption(false);
                 }}
@@ -1361,7 +1687,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '6px', marginTop: '10px', width: '100%', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '6px', marginTop: '10px', width: '100%', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => setIsPlaying(p => !p)}
@@ -1371,17 +1697,55 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                   color: 'var(--text-primary)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '8px',
-                  padding: '6px 12px',
-                  fontSize: '0.78rem',
+                  padding: '6px 10px',
+                  fontSize: '0.76rem',
                   fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                {isPlaying ? <FiPause size={13} /> : <FiPlay size={13} />}
+                {isPlaying ? 'Duraklat' : 'Oynat'}
+              </button>
+
+              <button
+                type="button"
+                disabled={isRecording}
+                onClick={() => {
+                  const nextState = !liveAudioPreview;
+                  setLiveAudioPreview(nextState);
+                  if (nextState) {
+                    if (voiceMode === 'muted') setVoiceMode('female_studio');
+                    lastSpokenStepRef.current = -1;
+                    setCurrentTime(0);
+                    startTimeRef.current = performance.now();
+                    setIsPlaying(true);
+                    toast.success('🔊 Sesli önizleme açıldı! Sahne geçişlerinde AI spiker konuşacak.');
+                  } else if (activePreviewSourceRef.current) {
+                    try {
+                      activePreviewSourceRef.current.stop();
+                    } catch (_) {}
+                    activePreviewSourceRef.current = null;
+                  }
+                }}
+                style={{
+                  background: liveAudioPreview ? 'rgba(16, 185, 129, 0.22)' : 'var(--bg-secondary)',
+                  color: liveAudioPreview ? '#34d399' : 'var(--text-primary)',
+                  border: liveAudioPreview ? '1.5px solid #10b981' : '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  padding: '6px 10px',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '5px'
                 }}
               >
-                {isPlaying ? <FiPause size={13} /> : <FiPlay size={13} />}
-                {isPlaying ? 'Duraklat' : 'Oynat'}
+                {liveAudioPreview ? <FiVolume2 size={14} /> : <FiVolumeX size={14} />}
+                {liveAudioPreview ? '🔊 Ses Açık' : '🔈 Sesli Dinle'}
               </button>
 
               {[0, 1, 2, 3].map(idx => (
@@ -1396,43 +1760,116 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                     if (canvasRef.current) {
                       renderFrame(canvasRef.current.getContext('2d'), targetT, currentScenario);
                     }
+                    playSingleStepPreview(idx);
                   }}
                   style={{
                     background: activeStepIdx === idx ? 'var(--accent-blue)' : 'var(--bg-secondary)',
                     color: activeStepIdx === idx ? '#fff' : 'var(--text-secondary)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
-                    padding: '6px 10px',
-                    fontSize: '0.75rem',
+                    padding: '6px 8px',
+                    fontSize: '0.73rem',
                     fontWeight: 700,
                     cursor: 'pointer'
                   }}
                 >
-                  Sahne {idx + 1}
+                  S{idx + 1}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* SAĞ: Seçili Senaryo Akışı, Video İndirme & WhatsApp Alt Metni */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {/* SAĞ: Yapay Zeka Ses Ayarları, Senaryo Akışı, Video İndirme & WhatsApp Alt Metni */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* 🎙️ YAPAY ZEKA SESLENDİRME & FON MÜZİĞİ SEÇİCİ */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              borderRadius: '12px',
+              padding: '11px 14px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#34d399', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <FiVolume2 size={15} />
+                  Yapay Zeka Spiker Sesi:
+                </span>
+
+                {[
+                  { id: 'female_studio', label: '👩 Kurumsal Kadın AI (Net Ton)' },
+                  { id: 'male_warm', label: '👨 Tok Kurumsal AI (Derin Ton)' },
+                  { id: 'muted', label: '🔇 Spiker Kapalı' }
+                ].map(opt => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    disabled={isRecording}
+                    onClick={() => {
+                      setVoiceMode(opt.id);
+                      if (opt.id !== 'muted') {
+                        setTimeout(() => playSingleStepPreview(activeStepIdx), 60);
+                      }
+                    }}
+                    style={{
+                      background: voiceMode === opt.id ? '#10b981' : 'var(--bg-card)',
+                      color: voiceMode === opt.id ? '#052e16' : 'var(--text-secondary)',
+                      border: voiceMode === opt.id ? '1px solid #34d399' : '1px solid var(--border-color)',
+                      borderRadius: '7px',
+                      padding: '5px 10px',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                disabled={isRecording}
+                onClick={() => setBgMusicEnabled(b => !b)}
+                style={{
+                  background: bgMusicEnabled ? 'rgba(59, 130, 246, 0.2)' : 'var(--bg-card)',
+                  color: bgMusicEnabled ? '#60a5fa' : 'var(--text-muted)',
+                  border: bgMusicEnabled ? '1px solid rgba(59, 130, 246, 0.5)' : '1px solid var(--border-color)',
+                  borderRadius: '7px',
+                  padding: '5px 10px',
+                  fontSize: '0.73rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                <FiMusic size={13} />
+                {bgMusicEnabled ? '🎵 Kurumsal Fon & Geçiş Sesi: Açık' : '🎵 Fon Sesi: Kapalı'}
+              </button>
+            </div>
+
             <div style={{
               background: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
               borderRadius: '12px',
-              padding: '13px 16px'
+              padding: '12px 15px'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '9px' }}>
-                <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ fontSize: '0.83rem', fontWeight: 800, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <FiLayers style={{ color: '#10b981' }} />
-                  {currentScenario.shortTitle} — 4 Sahnelik Geçiş Planı:
+                  {currentScenario.shortTitle} — 4 Sahne & Spiker Metni (Dinlemek İçin Sahneye Tıklayın):
                 </div>
-                <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>
-                  Takip Kodu: {currentScenario.refCode}
+                <span style={{ fontSize: '0.71rem', color: '#34d399', fontWeight: 700 }}>
+                  Takip: {currentScenario.refCode}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {currentScenario.steps.map((st, idx) => (
                   <div
                     key={idx}
@@ -1443,18 +1880,24 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
                       if (canvasRef.current) {
                         renderFrame(canvasRef.current.getContext('2d'), targetT, currentScenario);
                       }
+                      playSingleStepPreview(idx);
                     }}
                     style={{
                       background: activeStepIdx === idx ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-card)',
                       border: activeStepIdx === idx ? `1px solid ${st.accent}` : '1px solid var(--border-color)',
                       borderRadius: '8px',
-                      padding: '8px 12px',
+                      padding: '7px 11px',
                       cursor: 'pointer'
                     }}
                   >
-                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: st.accent }}>{st.badge}</div>
-                    <div style={{ fontSize: '0.83rem', fontWeight: 700, color: 'var(--text-heading)' }}>{st.title}</div>
-                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>{st.subtitle}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: st.accent }}>{st.badge}</span>
+                      <span style={{ fontSize: '0.68rem', color: '#34d399', fontWeight: 700 }}>🔊 Dinle</span>
+                    </div>
+                    <div style={{ fontSize: '0.81rem', fontWeight: 700, color: 'var(--text-heading)' }}>{st.title}</div>
+                    <div style={{ fontSize: '0.74rem', color: '#a7f3d0', fontStyle: 'italic', marginTop: '2px' }}>
+                      🎙️ "{st.voiceover}"
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1488,8 +1931,8 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
               >
                 <FiDownload size={18} />
                 {isRecording
-                  ? `⏳ Video Hazırlanıyor (%${recordProgress})...`
-                  : `🎬 "${currentScenario.shortTitle}" Videosunu İndir`}
+                  ? `⏳ Sesli Video Kaydediliyor (%${recordProgress})...`
+                  : `🎬 "${currentScenario.shortTitle}" (${voiceMode === 'muted' ? 'Sessiz' : 'AI Sesli'}) İndir`}
               </button>
 
               <button
