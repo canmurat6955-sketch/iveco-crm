@@ -827,6 +827,23 @@ export default function OfficeQuickAssistantDrawer() {
                         `*Satış Sorumlusu Can Murat — IVECO ERC Samsun Otomotiv*\n📞 *0544 622 59 31*`
                     },
                     {
+                      id: 'fb_grup',
+                      badge: '📘 2B. Facebook Kamyoncu, Nakliyeci & Ticari Araç Grupları',
+                      color: '#1877F2',
+                      link: `${origin}/fiyat-listesi?ref=fb_grup`,
+                      desc: 'Facebook gruplarından tıklayanlar Niyet Radarına "📘 Facebook Grubu Ziyaretçisi" olarak düşer.',
+                      text:
+                        `🚛 Gruptaki tüm kamyoncu, nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, kazasız belasız seferler dilerim!\n\n` +
+                        `IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz 2026 Canlı Şasi Fiyat, Takas & Kredi Ekranımızı açtık:\n\n` +
+                        `✅ Ehliyet & Tonaja Göre Şasi Seçimi: Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici ve T-Way,\n` +
+                        `🏗️ 24 Gerçek Üstyapı Örneği Galerisi: Şasi üzerine tente, kapalı kasa, frigo, damper, vinç ve oto kurtarıcı uygulama örnekleri,\n` +
+                        `🔄 Canlı Takas + Kredi Hesabı: Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz ile aylık taksitinizi anında görün,\n` +
+                        `📸 4 Resimle 15 Dk'da Takas: Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
+                        `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n` +
+                        `👇 Hemen incelemek ve kendi hesabınızı yapmak için tıklayın:\n\n` +
+                        `${origin}/fiyat-listesi?ref=fb_grup`
+                    },
+                    {
                       id: 'wa_durum',
                       badge: '🟢 3. WhatsApp Durum (Status) — En Güçlü Kanca',
                       color: '#22c55e',

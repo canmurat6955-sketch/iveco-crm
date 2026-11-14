@@ -50,6 +50,10 @@ const SOURCE_META = {
   wa_durum_kdv: { label: 'WA Durum (%20 KDV & İndirim)', short: '📲 WA Durum (KDV)', color: '#34d399', bg: 'rgba(16, 185, 129, 0.16)', border: 'rgba(16, 185, 129, 0.35)' },
   wa_durum_kantar: { label: 'WA Durum (35C vs 70C Kantar)', short: '📲 WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
   wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: '👥 WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
+  fb_grup: { label: 'Facebook Kamyoncu / Nakliye Grubu', short: '📘 Facebook Grubu', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
+  facebook: { label: 'Facebook Paylaşım Linki', short: '📘 Facebook', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
+  instagram: { label: 'Instagram Biyografi / Hikaye / Reels', short: '📸 Instagram', color: '#f472b6', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(236, 72, 153, 0.4)' },
+  linkedin: { label: 'LinkedIn Kurumsal Filo Paylaşımı', short: '💼 LinkedIn', color: '#38bdf8', bg: 'rgba(14, 165, 233, 0.16)', border: 'rgba(14, 165, 233, 0.4)' },
   wa_musteri: { label: 'WhatsApp Müşteri Linki', short: '💬 WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   wa_ozel: { label: 'WhatsApp Özel Teklif Linki', short: '👑 Özel Teklif Linki', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   public_pricing_catalog: { label: '2026 Dijital Fiyat Kataloğu', short: '📘 Fiyat Kataloğu Linki', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
@@ -68,6 +72,15 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
     return { label: 'Özel Kampanya / Oda Protokol Linki', short: '🏛️ Özel Kampanya / Oda Linki', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.4)' };
   }
   if (source && SOURCE_META[source]) return SOURCE_META[source];
+  if (combined.includes('fb_grup') || combined.includes('facebook grubu') || combined.includes('facebook')) {
+    return SOURCE_META.fb_grup;
+  }
+  if (combined.includes('instagram') || combined.includes('reels')) {
+    return SOURCE_META.instagram;
+  }
+  if (combined.includes('linkedin')) {
+    return SOURCE_META.linkedin;
+  }
   if (combined.includes('wa_durum_takas')) return SOURCE_META.wa_durum_takas;
   if (combined.includes('wa_durum_odemesiz')) return SOURCE_META.wa_durum_odemesiz;
   if (combined.includes('wa_durum_kdv')) return SOURCE_META.wa_durum_kdv;
@@ -126,6 +139,13 @@ function describeClickedLink(signal) {
     return {
       linkTitle: camp || 'Resmi Proforma Teklifi',
       linkSub: shortPath || '/p/teklif',
+      isPartner: false
+    };
+  }
+  if (lowerUrl.includes('ref=fb_grup') || signal.source === 'fb_grup') {
+    return {
+      linkTitle: companyInUrl ? `📘 Facebook Grubu: ${companyInUrl}` : '📘 Facebook Kamyoncu / Nakliye Grubu Linki',
+      linkSub: '/fiyat-listesi?ref=fb_grup',
       isPartner: false
     };
   }

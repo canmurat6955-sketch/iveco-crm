@@ -1452,6 +1452,8 @@ export default function PublicVehicleFinder() {
     if (activePartner && activePartner.id !== 'vip_ozel') {
       return `${activePartner.icon || '🏛️'} ${activePartner.shortName} Üyesi Ziyaretçisi`;
     }
+    if (code.includes('fb_grup')) return '📘 Facebook Grubu Ziyaretçisi';
+    if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
     if (code.includes('wa_grup') || code.includes('grup') || code.includes('nakliye')) return '🚚 Nakliye WhatsApp Grubu Ziyaretçisi';
     if (code.includes('wa_ozel') || code.includes('ozel')) return '👑 WhatsApp Özel Müşteri Ziyaretçisi';
     if (code.includes('wa_musteri') || code.includes('musteri')) return '💬 WhatsApp Müşteri Linki Ziyaretçisi';
@@ -1459,7 +1461,6 @@ export default function PublicVehicleFinder() {
     if (code.includes('linkedin')) return '💼 LinkedIn Ziyaretçisi';
     if (code.includes('wa_durum') || code.includes('durum')) return '🟢 WhatsApp Durum Ziyaretçisi';
     if (code.includes('wa_tanitim')) return '💬 WhatsApp Tanıtım Ziyaretçisi';
-    if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
     if (code.includes('sosyal')) return '📱 Sosyal Medya Ziyaretçisi';
     if (activePartner) {
       return `${activePartner.icon || '👑'} ${activePartner.shortName} Ziyaretçisi`;

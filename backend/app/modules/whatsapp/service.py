@@ -388,6 +388,8 @@ class WhatsAppService:
         src_lower = (source_channel or "").lower()
         if "wa_durum" in src_lower or "durum" in src_lower:
             channel_label = "🟢 WhatsApp Durum Paylaşımı"
+        elif "fb_grup" in src_lower or "facebook" in src_lower or "fb" in src_lower:
+            channel_label = "📘 Facebook Kamyoncu / Nakliye Grubu"
         elif "wa_grup" in src_lower or "grup" in src_lower or "nakliye" in src_lower:
             channel_label = "🚚 Nakliye WhatsApp Grubu"
         elif "wa_ozel" in src_lower or "crm_existing" in src_lower:

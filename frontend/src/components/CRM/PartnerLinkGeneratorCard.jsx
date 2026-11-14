@@ -61,6 +61,14 @@ const SOCIAL_CHANNELS = [
     color: '#eab308'
   },
   {
+    id: 'fb_grup',
+    label: '📘 Facebook Grupları',
+    shortDesc: 'Facebook kamyoncu, nakliyeci, esnaf ve alım-satım grupları için paylaşım linki',
+    refCode: 'fb_grup',
+    badgeText: '📘 Facebook Grubu Ziyaretçisi',
+    color: '#1877F2'
+  },
+  {
     id: 'instagram',
     label: '📸 Instagram',
     shortDesc: 'Biyografi (Bio), Hikaye (Link Etiketi) ve Reels paylaşım linki',
@@ -247,6 +255,15 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${link}`
         );
       }
+      if (selectedChannelId === 'fb_grup') {
+        const groupPrefix = vipCompanyName.trim() ? `📘 ${vipCompanyName.trim()} ailesine ` : 'Gruptaki tüm kamyoncu, nakliyeci ve esnaf abilerime/kardeşlerime ';
+        return (
+          `${groupPrefix}hayırlı işler, kazasız belasız seferler dilerim! 🚛🙏\n\n` +
+          `Kimseyi aramadan 10 saniyede elinizdeki aracın takas değerini düşüp, 2026 model sıfır IVECO şasi (Daily 3.5T, Daily 7T, Eurocargo, S-Way) için 1.000.000 TL %0 Faizle ayda kaç TL taksit çıkacağını ve 24 farklı gerçek üstyapı örneğini kendi ekranınızda görebileceğiniz canlı hesap cetvelimizi bıraktım${discountShortNote} 👇\n\n` +
+          `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun)\n\n` +
+          `${link}`
+        );
+      }
       if (selectedChannelId === 'instagram') {
         return (
           `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye kimseye sormayın, 10 saniyede kendiniz hesaplayın! 🚛👇\n\n` +
@@ -338,6 +355,22 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🔔 *Takastan Temiz 2. El Habercisi:* Sıfır bütçesini aşanlar kaydolsun, takasa temiz araç düştüğü an ilk size haber verelim!\n\n` +
         `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31*\n` +
         `👇 *Hemen incelemek ve hesap yapmak için tıklayın:*\n\n` +
+        `${link}`
+      );
+    }
+
+    if (selectedChannelId === 'fb_grup') {
+      const groupTitle = vipCompanyName.trim() ? `📘 ${vipCompanyName.trim()} üyelerine özel ` : '';
+      return (
+        `🚛 Gruptaki tüm kamyoncu, nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, bol kazançlar dilerim!\n\n` +
+        `${groupTitle}IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz 2026 Canlı Şasi Fiyat, Takas & Kredi Ekranımızı açtık:\n\n` +
+        discountLine +
+        `✅ Ehliyet & Tonaja Göre Şasi Seçimi: Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici ve T-Way,\n` +
+        `🏗️ 24 Gerçek Üstyapı Örneği Galerisi: Şasi üzerine tente, kapalı kasa, frigo, damper, vinç ve oto kurtarıcı uygulama örnekleri,\n` +
+        `🔄 Canlı Takas + Kredi Hesabı: Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya banka oranlarıyla aylık taksitinizi anında görün,\n` +
+        `📸 4 Resimle 15 Dk'da Takas: Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
+        `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n` +
+        `👇 Hemen incelemek ve kendi hesabınızı yapmak için tıklayın:\n\n` +
         `${link}`
       );
     }
@@ -518,7 +551,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 padding: '2px 8px',
                 borderRadius: '999px'
               }}>
-                WA Durum • WA Müşteri • Özel Müşteri • Instagram • LinkedIn • Dernek/SİMDER
+                WA Durum • WA Müşteri • Özel Müşteri • Facebook Grupları • Instagram • LinkedIn • Dernek/SİMDER
               </span>
             </div>
             <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
@@ -579,7 +612,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 gap: '6px'
               }}
             >
-              📲 1. WhatsApp (Durum / Müşteri / Özel) • Instagram • LinkedIn
+              📲 1. WhatsApp • Facebook Grupları • Instagram • LinkedIn
             </button>
             <button
               type="button"
@@ -607,7 +640,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
 
           {studioMode === 'channels' ? (
             /* =====================================================================
-               MOD 1: WHATSAPP DURUM / MÜŞTERİ / ÖZEL MÜŞTERİ / INSTAGRAM / LINKEDIN
+               MOD 1: WHATSAPP DURUM / MÜŞTERİ / ÖZEL MÜŞTERİ / FACEBOOK GRUPLARI / INSTAGRAM / LINKEDIN
                ===================================================================== */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* 1. Mecra Seçimi */}
@@ -617,7 +650,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 </div>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(6, 1fr)',
+                  gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(128px, 1fr))',
                   gap: '7px'
                 }}>
                   {SOCIAL_CHANNELS.map(ch => {
@@ -667,70 +700,102 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 borderRadius: '12px',
                 padding: '12px'
               }}>
-                {/* Sol Kutu: Müşteri / Firma Seçimi (Özellikle WhatsApp Özel Müşteri ve WhatsApp Müşteri için) */}
+                {/* Sol Kutu: Müşteri / Firma / Facebook Grubu Seçimi */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8' }}>
-                    👤 Müşteri / Firma Bilgisi {selectedChannelId === 'wa_ozel' ? '(Müşteriye Özel Açılış Başlığı)' : '(Opsiyonel - Doğrudan WA Gönderimi İçin)'}:
+                    {selectedChannelId === 'fb_grup'
+                      ? '📘 Paylaşılacak Facebook Grubu Adı (Opsiyonel - Hangi Gruptan Geldiğini Görmek İçin):'
+                      : `👤 Müşteri / Firma Bilgisi ${selectedChannelId === 'wa_ozel' ? '(Müşteriye Özel Açılış Başlığı)' : '(Opsiyonel - Doğrudan WA Gönderimi İçin)'}:`}
                   </div>
 
-                  {/* CRM'den Hızlı Müşteri Bul */}
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type="text"
-                      value={vipCustomerSearch}
-                      onChange={(e) => setVipCustomerSearch(e.target.value)}
-                      placeholder="🔍 Kayıtlı müşterilerden ara (Örn: Yılmaz, 0532...)"
-                      style={{
-                        width: '100%',
-                        padding: '7px 10px',
-                        borderRadius: '8px',
-                        background: 'rgba(2, 6, 23, 0.85)',
-                        border: '1px solid rgba(56, 189, 248, 0.3)',
-                        color: '#fff',
-                        fontSize: '0.76rem'
-                      }}
-                    />
-                    {vipMatchedCustomers.length > 0 && (
-                      <div style={{
-                        marginTop: '4px',
-                        background: '#020617',
-                        border: '1px solid rgba(56, 189, 248, 0.45)',
-                        borderRadius: '8px',
-                        maxHeight: '130px',
-                        overflowY: 'auto',
-                        padding: '4px'
-                      }}>
-                        {vipMatchedCustomers.map(c => (
-                          <div
-                            key={c.id}
-                            onClick={() => {
-                              setVipSelectedCustomer(c);
-                              setVipCompanyName(c.company_name || '');
-                              setVipPhone(c.phone || '');
-                              setVipCustomerSearch('');
-                              setVipMatchedCustomers([]);
-                              toast.success(`✅ ${c.company_name} seçildi!`);
-                            }}
-                            style={{
-                              padding: '6px 8px',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontSize: '0.74rem',
-                              color: '#f8fafc',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              borderBottom: '1px solid rgba(255,255,255,0.05)'
-                            }}
-                          >
-                            <strong>{c.company_name}</strong>
-                            <span style={{ color: '#38bdf8' }}>{c.phone || c.city}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  {/* CRM'den Hızlı Müşteri Bul veya Facebook Grubu Hızlı Etiketleri */}
+                  {selectedChannelId === 'fb_grup' ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {[
+                        'Türkiye Kamyoncular ve Nakliyeciler',
+                        'IVECO Daily & Eurocargo Kullanıcıları',
+                        'Karadeniz Nakliyeciler & Lojistik',
+                        'Kamyon & Çekici Alım Satım Grubu',
+                        'Oto Kurtarıcı & Çekici Esnafları'
+                      ].map(gName => (
+                        <button
+                          key={gName}
+                          type="button"
+                          onClick={() => setVipCompanyName(vipCompanyName === gName ? '' : gName)}
+                          style={{
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            border: vipCompanyName === gName ? '1px solid #1877F2' : '1px solid rgba(255,255,255,0.1)',
+                            background: vipCompanyName === gName ? 'rgba(24, 119, 242, 0.28)' : 'rgba(255,255,255,0.04)',
+                            color: vipCompanyName === gName ? '#93c5fd' : '#94a3b8',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📘 {gName}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        value={vipCustomerSearch}
+                        onChange={(e) => setVipCustomerSearch(e.target.value)}
+                        placeholder="🔍 Kayıtlı müşterilerden ara (Örn: Yılmaz, 0532...)"
+                        style={{
+                          width: '100%',
+                          padding: '7px 10px',
+                          borderRadius: '8px',
+                          background: 'rgba(2, 6, 23, 0.85)',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          color: '#fff',
+                          fontSize: '0.76rem'
+                        }}
+                      />
+                      {vipMatchedCustomers.length > 0 && (
+                        <div style={{
+                          marginTop: '4px',
+                          background: '#020617',
+                          border: '1px solid rgba(56, 189, 248, 0.45)',
+                          borderRadius: '8px',
+                          maxHeight: '130px',
+                          overflowY: 'auto',
+                          padding: '4px'
+                        }}>
+                          {vipMatchedCustomers.map(c => (
+                            <div
+                              key={c.id}
+                              onClick={() => {
+                                setVipSelectedCustomer(c);
+                                setVipCompanyName(c.company_name || '');
+                                setVipPhone(c.phone || '');
+                                setVipCustomerSearch('');
+                                setVipMatchedCustomers([]);
+                                toast.success(`✅ ${c.company_name} seçildi!`);
+                              }}
+                              style={{
+                                padding: '6px 8px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '0.74rem',
+                                color: '#f8fafc',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                borderBottom: '1px solid rgba(255,255,255,0.05)'
+                              }}
+                            >
+                              <strong>{c.company_name}</strong>
+                              <span style={{ color: '#38bdf8' }}>{c.phone || c.city}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: selectedChannelId === 'fb_grup' ? '1fr' : '1.2fr 1fr', gap: '8px' }}>
                     <input
                       type="text"
                       value={vipCompanyName}
@@ -738,7 +803,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                         setVipCompanyName(e.target.value);
                         if (!e.target.value) setVipSelectedCustomer(null);
                       }}
-                      placeholder="Firma veya Müşteri Adı (Opsiyonel)"
+                      placeholder={selectedChannelId === 'fb_grup' ? 'Facebook Grup Adı yazın veya boş bırakın (Opsiyonel)' : 'Firma veya Müşteri Adı (Opsiyonel)'}
                       style={{
                         padding: '8px 10px',
                         borderRadius: '8px',
@@ -749,21 +814,23 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                         fontWeight: 700
                       }}
                     />
-                    <input
-                      type="tel"
-                      value={vipPhone}
-                      onChange={(e) => setVipPhone(e.target.value)}
-                      placeholder="WhatsApp Tel (05xx...)"
-                      style={{
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        background: 'rgba(2, 6, 23, 0.85)',
-                        border: '1px solid rgba(34, 197, 94, 0.35)',
-                        color: '#4ade80',
-                        fontSize: '0.78rem',
-                        fontWeight: 700
-                      }}
-                    />
+                    {selectedChannelId !== 'fb_grup' && (
+                      <input
+                        type="tel"
+                        value={vipPhone}
+                        onChange={(e) => setVipPhone(e.target.value)}
+                        placeholder="WhatsApp Tel (05xx...)"
+                        style={{
+                          padding: '8px 10px',
+                          borderRadius: '8px',
+                          background: 'rgba(2, 6, 23, 0.85)',
+                          border: '1px solid rgba(34, 197, 94, 0.35)',
+                          color: '#4ade80',
+                          fontSize: '0.78rem',
+                          fontWeight: 700
+                        }}
+                      />
+                    )}
                   </div>
 
                   {selectedChannelId === 'wa_ozel' && (
@@ -1062,6 +1129,12 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   <button
                     type="button"
                     onClick={() => {
+                      if (selectedChannelId === 'fb_grup') {
+                        navigator.clipboard.writeText(channelGeneratedMessage);
+                        toast.success('📋 Gönderi metni kopyalandı! Facebook grubunda "Ctrl+V / Yapıştır" yapabilirsiniz.');
+                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(channelGeneratedLink)}`, '_blank', 'noopener,noreferrer');
+                        return;
+                      }
                       const clean = vipPhone.replace(/\D/g, '');
                       if (clean.length >= 10) {
                         openWhatsAppChat(clean, channelGeneratedMessage);
@@ -1074,9 +1147,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                     style={{
                       padding: '10px 12px',
                       borderRadius: '9px',
-                      background: '#22c55e',
+                      background: selectedChannelId === 'fb_grup' ? '#1877F2' : '#22c55e',
                       border: 'none',
-                      color: '#052e16',
+                      color: selectedChannelId === 'fb_grup' ? '#ffffff' : '#052e16',
                       fontWeight: 900,
                       fontSize: '0.76rem',
                       cursor: 'pointer',
@@ -1086,7 +1159,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       gap: '6px'
                     }}
                   >
-                    <FiSend size={14} /> {vipPhone.replace(/\D/g, '').length >= 10 ? '💬 WhatsApp’tan Gönder' : '💬 Kopyala & Paylaş'}
+                    <FiSend size={14} /> {selectedChannelId === 'fb_grup'
+                      ? '📘 Kopyala & Facebook’ta Paylaş'
+                      : (vipPhone.replace(/\D/g, '').length >= 10 ? '💬 WhatsApp’tan Gönder' : '💬 Kopyala & Paylaş')}
                   </button>
                 </div>
               </div>
