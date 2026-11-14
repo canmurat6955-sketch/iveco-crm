@@ -995,22 +995,60 @@ class DiscoveryService:
 
         dirty = False
         results = []
+        seen_ip_minute = set()
         for s in signals:
-            # Sekme arka planda açık kaldığı için 1106 dk (66393 sn) gibi oluşan eski kayıtları otomatik düzelt
+            ip_str = str(s.ip_address or "")
+            # 1. Facebook / Meta link önizleme botu IP'lerinden (`66.220.149.x` vb.) girilmiş sahte kayıtları otomatik sil
+            if (
+                ip_str.startswith("66.220.14")
+                or ip_str.startswith("66.220.15")
+                or ip_str.startswith("173.252.")
+                or ip_str.startswith("69.63.17")
+                or ip_str.startswith("69.171.")
+            ):
+                try:
+                    self.db.delete(s)
+                    dirty = True
+                except Exception:
+                    pass
+                continue
+
+            # 2. Aynı IP'den aynı dakikada çift tetiklenen 3 sn'lik mükerrer açılış kaydını temizle
+            minute_key = f"{ip_str}_{str(s.created_at)[:16]}" if ip_str and s.created_at else None
+            if (
+                minute_key
+                and s.source == "whatsapp_personalized_link"
+                and (s.duration_seconds or 0) <= 5
+                and minute_key in seen_ip_minute
+            ):
+                try:
+                    self.db.delete(s)
+                    dirty = True
+                except Exception:
+                    pass
+                continue
+            if minute_key:
+                seen_ip_minute.add(minute_key)
+
+            # 3. Sekme arka planda açık kaldığı için 1106 dk (66393 sn) gibi oluşan eski kayıtları otomatik düzelt
             if s.duration_seconds and s.duration_seconds > 540:
                 s.duration_seconds = 45 + (s.id % 95)
                 dirty = True
 
-            # Yanlış IP eşleşmesinden kaynaklanan çift parantezli "(... Ziyaretçisi) (... Ziyaretçisi)" ve "(Cihazdan Tanındı)" kayıtlarını temizle
+            # 4. Yanlış IP eşleşmesinden kaynaklanan çift parantezli "(... Ziyaretçisi) (... Ziyaretçisi)" ve "(Cihazdan Tanındı)" kayıtlarını temizle
             if s.phone and "(Cihazdan Tanındı)" in s.phone and s.notes and "Numara: Henüz Tanımlanmadı" in s.notes:
                 s.phone = None
                 dirty = True
             if s.company_name and s.company_name.count("Ziyaretçisi") > 1:
-                import re
                 matches = re.findall(r"\(([^()]*Ziyaretçisi)\)", s.company_name)
                 if matches:
                     s.company_name = matches[-1]
                     dirty = True
+
+            # 5. created_at tarihini her zaman UTC timezone-aware (+00:00) olarak döndür ki tarayıcı 3 saat geri ("3 saat önce") göstermesin!
+            aware_created_at = s.created_at
+            if aware_created_at is not None and aware_created_at.tzinfo is None:
+                aware_created_at = aware_created_at.replace(tzinfo=timezone.utc)
 
             cust_name = s.customer.company_name if s.customer else None
             results.append({
@@ -1034,7 +1072,7 @@ class DiscoveryService:
                 "matched_customer_name": cust_name,
                 "status": s.status,
                 "notes": s.notes,
-                "created_at": s.created_at,
+                "created_at": aware_created_at,
             })
         if dirty:
             try:
@@ -1044,7 +1082,77 @@ class DiscoveryService:
         return results
 
     def create_intent_signal(self, data: WebIntentSignalCreate) -> dict:
-        """Yeni bir web arama niyeti / kampanya tıklama sinyali kaydeder."""
+        """Yeni bir web arama niyeti / kampanya tıklama sinyali kaydeder veya mevcut oturumun süresini günceller."""
+        is_heartbeat = bool(data.search_query and "[Süre Güncellemesi]" in data.search_query)
+
+        # Aynı IP'den son 10 dakika içinde oluşturulmuş aktif oturum kaydı varsa:
+        # - Heartbeat ise sadece süreyi ve scroll derinliğini güncelle (yeni satır açma).
+        # - İlk açılış kaydı ("Linkine Tıkladı" / 5 sn) üzerine yeni bir araç/kredi incelemesi geldiyse aynı satırı zenginleştir.
+        if data.ip_address:
+            cutoff_naive = datetime.utcnow() - timedelta(minutes=10)
+            recent_sig = (
+                self.db.query(WebIntentSignal)
+                .filter(
+                    WebIntentSignal.ip_address == data.ip_address,
+                    WebIntentSignal.created_at >= cutoff_naive,
+                )
+                .order_by(desc(WebIntentSignal.created_at))
+                .first()
+            )
+            if recent_sig:
+                if is_heartbeat:
+                    recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
+                    recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
+                    self.db.commit()
+                    return {
+                        "id": recent_sig.id,
+                        "message": "İnceleme süresi güncellendi",
+                        "intent_score": recent_sig.intent_score,
+                        "is_heartbeat_only": True,
+                    }
+
+                # Eğer önceki kayıt son 3 dakika içindeyse ve sadece "Linkine Tıkladı" / "Linki Açıldı" ise,
+                # yeni gelen gerçek aksiyonu (veya mükerrer açılış sinyalini) aynı satır üzerinde birleştir:
+                prev_q = str(recent_sig.search_query or "")
+                new_q = str(data.search_query or "")
+                is_prev_generic_open = (
+                    "Linkine Tıkladı" in prev_q
+                    or "Linki Açıldı" in prev_q
+                    or "Araç Seçiciyi Açtı" in prev_q
+                )
+                is_new_generic_open = (
+                    "Linkine Tıkladı" in new_q
+                    or "Linki Açıldı" in new_q
+                    or "Araç Seçiciyi Açtı" in new_q
+                )
+                if is_prev_generic_open or is_new_generic_open:
+                    recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
+                    recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
+                    if not is_new_generic_open:
+                        recent_sig.search_query = data.search_query
+                        if data.target_model:
+                            recent_sig.target_model = data.target_model
+                        if data.target_campaign:
+                            recent_sig.target_campaign = data.target_campaign
+                        if data.notes:
+                            recent_sig.notes = data.notes
+                    if data.phone and not recent_sig.phone:
+                        recent_sig.phone = data.phone
+                    if data.company_name and "Ziyaretçisi" not in data.company_name:
+                        recent_sig.company_name = data.company_name
+                    if data.intent_score and data.intent_score > (recent_sig.intent_score or 0):
+                        recent_sig.intent_score = data.intent_score
+                    self.db.commit()
+                    return {
+                        "id": recent_sig.id,
+                        "message": "Mevcut ziyaret oturumu güncellendi",
+                        "intent_score": recent_sig.intent_score,
+                        "is_heartbeat_only": is_new_generic_open,
+                    }
+
+        if is_heartbeat:
+            return {"id": 0, "message": "Aktif oturum bulunamadı", "intent_score": 0, "is_heartbeat_only": True}
+
         signal = WebIntentSignal(
             source=data.source,
             search_query=data.search_query,

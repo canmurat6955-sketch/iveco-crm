@@ -283,6 +283,37 @@ def record_intent_signal(
     if client_ip and not data.ip_address:
         data.ip_address = client_ip
 
+    # Facebook, WhatsApp, LinkedIn, Telegram ve Google link önizleme botlarını (crawler) engelle
+    ua = (request.headers.get("user-agent") or "").lower()
+    bot_markers = (
+        "facebookexternalhit",
+        "facebot",
+        "meta-externalagent",
+        "whatsapp",
+        "twitterbot",
+        "telegrambot",
+        "linkedinbot",
+        "slackbot",
+        "discordbot",
+        "googlebot",
+        "bingbot",
+        "yandexbot",
+        "ahrefsbot",
+        "semrushbot",
+        "headlesschrome",
+        "lighthouse",
+    )
+    ip_str = str(data.ip_address or "")
+    is_fb_crawler_ip = (
+        ip_str.startswith("66.220.14")
+        or ip_str.startswith("66.220.15")
+        or ip_str.startswith("173.252.")
+        or ip_str.startswith("69.63.17")
+        or ip_str.startswith("69.171.")
+    )
+    if any(b in ua for b in bot_markers) or is_fb_crawler_ip:
+        return {"id": 0, "message": "Önizleme botu filtrelendi", "intent_score": 0, "ignored_bot": True}
+
     # Sekme arka planda açık kaldığında oluşabilecek gerçek dışı süreleri (örn: 1106 dk) sınırla
     if data.duration_seconds and data.duration_seconds > 540:
         data.duration_seconds = 45 + (data.duration_seconds % 120)
@@ -303,6 +334,9 @@ def record_intent_signal(
         pass
 
     res = DiscoveryService(db).create_intent_signal(data)
+    if res.get("is_heartbeat_only"):
+        return res
+
     try:
         if (data.intent_score and data.intent_score >= 80) or (
             data.source in (
@@ -312,6 +346,7 @@ def record_intent_signal(
                 "wa_durum",
                 "whatsapp_durum",
                 "wa_grup",
+                "fb_grup",
                 "wa_musteri",
                 "wa_ozel",
                 "instagram",

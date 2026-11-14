@@ -108,6 +108,19 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   };
 }
 
+// Sunucudan gelen UTC tarih dizgesini (sonunda Z olmasa bile) doğru Türkiye saatine (+03:00) çevirmek için güvenli ayrıştırıcı
+function parseServerUtcDate(isoStr) {
+  if (!isoStr) return null;
+  if (isoStr instanceof Date) return Number.isNaN(isoStr.getTime()) ? null : isoStr;
+  let s = String(isoStr).trim();
+  // Eğer YYYY-MM-DDTHH:mm... formatındaysa ve sonunda Z veya +03:00 gibi saat dilimi yoksa UTC ('Z') ekle
+  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(s) && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
+    s = s.replace(' ', 'T') + 'Z';
+  }
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 // Girilen linkin URL'sinden ve parametrelerinden sade, anlaşılır açıklama üretir
 function describeClickedLink(signal) {
   const rawUrl = String(signal.page_url || '').trim();
@@ -119,9 +132,9 @@ function describeClickedLink(signal) {
   const partnerMatch = shortPath.match(/[?&]partner=([^&#]+)/i);
   if (partnerMatch && partnerMatch[1]) {
     try {
-      partnerSlug = decodeURIComponent(partnerMatch[1]).replace(/[-_]/g, ' ').toUpperCase();
+      partnerSlug = decodeURIComponent(partnerMatch[1].replace(/\+/g, ' ')).replace(/[-_]/g, ' ').toUpperCase();
     } catch {
-      partnerSlug = partnerMatch[1];
+      partnerSlug = partnerMatch[1].replace(/\+/g, ' ');
     }
   }
 
@@ -129,9 +142,9 @@ function describeClickedLink(signal) {
   const compMatch = shortPath.match(/[?&]company=([^&#]+)/i);
   if (compMatch && compMatch[1]) {
     try {
-      companyInUrl = decodeURIComponent(compMatch[1]);
+      companyInUrl = decodeURIComponent(compMatch[1].replace(/\+/g, ' ')).trim();
     } catch {
-      companyInUrl = compMatch[1];
+      companyInUrl = compMatch[1].replace(/\+/g, ' ').trim();
     }
   }
 
@@ -204,8 +217,9 @@ function formatTurkishPhone(phone) {
 function cleanVisitorName(rawName) {
   if (!rawName) return '';
   return String(rawName)
+    .replace(/\+/g, ' ')
     .replace(/\s*\([^)]*(?:Ziyaretçi|Ziyaretci|Link|Durum|Grup|Portal|Katalog)[^)]*\)/gi, '')
-    .replace(/^[👑💬🚚📡📲🏛️🔥✨👤🏢]+\s*/gu, '')
+    .replace(/^[👑💬🚚📡📲🏛️🔥✨👤🏢📘]+\s*/gu, '')
     .trim();
 }
 
@@ -216,6 +230,11 @@ function isGenericVisitorName(name) {
   return (
     lower.includes('ziyaretçi') ||
     lower.includes('ziyaretci') ||
+    lower.includes('alım satım') ||
+    lower.includes('alim satim') ||
+    lower.includes('kamyoncular') ||
+    lower.includes('nakliyeciler') ||
+    lower.includes('kullanıcıları') ||
     lower === 'portal ziyaretçisi' ||
     lower === 'katalog ziyaretçisi' ||
     lower === 'mobil ziyaretçi' ||
@@ -381,9 +400,9 @@ export default function IntentRadar() {
     fetchData();
   }, []);
 
-  // Süre Formatlayıcı
+  // Süre Formatlayıcı (İlk açılış sinyallerindeki sabit 3 sn / 5 sn değerlerini "Giriş Yaptı" olarak göster, gerçek kalış sürelerini dk/sn yaz)
   const formatDuration = (seconds) => {
-    if (!seconds) return '—';
+    if (!seconds || seconds <= 5) return 'Giriş Yaptı';
     const safeSeconds = seconds > 540 ? (45 + (seconds % 95)) : seconds;
     const mins = Math.floor(safeSeconds / 60);
     const secs = safeSeconds % 60;
@@ -391,19 +410,19 @@ export default function IntentRadar() {
     return `${secs} sn`;
   };
 
-  // Tarih / Saat Formatlayıcı
+  // Tarih / Saat Formatlayıcı (Sunucu UTC zamanını her zaman Türkiye Saatine +03:00 çevirir — "3 saat önce" hatasını kesin önler)
   const formatDateTime = (isoStr) => {
-    if (!isoStr) return { full: '—', relative: '' };
-    const d = new Date(isoStr);
-    if (Number.isNaN(d.getTime())) return { full: '—', relative: '' };
+    const d = parseServerUtcDate(isoStr);
+    if (!d) return { full: '—', relative: '' };
     const full = d.toLocaleString('tr-TR', {
+      timeZone: 'Europe/Istanbul',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
-    const diffMs = Date.now() - d.getTime();
+    const diffMs = Math.max(0, Date.now() - d.getTime());
     const diffMins = Math.floor(diffMs / 60000);
     let relative = '';
     if (diffMins < 1) relative = 'Az önce';
@@ -413,17 +432,37 @@ export default function IntentRadar() {
     return { full, relative };
   };
 
-  // 1. ADIM: Tarih Filtresinden Geçen Ham Sinyaller
+  // 1. ADIM: Bot / Önizleme Taramalarından Arındırılmış & Tarih Filtresinden Geçen Sinyaller
   const dateFilteredSignals = useMemo(() => {
-    if (dateRange === 'all') return signals;
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const startOfYesterday = startOfToday - 86400000;
+    const seenIpMinute = new Set();
 
     return signals.filter(s => {
-      if (!s.created_at) return true;
-      const t = new Date(s.created_at).getTime();
-      if (Number.isNaN(t)) return true;
+      const ipStr = String(s.ip_address || '');
+      // Facebook / Meta link önizleme robotu IP'lerini (66.220.149.x vb.) filtrele
+      if (
+        ipStr.startsWith('66.220.14') ||
+        ipStr.startsWith('66.220.15') ||
+        ipStr.startsWith('173.252.') ||
+        ipStr.startsWith('69.63.17') ||
+        ipStr.startsWith('69.171.')
+      ) {
+        return false;
+      }
+
+      // Aynı IP'den aynı dakikada çift tetiklenmiş 3 sn'lik mükerrer açılış kaydını gizle
+      const minKey = ipStr && s.created_at ? `${ipStr}_${String(s.created_at).slice(0, 16)}` : '';
+      if (minKey && s.source === 'whatsapp_personalized_link' && (s.duration_seconds || 0) <= 5 && seenIpMinute.has(minKey)) {
+        return false;
+      }
+      if (minKey) seenIpMinute.add(minKey);
+
+      if (dateRange === 'all') return true;
+      const d = parseServerUtcDate(s.created_at);
+      if (!d) return true;
+      const t = d.getTime();
       if (dateRange === 'today') return t >= startOfToday;
       if (dateRange === 'yesterday') return t >= startOfYesterday && t < startOfToday;
       if (dateRange === '7d') return t >= Date.now() - 7 * 86400000;
@@ -954,9 +993,7 @@ export default function IntentRadar() {
         ]
       },
       ...identifiedVisitors.map((v, idx) => {
-        const lastDateStr = v.last_seen_at
-          ? new Date(v.last_seen_at).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-          : '-';
+        const lastDateStr = v.last_seen_at ? formatDateTime(v.last_seen_at).full : '-';
         const visitSummary = v.visitDaysCount > 1
           ? `${v.visitDaysCount} Farklı Gün • ${v.eventCount} İşlem (${formatDuration(v.duration_seconds)})`
           : `${v.eventCount} İşlem (${formatDuration(v.duration_seconds)})`;
@@ -1124,9 +1161,7 @@ export default function IntentRadar() {
         ]
       },
       ...anonymousVisitors.map((v, idx) => {
-        const lastDateStr = v.last_seen_at
-          ? new Date(v.last_seen_at).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-          : '-';
+        const lastDateStr = v.last_seen_at ? formatDateTime(v.last_seen_at).full : '-';
         const baseStyle = idx % 2 === 1 ? 13 : 4;
         return {
           height: 22,

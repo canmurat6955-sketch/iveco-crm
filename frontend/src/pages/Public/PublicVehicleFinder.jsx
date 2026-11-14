@@ -891,38 +891,15 @@ export default function PublicVehicleFinder() {
 
   // Aktif İnceleme Süresi Sayacı: Sekme arka planda (uykuda) kaldığında sayacı durdurur,
   // böylece akşamdan açık kalan sekmelerde "1106 dk" gibi gerçek dışı süreler oluşmaz.
-  const activeSecondsRef = React.useRef(5);
+  const activeSecondsRef = React.useRef(1);
   useEffect(() => {
     const interval = setInterval(() => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-        activeSecondsRef.current = Math.min(activeSecondsRef.current + 2, 540);
+        activeSecondsRef.current = Math.min(activeSecondsRef.current + 1, 540);
       }
-    }, 2000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  // Kişisel VIP Link tıklandığında CRM'e sessizce dijital niyet / ziyaret sinyali kaydet
-  useEffect(() => {
-    if (!isPreviewMode && (customerIdParam || phoneParam || companyParam)) {
-      const parsedCid = customerIdParam ? parseInt(customerIdParam, 10) : undefined;
-      discoveryApi.recordIntentSignal({
-        source: 'whatsapp_personalized_link',
-        search_query: `[Kişisel Link Ziyareti]: ${companyParam || nameParam || 'VIP Müşteri'} Araç Seçiciyi Açtı`,
-        target_model: 'IVECO Şasi & Kasa Seçici',
-        company_name: companyParam || nameParam || 'Kayıtlı Müşteri',
-        phone: phoneParam || customerPhone || undefined,
-        city: 'Samsun',
-        page_url: window.location.href,
-        referrer: document.referrer || 'whatsapp_chat',
-        duration_seconds: 3,
-        scroll_depth: 30,
-        intent_score: 94,
-        intent_level: 'very_high',
-        matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
-        notes: `Müşteri WhatsApp üzerinden iletilen kişiselleştirilmiş şasi & kantar seçici bağlantısını tıkladı.`
-      }).catch(err => console.debug('Intent signal log error:', err));
-    }
-  }, [customerIdParam, phoneParam, companyParam, isPreviewMode]);
 
   // ── KESİN ŞASİ, KASA BOYUTLARI VE KANTAR EŞLEŞTİRME MOTORU ──────
   const matched = useMemo(() => {
@@ -1470,10 +1447,23 @@ export default function PublicVehicleFinder() {
 
   // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e ve WhatsApp Botuna İletir)
   const sentFootprintsRef = React.useRef(new Set());
+  const isBotVisitor = React.useMemo(() => {
+    if (typeof navigator === 'undefined') return false;
+    if (navigator.webdriver) return true;
+    const ua = (navigator.userAgent || '').toLowerCase();
+    return /facebookexternalhit|facebot|meta-externalagent|whatsapp|twitterbot|telegrambot|linkedinbot|slackbot|discordbot|googlebot|bingbot|yandexbot|headlesschrome|lighthouse/i.test(ua);
+  }, []);
+
   const recordCustomerFootprint = (actionLabel, modelOverride, campaignOverride, phoneOverride, nameOverride) => {
-    if (isAdminMode || isPreviewMode) return;
+    if (isAdminMode || isPreviewMode || isBotVisitor) return;
     const effectivePhone = (phoneOverride ?? customerPhone ?? '').trim();
-    const effectiveName = (nameOverride ?? (customerCompany || customerName) ?? '').trim();
+    const isGroupRef = (refCode || '').includes('fb_grup') || (refCode || '').includes('wa_grup');
+    const rawNameCandidate = (nameOverride ?? (customerCompany || customerName) ?? '').trim();
+    // Grup linklerinde URL'deki ?company=... grup adıdır, kişinin şahsi adı değildir (telefon girmediyse grup adını kişi adı sanma)
+    const effectiveName = (isGroupRef && !effectivePhone && rawNameCandidate === (companyParam || '').trim())
+      ? ''
+      : rawNameCandidate;
+
     const key = `${actionLabel}|${modelOverride || ''}|${campaignOverride || ''}|${effectivePhone}`;
     if (sentFootprintsRef.current.has(key)) return;
     sentFootprintsRef.current.add(key);
@@ -1483,13 +1473,13 @@ export default function PublicVehicleFinder() {
     const visitorLabel = cleanBaseName
       ? (socialSourceLabel ? `${cleanBaseName} (${socialSourceLabel})` : cleanBaseName)
       : (socialSourceLabel || 'Portal Ziyaretçisi');
-    const durationSeconds = Math.max(3, Math.min(activeSecondsRef.current || 12, 540));
+    const durationSeconds = Math.max(1, Math.min(activeSecondsRef.current || 1, 540));
 
     discoveryApi.recordIntentSignal({
       source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
       search_query: `[Canlı Ayak İzi - ${actionLabel}]`,
       target_model: modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog',
-      target_campaign: campaignOverride || (sectorParam ? `Sektör: ${sectorParam}` : (socialSourceLabel || '2026 Fiyat & Kredi Portalı')),
+      target_campaign: campaignOverride || (isGroupRef && companyParam ? `Grup: ${companyParam}` : (sectorParam ? `Sektör: ${sectorParam}` : (socialSourceLabel || '2026 Fiyat & Kredi Portalı'))),
       company_name: visitorLabel,
       city: customerCity || 'Samsun',
       phone: effectivePhone,
@@ -1553,17 +1543,55 @@ export default function PublicVehicleFinder() {
 
   // Müşteri kendisine gönderilen VIP Linki, Sosyal Medya Linkini veya doğrudan Fiyat Listesini açtığında anında CRM'e "Portal Açıldı" sinyali gönder
   useEffect(() => {
-    if (!isAdminMode && !isPreviewMode) {
+    if (!isAdminMode && !isPreviewMode && !isBotVisitor) {
       const timer = setTimeout(() => {
         recordCustomerFootprint(
           socialSourceLabel ? `${socialSourceLabel} Linkine Tıkladı` : 'Fiyat & Kampanya Linki Açıldı',
           selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
           activePartner ? `Kurum Protokolü: ${activePartner.shortTitle || activePartner.name}` : (sectorParam ? `Sektör Filtresi: ${sectorParam}` : (socialSourceLabel || 'Doğrudan Fiyat Listesi Girişi'))
         );
-      }, 1500);
+      }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [customerCompany, customerIdParam, socialSourceLabel, refCode]);
+  }, [customerIdParam, socialSourceLabel, refCode, isBotVisitor]);
+
+  // ⏱️ GERÇEK KALMA SÜRESİ GÜNCELLEYİCİ (Herkesin "5 sn" kalmasını önler; müşteri sayfada kaldıkça gerçek süresini günceller)
+  useEffect(() => {
+    if (isAdminMode || isPreviewMode || isBotVisitor) return;
+    const sendDurationHeartbeat = () => {
+      const sec = Math.min(activeSecondsRef.current || 1, 540);
+      if (sec < 8) return;
+      discoveryApi.recordIntentSignal({
+        source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
+        search_query: '[Süre Güncellemesi]',
+        target_model: selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
+        page_url: window.location.href,
+        duration_seconds: sec,
+        scroll_depth: 85,
+        intent_score: 85,
+        intent_level: 'high'
+      }).catch(() => {});
+    };
+
+    const t1 = setTimeout(sendDurationHeartbeat, 15000);
+    const t2 = setTimeout(sendDurationHeartbeat, 35000);
+    const t3 = setTimeout(sendDurationHeartbeat, 75000);
+    const t4 = setTimeout(sendDurationHeartbeat, 150000);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        sendDurationHeartbeat();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [isAdminMode, isPreviewMode, isBotVisitor, customerIdParam, refCode, selectedModelKey, matched?.modelTitle]);
 
   // Form Gönderimi (Teklif İste & CRM'e Lead / Müşteri Etkileşimi Olarak Yaz)
   const handleSubmitLead = async (e) => {
