@@ -538,180 +538,42 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
         </div>
       )}
 
-      {/* 🔄 TAKAS + KREDİ NET ÖDEME HESAPLAYICI & 🏢 2+ ARAÇ FİLO İSKONTOSU ÇİFT AKSİYON BARI */}
+      {/* 🔄 ARAÇ KARTINDAN "TAKASA SAY" TIKLANDIĞINDA AÇILAN PANEL (Varsayılan olarak gizlidir, telefonda yer kaplamaz) */}
+      {(showTradeInBox || showFleetBox) && (
       <div
         id="tradein-loan-calc-box"
         style={{
           background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(24, 42, 72, 0.94) 100%)',
-          border: showTradeInBox ? '1.5px solid #f59e0b' : '1px solid rgba(245, 158, 11, 0.42)',
+          border: '1.5px solid #f59e0b',
           borderRadius: '12px',
           padding: isMobileView ? '10px 12px' : '12px 16px',
           marginBottom: isMobileView ? '12px' : '16px'
         }}
       >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '10px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '220px' }}>
-            <span style={{ fontSize: isMobileView ? '1.25rem' : '1.45rem' }}>🔄</span>
-            <div>
-              <div style={{ fontSize: isMobileView ? '0.82rem' : '0.88rem', fontWeight: 800, color: '#fde68a' }}>
-                Takas + Kredi Net Ödeme Hesaplayıcı & Filo İskontosu (2+ Araç)
-              </div>
-              <div style={{ fontSize: isMobileView ? '0.71rem' : '0.75rem', color: '#e2e8f0' }}>
-                Mevcut aracınızı peşinata saydırıp kalan fark için aylık banka kredi taksitinizi anında hesaplayın.
-              </div>
-            </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fde68a' }}>
+            🔄 Takas + Kredi Hesaplayıcı
           </div>
-
-          <div style={isMobileView ? {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '6px',
-            width: '100%'
-          } : {
-            display: 'flex',
-            gap: '8px',
-            flexWrap: 'wrap'
-          }}>
-            <button
-              type="button"
-              onClick={() => {
-                const next = !showTradeInBox;
-                setShowTradeInBox(next);
-                setShowFleetBox(false);
-                if (next && onTrackFootprint) {
-                  onTrackFootprint('Takas + Kredi Hesaplayıcı Açıldı', selectedTradeVehicle?.model || 'Daily 35C16', 'Üst Bar');
-                }
-              }}
-              style={{
-                background: showTradeInBox ? 'rgba(255,255,255,0.16)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                color: showTradeInBox ? '#fff' : '#0f172a',
-                border: 'none',
-                borderRadius: '8px',
-                padding: isMobileView ? '9px 6px' : '8px 13px',
-                fontSize: isMobileView ? '0.74rem' : '0.75rem',
-                fontWeight: 900,
-                cursor: 'pointer',
-                textAlign: 'center'
-              }}
-            >
-              {showTradeInBox ? '✕ Hesaplayıcıyı Kapat' : '🔄 Takas + Kredi Hesapla'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => { setShowFleetBox(prev => !prev); setShowTradeInBox(false); }}
-              style={{
-                background: showFleetBox ? 'rgba(255,255,255,0.16)' : 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-                color: '#ffffff',
-                border: '1px solid #38bdf8',
-                borderRadius: '8px',
-                padding: isMobileView ? '9px 6px' : '8px 13px',
-                fontSize: isMobileView ? '0.74rem' : '0.75rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                textAlign: 'center'
-              }}
-            >
-              {showFleetBox ? '✕ Kapat' : '🏢 2+ Araç Filo İskontosu'}
-            </button>
-          </div>
-        </div>
-
-        {/* ÖZELLİK 1: EN ÜSTTE TEK SATIRLIK CANLI PEŞİNAT / TAKAS SÜRGÜSÜ */}
-        <div style={{
-          marginTop: '10px',
-          paddingTop: '9px',
-          borderTop: '1px solid rgba(56, 189, 248, 0.22)',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '8px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.73rem', fontWeight: 800, color: '#e2e8f0' }}>
-              🎚️ Canlı Peşinat / Takasım:
-            </span>
-            <span style={{
-              fontSize: '0.80rem',
-              fontWeight: 900,
-              color: '#4ade80',
-              background: 'rgba(16, 185, 129, 0.16)',
-              border: '1px solid rgba(16, 185, 129, 0.45)',
-              padding: '2px 8px',
-              borderRadius: '6px'
-            }}>
-              {Number(tradeInValue || 0) === 0 ? 'Peşinatsız (0 TL)' : `${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL`}
-            </span>
-            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-              {[
-                { label: '0 TL', val: 0 },
-                { label: '750B', val: 750000 },
-                { label: '1M', val: 1000000 },
-                { label: '1.25M', val: 1250000 },
-                { label: '1.5M', val: 1500000 }
-              ].map(preset => (
-                <button
-                  key={preset.val}
-                  type="button"
-                  onClick={() => {
-                    setTradeInValue(preset.val);
-                    if (onTrackFootprint) {
-                      onTrackFootprint('Canlı Peşinat/Takas Seçildi', `${preset.val.toLocaleString('tr-TR')} TL Peşinat`, 'Tüm Araç Kartları');
-                    }
-                  }}
-                  style={{
-                    background: Number(tradeInValue) === preset.val ? '#0284c7' : 'rgba(15, 23, 42, 0.7)',
-                    color: Number(tradeInValue) === preset.val ? '#fff' : '#cbd5e1',
-                    border: Number(tradeInValue) === preset.val ? '1px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.3)',
-                    borderRadius: '5px',
-                    padding: '2px 6px',
-                    fontSize: '0.67rem',
-                    fontWeight: 800,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobileView ? '1 1 100%' : '1 1 220px', maxWidth: isMobileView ? '100%' : '320px' }}>
-            <input
-              type="range"
-              min={0}
-              max={2500000}
-              step={50000}
-              value={Number(tradeInValue) || 0}
-              onChange={(e) => setTradeInValue(Number(e.target.value))}
-              onMouseUp={() => {
-                if (onTrackFootprint) {
-                  onTrackFootprint('Canlı Peşinat/Takas Sürgüsü Kullanıldı', `${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat`, 'Tüm Araç Kartları');
-                }
-              }}
-              onTouchEnd={() => {
-                if (onTrackFootprint) {
-                  onTrackFootprint('Canlı Peşinat/Takas Sürgüsü Kullanıldı', `${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat`, 'Tüm Araç Kartları');
-                }
-              }}
-              style={{ width: '100%', accentColor: '#38bdf8', cursor: 'pointer', height: '6px' }}
-              title="Kaydırarak tüm araç kartlarındaki kalan kredi ve taksit tutarını canlı güncelleyin"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => { setShowTradeInBox(false); setShowFleetBox(false); }}
+            style={{
+              background: 'rgba(255,255,255,0.14)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '4px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
+          >
+            ✕ Kapat
+          </button>
         </div>
 
         {showTradeInBox && (
           <div style={{
-            marginTop: '12px',
-            paddingTop: '14px',
-            borderTop: '1px dashed rgba(245, 158, 11, 0.45)',
             display: 'flex',
             flexDirection: 'column',
             gap: '12px'
@@ -1100,6 +962,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           </div>
         )}
       </div>
+      )}
 
       {/* 1. ANA MODEL & EHLİYET GRUBU SEÇİCİ + İSTEĞE BAĞLI DETAYLI FİLTRE */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: isMobileView ? '12px' : '16px' }}>
