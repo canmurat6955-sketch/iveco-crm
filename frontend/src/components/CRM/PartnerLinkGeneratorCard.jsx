@@ -7,6 +7,7 @@ import {
   buildPartnerShareUrl,
   buildPartnerAnnouncementText
 } from '../../data/partnerProtocols';
+import { BANK_LIST } from '../../data/bankCampaigns';
 import { crmApi, discoveryApi } from '../../api/client';
 import { getPublicOrigin } from '../../utils/publicUrl';
 import { openWhatsAppChat } from '../../utils/openExternal';
@@ -51,6 +52,14 @@ const SOCIAL_CHANNELS = [
     refCode: 'wa_ozel',
     badgeText: '👑 WhatsApp Özel Müşteri Ziyaretçisi',
     color: '#f59e0b'
+  },
+  {
+    id: 'banka_kanal',
+    label: '🏦 Bankacılara Özel (Tek Banka Linki)',
+    shortDesc: 'Sadece seçilen bankanın (Garanti, DenizBank vb.) kredi oranlarını gösterir',
+    refCode: 'banka_garanti',
+    badgeText: '🏦 Banka Özel Link Ziyaretçisi',
+    color: '#38bdf8'
   },
   {
     id: 'smmm_kanal',
@@ -100,13 +109,15 @@ const TAX_OUTREACH_SENT_KEY = 'iveco_year_end_tax_sent_v1';
 
 export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [isExpanded, setIsExpanded] = useState(true);
-  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Mali Müşavir / FB Grupları / Instagram / LinkedIn
+  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Bankacılara Özel / Mali Müşavir / FB Grupları / Instagram / LinkedIn
   // 'partners' = Dernek, Oda & Birlik Protokolleri (SİMDER, SMMM, Arıcılar Birliği vb.)
   // 'tax_radar' = Madde 4: CRM'deki Eski Kayıtlara & Niyet Radarı'na "Yıl Sonu KDV / Vergi Uyarısı" Hızlı Tarama
   const [studioMode, setStudioMode] = useState('channels');
 
   // --- SEKME 1: SOSYAL MEDYA & WHATSAPP MÜŞTERİ LİNK ÜRETİCİ STATE'LERİ ---
   const [selectedChannelId, setSelectedChannelId] = useState('wa_durum');
+  const [selectedBankChannelId, setSelectedBankChannelId] = useState('garanti');
+  const [bankOpenTab, setBankOpenTab] = useState('krediler'); // 'krediler' | 'fiyatlar'
   const [hookStyle, setHookStyle] = useState('curiosity_short'); // 'curiosity_short' | 'tradein_hook' | 'tax_hook' | 'detailed'
   const [channelSector, setChannelSector] = useState('all');
   const [vipTone, setVipTone] = useState('friendly'); // 'friendly' | 'new_lead' | 'corporate'
@@ -175,10 +186,43 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     [selectedChannelId]
   );
 
+  const selectedBankObj = useMemo(
+    () => BANK_LIST.find(b => b.id === selectedBankChannelId) || BANK_LIST[0],
+    [selectedBankChannelId]
+  );
+
   // Sekme 1 için üretilen Link
   const channelGeneratedLink = useMemo(() => {
     const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
     const params = new URLSearchParams();
+
+    if (selectedChannelId === 'banka_kanal') {
+      params.set('bank', selectedBankObj.id);
+      if (bankOpenTab === 'krediler') {
+        params.set('tab', 'krediler');
+      }
+      if (vipCompanyName.trim()) {
+        params.set('bbranch', vipCompanyName.trim());
+        params.set('company', `${selectedBankObj.shortName} - ${vipCompanyName.trim()}`);
+      }
+      const cleanPhone = vipPhone.replace(/\D/g, '');
+      if (cleanPhone.length >= 10) {
+        params.set('phone', cleanPhone);
+      }
+      if (channelSector && channelSector !== 'all') {
+        params.set('sector', channelSector);
+      }
+      if (enableChannelDiscount && Number(channelDiscountValue) > 0) {
+        params.set('partner', 'vip_ozel');
+        params.set('pshort', `${selectedBankObj.shortName} Müşterisi`);
+        params.set('pname', `${selectedBankObj.name} Portföy Müşterisi Özel İndirimi`);
+        params.set('pdisc', String(channelDiscountValue));
+        params.set('pdisc_type', channelDiscountType);
+        params.set('picon', selectedBankObj.icon || '🏦');
+      }
+      params.set('ref', `banka_${selectedBankObj.id}`);
+      return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
+    }
 
     if (vipSelectedCustomer?.id) {
       params.set('cid', String(vipSelectedCustomer.id));
@@ -208,6 +252,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
   }, [
     origin,
+    selectedChannelId,
+    selectedBankObj,
+    bankOpenTab,
     activeChannel,
     vipSelectedCustomer,
     vipCompanyName,
@@ -232,6 +279,37 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           ? `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *%${channelDiscountValue} Özel İskonto* fiyatlardan otomatik düşülmüştür!\n`
           : `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *Araç Başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim* fiyatlardan otomatik düşülmüştür!\n`)
       : '';
+
+    // 🏦 BANKACILARA ÖZEL (SADECE SEÇİLEN BANKANIN ORANLARI GÖRÜNEN TEK BANKA LİNKİ)
+    if (selectedChannelId === 'banka_kanal') {
+      const bankerGreeting = vipCompanyName.trim()
+        ? `Sayın *${vipCompanyName.trim()}* (${selectedBankObj.name}),`
+        : `${selectedBankObj.icon} *Değerli ${selectedBankObj.name} Ticari / KOBİ Portföy Yöneticimiz,*`;
+      const isParticipation = selectedBankObj.type === 'Katılım';
+      const rateTermLabel = isParticipation ? 'kâr payı ve finansman' : 'faiz ve ticari kredi';
+      if (hookStyle === 'curiosity_short') {
+        return (
+          `${bankerGreeting} merhabalar, kolay gelsin. 🙏\n\n` +
+          `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+          `Şubenizde ticari araç (kamyonet, panelvan, kamyon veya çekici) yatırımı ya da yıl sonu KDV/vergi mahsubu için kredi limiti kullanan müşterileriniz olduğunda, *sadece ${selectedBankObj.name} ${rateTermLabel} oranlarının* ve 2026 IVECO proforma fiyatlarımızın yer aldığı *${selectedBankObj.shortName} Özel Dijital Ekranımızı* aşağıya bıraktım${discountShortNote}.\n\n` +
+          `Müşterinizle doğrudan paylaşabilirsiniz; ekranda yalnızca *${selectedBankObj.name}* paketleri görünür ve şasi proformasını aynı gün hazırlarız 👇\n\n` +
+          `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+          `${link}`
+        );
+      }
+      return (
+        `${bankerGreeting}\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `Portföyünüzde ticari araç alımı, filo yenileme veya yıl sonu vergi/KDV planlaması yapan müşterileriniz için *yalnızca ${selectedBankObj.name} ${rateTermLabel} oranlarının ve vade paketlerinin* yer aldığı özel hesaplama bağlantımızı bilgilerinize sunarım${discountShortNote}:\n\n` +
+        discountLine +
+        `${selectedBankObj.icon} *Sadece ${selectedBankObj.name} Oranları:* Bu bağlantıda diğer bankalar yer almaz; yalnızca *${selectedBankObj.name}* ticari finansman paketleri ve taksit tablosu açılır.\n` +
+        `⚡ *Aynı Gün Proforma & Şasi Faturası:* Kredi/finansman onayı çıkan müşterilerinize üstyapıyı beklemeden *aynı gün resmi şasi proforması ve faturası* kesiyoruz.\n` +
+        `🧾 *%20 KDV & Tam Amortisman Tablosu:* Müşteriniz araç kartından %20 KDV mahsubu ve 1. yıl tam amortisman hesabını tek tuşla görebilir.\n\n` +
+        `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n` +
+        `👇 *${selectedBankObj.name} özel kredi ve 2026 IVECO fiyat ekranı:*\n\n` +
+        `${link}`
+      );
+    }
 
     // WHATSAPP DURUM (STATUS) ÖZEL KURALI:
     // Android WhatsApp Durum'da metin ~180 karakteri aşarsa veya linkin altında/başında metin-emoji olursa
@@ -452,6 +530,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     );
   }, [
     selectedChannelId,
+    selectedBankObj,
     hookStyle,
     channelGeneratedLink,
     vipCompanyName,
@@ -913,6 +992,113 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 </div>
               </div>
 
+              {/* 🏦 BANKACILARA ÖZEL TEK BANKA SEÇİCİ KUTUSU */}
+              {selectedChannelId === 'banka_kanal' && (
+                <div style={{
+                  background: `linear-gradient(135deg, ${selectedBankObj.color || '#0284c7'}28 0%, rgba(15, 23, 42, 0.95) 100%)`,
+                  border: `1.5px solid ${selectedBankObj.color || '#38bdf8'}`,
+                  borderRadius: '12px',
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 900, color: '#fff' }}>
+                        🏦 Hangi Bankanın Portföy Yöneticisine / Müşterisine Link Göndereceksin?
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '2px' }}>
+                        Seçtiğin bankanın linkini gönderdiğinde müşterinin ve bankacının ekranında <strong style={{ color: '#4ade80' }}>SADECE {selectedBankObj.name}</strong> oranları, vade paketleri ve logosu görünür; diğer bankalar gizlenir!
+                      </div>
+                    </div>
+
+                    {/* Açılış Sekmesi Seçimi */}
+                    <div style={{ display: 'flex', gap: '5px', background: 'rgba(2, 6, 23, 0.75)', padding: '4px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setBankOpenTab('krediler')}
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: '6px',
+                          border: bankOpenTab === 'krediler' ? '1px solid #38bdf8' : 'none',
+                          background: bankOpenTab === 'krediler' ? 'rgba(2, 132, 199, 0.35)' : 'transparent',
+                          color: bankOpenTab === 'krediler' ? '#fff' : '#94a3b8',
+                          fontSize: '0.69rem',
+                          fontWeight: 800,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        💳 Doğrudan {selectedBankObj.shortName} Kredi Tablosu Açılsın
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBankOpenTab('fiyatlar')}
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: '6px',
+                          border: bankOpenTab === 'fiyatlar' ? '1px solid #10b981' : 'none',
+                          background: bankOpenTab === 'fiyatlar' ? 'rgba(16, 185, 129, 0.3)' : 'transparent',
+                          color: bankOpenTab === 'fiyatlar' ? '#fff' : '#94a3b8',
+                          fontSize: '0.69rem',
+                          fontWeight: 800,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🚛 Fiyat Listesi Açılsın ({selectedBankObj.shortName} Kilitli)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+                    gap: '7px'
+                  }}>
+                    {BANK_LIST.map(bank => {
+                      const isBankSel = selectedBankChannelId === bank.id;
+                      return (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          onClick={() => setSelectedBankChannelId(bank.id)}
+                          style={{
+                            padding: '8px 8px',
+                            borderRadius: '9px',
+                            border: isBankSel ? '2px solid #ffffff' : '1px solid rgba(255,255,255,0.14)',
+                            background: isBankSel
+                              ? bank.bgGradient
+                              : 'rgba(2, 6, 23, 0.78)',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-start',
+                            gap: '2px',
+                            textAlign: 'left',
+                            boxShadow: isBankSel ? '0 6px 16px rgba(0,0,0,0.4)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>
+                              {bank.icon} {bank.shortName}
+                            </span>
+                            {isBankSel && (
+                              <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.22)', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
+                                SEÇİLİ
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: '0.62rem', color: isBankSel ? 'rgba(255,255,255,0.9)' : '#94a3b8', fontWeight: 600 }}>
+                            {bank.badge}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* 2. Özel Müşteri Bilgileri & İsteğe Bağlı Özel İndirim / Sektör */}
               <div style={{
                 display: 'grid',
@@ -923,15 +1109,17 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 borderRadius: '12px',
                 padding: '12px'
               }}>
-                {/* Sol Kutu: Müşteri / Firma / Facebook Grubu Seçimi */}
+                {/* Sol Kutu: Müşteri / Firma / Facebook Grubu / Bankacı Seçimi */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8' }}>
                     {selectedChannelId === 'fb_grup'
                       ? '📘 Paylaşılacak Facebook Grubu Adı (Opsiyonel - Hangi Gruptan Geldiğini Görmek İçin):'
-                      : `👤 Müşteri / Firma Bilgisi ${selectedChannelId === 'wa_ozel' ? '(Müşteriye Özel Açılış Başlığı)' : '(Opsiyonel - Doğrudan WA Gönderimi İçin)'}:`}
+                      : selectedChannelId === 'banka_kanal'
+                        ? `🏦 ${selectedBankObj.name} Şube veya Portföy Yöneticisi Adı (Opsiyonel):`
+                        : `👤 Müşteri / Firma Bilgisi ${selectedChannelId === 'wa_ozel' ? '(Müşteriye Özel Açılış Başlığı)' : '(Opsiyonel - Doğrudan WA Gönderimi İçin)'}:`}
                   </div>
 
-                  {/* CRM'den Hızlı Müşteri Bul veya Facebook Grubu Hızlı Etiketleri */}
+                  {/* CRM'den Hızlı Müşteri Bul veya Facebook Grubu / Banka Şubesi Hızlı Etiketleri */}
                   {selectedChannelId === 'fb_grup' ? (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                       {[
@@ -957,6 +1145,35 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                           }}
                         >
                           📘 {gName}
+                        </button>
+                      ))}
+                    </div>
+                  ) : selectedChannelId === 'banka_kanal' ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {[
+                        'Samsun Ticari Şube',
+                        'İlkadım Şubesi KOBİ Portföy',
+                        'Atakum Şubesi Ticari Portföy',
+                        'Samsun Sanayi Şubesi',
+                        'Bafra / Çarşamba Şubesi',
+                        'Ordu / Trabzon / Çorum Ticari Şube'
+                      ].map(bName => (
+                        <button
+                          key={bName}
+                          type="button"
+                          onClick={() => setVipCompanyName(vipCompanyName === bName ? '' : bName)}
+                          style={{
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            border: vipCompanyName === bName ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                            background: vipCompanyName === bName ? 'rgba(2, 132, 199, 0.28)' : 'rgba(255,255,255,0.04)',
+                            color: vipCompanyName === bName ? '#7dd3fc' : '#94a3b8',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          🏦 {bName}
                         </button>
                       ))}
                     </div>
@@ -1026,7 +1243,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                         setVipCompanyName(e.target.value);
                         if (!e.target.value) setVipSelectedCustomer(null);
                       }}
-                      placeholder={selectedChannelId === 'fb_grup' ? 'Facebook Grup Adı yazın veya boş bırakın (Opsiyonel)' : 'Firma veya Müşteri Adı (Opsiyonel)'}
+                      placeholder={
+                        selectedChannelId === 'fb_grup'
+                          ? 'Facebook Grup Adı yazın veya boş bırakın (Opsiyonel)'
+                          : selectedChannelId === 'banka_kanal'
+                            ? `${selectedBankObj.shortName} Şube veya Bankacı Adı (Opsiyonel)`
+                            : 'Firma veya Müşteri Adı (Opsiyonel)'
+                      }
                       style={{
                         padding: '8px 10px',
                         borderRadius: '8px',
@@ -1042,7 +1265,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                         type="tel"
                         value={vipPhone}
                         onChange={(e) => setVipPhone(e.target.value)}
-                        placeholder="WhatsApp Tel (05xx...)"
+                        placeholder={selectedChannelId === 'banka_kanal' ? 'Bankacı WA Tel (05xx...)' : 'WhatsApp Tel (05xx...)'}
                         style={{
                           padding: '8px 10px',
                           borderRadius: '8px',

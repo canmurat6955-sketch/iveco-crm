@@ -53,6 +53,7 @@ const SOURCE_META = {
   fb_grup: { label: 'Facebook Kamyoncu / Nakliye Grubu', short: '📘 Facebook Grubu', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   facebook: { label: 'Facebook Paylaşım Linki', short: '📘 Facebook', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   smmm_kanal: { label: 'Mali Müşavir / SMMM KDV Tablosu Linki', short: '👨‍💼 Mali Müşavir / SMMM', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
+  banka_kanal: { label: 'Bankaya Özel Kredi Oranlı Link', short: '🏦 Banka Özel Linki', color: '#38bdf8', bg: 'rgba(2, 132, 199, 0.2)', border: 'rgba(56, 189, 248, 0.48)' },
   yilsonu_kdv_tarama: { label: 'Yıl Sonu %20 KDV & Şasi Faturası Taraması', short: '🧾 Yıl Sonu KDV Taraması', color: '#fde047', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
   wa_muhasebe_paylasim: { label: 'Müşterinin Mali Müşavirine Gönderdiği KDV Özeti', short: '📤 Muhasebeciye İletilen KDV', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
   instagram: { label: 'Instagram Biyografi / Hikaye / Reels', short: '📸 Instagram', color: '#f472b6', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(236, 72, 153, 0.4)' },
@@ -70,6 +71,9 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   const combined = `${source || ''} ${notesOrCampaign || ''} ${pageUrl || ''}`.toLowerCase();
   if (source === 'proforma_link' || combined.includes('/p/')) {
     return SOURCE_META.proforma_link;
+  }
+  if (combined.includes('banka_') || combined.includes('bank=') || combined.includes('banka=')) {
+    return SOURCE_META.banka_kanal;
   }
   if (combined.includes('smmm') || combined.includes('mali müşavir') || combined.includes('mali musavir')) {
     return SOURCE_META.smmm_kanal;
@@ -160,11 +164,28 @@ function describeClickedLink(signal) {
     }
   }
 
+  let bankInUrl = '';
+  const bankMatch = shortPath.match(/[?&](?:bank|banka)=([^&#]+)/i) || shortPath.match(/[?&]ref=banka_([^&#]+)/i);
+  if (bankMatch && bankMatch[1]) {
+    try {
+      bankInUrl = decodeURIComponent(bankMatch[1].replace(/\+/g, ' ')).replace(/[-_]/g, ' ').toUpperCase();
+    } catch {
+      bankInUrl = bankMatch[1].toUpperCase();
+    }
+  }
+
   if (signal.source === 'proforma_link' || lowerUrl.startsWith('/p/')) {
     return {
       linkTitle: camp || 'Resmi Proforma Teklifi',
       linkSub: shortPath || '/p/teklif',
       isPartner: false
+    };
+  }
+  if (bankInUrl) {
+    return {
+      linkTitle: companyInUrl ? `🏦 Banka Özel Linki (${companyInUrl})` : `🏦 Bankaya Özel Kredi Linki (${bankInUrl})`,
+      linkSub: `/fiyat-listesi?bank=${bankInUrl.toLowerCase()}`,
+      isPartner: true
     };
   }
   if (lowerUrl.includes('ref=yilsonu_kdv_tarama')) {

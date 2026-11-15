@@ -10,12 +10,12 @@ import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiGl
 
 // Not: Kaynaksız "hızlı kredi paketi" örnekleri kaldırıldı; yalnızca resmi banka tablolarındaki kampanyalar gösterilir.
 
-export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
+export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank = null }) {
   // Para Birimi Modu: 'TRY' veya 'EUR'
   const [currencyMode, setCurrencyMode] = useState('TRY');
 
   // TL Kredi State'leri
-  const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
+  const [selectedBankId, setSelectedBankId] = useState(lockedBank?.id || 'teb_cetelem');
   const [loanAmount, setLoanAmount] = useState(1000000);
   const [loanTerm, setLoanTerm] = useState(12);
 
@@ -23,13 +23,39 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
   const [selectedVehicleCategory, setSelectedVehicleCategory] = useState('daily35');
   const [campaignTypeFilter, setCampaignTypeFilter] = useState('all'); // 'all', 'zero', 'grace'
 
-  // EUR Kredi State'leri — paketler doğrudan banka Excel tablolarından (varsayılan: Kuveyt Türk)
-  const [selectedEurBankId, setSelectedEurBankId] = useState('kuveyt_turk');
+  // EUR Kredi State'leri — paketler doğrudan banka Excel tablolarından
+  const [selectedEurBankId, setSelectedEurBankId] = useState(
+    lockedBank?.hasEurCampaigns ? lockedBank.id : 'kuveyt_turk'
+  );
   const [selectedEurPresetId, setSelectedEurPresetId] = useState(null);
   const [eurTypeFilter, setEurTypeFilter] = useState('all'); // 'all' | 'zero' | 'grace' | 'equal'
 
-  const activeBank = BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
-  const activeEurBank = EUR_PARTNER_BANKS.find(b => b.id === selectedEurBankId) || EUR_PARTNER_BANKS[0];
+  React.useEffect(() => {
+    if (lockedBank?.id) {
+      setSelectedBankId(lockedBank.id);
+      if (lockedBank.hasEurCampaigns) {
+        setSelectedEurBankId(lockedBank.id);
+      } else {
+        setCurrencyMode('TRY');
+      }
+    }
+  }, [lockedBank?.id, lockedBank?.hasEurCampaigns]);
+
+  const visibleBanks = useMemo(
+    () => (lockedBank ? BANK_LIST.filter(b => b.id === lockedBank.id) : BANK_LIST),
+    [lockedBank]
+  );
+
+  const visibleEurBanks = useMemo(
+    () => (lockedBank ? EUR_PARTNER_BANKS.filter(b => b.id === lockedBank.id) : EUR_PARTNER_BANKS),
+    [lockedBank]
+  );
+
+  const effectiveBankId = lockedBank?.id || selectedBankId;
+  const effectiveEurBankId = lockedBank?.hasEurCampaigns ? lockedBank.id : selectedEurBankId;
+
+  const activeBank = BANK_LIST.find(b => b.id === effectiveBankId) || visibleBanks[0] || BANK_LIST[0];
+  const activeEurBank = EUR_PARTNER_BANKS.find(b => b.id === effectiveEurBankId) || visibleEurBanks[0] || EUR_PARTNER_BANKS[0];
 
   const eurPackages = useMemo(() => {
     let list = EUR_LOAN_PRESETS.filter(p => p.bankId === activeEurBank.id);
@@ -43,7 +69,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
 
   // Seçili banka ve araç grubuna ait resmi Excel kampanyaları
   const realCampaigns = useMemo(() => {
-    const res = getCampaignsForVehicleAndBank(selectedVehicleCategory, selectedBankId);
+    const res = getCampaignsForVehicleAndBank(selectedVehicleCategory, effectiveBankId);
     let list = res.campaigns || [];
     if (campaignTypeFilter === 'zero') {
       list = list.filter(c => c.rate === 0);
@@ -51,7 +77,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
       list = list.filter(c => c.gracePeriodMonths || c.gracePeriod || (c.title && c.title.toLowerCase().includes('ödemesiz')) || (c.desc && c.desc.toLowerCase().includes('ödemesiz')));
     }
     return list;
-  }, [selectedVehicleCategory, selectedBankId, campaignTypeFilter]);
+  }, [selectedVehicleCategory, effectiveBankId, campaignTypeFilter]);
 
   const handleApplyPreset = (preset) => {
     setLoanAmount(preset.amount);
@@ -101,19 +127,25 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
             textTransform: 'uppercase', 
             letterSpacing: '0.8px' 
           }}>
-            {currencyMode === 'EUR' 
-              ? '🇪🇺 İHRACATÇI & ULUSLARARASI NAKLİYEYE ÖZEL DÖVİZ KREDİSİ' 
-              : '🇹🇷 RESMİ ANLAŞMALI BANKALAR & %0 FAİZ'}
+            {lockedBank
+              ? `${lockedBank.icon} ${lockedBank.name.toUpperCase()} TİCARİ PORTFÖY & KOBİ ÖZEL FİNANSMAN EKRANI`
+              : currencyMode === 'EUR' 
+                ? '🇪🇺 İHRACATÇI & ULUSLARARASI NAKLİYEYE ÖZEL DÖVİZ KREDİSİ' 
+                : '🇹🇷 RESMİ ANLAŞMALI BANKALAR & %0 FAİZ'}
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '4px 0 2px', color: '#fff' }}>
-            {currencyMode === 'EUR' 
-              ? 'S-Way & T-Way İhracatçı Euro (EUR) Kredisi' 
-              : 'IVECO Ticari Finansman & Kredi Çözümleri'}
+            {lockedBank
+              ? `${lockedBank.name} — 2026 IVECO Resmi Kredi Oranları & Ödeme Tablosu`
+              : currencyMode === 'EUR' 
+                ? 'S-Way & T-Way İhracatçı Euro (EUR) Kredisi' 
+                : 'IVECO Ticari Finansman & Kredi Çözümleri'}
           </h2>
           <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
-            {currencyMode === 'EUR'
-              ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: Kuveyt Türk\'te 24 aya kadar %0 kâr payı, 6 ay ödemesiz dönem ve 60 aya kadar eşit taksit seçenekleri.'
-              : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 800.000 TL - 1.500.000 TL arası %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
+            {lockedBank
+              ? `${lockedBank.bankerName ? `Sayın ${lockedBank.bankerName} portföyüne özel hazırlanan bu ekranda ` : 'Bu özel banka bağlantısında '}yalnızca ${lockedBank.name} resmi ticari taşıt kredisi oranları ve vade seçenekleri listelenmektedir. Seçilen şasi için proforma fatura aynı gün kesilir.`
+              : currencyMode === 'EUR'
+                ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: Kuveyt Türk\'te 24 aya kadar %0 kâr payı, 6 ay ödemesiz dönem ve 60 aya kadar eşit taksit seçenekleri.'
+                : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 800.000 TL - 1.500.000 TL arası %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
           </p>
         </div>
         <div style={{
@@ -124,71 +156,73 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
           textAlign: 'right'
         }}>
           <div style={{ fontSize: '0.70rem', color: currencyMode === 'EUR' ? '#38bdf8' : '#4ade80', fontWeight: 700 }}>
-            {currencyMode === 'EUR' ? '🛡️ 32 SAYILI KARAR' : '⚡ 1 SAATTE ÖN ONAY'}
+            {lockedBank ? `🔒 SADECE ${lockedBank.shortName.toUpperCase()}` : (currencyMode === 'EUR' ? '🛡️ 32 SAYILI KARAR' : '⚡ 1 SAATTE ÖN ONAY')}
           </div>
           <div style={{ fontSize: '0.85rem', color: '#fff', fontWeight: 800 }}>
-            {currencyMode === 'EUR' ? 'Döviz Gelirine Özel Düşük Faiz' : 'Kefilsiz & Hızlı Başvuru'}
+            {lockedBank ? 'Aynı Gün Şasi Proforma' : (currencyMode === 'EUR' ? 'Döviz Gelirine Özel Düşük Faiz' : 'Kefilsiz & Hızlı Başvuru')}
           </div>
         </div>
       </div>
 
-      {/* Currency Switcher: TL vs EUR Toggle */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '20px',
-        background: 'rgba(15, 23, 42, 0.8)',
-        padding: '6px',
-        borderRadius: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        width: 'fit-content',
-        flexWrap: 'wrap'
-      }}>
-        <button
-          type="button"
-          onClick={() => setCurrencyMode('TRY')}
-          style={{
-            background: currencyMode === 'TRY' ? '#0284c7' : 'transparent',
-            color: currencyMode === 'TRY' ? '#fff' : '#94a3b8',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            fontSize: '0.82rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.2s'
-          }}
-        >
-          <span>🇹🇷</span> TL Ticari Krediler & %0 Faiz
-        </button>
+      {/* Currency Switcher: TL vs EUR Toggle (EUR toggle hidden if lockedBank does not have EUR campaigns) */}
+      {(!lockedBank || lockedBank.hasEurCampaigns) && (
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '20px',
+          background: 'rgba(15, 23, 42, 0.8)',
+          padding: '6px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          width: 'fit-content',
+          flexWrap: 'wrap'
+        }}>
+          <button
+            type="button"
+            onClick={() => setCurrencyMode('TRY')}
+            style={{
+              background: currencyMode === 'TRY' ? '#0284c7' : 'transparent',
+              color: currencyMode === 'TRY' ? '#fff' : '#94a3b8',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.82rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <span>🇹🇷</span> {lockedBank ? `${lockedBank.shortName} TL Ticari Krediler` : 'TL Ticari Krediler & %0 Faiz'}
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setCurrencyMode('EUR')}
-          style={{
-            background: currencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
-            color: currencyMode === 'EUR' ? '#fff' : '#94a3b8',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            fontSize: '0.82rem',
-            fontWeight: 800,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            transition: 'all 0.2s'
-          }}
-        >
-          <span>💶</span> İhracatçıya Özel Euro (EUR) Kredisi
-          <span style={{ fontSize: '0.66rem', background: '#f59e0b', color: '#000', padding: '1px 6px', borderRadius: '4px', fontWeight: 900 }}>
-            Düşük Faiz
-          </span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setCurrencyMode('EUR')}
+            style={{
+              background: currencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+              color: currencyMode === 'EUR' ? '#fff' : '#94a3b8',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.82rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <span>💶</span> {lockedBank ? `${lockedBank.shortName} Euro (EUR) Kredisi` : 'İhracatçıya Özel Euro (EUR) Kredisi'}
+            <span style={{ fontSize: '0.66rem', background: '#f59e0b', color: '#000', padding: '1px 6px', borderRadius: '4px', fontWeight: 900 }}>
+              Düşük Faiz
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* ======================================================== */}
       {/* 1. SEÇENEK: İHRACATÇI EURO KREDİLERİ (EUR MODE)          */}
@@ -209,18 +243,26 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
             <span style={{ fontSize: '1.4rem' }}>🇪🇺</span>
             <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.5 }}>
               <strong style={{ color: '#4ade80' }}>İhracatçı Firmalar İçin Euro Kredisi Neden Çok Büyük Avantajdır?</strong><br />
-              Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€80.000 için 24 aya kadar, €90.000 - €110.000 için 12 aya kadar %0 kâr payı</strong> ve 6 ay ödemesiz dönem; Garanti BBVA ve BNP Paribas'ta ise <strong>60 aya kadar çok düşük faizli sabit Euro taksit</strong> imkanı vardır.
+              {lockedBank ? (
+                <>
+                  Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>{lockedBank.name} üzerinden dövizle (Euro) borçlanma hakkına</strong> sahiptir. Aşağıda yalnızca <strong>{lockedBank.name}</strong> resmi Euro finansman paketleri yer almaktadır.
+                </>
+              ) : (
+                <>
+                  Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€80.000 için 24 aya kadar, €90.000 - €110.000 için 12 aya kadar %0 kâr payı</strong> ve 6 ay ödemesiz dönem; Garanti BBVA ve BNP Paribas'ta ise <strong>60 aya kadar çok düşük faizli sabit Euro taksit</strong> imkanı vardır.
+                </>
+              )}
             </div>
           </div>
 
           {/* Euro Partner Financial Institutions */}
           <div style={{ marginBottom: '22px' }}>
             <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
-              🏛️ ANLAŞMALI EURO FİNANSMAN KURUMLARI
+              🏛️ {lockedBank ? `${lockedBank.name.toUpperCase()} EURO FİNANSMAN PROGRAMI` : 'ANLAŞMALI EURO FİNANSMAN KURUMLARI'}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
-              {EUR_PARTNER_BANKS.map(bank => {
-                const isSelected = selectedEurBankId === bank.id;
+              {visibleEurBanks.map(bank => {
+                const isSelected = effectiveEurBankId === bank.id;
                 return (
                   <button
                     key={bank.id}
@@ -404,55 +446,57 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep }) {
         /* 2. SEÇENEK: TL TİCARİ KREDİLER (TRY MODE)                */
         /* ======================================================== */
         <div>
-          {/* Partner Banks Grid */}
-          <div style={{ marginBottom: '22px' }}>
-            <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
-              🏛️ ANLAŞMALI RESMİ FİNANSMAN KURUMLARI
+          {/* Partner Banks Grid (Hidden when lockedBank is active since the header already highlights activeBank) */}
+          {!lockedBank && (
+            <div style={{ marginBottom: '22px' }}>
+              <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
+                🏛️ ANLAŞMALI RESMİ FİNANSMAN KURUMLARI
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+                {visibleBanks.map(bank => {
+                  const isSelected = effectiveBankId === bank.id;
+                  return (
+                    <button
+                      key={bank.id}
+                      type="button"
+                      onClick={() => setSelectedBankId(bank.id)}
+                      style={{
+                        background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.45) 0%, rgba(28, 48, 80, 0.92) 100%)' : 'rgba(30, 52, 86, 0.82)',
+                        border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
+                        borderRadius: '12px',
+                        padding: '12px 14px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        color: '#fff',
+                        boxShadow: isSelected ? '0 4px 16px rgba(2, 132, 199, 0.35)' : 'none',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
+                        <span style={{
+                          fontSize: '0.66rem',
+                          fontWeight: 800,
+                          background: bank.bg || 'rgba(56, 189, 248, 0.15)',
+                          color: bank.color || '#38bdf8',
+                          padding: '2px 6px',
+                          borderRadius: '6px'
+                        }}>
+                          {bank.badge}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff' }}>
+                        {bank.name}
+                      </div>
+                      <div style={{ fontSize: '0.70rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
+                        {bank.description}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
-              {BANK_LIST.map(bank => {
-                const isSelected = selectedBankId === bank.id;
-                return (
-                  <button
-                    key={bank.id}
-                    type="button"
-                    onClick={() => setSelectedBankId(bank.id)}
-                    style={{
-                      background: isSelected ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.45) 0%, rgba(28, 48, 80, 0.92) 100%)' : 'rgba(30, 52, 86, 0.82)',
-                      border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
-                      borderRadius: '12px',
-                      padding: '12px 14px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      color: '#fff',
-                      boxShadow: isSelected ? '0 4px 16px rgba(2, 132, 199, 0.35)' : 'none',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
-                      <span style={{
-                        fontSize: '0.66rem',
-                        fontWeight: 800,
-                        background: bank.bg || 'rgba(56, 189, 248, 0.15)',
-                        color: bank.color || '#38bdf8',
-                        padding: '2px 6px',
-                        borderRadius: '6px'
-                      }}>
-                        {bank.badge}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#ffffff' }}>
-                      {bank.name}
-                    </div>
-                    <div style={{ fontSize: '0.70rem', color: '#cbd5e1', marginTop: '4px', lineHeight: 1.3 }}>
-                      {bank.description}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          )}
 
           {/* Selected Bank Highlight & Presets */}
           <div style={{

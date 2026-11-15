@@ -97,7 +97,7 @@ function normalizeSectorId(rawSector) {
   return 'all';
 }
 
-export default function PricingCatalogTab({ initialSector = '', partnerProtocol = null, onSelectVehicle, onDirectWhatsApp, onTrackFootprint, salesRep }) {
+export default function PricingCatalogTab({ initialSector = '', partnerProtocol = null, lockedBank = null, onSelectVehicle, onOpenLoanTab, onDirectWhatsApp, onTrackFootprint, salesRep }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => normalizeSectorId(initialSector));
   const [searchQuery, setSearchQuery] = useState('');
@@ -322,7 +322,9 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
     if (onDirectWhatsApp) {
       const protocolPrefix = partnerProtocol
         ? ` [🏛️ *${partnerProtocol.fullName}* — ${partnerProtocol.discountLabel}]`
-        : '';
+        : lockedBank
+          ? ` [🏦 *${lockedBank.name}* Özel Finansman]`
+          : '';
       if (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) {
         const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat)${protocolPrefix} için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
         onDirectWhatsApp(msg);
@@ -366,7 +368,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
     if (seg === 't-way') {
       return '🚜 10mm Ağır Şasi • ⚖️ 26T (6x4) & 32T (8x4) Kantar • 🏗️ Damper & Mikser';
     }
-    return '🚛 Resmi Kantar Uyumlu • 🏦 Anlaşmalı Banka & Katılım Finansmanı';
+    return `🚛 Resmi Kantar Uyumlu • 🏦 ${lockedBank ? `${lockedBank.name} Özel` : 'Anlaşmalı Banka & Katılım'} Finansmanı`;
   };
 
   const handleShareWithPartner = (vehicle, effectiveTlPrice, vatShieldTl, remainingAfterTradeIn, monthlyPaymentEst) => {
@@ -380,7 +382,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
         `KDV Avantajı: ${vatShieldTl.toLocaleString('tr-TR')} TL | 1.Yıl Amortisman: ${firstYearAmortisman.toLocaleString('tr-TR')} TL`
       );
     }
-    const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_muhasebe_paylasim`;
+    const bankQuery = lockedBank ? `&bank=${lockedBank.id}` : '';
+    const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_muhasebe_paylasim${bankQuery}`;
     const priceLine = (vehicle.segment === 'T-Way' || vehicle.isCustomPrice)
       ? `💰 *Fiyat:* Özel Şantiye / Proje Teklifi`
       : vehicle.currency === 'EUR'
@@ -389,9 +392,10 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
     const vatLine = vatShieldTl > 0
       ? `\n🧾 *İndirilecek %20 KDV (Tek Seferde Mahsup):* ~${vatShieldTl.toLocaleString('tr-TR')} TL\n📉 *1. Yıl Tam Amortisman Gideri (%20 - Ticari Şaside Kıst Amortisman Yok):* ~${firstYearAmortisman.toLocaleString('tr-TR')} TL (~${corpTaxShield.toLocaleString('tr-TR')} TL Kurumlar Vergisi Avantajı)\n⚡ *Yıl Sonu Fatura Notu:* Üstyapının (kasa/frigo/tente) tamamlanmasını beklemeden *ŞASİ faturası hemen kesilip* 2026 KDV ve amortisman hakkı kullanılabilir.`
       : '';
+    const bankPrefix = lockedBank ? `${lockedBank.name} • ` : '';
     const loanLine = (!vehicle.isCustomPrice && vehicle.currency !== 'EUR' && remainingAfterTradeIn > 0)
-      ? `\n💳 *Kampanya Özeti:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) | ${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat/Takas Sonrası Kalan: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)`
-      : `\n💳 *Kampanya Özeti:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) veya 6 Ay Ödemesiz Ticari Kredi`;
+      ? `\n💳 *Kampanya Özeti:* ${bankPrefix}1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) | ${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat/Takas Sonrası Kalan: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)`
+      : `\n💳 *Kampanya Özeti:* ${bankPrefix}1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) veya 6 Ay Ödemesiz Ticari Kredi`;
 
     const text =
       `📋 *2026 IVECO Yıl Sonu KDV, Amortisman & Kampanya Tablosu (Mali Müşavir / Muhasebe Özeti)*\n` +
@@ -1770,7 +1774,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                       whiteSpace: 'nowrap'
                     }}
                   >
-                    <FiTruck size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> Kredi Planı
+                    <FiTruck size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {lockedBank ? `${lockedBank.shortName} Kredi` : 'Kredi Planı'}
                   </button>
 
                   <button
@@ -1873,12 +1877,13 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
         const incomeTaxShieldTl = Math.round(firstYearDepTl * taxEntityRate);
         const totalFirstYearGainTl = kdvAmountTl + incomeTaxShieldTl;
 
+        const bankTag = lockedBank ? `${lockedBank.shortName} • ` : '';
         const summaryRows = [
-          { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: 1850000, campaign: '1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)' },
-          { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: 2050000, campaign: '1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)' },
-          { label: 'Daily 70C18 / 72C18 Şasi (7.2 Ton)', gross: 2490000, campaign: '1M TL %0 Faiz veya 6 Ay Ödemesiz Kredi' },
-          { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: 'Anlaşmalı Banka & Katılım Kredisi' },
-          { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: 'İhracatçı Euro & TL Filo Finansmanı' }
+          { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: 1850000, campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
+          { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: 2050000, campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
+          { label: 'Daily 70C18 / 72C18 Şasi (7.2 Ton)', gross: 2490000, campaign: `${bankTag}1M TL %0 Faiz veya 6 Ay Ödemesiz Kredi` },
+          { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Özel Ticari Kredisi` : 'Anlaşmalı Banka & Katılım Kredisi' },
+          { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Filo Finansmanı` : 'İhracatçı Euro & TL Filo Finansmanı' }
         ];
 
         const handleShareFullTaxTable = () => {
@@ -1889,7 +1894,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
               `Fatura: ${activeInvoiceTl.toLocaleString('tr-TR')} TL | KDV: ${kdvAmountTl.toLocaleString('tr-TR')} TL | Toplam 1.Yıl Vergi Avantajı: ${totalFirstYearGainTl.toLocaleString('tr-TR')} TL`
             );
           }
-          const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_smmm_tablo`;
+          const bankQuery = lockedBank ? `&bank=${lockedBank.id}` : '';
+          const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_smmm_tablo${bankQuery}`;
           const msg =
             `👨‍💼 *2026 IVECO Yıl Sonu KDV, Tam Amortisman & Kampanya Tablosu (Mali Müşavir / Muhasebe Özeti)*\n\n` +
             `🚛 *Seçilen Araç:* ${selectedModalVeh?.model || 'IVECO 2026 Ticari Şasi'}\n` +
@@ -1900,7 +1906,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
             `🏦 *3. Kurumlar/Gelir Vergisi Kalkanı (%${Math.round(taxEntityRate * 100)}):* *~${incomeTaxShieldTl.toLocaleString('tr-TR')} TL*\n` +
             `✅ *1. Yıl Toplam KDV + Vergi Avantajı:* *~${totalFirstYearGainTl.toLocaleString('tr-TR')} TL*\n\n` +
             `⚡ *Kritik Yıl Sonu Avantajı:* Ticari şasi alımlarında binek araçtaki kıst amortisman ve gider kısıtlaması yoktur. Üstyapının (kasa/frigo/tente) bitmesini beklemeden *ŞASİ faturası hemen kesilip* 2026 vergisinden düşülebilir.\n` +
-            `💳 *Aktif Kredi Kampanyası:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)\n\n` +
+            `💳 *Aktif Kredi Kampanyası:* ${lockedBank ? `${lockedBank.name} • ` : ''}1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)\n\n` +
             `📞 *Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n` +
             `👇 *Canlı katalog ve tüm modellerin KDV tablosu:*\n${shareUrl}`;
           window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');

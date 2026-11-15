@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { discoveryApi, fetchTcmbEurRate } from '../../api/client';
 import toast, { Toaster } from 'react-hot-toast';
-import { BANK_LIST, AMOUNT_TIERS, getAmountTiersForCategory, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS } from '../../data/bankCampaigns';
+import { BANK_LIST, AMOUNT_TIERS, getAmountTiersForCategory, getCampaignsForVehicleAndBank, EUR_LOAN_PRESETS, EUR_PARTNER_BANKS, resolveBankFromSearchParams } from '../../data/bankCampaigns';
 import { resolvePartnerFromSearchParams } from '../../data/partnerProtocols';
 import {
   FiTruck,
@@ -652,6 +652,7 @@ const VEHICLE_CATALOG = [
 export default function PublicVehicleFinder() {
   const [searchParams] = useSearchParams();
   const activePartner = useMemo(() => resolvePartnerFromSearchParams(searchParams), [searchParams]);
+  const lockedBank = useMemo(() => resolveBankFromSearchParams(searchParams), [searchParams]);
   const detectedReferrerChannel = useMemo(() => {
     if (typeof document === 'undefined' || !document.referrer) return '';
     const r = document.referrer.toLowerCase();
@@ -660,7 +661,7 @@ export default function PublicVehicleFinder() {
     if (r.includes('facebook') || r.includes('fb.')) return 'facebook';
     return '';
   }, []);
-  const refCode = searchParams.get('ref') || searchParams.get('src') || searchParams.get('source') || detectedReferrerChannel || (activePartner ? `partner_${activePartner.id}` : 'wa_durum');
+  const refCode = searchParams.get('ref') || searchParams.get('src') || searchParams.get('source') || detectedReferrerChannel || (lockedBank ? `banka_${lockedBank.id}` : (activePartner ? `partner_${activePartner.id}` : 'wa_durum'));
   const customerIdParam = searchParams.get('cid') || searchParams.get('customer_id');
   const companyParam = searchParams.get('company') || searchParams.get('firma') || searchParams.get('comp') || '';
   const nameParam = searchParams.get('name') || searchParams.get('yetkili') || '';
@@ -831,14 +832,27 @@ export default function PublicVehicleFinder() {
   }, [modelParam]);
 
   // Kredi Parametreleri (Çoklu Banka & Tutar Kırılımları - Ekim 2026 Kampanyaları)
-  const [selectedBankId, setSelectedBankId] = useState('teb_cetelem');
+  const [selectedBankId, setSelectedBankId] = useState(lockedBank?.id || 'teb_cetelem');
   const [selectedTierId, setSelectedTierId] = useState('all');
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
   // İhracatçı Euro Kredisi State'leri (S-Way, T-Way ve Uluslararası Nakliye İçin)
   const [loanCurrencyMode, setLoanCurrencyMode] = useState('TRY');
-  const [selectedEurBankId, setSelectedEurBankId] = useState('kuveyt_turk');
+  const [selectedEurBankId, setSelectedEurBankId] = useState(
+    lockedBank?.hasEurCampaigns ? lockedBank.id : 'kuveyt_turk'
+  );
   const [selectedEurCampaignId, setSelectedEurCampaignId] = useState(null);
+
+  useEffect(() => {
+    if (lockedBank?.id) {
+      setSelectedBankId(lockedBank.id);
+      if (lockedBank.hasEurCampaigns) {
+        setSelectedEurBankId(lockedBank.id);
+      } else {
+        setLoanCurrencyMode('TRY');
+      }
+    }
+  }, [lockedBank?.id, lockedBank?.hasEurCampaigns]);
 
   // VIP Test & Simülasyon Paneli State'leri (Satış Sorumlusu: Can Murat Onay)
   const [showTestPanel, setShowTestPanel] = useState(false);
@@ -1373,10 +1387,23 @@ export default function PublicVehicleFinder() {
     };
   }, [selectedModelKey, selectedCatalogOverride, payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
 
+  const visibleFinderBanks = useMemo(
+    () => (lockedBank ? BANK_LIST.filter(b => b.id === lockedBank.id) : BANK_LIST),
+    [lockedBank]
+  );
+
+  const visibleFinderEurBanks = useMemo(
+    () => (lockedBank ? EUR_PARTNER_BANKS.filter(b => b.id === lockedBank.id) : EUR_PARTNER_BANKS),
+    [lockedBank]
+  );
+
+  const activeFinderBankId = lockedBank?.id || selectedBankId;
+  const activeFinderEurBankId = lockedBank?.hasEurCampaigns ? lockedBank.id : selectedEurBankId;
+
   // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
-    return getCampaignsForVehicleAndBank(matched.series, selectedBankId, selectedTierId);
-  }, [matched.series, selectedBankId, selectedTierId]);
+    return getCampaignsForVehicleAndBank(matched.series, activeFinderBankId, selectedTierId);
+  }, [matched.series, activeFinderBankId, selectedTierId]);
 
   const categoryTiers = useMemo(() => {
     return getAmountTiersForCategory(vehicleCategory);
@@ -1392,8 +1419,8 @@ export default function PublicVehicleFinder() {
   }, [categoryTiers, selectedTierId]);
 
   const currentBankMeta = useMemo(() => {
-    return BANK_LIST.find(b => b.id === selectedBankId) || BANK_LIST[0];
-  }, [selectedBankId]);
+    return BANK_LIST.find(b => b.id === activeFinderBankId) || visibleFinderBanks[0] || BANK_LIST[0];
+  }, [activeFinderBankId, visibleFinderBanks]);
 
   const activeCampaign = useMemo(() => {
     if (!availableCampaigns || availableCampaigns.length === 0) return null;
@@ -1406,8 +1433,8 @@ export default function PublicVehicleFinder() {
 
   // İhracatçı Euro Finansmanı Banka ve Paket Bilgileri
   const activeEurBankMeta = useMemo(() => {
-    return EUR_PARTNER_BANKS.find(b => b.id === selectedEurBankId) || EUR_PARTNER_BANKS[0];
-  }, [selectedEurBankId]);
+    return EUR_PARTNER_BANKS.find(b => b.id === activeFinderEurBankId) || visibleFinderEurBanks[0] || EUR_PARTNER_BANKS[0];
+  }, [activeFinderEurBankId, visibleFinderEurBanks]);
 
   const eurBankPresets = useMemo(() => {
     return EUR_LOAN_PRESETS.filter(p => p.bankId === activeEurBankMeta.id);
@@ -1418,17 +1445,26 @@ export default function PublicVehicleFinder() {
   }, [eurBankPresets, selectedEurCampaignId]);
 
   // Model değişiminde EUR aracı (S-Way, T-Way) otomatik olarak Euro Kredisi modunu aktif eder
+  // (Ancak tek banka kilidi aktifse ve o bankanın Euro tablosu yoksa TRY modunda kalır)
   useEffect(() => {
+    if (lockedBank && !lockedBank.hasEurCampaigns) {
+      setLoanCurrencyMode('TRY');
+      return;
+    }
     if (matched && (matched.currency === 'EUR' || matched.key === 'tractor_sway' || (matched.key && matched.key.startsWith('tway_')))) {
       setLoanCurrencyMode('EUR');
     }
-  }, [matched?.key, matched?.currency]);
+  }, [matched?.key, matched?.currency, lockedBank]);
 
   const socialSourceLabel = React.useMemo(() => {
     const code = (refCode || '').toLowerCase();
+    if (lockedBank) {
+      return `${lockedBank.icon || '🏦'} ${lockedBank.name} Özel Link Ziyaretçisi`;
+    }
     if (activePartner && activePartner.id !== 'vip_ozel') {
       return `${activePartner.icon || '🏛️'} ${activePartner.shortName} Üyesi Ziyaretçisi`;
     }
+    if (code.includes('smmm')) return '👨‍💼 Mali Müşavir / SMMM Linki Ziyaretçisi';
     if (code.includes('fb_grup')) return '📘 Facebook Grubu Ziyaretçisi';
     if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
     if (code.includes('wa_grup') || code.includes('grup') || code.includes('nakliye')) return '🚚 Nakliye WhatsApp Grubu Ziyaretçisi';
@@ -1443,7 +1479,7 @@ export default function PublicVehicleFinder() {
       return `${activePartner.icon || '👑'} ${activePartner.shortName} Ziyaretçisi`;
     }
     return '';
-  }, [refCode, activePartner]);
+  }, [refCode, activePartner, lockedBank]);
 
   // 📡 CANLI MÜŞTERİ AYAK İZİ (Sessiz Sinyal Kaydedici — Müşteri Form Doldurmasa Bile Ne İncelediğini CRM'e ve WhatsApp Botuna İletir)
   const sentFootprintsRef = React.useRef(new Set());
@@ -2847,6 +2883,91 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
+      {/* ── 🏦 BANKAYA ÖZEL KURUMSAL FİNANSMAN & PORTFÖY BANNER'I (Sadece Seçilen Bankanın Oranları Görünür) ── */}
+      {lockedBank && (
+        <div style={{
+          maxWidth: '1080px',
+          margin: '0 auto 12px',
+          background: `linear-gradient(135deg, ${lockedBank.bg || 'rgba(16, 185, 129, 0.22)'} 0%, rgba(15, 23, 42, 0.96) 65%, rgba(2, 132, 199, 0.2) 100%)`,
+          border: `1.5px solid ${lockedBank.color || '#10b981'}`,
+          borderRadius: isMobileView ? '12px' : '16px',
+          padding: isMobileView ? '9px 12px' : '14px 18px',
+          display: 'flex',
+          flexDirection: isMobileView ? 'row' : 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+          flexWrap: 'wrap',
+          boxShadow: '0 8px 24px rgba(2, 6, 23, 0.35)',
+          textAlign: 'left'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobileView ? '8px' : '12px', flex: '1 1 240px', minWidth: 0 }}>
+            <div style={{
+              width: isMobileView ? '34px' : '44px',
+              height: isMobileView ? '34px' : '44px',
+              borderRadius: '10px',
+              background: lockedBank.bg || 'rgba(16, 185, 129, 0.22)',
+              border: `1.5px solid ${lockedBank.color || '#10b981'}`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: isMobileView ? '1.15rem' : '1.45rem',
+              flexShrink: 0
+            }}>
+              {lockedBank.icon || '🏦'}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{
+                fontSize: isMobileView ? '0.64rem' : '0.7rem',
+                fontWeight: 900,
+                color: lockedBank.color || '#4ade80',
+                textTransform: 'uppercase',
+                letterSpacing: '0.4px'
+              }}>
+                🔒 {lockedBank.name.toUpperCase()} {lockedBank.branchName ? `(${lockedBank.branchName}) ` : ''}ÖZEL TİCARİ FİNANSMAN EKRANI
+              </div>
+              <div style={{
+                fontSize: isMobileView ? '0.82rem' : '0.98rem',
+                fontWeight: 900,
+                color: '#ffffff',
+                lineHeight: 1.25
+              }}>
+                {lockedBank.bankerName
+                  ? `Sayın ${lockedBank.bankerName} Portföyü — Yalnızca ${lockedBank.shortName} Resmi Oranları Aktif`
+                  : `Bu Bağlantıda Yalnızca ${lockedBank.name} Resmi Ticari Kredi Oranları Listelenmektedir`}
+              </div>
+              {!isMobileView && (
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '2px' }}>
+                  {lockedBank.description} • <strong>Aynı gün şasi proforma faturası: Satış Sorumlusu Can Murat (0544 622 59 31)</strong>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainTab('krediler');
+              recordCustomerFootprint('Banka Özel Linki', `${lockedBank.name} Kredi Tablosu Açıldı`, 'Banka Özel Banner');
+            }}
+            style={{
+              background: lockedBank.color || '#10b981',
+              color: '#020617',
+              border: 'none',
+              borderRadius: '10px',
+              padding: isMobileView ? '7px 10px' : '9px 14px',
+              fontSize: isMobileView ? '0.72rem' : '0.78rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
+            }}
+          >
+            {lockedBank.icon} {lockedBank.shortName} Oran Tablosu →
+          </button>
+        </div>
+      )}
+
       {/* 🚀 SONUÇ ODAKLI KOMPAKT HIZLI GEÇİŞ & REHBER BARI (ÖNCE SONUÇ, İSTERSE DETAY) */}
       <div style={{
         maxWidth: '1080px',
@@ -2901,7 +3022,7 @@ IVECO ERC Samsun Otomotiv
             type="button"
             onClick={() => {
               setActiveMainTab('krediler');
-              recordCustomerFootprint('Başlangıç Kutusu', 'Banka Kredi & Taksit Tablosu', 'Hızlı Başlangıç');
+              recordCustomerFootprint('Başlangıç Kutusu', lockedBank ? `${lockedBank.name} Kredi Tablosu` : 'Banka Kredi & Taksit Tablosu', 'Hızlı Başlangıç');
             }}
             style={{
               minWidth: 0,
@@ -2919,13 +3040,13 @@ IVECO ERC Samsun Otomotiv
               gap: isMobileView ? '6px' : '8px'
             }}
           >
-            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>💳</span>
+            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>{lockedBank ? lockedBank.icon : '💳'}</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#6ee7b7', lineHeight: 1.18 }}>
-                Kredi & Taksit Hesapla
+                {lockedBank ? `${lockedBank.shortName} Kredi Oranları` : 'Kredi & Taksit Hesapla'}
               </div>
               <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
-                %0 faiz & anlaşmalı bankalar
+                {lockedBank ? `Sadece ${lockedBank.shortName} tablosu` : '%0 faiz & anlaşmalı bankalar'}
               </div>
             </div>
           </button>
@@ -3079,8 +3200,13 @@ IVECO ERC Samsun Otomotiv
           <PricingCatalogTab
             initialSector={sectorParam || activePartner?.defaultSector || ''}
             partnerProtocol={activePartner}
+            lockedBank={lockedBank}
+            onOpenLoanTab={() => {
+              setActiveMainTab('krediler');
+              recordCustomerFootprint('Fiyat Listesinden Banka Tablosuna Geçti', lockedBank ? lockedBank.name : 'Tüm Bankalar', 'Banka Kredi Sekmesi');
+            }}
             onSelectVehicle={(vehicle) => {
-              recordCustomerFootprint('Kredi Planı İnceleme', vehicle?.model || String(vehicle), '2026 Fiyat Listesinden Seçildi');
+              recordCustomerFootprint('Kredi Planı İnceleme', vehicle?.model || String(vehicle), lockedBank ? `${lockedBank.name} Özel Linkten Seçildi` : '2026 Fiyat Listesinden Seçildi');
               handleSelectVehicle(vehicle);
               setActiveMainTab('secici');
               setStep(2);
@@ -3122,6 +3248,7 @@ IVECO ERC Samsun Otomotiv
       {activeMainTab === 'krediler' && (
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
           <LoanFinanceTab
+            lockedBank={lockedBank}
             onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
             salesRep={SALES_REP}
           />
@@ -4283,69 +4410,71 @@ IVECO ERC Samsun Otomotiv
               </div>
 
               {/* Para Birimi & Finansman Türü Seçimi (TL vs İhracatçı Euro) */}
-              <div style={{
-                display: isMobileView ? 'grid' : 'flex',
-                gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : undefined,
-                gap: '6px',
-                marginBottom: '16px',
-                background: 'rgba(2, 6, 23, 0.65)',
-                padding: '4px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                width: isMobileView ? '100%' : 'fit-content',
-                boxSizing: 'border-box'
-              }}>
-                <button
-                  type="button"
-                  onClick={() => { setLoanCurrencyMode('TRY'); setShowAllLoansMobile(false); }}
-                  style={{
-                    minWidth: 0,
-                    background: loanCurrencyMode === 'TRY' ? '#0284c7' : 'transparent',
-                    color: loanCurrencyMode === 'TRY' ? '#fff' : '#94a3b8',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: isMobileView ? '8px 6px' : '6px 14px',
-                    fontSize: isMobileView ? '0.75rem' : '0.78rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <span>🇹🇷</span> TL Ticari Kredi
-                </button>
+              {(!lockedBank || lockedBank.hasEurCampaigns) && (
+                <div style={{
+                  display: isMobileView ? 'grid' : 'flex',
+                  gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : undefined,
+                  gap: '6px',
+                  marginBottom: '16px',
+                  background: 'rgba(2, 6, 23, 0.65)',
+                  padding: '4px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  width: isMobileView ? '100%' : 'fit-content',
+                  boxSizing: 'border-box'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => { setLoanCurrencyMode('TRY'); setShowAllLoansMobile(false); }}
+                    style={{
+                      minWidth: 0,
+                      background: loanCurrencyMode === 'TRY' ? '#0284c7' : 'transparent',
+                      color: loanCurrencyMode === 'TRY' ? '#fff' : '#94a3b8',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: isMobileView ? '8px 6px' : '6px 14px',
+                      fontSize: isMobileView ? '0.75rem' : '0.78rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '5px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span>🇹🇷</span> {lockedBank ? `${lockedBank.shortName} TL Kredi` : 'TL Ticari Kredi'}
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => { setLoanCurrencyMode('EUR'); setShowAllLoansMobile(false); }}
-                  style={{
-                    minWidth: 0,
-                    background: loanCurrencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
-                    color: loanCurrencyMode === 'EUR' ? '#fff' : '#94a3b8',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: isMobileView ? '8px 6px' : '6px 14px',
-                    fontSize: isMobileView ? '0.74rem' : '0.78rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <span>💶</span> {isMobileView ? 'Euro (EUR) Kredisi' : 'İhracatçı Euro (EUR) Kredisi'}
-                  {!isMobileView && (
-                    <span style={{ fontSize: '0.64rem', background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
-                      Düşük Döviz Faizi
-                    </span>
-                  )}
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => { setLoanCurrencyMode('EUR'); setShowAllLoansMobile(false); }}
+                    style={{
+                      minWidth: 0,
+                      background: loanCurrencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+                      color: loanCurrencyMode === 'EUR' ? '#fff' : '#94a3b8',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: isMobileView ? '8px 6px' : '6px 14px',
+                      fontSize: isMobileView ? '0.74rem' : '0.78rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '5px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span>💶</span> {lockedBank ? `${lockedBank.shortName} Euro Kredisi` : (isMobileView ? 'Euro (EUR) Kredisi' : 'İhracatçı Euro (EUR) Kredisi')}
+                    {!isMobileView && (
+                      <span style={{ fontSize: '0.64rem', background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
+                        Düşük Döviz Faizi
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
 
               {loanCurrencyMode === 'EUR' ? (
                 /* ── İHRACATÇI EURO KREDİSİ GÖRÜNÜMÜ ── */
@@ -4361,15 +4490,23 @@ IVECO ERC Samsun Otomotiv
                     lineHeight: 1.45
                   }}>
                     🛡️ <strong style={{ color: '#4ade80' }}>S-Way / T-Way Euro Finansman Kampanyaları:</strong><br />
-                    Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için <strong>Kuveyt Türk</strong> (12 aya kadar %0 kâr payı, 6 ay ödemesiz seçenekler), <strong>Garanti BBVA</strong> ve <strong>BNP Paribas</strong> (%0 faizli Euro paketler) kampanya tabloları geçerlidir.
+                    {lockedBank ? (
+                      <>
+                        Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için yalnızca <strong>{lockedBank.name}</strong> resmi Euro kampanya tablosu gösterilmektedir.
+                      </>
+                    ) : (
+                      <>
+                        Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için <strong>Kuveyt Türk</strong> (12 aya kadar %0 kâr payı, 6 ay ödemesiz seçenekler), <strong>Garanti BBVA</strong> ve <strong>BNP Paribas</strong> (%0 faizli Euro paketler) kampanya tabloları geçerlidir.
+                      </>
+                    )}
                   </div>
 
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px' }}>
-                    Anlaşmalı Euro Finansman Kurumu:
+                    {lockedBank ? `🔒 Aktif Euro Finansman Kurumu (${lockedBank.name}):` : 'Anlaşmalı Euro Finansman Kurumu:'}
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginBottom: '16px' }}>
-                    {EUR_PARTNER_BANKS.map(bank => {
-                      const isSelected = selectedEurBankId === bank.id;
+                    {visibleFinderEurBanks.map(bank => {
+                      const isSelected = activeFinderEurBankId === bank.id;
                       return (
                         <button
                           key={bank.id}
@@ -4535,12 +4672,20 @@ IVECO ERC Samsun Otomotiv
                 /* ── TL TİCARİ KREDİ GÖRÜNÜMÜ ── */
                 <div>
                   <p style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '14px', lineHeight: 1.4 }}>
-                    Çalıştığınız bankayı seçerek <strong>{matched.series}</strong> modeline özel taksit ve finansman seçeneklerini inceleyebilirsiniz:
+                    {lockedBank ? (
+                      <>
+                        <strong>{lockedBank.name}</strong> bünyesinde <strong>{matched.series}</strong> modeline özel güncel ticari kredi oranları ve taksit seçenekleri:
+                      </>
+                    ) : (
+                      <>
+                        Çalıştığınız bankayı seçerek <strong>{matched.series}</strong> modeline özel taksit ve finansman seçeneklerini inceleyebilirsiniz:
+                      </>
+                    )}
                   </p>
 
               {/* 1. BANKA SEÇİCİ GRID */}
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                Hangi Banka ile Çalışıyorsunuz?
+                {lockedBank ? `🔒 Aktif Finansman Kurumu (${lockedBank.name}):` : 'Hangi Banka ile Çalışıyorsunuz?'}
               </label>
               <div style={{
                 display: 'grid',
@@ -4548,8 +4693,8 @@ IVECO ERC Samsun Otomotiv
                 gap: '8px',
                 marginBottom: '16px'
               }}>
-                {BANK_LIST.map(bank => {
-                  const isSelected = selectedBankId === bank.id;
+                {visibleFinderBanks.map(bank => {
+                  const isSelected = activeFinderBankId === bank.id;
                   return (
                     <button
                       key={bank.id}

@@ -2591,8 +2591,193 @@ export const BANK_CAMPAIGNS = {
       }
     ]
   },
+  "denizbank": {
+    "daily35": [
+      {
+        "id": "db_35_800_8",
+        "title": "800.000 TL — 8 Ay (%0 Faiz — DenizBank Ticari)",
+        "principal": 800000,
+        "term": 8,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 100000,
+        "total": 800000,
+        "highlight": true,
+        "tag": "SIFIR FAİZ"
+      },
+      {
+        "id": "db_35_900_9",
+        "title": "900.000 TL — 9 Ay (%0 Faiz — DenizBank Ticari)",
+        "principal": 900000,
+        "term": 9,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 100000,
+        "total": 900000,
+        "highlight": true,
+        "tag": "9 AY SIFIR FAİZ"
+      },
+      {
+        "id": "db_35_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%0.79 Faiz — DenizBank)",
+        "principal": 1000000,
+        "term": 12,
+        "rateLabel": "%0.79",
+        "rate": 0.79,
+        "monthly": 87915,
+        "total": 1054980,
+        "highlight": true,
+        "tag": "AVANTAJLI 12 AY"
+      },
+      {
+        "id": "db_35_1500_24",
+        "title": "1.500.000 TL — 24 Ay (%2.38 Faiz — DenizBank)",
+        "principal": 1500000,
+        "term": 24,
+        "rateLabel": "%2.38",
+        "rate": 2.38,
+        "monthly": 84120,
+        "total": 2018880
+      },
+      {
+        "id": "db_35_2000_36",
+        "title": "2.000.000 TL — 36 Ay (%2.74 Faiz — DenizBank)",
+        "principal": 2000000,
+        "term": 36,
+        "rateLabel": "%2.74",
+        "rate": 2.74,
+        "monthly": 90499,
+        "total": 3257964
+      }
+    ],
+    "daily70": [
+      {
+        "id": "db_70_1000_12",
+        "title": "1.000.000 TL — 12 Ay (%0 Faiz — DenizBank)",
+        "principal": 1000000,
+        "term": 12,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 83333,
+        "total": 1000000,
+        "highlight": true,
+        "tag": "12 AY SIFIR FAİZ"
+      },
+      {
+        "id": "db_70_1100_12",
+        "title": "1.100.000 TL — 12 Ay (%0 Faiz — DenizBank)",
+        "principal": 1100000,
+        "term": 12,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 91667,
+        "total": 1100000,
+        "highlight": true,
+        "tag": "1.1M SIFIR FAİZ"
+      },
+      {
+        "id": "db_70_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.38 Faiz — DenizBank)",
+        "principal": 1500000,
+        "term": 12,
+        "rateLabel": "%1.38",
+        "rate": 1.38,
+        "monthly": 137126,
+        "total": 1645512
+      },
+      {
+        "id": "db_70_2500_24",
+        "title": "2.500.000 TL — 24 Ay (%2.48 Faiz — DenizBank)",
+        "principal": 2500000,
+        "term": 24,
+        "rateLabel": "%2.48",
+        "rate": 2.48,
+        "monthly": 141227,
+        "total": 3389445
+      },
+      {
+        "id": "db_70_3500_36",
+        "title": "3.500.000 TL — 36 Ay (%2.81 Faiz — DenizBank)",
+        "principal": 3500000,
+        "term": 36,
+        "rateLabel": "%2.81",
+        "rate": 2.81,
+        "monthly": 159128,
+        "total": 5728608
+      }
+    ],
+    "eurocargo": [
+      {
+        "id": "db_ec_1100_12",
+        "title": "1.100.000 TL — 12 Ay (%0 Faiz — DenizBank)",
+        "principal": 1100000,
+        "term": 12,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 91667,
+        "total": 1100000,
+        "highlight": true,
+        "tag": "1.1M SIFIR FAİZ"
+      },
+      {
+        "id": "db_ec_1500_12",
+        "title": "1.500.000 TL — 12 Ay (%1.38 Faiz — DenizBank)",
+        "principal": 1500000,
+        "term": 12,
+        "rateLabel": "%1.38",
+        "rate": 1.38,
+        "monthly": 137126,
+        "total": 1645512
+      },
+      {
+        "id": "db_ec_2500_24",
+        "title": "2.500.000 TL — 24 Ay (%2.48 Faiz — DenizBank)",
+        "principal": 2500000,
+        "term": 24,
+        "rateLabel": "%2.48",
+        "rate": 2.48,
+        "monthly": 141227,
+        "total": 3389445
+      },
+      {
+        "id": "db_ec_3500_36",
+        "title": "3.500.000 TL — 36 Ay (%2.81 Faiz — DenizBank)",
+        "principal": 3500000,
+        "term": 36,
+        "rateLabel": "%2.81",
+        "rate": 2.81,
+        "monthly": 159128,
+        "total": 5728608
+      }
+    ]
+  },
   "bnp_paribas": {
-    "daily35": [],
+    "daily35": [
+      {
+        "id": "bnp_35_800_8",
+        "title": "800.000 TL — 8 Ay (%0 Faiz — BNP Paribas)",
+        "principal": 800000,
+        "term": 8,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 100000,
+        "total": 800000,
+        "highlight": true,
+        "tag": "SIFIR FAİZ"
+      },
+      {
+        "id": "bnp_35_900_9",
+        "title": "900.000 TL — 9 Ay (%0 Faiz — BNP Paribas)",
+        "principal": 900000,
+        "term": 9,
+        "rateLabel": "%0 Faiz",
+        "rate": 0,
+        "monthly": 100000,
+        "total": 900000,
+        "highlight": true,
+        "tag": "9 AY SIFIR FAİZ"
+      }
+    ],
     "daily70": [
       {
         "id": "bnp_70_1000_12",
@@ -2623,6 +2808,68 @@ export const BANK_CAMPAIGNS = {
     ]
   }
 };
+
+const BANK_QUERY_ALIASES = {
+  garanti: 'garanti',
+  garanti_bbva: 'garanti',
+  garantibbva: 'garanti',
+  deniz: 'denizbank',
+  denizbank: 'denizbank',
+  deniz_bank: 'denizbank',
+  kuveyt: 'kuveyt_turk',
+  kuveyt_turk: 'kuveyt_turk',
+  kuveytturk: 'kuveyt_turk',
+  albaraka: 'albaraka',
+  albaraka_turk: 'albaraka',
+  albarakaturk: 'albaraka',
+  teb: 'teb_cetelem',
+  cetelem: 'teb_cetelem',
+  teb_cetelem: 'teb_cetelem',
+  akbank: 'akbank',
+  is: 'is_bankasi',
+  is_bankasi: 'is_bankasi',
+  isbankasi: 'is_bankasi',
+  yapi_kredi: 'yapi_kredi',
+  yapikredi: 'yapi_kredi',
+  yk: 'yapi_kredi',
+  vakif: 'vakif_katilim',
+  vakif_katilim: 'vakif_katilim',
+  vakifkatilim: 'vakif_katilim',
+  bnp: 'bnp_paribas',
+  bnp_paribas: 'bnp_paribas',
+  bnpparibas: 'bnp_paribas'
+};
+
+export function resolveBankFromSearchParams(searchParams) {
+  if (!searchParams) return null;
+  const rawBank = (
+    searchParams.get('bank') ||
+    searchParams.get('banka') ||
+    ''
+  ).trim().toLowerCase();
+
+  const rawRef = (searchParams.get('ref') || '').trim().toLowerCase();
+  let candidateKey = rawBank;
+  if (!candidateKey && rawRef.startsWith('banka_')) {
+    candidateKey = rawRef.replace(/^banka_/, '');
+  }
+  if (!candidateKey) return null;
+
+  const resolvedId = BANK_QUERY_ALIASES[candidateKey] || candidateKey;
+  const bankObj = BANK_LIST.find(b => b.id === resolvedId && b.id !== 'diger_yok');
+  if (!bankObj) return null;
+
+  const hasEurCampaigns = EUR_PARTNER_BANKS.some(eb => eb.id === bankObj.id);
+  const bankerName = (searchParams.get('bbanker') || searchParams.get('bankaci') || '').trim();
+  const branchName = (searchParams.get('bbranch') || searchParams.get('sube') || '').trim();
+
+  return {
+    ...bankObj,
+    hasEurCampaigns,
+    bankerName,
+    branchName
+  };
+}
 
 export function getCampaignsForVehicleAndBank(modelKey = 'daily35', bankId = 'teb_cetelem', tierId = 'all') {
   let category = 'daily35';
