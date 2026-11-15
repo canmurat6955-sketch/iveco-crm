@@ -52,6 +52,9 @@ const SOURCE_META = {
   wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: '👥 WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
   fb_grup: { label: 'Facebook Kamyoncu / Nakliye Grubu', short: '📘 Facebook Grubu', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   facebook: { label: 'Facebook Paylaşım Linki', short: '📘 Facebook', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
+  smmm_kanal: { label: 'Mali Müşavir / SMMM KDV Tablosu Linki', short: '👨‍💼 Mali Müşavir / SMMM', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
+  yilsonu_kdv_tarama: { label: 'Yıl Sonu %20 KDV & Şasi Faturası Taraması', short: '🧾 Yıl Sonu KDV Taraması', color: '#fde047', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
+  wa_muhasebe_paylasim: { label: 'Müşterinin Mali Müşavirine Gönderdiği KDV Özeti', short: '📤 Muhasebeciye İletilen KDV', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
   instagram: { label: 'Instagram Biyografi / Hikaye / Reels', short: '📸 Instagram', color: '#f472b6', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(236, 72, 153, 0.4)' },
   linkedin: { label: 'LinkedIn Kurumsal Filo Paylaşımı', short: '💼 LinkedIn', color: '#38bdf8', bg: 'rgba(14, 165, 233, 0.16)', border: 'rgba(14, 165, 233, 0.4)' },
   wa_musteri: { label: 'WhatsApp Müşteri Linki', short: '💬 WhatsApp Müşteri', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
@@ -67,6 +70,15 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   const combined = `${source || ''} ${notesOrCampaign || ''} ${pageUrl || ''}`.toLowerCase();
   if (source === 'proforma_link' || combined.includes('/p/')) {
     return SOURCE_META.proforma_link;
+  }
+  if (combined.includes('smmm') || combined.includes('mali müşavir') || combined.includes('mali musavir')) {
+    return SOURCE_META.smmm_kanal;
+  }
+  if (combined.includes('yilsonu_kdv_tarama')) {
+    return SOURCE_META.yilsonu_kdv_tarama;
+  }
+  if (combined.includes('wa_muhasebe_paylasim') || combined.includes('wa_smmm_tablo')) {
+    return SOURCE_META.wa_muhasebe_paylasim;
   }
   if (combined.includes('partner=') || combined.includes('protokol') || combined.includes('ziraat') || combined.includes('esob') || combined.includes('kooperatif') || combined.includes('odası') || combined.includes('odasi')) {
     return { label: 'Özel Kampanya / Oda Protokol Linki', short: '🏛️ Özel Kampanya / Oda Linki', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.4)' };
@@ -153,6 +165,20 @@ function describeClickedLink(signal) {
       linkTitle: camp || 'Resmi Proforma Teklifi',
       linkSub: shortPath || '/p/teklif',
       isPartner: false
+    };
+  }
+  if (lowerUrl.includes('ref=yilsonu_kdv_tarama')) {
+    return {
+      linkTitle: companyInUrl ? `🧾 Yıl Sonu KDV Taraması (${companyInUrl})` : '🧾 Yıl Sonu KDV & Şasi Faturası Taraması',
+      linkSub: '/fiyat-listesi?ref=yilsonu_kdv_tarama',
+      isPartner: false
+    };
+  }
+  if (lowerUrl.includes('ref=smmm_kanal') || lowerUrl.includes('partner=smmm') || lowerUrl.includes('protokol_smmm')) {
+    return {
+      linkTitle: companyInUrl ? `👨‍💼 Mali Müşavir / SMMM: ${companyInUrl}` : '👨‍💼 Mali Müşavir & SMMM KDV Tablosu Linki',
+      linkSub: '/fiyat-listesi (Mali Müşavir / KDV Tablosu)',
+      isPartner: true
     };
   }
   if (lowerUrl.includes('ref=fb_grup') || signal.source === 'fb_grup') {
@@ -915,8 +941,36 @@ export default function IntentRadar() {
     }
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const model = (signal.realModelsList && signal.realModelsList[0]) || 'IVECO 2026 Ticari Araç';
-    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat olarak ulaşıyorum (0544 622 59 31). Dijital kataloğumuzda incelediğiniz ${model} ve Kasım 2026 dönemine özel %0 faizli / ödemesiz ticari finansman seçeneklerimiz hakkında firmanıza özel ödeme tablosunu paylaşmak isterim.`;
+    const message = `Merhaba, IVECO ERC Samsun Otomotiv Satış Sorumlusu Can Murat olarak ulaşıyorum (0544 622 59 31). Dijital kataloğumuzda incelediğiniz ${model} ve 2026 dönemine özel %0 faizli / ödemesiz ticari finansman seçeneklerimiz hakkında firmanıza özel ödeme tablosunu paylaşmak isterim.`;
     const url = `https://wa.me/90${cleanPhone.startsWith('0') ? cleanPhone.slice(1) : cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
+  // Yıl Sonu %20 KDV & Hemen Şasi Faturası + Kampanya Tablosu Mesajı Gönder (Madde 4)
+  const handleOpenTaxWhatsApp = (signal) => {
+    if (!signal.phone) {
+      toast.error('Telefon numarası bulunamadı');
+      return;
+    }
+    const cleanPhone = signal.phone.replace(/\D/g, '');
+    const last10 = cleanPhone.slice(-10);
+    const model = (signal.realModelsList && signal.realModelsList[0]) || '2026 IVECO Ticari Şasi';
+    const baseOrigin = (getPublicOrigin() || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const params = new URLSearchParams();
+    if (signal.matched_customer_id) params.set('cid', String(signal.matched_customer_id));
+    if (signal.company_name && !isGenericVisitorName(signal.company_name)) params.set('company', signal.company_name);
+    if (last10) params.set('phone', last10);
+    params.set('ref', 'yilsonu_kdv_tarama');
+    const trackLink = `${baseOrigin}/fiyat-listesi?${params.toString()}`;
+    const hasName = signal.company_name && !isGenericVisitorName(signal.company_name);
+    const prefix = hasName ? `*${signal.company_name}* — ` : '';
+    const message =
+      `${prefix}Merhaba, hayırlı işler dilerim. 🙏\n\n` +
+      `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+      `Dijital ekranımızda incelediğiniz *${model}* için yıl sonu vergi/KDV kapanışı öncesi önemli bir avantajı paylaşmak istedim: Üstyapının (kasa/frigo/tente) tamamlanmasını beklemeden *ŞASİ faturanızı hemen kesebiliyoruz*; böylece fatura içindeki *%20 KDV'nin tamamını* ve *1. yıl %20 tam amortismanı (kıst amortisman olmadan)* doğrudan 2026 verginizden düşebiliyorsunuz.\n\n` +
+      `📊 Size özel hazırladığım *KDV, Amortisman & 1.000.000 TL %0 Faiz Kampanya Tablosunu* aşağıdan inceleyip tek tuşla mali müşavirinize iletebilirsiniz 👇\n\n` +
+      `${trackLink}`;
+    const url = `https://wa.me/90${last10}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
@@ -2439,47 +2493,71 @@ export default function IntentRadar() {
                   {/* 4. SÜTUN: İletişim & CRM Aksiyon Butonları */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {signal.phone ? (
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <a
-                          href={`tel:${signal.phone.replace(/\s+/g, '')}`}
-                          style={{
-                            flex: 1,
-                            background: 'rgba(16, 185, 129, 0.15)',
-                            color: '#10b981',
-                            border: '1px solid rgba(16, 185, 129, 0.35)',
-                            borderRadius: '6px',
-                            padding: '8px 10px',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '5px',
-                            textDecoration: 'none'
-                          }}
-                        >
-                          <FiPhoneCall size={14} /> Hemen Ara
-                        </a>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <a
+                            href={`tel:${signal.phone.replace(/\s+/g, '')}`}
+                            style={{
+                              flex: 1,
+                              background: 'rgba(16, 185, 129, 0.15)',
+                              color: '#10b981',
+                              border: '1px solid rgba(16, 185, 129, 0.35)',
+                              borderRadius: '6px',
+                              padding: '8px 10px',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '5px',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            <FiPhoneCall size={14} /> Hemen Ara
+                          </a>
+
+                          <button
+                            onClick={() => handleOpenWhatsApp(signal)}
+                            style={{
+                              flex: 1,
+                              background: 'rgba(34, 197, 94, 0.15)',
+                              color: '#22c55e',
+                              border: '1px solid rgba(34, 197, 94, 0.35)',
+                              borderRadius: '6px',
+                              padding: '8px 10px',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '5px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <FiMessageSquare size={14} /> WhatsApp
+                          </button>
+                        </div>
 
                         <button
-                          onClick={() => handleOpenWhatsApp(signal)}
+                          onClick={() => handleOpenTaxWhatsApp(signal)}
                           style={{
-                            flex: 1,
-                            background: 'rgba(34, 197, 94, 0.15)',
-                            color: '#22c55e',
-                            border: '1px solid rgba(34, 197, 94, 0.35)',
+                            width: '100%',
+                            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%)',
+                            color: '#fde047',
+                            border: '1px solid rgba(245, 158, 11, 0.45)',
                             borderRadius: '6px',
-                            padding: '8px 10px',
-                            fontSize: '0.8rem',
-                            fontWeight: 700,
+                            padding: '6px 10px',
+                            fontSize: '0.73rem',
+                            fontWeight: 800,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '5px',
                             cursor: 'pointer'
                           }}
+                          title="Üstyapıyı beklemeden şasi faturası + %20 KDV + 1M TL %0 faiz kampanya tablosu linkini WhatsApp'tan gönder"
                         >
-                          <FiMessageSquare size={14} /> WhatsApp
+                          🧾 Yıl Sonu KDV & Şasi Faturası Linki
                         </button>
                       </div>
                     ) : (

@@ -7,7 +7,7 @@ import {
   buildPartnerShareUrl,
   buildPartnerAnnouncementText
 } from '../../data/partnerProtocols';
-import { crmApi } from '../../api/client';
+import { crmApi, discoveryApi } from '../../api/client';
 import { getPublicOrigin } from '../../utils/publicUrl';
 import { openWhatsAppChat } from '../../utils/openExternal';
 import {
@@ -53,6 +53,14 @@ const SOCIAL_CHANNELS = [
     color: '#f59e0b'
   },
   {
+    id: 'smmm_kanal',
+    label: '👨‍💼 Mali Müşavir / Muhasebeci',
+    shortDesc: 'Mali müşavirlere ve mükelleflerine özel %20 KDV + Kampanya Tablosu linki',
+    refCode: 'smmm_kanal',
+    badgeText: '👨‍💼 Mali Müşavir / SMMM Linki Ziyaretçisi',
+    color: '#10b981'
+  },
+  {
     id: 'wa_grup',
     label: '🚚 Nakliye WA Grupları',
     shortDesc: 'Kamyoncu, nakliyeci ve lojistik WhatsApp grupları için duyuru linki',
@@ -88,11 +96,13 @@ const SOCIAL_CHANNELS = [
 
 const QUICK_TL_DISCOUNTS = [25000, 40000, 50000, 75000, 100000];
 const QUICK_PCT_DISCOUNTS = [1.5, 2, 3, 4, 5];
+const TAX_OUTREACH_SENT_KEY = 'iveco_year_end_tax_sent_v1';
 
 export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [isExpanded, setIsExpanded] = useState(true);
-  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Instagram / LinkedIn
-  // 'partners' = Dernek, Oda & Birlik Protokolleri (SİMDER, Arıcılar Birliği vb.)
+  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Mali Müşavir / FB Grupları / Instagram / LinkedIn
+  // 'partners' = Dernek, Oda & Birlik Protokolleri (SİMDER, SMMM, Arıcılar Birliği vb.)
+  // 'tax_radar' = Madde 4: CRM'deki Eski Kayıtlara & Niyet Radarı'na "Yıl Sonu KDV / Vergi Uyarısı" Hızlı Tarama
   const [studioMode, setStudioMode] = useState('channels');
 
   // --- SEKME 1: SOSYAL MEDYA & WHATSAPP MÜŞTERİ LİNK ÜRETİCİ STATE'LERİ ---
@@ -110,7 +120,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [channelDiscountValue, setChannelDiscountValue] = useState(50000);
   const [channelDiscountTitle, setChannelDiscountTitle] = useState('Özel Müşteri İskontosu');
 
-  // --- SEKME 2: DERNEK, ODA & BİRLİK (SİMDER, ARICILAR BİRLİĞİ VB.) STATE'LERİ ---
+  // --- SEKME 2: DERNEK, ODA & BİRLİK (SİMDER, SMMM, ARICILAR BİRLİĞİ VB.) STATE'LERİ ---
   const [customPartners, setCustomPartners] = useState(() => getSavedCustomPartners());
   const allPresets = useMemo(() => [...DEFAULT_PARTNER_PROTOCOLS, ...customPartners], [customPartners]);
   const [selectedId, setSelectedId] = useState('simder');
@@ -123,6 +133,21 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [defaultSector, setDefaultSector] = useState(DEFAULT_PARTNER_PROTOCOLS[0].defaultSector);
   const [extraPerk, setExtraPerk] = useState(DEFAULT_PARTNER_PROTOCOLS[0].extraPerk);
   const [targetPhone, setTargetPhone] = useState('');
+
+  // --- SEKME 3 (MADDE 4): ESKİ CRM KAYITLARI & NİYET RADARI YIL SONU KDV TARAMASI STATE'LERİ ---
+  const [taxRadarTargets, setTaxRadarTargets] = useState([]);
+  const [taxRadarLoading, setTaxRadarLoading] = useState(false);
+  const [taxRadarSearch, setTaxRadarSearch] = useState('');
+  const [taxRadarFilter, setTaxRadarFilter] = useState('unsent'); // 'all' | 'unsent' | 'crm' | 'radar'
+  const [taxRadarTemplate, setTaxRadarTemplate] = useState('esnaf_kdv'); // 'esnaf_kdv' | 'kurumsal_vergi' | 'smmm_muhasebe'
+  const [sentTaxPhones, setSentTaxPhones] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem(TAX_OUTREACH_SENT_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
 
   const origin = getPublicOrigin();
 
@@ -288,11 +313,29 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       );
     }
 
-    // 3. %20 KDV VERGİ KALKANI & MUHASEBE KANCASI
-    if (hookStyle === 'tax_hook') {
+    // 3. %20 KDV VERGİ KALKANI, KAMPANYA TABLOSU & ŞASİ FATURASI KANCASI
+    if (hookStyle === 'tax_hook' || selectedChannelId === 'smmm_kanal') {
+      if (selectedChannelId === 'smmm_kanal') {
+        const prefix = vipCompanyName.trim() ? `Sayın *${vipCompanyName.trim()}*,\n\n` : `👨‍💼 *Değerli Mali Müşavirimiz / SMMM Meslek Mensubumuz,*\n\n`;
+        return (
+          `${prefix}` +
+          `Yıl sonu vergi planlamasında yüksek *KDV* veya *Gelir/Kurumlar Vergisi* çıkacak mükellefleriniz için hazırladığımız *2026 IVECO KDV, Tam Amortisman & Kampanya Tablomuzu* bilgilerinize sunarız${discountShortNote}:\n\n` +
+          `🧾 *1. %20 İndirilecek KDV:* Ticari şasi/panelvan/çekici faturasındaki *%20 KDV (~308.000 TL - 1.150.000 TL)* tek seferde ödenecek KDV'den mahsup edilir.\n` +
+          `📉 *2. Kıst Amortisman Yok:* Binek araçların aksine ticari araçlarımızda kıst amortisman sınırı yoktur; yılın son ayında kesilen faturada bile *1. yıl %20 tam amortisman* gider yazılır.\n` +
+          `⚡ *3. Üstyapıyı Beklemeden Hemen Şasi Faturası:* Kasa/frigo imalatını beklemeden *ŞASİ faturasını hemen kesiyoruz*; mükellefiniz 2026 vergi avantajını kaçırmadan üstyapısını yaptırabiliyor.\n` +
+          `💳 *4. Kampanya Özeti:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)*\n\n` +
+          `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n` +
+          `👇 *Canlı KDV & Kampanya Tablosunu incelemek veya mükellefinizle paylaşmak için tıklayın:*\n\n` +
+          `${link}`
+        );
+      }
       return (
-        `🧾 *Vergi Ödemek Yerine Filoyu Yenilemek İsteyen İşletmelerimize Not:*\n\n` +
-        `2026 model IVECO şasi ve çekici modellerimizde aracın fatura bedeli içindeki *%20 KDV tutarını doğrudan vergiden düşebileceğiniz* tutarları ve *1M TL %0 Faiz* kredi tablosunu tek ekranda hazırladık${discountShortNote}. Mali müşavirinize tek tuşla gönderebilirsiniz 👇\n\n` +
+        `🧾 *Yıl Sonu Vergi & KDV Ödemek Yerine Filoyu Yenilemek İsteyen İşletmelerimize Not:*\n\n` +
+        `2026 model IVECO şasi, panelvan ve çekici alımlarında:\n` +
+        `✅ Fatura içindeki *%20 KDV'nin tamamını* doğrudan ödenecek KDV'nizden düşebilir,\n` +
+        `✅ Binek araçtaki kıst amortisman cezasına takılmadan *1. yıl %20 tam amortisman* gider yazabilir,\n` +
+        `✅ Kasa/üstyapı sırasını beklemeden *ŞASİ faturanızı hemen kestirip* *1.000.000 TL 12 Ay %0 Faiz* avantajından yararlanabilirsiniz${discountShortNote}!\n\n` +
+        `📊 Ekrandaki *"🧾 KDV & Kampanya"* butonundan kendi faturanızı hesaplayıp mali müşavirinize tek tuşla gönderebilirsiniz 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
       );
@@ -305,6 +348,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `2026 model IVECO Daily (B ve C Ehliyet), Eurocargo, S-Way ve T-Way güncel fiyat listemizi, anlaşmalı banka kredi oranlarımızı ve takas hesaplama ekranımızı aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n` +
         discountLine +
         `✅ *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya vadeli banka oranlarıyla aylık taksitinizi anında görün,\n` +
+        `🧾 *%20 KDV & Kampanya Tablosu:* Model bazlı indirilecek KDV ve tam yıl amortisman tablosunu tek tıkla muhasebecinize iletin,\n` +
         `📸 *4 Resimle 15 Dk'da Takas:* Mevcut aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyip 15 dakikada takas ön fiyatı alın 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
@@ -319,6 +363,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `IVECO ERC Samsun'da *Satış Sorumlusu Can Murat* olarak senin için özel bir canlı katalog ve hesaplama bağlantısı hazırladım. Artık 2026 şasi fiyatlarına bakmak veya takas/kredi hesabı yapmak için beni aramana bile gerek yok:\n\n` +
           discountLine +
           `🔄 Elindeki aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* ile kalan taksitini 10 saniyede kendin hesaplayabilirsin,\n` +
+          `🧾 Yıl sonu *%20 KDV İndirimi + Tam Amortisman* tablosunu tek tuşla muhasebecine gönderebilirsin,\n` +
           `📸 Mevcut aracının *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takasla fiyat alabilirsin 👇\n\n` +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
           `${link}`
@@ -328,7 +373,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         return (
           `Sayın *${targetTitle}* Yönetimi,\n\n` +
           `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
-          `2026 yılı filo yenileme ve ticari araç yatırımlarınız kapsamında firmanıza özel hazırladığım dijital katalog, %20 KDV vergi kalkanı & amortisman özeti ve ticari kredi simülasyon bağlantınızı bilgilerinize sunarım:\n\n` +
+          `2026 yılı filo yenileme ve ticari araç yatırımlarınız kapsamında firmanıza özel hazırladığım dijital katalog, %20 KDV vergi kalkanı & tam yıl amortisman özeti (üstyapıyı beklemeden şasi faturası kesim imkanı) ve ticari kredi simülasyon bağlantınızı bilgilerinize sunarım:\n\n` +
           discountLine +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
           `${link}`
@@ -337,7 +382,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       return (
         `Sayın *${targetTitle}*,\n\n` +
         `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
-        `Firmanız için hazırladığım 2026 model IVECO şasi fiyat listesini, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (1 dıştan, 1 içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz 👇\n\n` +
+        `Firmanız için hazırladığım 2026 model IVECO şasi fiyat listesini, %20 KDV + kampanya tablosunu, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (1 dıştan, 1 içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz 👇\n\n` +
         discountLine +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
         `${link}`
@@ -347,12 +392,12 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     if (selectedChannelId === 'wa_grup') {
       return (
         `🚛 *Gruptaki tüm nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, kazasız belasız seferler dilerim!*\n\n` +
-        `IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz *2026 Canlı Fiyat, Takas & Kredi Ekranımızı* açtık:\n\n` +
+        `IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz *2026 Canlı Fiyat, KDV Tablosu, Takas & Kredi Ekranımızı* açtık:\n\n` +
         discountLine +
         `✅ *Ehliyet & Tonaja Göre Seçim:* Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici (CE Ehliyet) ve T-Way Damper/Mikser,\n` +
         `🔄 *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz veya anlaşmalı banka oranlarıyla aylık taksitinizi anında görün,\n` +
-        `📸 *4 Resimle 15 Dk'da Takas:* Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım,\n` +
-        `🔔 *Takastan Temiz 2. El Habercisi:* Sıfır bütçesini aşanlar kaydolsun, takasa temiz araç düştüğü an ilk size haber verelim!\n\n` +
+        `🧾 *Yıl Sonu %20 KDV & Şasi Faturası Avantajı:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV'yi verginizden düşün,\n` +
+        `📸 *4 Resimle 15 Dk'da Takas:* Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
         `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31*\n` +
         `👇 *Hemen incelemek ve hesap yapmak için tıklayın:*\n\n` +
         `${link}`
@@ -363,10 +408,11 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       const groupTitle = vipCompanyName.trim() ? `📘 ${vipCompanyName.trim()} üyelerine özel ` : '';
       return (
         `🚛 Gruptaki tüm kamyoncu, nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, bol kazançlar dilerim!\n\n` +
-        `${groupTitle}IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz 2026 Canlı Şasi Fiyat, Takas & Kredi Ekranımızı açtık:\n\n` +
+        `${groupTitle}IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz 2026 Canlı Şasi Fiyat, KDV Tablosu, Takas & Kredi Ekranımızı açtık:\n\n` +
         discountLine +
         `✅ Ehliyet & Tonaja Göre Şasi Seçimi: Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici ve T-Way,\n` +
         `🏗️ 24 Gerçek Üstyapı Örneği Galerisi: Şasi üzerine tente, kapalı kasa, frigo, damper, vinç ve oto kurtarıcı uygulama örnekleri,\n` +
+        `🧾 %20 KDV & Tam Amortisman Tablosu: Üstyapıyı beklemeden şasi faturası kesip %20 KDV'yi vergiden düşme hesabı,\n` +
         `🔄 Canlı Takas + Kredi Hesabı: Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya banka oranlarıyla aylık taksitinizi anında görün,\n` +
         `📸 4 Resimle 15 Dk'da Takas: Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
         `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n` +
@@ -381,9 +427,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         discountLine +
         `Yeni Dijital Showroom ekranımızda neler var?\n` +
         `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
+        `🧾 Yıl Sonu %20 KDV & Mali Müşavir Kampanya Tablosu,\n` +
         `📸 4 Resimle (1 Dıştan, 1 İçten, KM, Ruhsat) 15 Dakikada Takas Ekspertizi,\n` +
         `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
-        `☕ Showroom Kahve, İş Yeri Ziyareti veya Canlı Görüntülü Araç Turu Randevusu,\n` +
         `🔔 Sıfır bütçesini aşanlar için: Takastan Temiz 2. El IVECO Habercisi!\n\n` +
         `📞 Satış Sorumlusu Can Murat — 0544 622 59 31\n` +
         `👇 Hemen denemek için profilimdeki / hikayemdeki linke tıklayın:\n\n` +
@@ -398,7 +444,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       `Platform üzerinden doğrudan:\n` +
       `1️⃣ Tonaj, üstyapı ve ehliyet sınıfına göre 2026 Daily (3.5T - 7T), Eurocargo, S-Way Çekici ve T-Way şasi eşleştirmesi,\n` +
       `2️⃣ Takas peşinatı + %0 faizli TL ve EUR ticari kredi nakit akış simülasyonu,\n` +
-      `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, 5 Yıllık TCO Yakıt Avantajı & Amortisman özeti,\n` +
+      `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, Kıst Amortisman Muafiyeti & Üstyapıyı Beklemeden Hemen Şasi Faturası Özeti,\n` +
       `4️⃣ 4 fotoğrafla (dıştan, içten, KM, ruhsat) 15 dakikada takas değerleme ve 24 saatlik ücretsiz şasi/fiyat blokajı oluşturabilirsiniz 👇\n\n` +
       `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n\n` +
       `${link}\n\n` +
@@ -414,6 +460,161 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     channelDiscountType,
     channelDiscountValue
   ]);
+
+  // --- SEKME 3 (MADDE 4): CRM ESKİ KAYITLAR & NİYET RADARI YIL SONU KDV TARAMASI ---
+  useEffect(() => {
+    if (studioMode !== 'tax_radar' || taxRadarTargets.length > 0) return;
+    let active = true;
+    const loadTargets = async () => {
+      setTaxRadarLoading(true);
+      try {
+        const [crmRes, radarRes] = await Promise.allSettled([
+          crmApi.getCustomers({ page_size: 100 }),
+          discoveryApi.getIntentSignals({ limit: 150 })
+        ]);
+        const mapByPhone = new Map();
+        const normalizePhoneKey = (p) => {
+          const digits = String(p || '').replace(/\D/g, '');
+          if (digits.length < 10) return '';
+          return digits.slice(-10);
+        };
+
+        if (radarRes.status === 'fulfilled') {
+          const signals = radarRes.value?.data || [];
+          signals.forEach(s => {
+            const pKey = normalizePhoneKey(s.phone);
+            if (!pKey) return;
+            const rawName = (s.matched_customer_name || s.company_name || '').trim();
+            const isAnon = !rawName || rawName.toLowerCase().includes('anonim') || rawName.toLowerCase().includes('ziyaretçi');
+            if (!mapByPhone.has(pKey)) {
+              mapByPhone.set(pKey, {
+                key: `radar_${pKey}`,
+                phoneKey: pKey,
+                phone: s.phone,
+                customerId: s.matched_customer_id || null,
+                name: isAnon ? 'Niyet Radarı Ziyaretçisi' : rawName,
+                city: s.city || 'Samsun',
+                model: s.target_model || '2026 IVECO Şasi',
+                sourceType: 'radar',
+                sourceBadge: '📡 Niyet Radarı'
+              });
+            }
+          });
+        }
+
+        if (crmRes.status === 'fulfilled') {
+          const items = crmRes.value?.data?.items || crmRes.value?.data || [];
+          items.forEach(c => {
+            const pKey = normalizePhoneKey(c.phone);
+            if (!pKey) return;
+            const existing = mapByPhone.get(pKey);
+            mapByPhone.set(pKey, {
+              key: `crm_${c.id}`,
+              phoneKey: pKey,
+              phone: c.phone,
+              customerId: c.id,
+              name: c.company_name || c.contact_person || existing?.name || 'Kayıtlı Müşteri',
+              city: c.city || existing?.city || 'Samsun',
+              model: existing?.model || c.interested_model || '2026 IVECO Şasi',
+              sourceType: existing ? 'both' : 'crm',
+              sourceBadge: existing ? '🔥 CRM + Radarda İnceledi' : '🗂️ CRM Kayıtlı Müşteri'
+            });
+          });
+        }
+
+        if (active) {
+          setTaxRadarTargets(Array.from(mapByPhone.values()));
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (active) setTaxRadarLoading(false);
+      }
+    };
+    loadTargets();
+    return () => { active = false; };
+  }, [studioMode, taxRadarTargets.length]);
+
+  const buildTaxRadarCustomerLink = (target) => {
+    const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const params = new URLSearchParams();
+    if (target.customerId) params.set('cid', String(target.customerId));
+    if (target.name && !target.name.includes('Ziyaretçisi')) params.set('company', target.name);
+    if (target.phoneKey) params.set('phone', target.phoneKey);
+    params.set('ref', 'yilsonu_kdv_tarama');
+    return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
+  };
+
+  const buildTaxRadarCustomerMessage = (target) => {
+    const link = buildTaxRadarCustomerLink(target);
+    const hasRealName = target.name && !target.name.includes('Ziyaretçisi') && !target.name.includes('Kayıtlı Müşteri');
+    const titlePrefix = hasRealName ? `*${target.name}* — ` : '';
+    const modelNote = target.model && target.model !== 'Genel Fiyat Listesi' ? `*${target.model}* ve ` : '';
+
+    if (taxRadarTemplate === 'kurumsal_vergi') {
+      return (
+        `Sayın ${hasRealName ? `*${target.name}* Yönetimi` : 'Değerli İş Ortağımız'},\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `Yıl sonu vergi planlaması döneminde yüksek KDV veya Kurumlar/Gelir Vergisi ödemek yerine filonuzu yenileyebilmeniz için firmanıza özel *2026 KDV, Tam Amortisman & Kampanya Tablomuzu* hazırladım:\n\n` +
+        `🧾 *%20 İndirilecek KDV:* Ticari şasi/çekici faturasındaki %20 KDV'nin tamamı tek seferde ödenecek KDV'den mahsup edilir.\n` +
+        `📉 *Kıst Amortisman Yok:* Binek araçların aksine ticari araçlarımızda kıst amortisman sınırı yoktur; *1. yıl %20 tam amortisman* doğrudan gider yazılır.\n` +
+        `⚡ *Üstyapıyı Beklemeden Hemen Şasi Faturası:* Kasa/frigo imalatının bitmesini beklemeden *ŞASİ faturanızı hemen kesiyoruz*; vergi avantajını bu yıl kullanıp üstyapıyı dilediğiniz zaman yaptırabilirsiniz.\n` +
+        `💳 *Finansman:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)*\n\n` +
+        `👇 *Firmanıza özel canlı KDV & Kampanya Tablosunu incelemek ve mali müşavirinize iletmek için tıklayın:*\n\n` +
+        `${link}`
+      );
+    }
+
+    if (taxRadarTemplate === 'smmm_muhasebe') {
+      return (
+        `${titlePrefix}Merhaba, hayırlı işler dilerim. 🙏\n\n` +
+        `Mali müşavirinizle yıl sonu KDV ve vergi mahsubu hesabınızı kolayca yapabilmeniz için ${modelNote}2026 model IVECO ticari araçlarımızın *KDV Hariç Net Matrah, %20 İndirilecek KDV, 1. Yıl Tam Amortisman (Kıst Amortisman Yok) ve 1M TL %0 Faiz Kampanya Tablosunu* aşağıdaki bağlantıya yükledim.\n\n` +
+        `⚡ Üstyapının (kasa/frigo/tente) bitmesini beklemeden *ŞASİ faturanızı hemen kesip* 2026 vergisinden düşebiliyoruz.\n\n` +
+        `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun*\n` +
+        `👇 *KDV & Kampanya Tablosunu açmak veya muhasebecinize iletmek için tıklayın:*\n\n` +
+        `${link}`
+      );
+    }
+
+    // Default: 'esnaf_kdv' (Samimi Esnaf Yıl Sonu KDV & Şasi Faturası Uyarısı)
+    return (
+      `${titlePrefix}Abi selamlar, hayırlı işler, bol kazançlar dilerim. 🙏\n\n` +
+      `Sene sonu yaklaşırken yüksek KDV veya vergi ödemek yerine aracı yenilemek istersen diye önemli bir avantajı haber vermek istedim: Kasa/üstyapı sırasını hiç beklemeden *ŞASİ faturanı hemen kesebiliyoruz*; böylece aracın içindeki *%20 KDV'nin tamamını (~310.000 TL - 650.000 TL)* ve *1. yıl tam amortismanı* doğrudan verginden düşebiliyorsun.\n\n` +
+      `Üstelik elindeki aracın takasını düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* ile kalan taksitini ve *KDV & Kampanya Tablosunu* 10 saniyede görebileceğin sana özel ekranı aşağıya bıraktım 👇\n\n` +
+      `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+      `${link}`
+    );
+  };
+
+  const handleSendTaxRadarToTarget = (target) => {
+    const msg = buildTaxRadarCustomerMessage(target);
+    openWhatsAppChat(target.phoneKey || target.phone, msg);
+    const updated = { ...sentTaxPhones, [target.phoneKey]: new Date().toISOString() };
+    setSentTaxPhones(updated);
+    try {
+      window.localStorage.setItem(TAX_OUTREACH_SENT_KEY, JSON.stringify(updated));
+    } catch {}
+    toast.success(`💬 ${target.name} için Yıl Sonu KDV & Kampanya mesajı WhatsApp'ta açıldı!`);
+  };
+
+  const filteredTaxRadarTargets = useMemo(() => {
+    return taxRadarTargets.filter(t => {
+      const isSent = Boolean(sentTaxPhones[t.phoneKey]);
+      if (taxRadarFilter === 'unsent' && isSent) return false;
+      if (taxRadarFilter === 'crm' && t.sourceType === 'radar') return false;
+      if (taxRadarFilter === 'radar' && t.sourceType === 'crm') return false;
+      if (taxRadarSearch.trim()) {
+        const q = taxRadarSearch.toLowerCase();
+        const match =
+          (t.name && t.name.toLowerCase().includes(q)) ||
+          (t.phone && t.phone.toLowerCase().includes(q)) ||
+          (t.city && t.city.toLowerCase().includes(q)) ||
+          (t.model && t.model.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [taxRadarTargets, sentTaxPhones, taxRadarFilter, taxRadarSearch]);
 
   // --- SEKME 2 FONKSİYONLARI (DERNEK / ODA / SİMDER / ARICILAR BİRLİĞİ) ---
   const handleSelectPreset = (preset) => {
@@ -540,7 +741,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <h3 style={{ margin: 0, fontSize: isMobile ? '0.95rem' : '1.06rem', fontWeight: 900, color: '#f8fafc' }}>
-                🚀 Canlı Link, Sosyal Medya & Özel Kampanya Üretici
+                🚀 Canlı Link, Sosyal Medya, Mali Müşavir & Yıl Sonu KDV Tarama Üretici
               </h3>
               <span style={{
                 background: 'rgba(16, 185, 129, 0.2)',
@@ -551,11 +752,11 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 padding: '2px 8px',
                 borderRadius: '999px'
               }}>
-                WA Durum • WA Müşteri • Özel Müşteri • Facebook Grupları • Instagram • LinkedIn • Dernek/SİMDER
+                WA • Mali Müşavir (SMMM) • Facebook Grupları • SİMDER/Oda • Yıl Sonu KDV Taraması
               </span>
             </div>
             <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
-              İstediğin mecrayı veya derneği seç, dilersen özel indirim oranı ekle; tıklayan herkes Canlı Müşteri Ayak İzine hangi linkten geldiğiyle düşsün!
+              İstediğin mecrayı, mali müşavir protokolünü veya eski müşteri KDV taramasını seç; tıklayan herkes Canlı Müşteri Ayak İzine hangi linkten geldiğiyle düşsün!
             </div>
           </div>
         </div>
@@ -582,10 +783,10 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
 
       {isExpanded && (
         <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* İki Ana Mod Sekmesi */}
+          {/* Üç Ana Mod Sekmesi */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr',
+            gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1fr 1.15fr',
             gap: '8px',
             background: 'rgba(2, 6, 23, 0.65)',
             padding: '5px',
@@ -596,7 +797,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
               type="button"
               onClick={() => setStudioMode('channels')}
               style={{
-                padding: '10px 12px',
+                padding: '10px 10px',
                 borderRadius: '8px',
                 border: studioMode === 'channels' ? '1.5px solid #38bdf8' : 'none',
                 background: studioMode === 'channels'
@@ -604,7 +805,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   : 'transparent',
                 color: studioMode === 'channels' ? '#ffffff' : '#94a3b8',
                 fontWeight: 900,
-                fontSize: isMobile ? '0.78rem' : '0.82rem',
+                fontSize: isMobile ? '0.76rem' : '0.79rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -612,13 +813,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 gap: '6px'
               }}
             >
-              📲 1. WhatsApp • Facebook Grupları • Instagram • LinkedIn
+              📲 1. WhatsApp • Mali Müşavir • FB Grupları • Sosyal
             </button>
             <button
               type="button"
               onClick={() => setStudioMode('partners')}
               style={{
-                padding: '10px 12px',
+                padding: '10px 10px',
                 borderRadius: '8px',
                 border: studioMode === 'partners' ? '1.5px solid #f59e0b' : 'none',
                 background: studioMode === 'partners'
@@ -626,7 +827,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   : 'transparent',
                 color: studioMode === 'partners' ? '#fde047' : '#94a3b8',
                 fontWeight: 900,
-                fontSize: isMobile ? '0.78rem' : '0.82rem',
+                fontSize: isMobile ? '0.76rem' : '0.79rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -634,7 +835,29 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 gap: '6px'
               }}
             >
-              🏛️ 2. Dernek, Oda & Birlik İndirimli Linkler (SİMDER, Arıcılar vb.)
+              🏛️ 2. Dernek, Oda & SMMM İndirimli Linkler
+            </button>
+            <button
+              type="button"
+              onClick={() => setStudioMode('tax_radar')}
+              style={{
+                padding: '10px 10px',
+                borderRadius: '8px',
+                border: studioMode === 'tax_radar' ? '1.5px solid #10b981' : 'none',
+                background: studioMode === 'tax_radar'
+                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.38) 0%, rgba(15, 23, 42, 0.9) 100%)'
+                  : 'transparent',
+                color: studioMode === 'tax_radar' ? '#4ade80' : '#94a3b8',
+                fontWeight: 900,
+                fontSize: isMobile ? '0.76rem' : '0.79rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              🧾 3. Yıl Sonu KDV & Eski Müşteri Taraması (CRM+Radar)
             </button>
           </div>
 
@@ -1166,9 +1389,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 </div>
               </div>
             </div>
-          ) : (
+          ) : studioMode === 'partners' ? (
             /* =====================================================================
-               MOD 2: DERNEK, ODA & BİRLİK PROTOKOL LİNK ÜRETİCİ (SİMDER, ARICILAR VB.)
+               MOD 2: DERNEK, ODA & BİRLİK PROTOKOL LİNK ÜRETİCİ (SİMDER, SMMM, ARICILAR VB.)
                ===================================================================== */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {/* 1. Hazır Dernek / Oda Seçimi */}
@@ -1606,6 +1829,276 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       <FiSend size={13} /> WA Gönder
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* =====================================================================
+               MOD 3 (MADDE 4): CRM ESKİ KAYITLAR & NİYET RADARI YIL SONU KDV TARAMASI
+               ===================================================================== */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                borderRadius: '11px',
+                padding: '10px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 900, color: '#4ade80' }}>
+                      🧾 Yıl Sonu KDV & Şasi Faturası Uyarısı — Eski Müşteri & Radar Taraması
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
+                      Sistemde daha önce fiyat sormuş, teklif almış veya Niyet Radarı'na düşmüş müşterilere <strong>"Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV + tam yıl amortismanı vergiden düşün"</strong> mesajını ismine özel takip linkiyle tek tıkla gönderin!
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      border: '1px solid rgba(56, 189, 248, 0.4)',
+                      color: '#38bdf8',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      padding: '4px 10px',
+                      borderRadius: '999px'
+                    }}>
+                      Toplam: {taxRadarTargets.length} Numaralı Kayıt • Gönderilen: {Object.keys(sentTaxPhones).length}
+                    </span>
+                    {Object.keys(sentTaxPhones).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSentTaxPhones({});
+                          try { window.localStorage.removeItem(TAX_OUTREACH_SENT_KEY); } catch {}
+                          toast.success('Gönderildi işaretleri sıfırlandı.');
+                        }}
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.16)',
+                          border: '1px solid rgba(239, 68, 68, 0.4)',
+                          color: '#fca5a5',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        İşaretleri Sıfırla
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Mesaj Şablonu Seçici */}
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fde047', marginBottom: '5px' }}>
+                    1. Gönderilecek Yıl Sonu KDV & Şasi Faturası Şablonunu Seç:
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '6px' }}>
+                    {[
+                      { id: 'esnaf_kdv', label: '🤝 Samimi Esnaf (%20 KDV + Hemen Şasi Faturası + 1M %0 Faiz)' },
+                      { id: 'kurumsal_vergi', label: '🏢 Kurumsal Filo (%20 KDV + Kıst Amortisman Yok + Kredi)' },
+                      { id: 'smmm_muhasebe', label: '👨‍💼 Muhasebe / Mali Müşavir KDV & Kampanya Tablosu Özeti' }
+                    ].map(tpl => {
+                      const active = taxRadarTemplate === tpl.id;
+                      return (
+                        <button
+                          key={tpl.id}
+                          type="button"
+                          onClick={() => setTaxRadarTemplate(tpl.id)}
+                          style={{
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            border: active ? '1.5px solid #10b981' : '1px solid rgba(255,255,255,0.12)',
+                            background: active ? 'rgba(16, 185, 129, 0.24)' : 'rgba(2, 6, 23, 0.78)',
+                            color: active ? '#4ade80' : '#cbd5e1',
+                            fontSize: '0.72rem',
+                            fontWeight: active ? 900 : 700,
+                            cursor: 'pointer',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {tpl.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Filtre & Arama Çubuğu */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                    {[
+                      { id: 'unsent', label: '⏳ Henüz Gönderilmeyenler' },
+                      { id: 'all', label: '📋 Tüm Liste' },
+                      { id: 'crm', label: '🗂️ CRM Müşterileri' },
+                      { id: 'radar', label: '📡 Niyet Radarı Ziyaretçileri' }
+                    ].map(f => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setTaxRadarFilter(f.id)}
+                        style={{
+                          padding: '6px 10px',
+                          borderRadius: '7px',
+                          border: taxRadarFilter === f.id ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                          background: taxRadarFilter === f.id ? 'rgba(56, 189, 248, 0.24)' : 'rgba(2, 6, 23, 0.7)',
+                          color: taxRadarFilter === f.id ? '#7dd3fc' : '#94a3b8',
+                          fontSize: '0.71rem',
+                          fontWeight: 800,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+                    <FiSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={13} />
+                    <input
+                      type="text"
+                      value={taxRadarSearch}
+                      onChange={(e) => setTaxRadarSearch(e.target.value)}
+                      placeholder="Firma adı, telefon, şehir veya ilgilendiği modele göre ara..."
+                      style={{
+                        width: '100%',
+                        padding: '7px 10px 7px 28px',
+                        borderRadius: '8px',
+                        background: 'rgba(2, 6, 23, 0.88)',
+                        border: '1px solid rgba(148, 163, 184, 0.3)',
+                        color: '#fff',
+                        fontSize: '0.75rem'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Müşteri Listesi */}
+                <div style={{
+                  maxHeight: '320px',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  paddingRight: '4px'
+                }}>
+                  {taxRadarLoading ? (
+                    <div style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem' }}>
+                      ⏳ CRM ve Niyet Radarı müşteri kayıtları taranıyor...
+                    </div>
+                  ) : filteredTaxRadarTargets.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '0.76rem' }}>
+                      Bu filtrede görüntülenecek müşteri kalmadı. "📋 Tüm Liste" sekmesine geçebilirsiniz.
+                    </div>
+                  ) : (
+                    filteredTaxRadarTargets.slice(0, 80).map(target => {
+                      const isSent = Boolean(sentTaxPhones[target.phoneKey]);
+                      return (
+                        <div
+                          key={target.key}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '8px',
+                            padding: '8px 11px',
+                            borderRadius: '9px',
+                            background: isSent ? 'rgba(16, 185, 129, 0.08)' : 'rgba(2, 6, 23, 0.85)',
+                            border: isSent ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(148, 163, 184, 0.2)'
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 900, color: '#f8fafc' }}>
+                                {target.name}
+                              </span>
+                              <span style={{
+                                fontSize: '0.64rem',
+                                fontWeight: 800,
+                                padding: '1px 6px',
+                                borderRadius: '999px',
+                                background: target.sourceType === 'both'
+                                  ? 'rgba(245, 158, 11, 0.22)'
+                                  : target.sourceType === 'radar'
+                                    ? 'rgba(56, 189, 248, 0.2)'
+                                    : 'rgba(148, 163, 184, 0.2)',
+                                color: target.sourceType === 'both' ? '#fde047' : target.sourceType === 'radar' ? '#7dd3fc' : '#cbd5e1'
+                              }}>
+                                {target.sourceBadge}
+                              </span>
+                              {isSent && (
+                                <span style={{
+                                  fontSize: '0.64rem',
+                                  fontWeight: 900,
+                                  color: '#4ade80',
+                                  background: 'rgba(16, 185, 129, 0.2)',
+                                  padding: '1px 6px',
+                                  borderRadius: '999px'
+                                }}>
+                                  ✓ Gönderildi
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: '0.71rem', color: '#94a3b8', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              <span style={{ color: '#4ade80', fontWeight: 800 }}>📞 {target.phone}</span>
+                              <span>• 📍 {target.city}</span>
+                              <span>• 🚛 {target.model}</span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(buildTaxRadarCustomerMessage(target));
+                                toast.success(`📋 ${target.name} için KDV mesajı + özel takip linki kopyalandı!`);
+                              }}
+                              style={{
+                                padding: '7px 10px',
+                                borderRadius: '8px',
+                                background: 'rgba(56, 189, 248, 0.16)',
+                                border: '1px solid rgba(56, 189, 248, 0.4)',
+                                color: '#7dd3fc',
+                                fontSize: '0.71rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <FiCopy size={12} /> Kopyala
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleSendTaxRadarToTarget(target)}
+                              style={{
+                                padding: '7px 12px',
+                                borderRadius: '8px',
+                                background: isSent ? 'rgba(16, 185, 129, 0.25)' : '#22c55e',
+                                border: isSent ? '1px solid #10b981' : 'none',
+                                color: isSent ? '#4ade80' : '#052e16',
+                                fontSize: '0.73rem',
+                                fontWeight: 900,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              <FiSend size={12} /> {isSent ? 'Tekrar WA Gönder' : '💬 Yıl Sonu KDV Linki Gönder'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>

@@ -80,6 +80,18 @@ export const DEFAULT_PARTNER_PROTOCOLS = [
     defaultSector: 'all',
     badgeColor: '#8b5cf6',
     extraPerk: 'OSB & Ticaret Odası Üyelerine Özel %3 Kurumsal Protokol İskontosu + Filo Kredi Desteği'
+  },
+  {
+    id: 'smmm',
+    shortName: 'SMMM & Mali Müşavirler',
+    fullName: 'SMMM Odası & Mali Müşavir Mükelleflerine Özel Yıl Sonu Vergi Kalkanı Protokolü',
+    logoUrl: '',
+    icon: '👨‍💼',
+    discountType: 'amount',
+    discountValue: 50000,
+    defaultSector: 'all',
+    badgeColor: '#059669',
+    extraPerk: 'Mali Müşavir Referanslı Mükelleflere Araç Başı 50.000 ₺ İndirim + %20 KDV & Tam Yıl Amortisman Şasi Faturası Avantajı'
   }
 ];
 
@@ -298,13 +310,28 @@ export function buildPartnerAnnouncementText(origin, config) {
   const link = buildPartnerShareUrl(origin, config);
   const discText = config.discountType === 'percent'
     ? `*%${config.discountValue} Kurumsal Protokol İskontosu*`
-    : `*Araç Başına ${Number(config.discountValue).toLocaleString('tr-TR')} TL Özel Üye İndirimi*`;
+    : `*Araç Başına ${Number(config.discountValue).toLocaleString('tr-TR')} TL Özel Protokol İndirimi*`;
+
+  const lowerId = `${config.id || ''} ${config.shortName || ''}`.toLowerCase();
+  if (lowerId.includes('smmm') || lowerId.includes('müşavir') || lowerId.includes('musavir') || lowerId.includes('muhasebe')) {
+    return (
+      `👨‍💼 *Değerli Mali Müşavirimiz / SMMM Meslek Mensubumuz,*\n\n` +
+      `Yıl sonu vergi planlaması döneminde yüksek *KDV* veya *Gelir/Kurumlar Vergisi* çıkacak mükellefleriniz için IVECO ERC Samsun Otomotiv olarak hazırladığımız *2026 Ticari Araç Vergi Kalkanı & Kampanya Tablomuzu* bilgilerinize sunarız:\n\n` +
+      `🧾 *1. %20 İndirilecek KDV Avantajı:* Ticari şasi kamyon, panelvan ve çekici faturalarımızdaki *%20 KDV (~410.000 TL - 1.150.000 TL)* binek araç kısıtlamasına takılmadan tek seferde mükellefinizin ödenecek KDV'sinden düşülebilir.\n` +
+      `📉 *2. Kıst Amortisman Yok — 1. Yıl Tam Amortisman:* Binek araçların aksine ticari araçlarımızda kıst amortisman sınırı yoktur; Aralık ayında kesilen faturada dahi *1. yıl tam (%20) amortisman* doğrudan gider yazılabilir.\n` +
+      `⚡ *3. Üstyapıyı Beklemeden "Hemen Şasi Faturası" İmkanı:* Kasa, frigo veya tente üstyapısının tamamlanmasını beklemeden *ŞASİ faturasını yıl bitmeden hemen kesiyoruz*; mükellefiniz vergi avantajını bu yıl kullanırken üstyapısını dilediği zaman yaptırabiliyor.\n` +
+      `💳 *4. Mükellefinize Özel İndirim & %0 Faiz:* Referansınızla gelen mükelleflerinize ${discText} ve *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* kredi imkanı tanımlanmıştır.\n\n` +
+      `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n` +
+      `👇 *Model bazlı net KDV matrahı, indirilecek KDV ve kampanya tablosunu incelemek veya mükellefinizle paylaşmak için tıklayın:*\n\n` +
+      `${link}`
+    );
+  }
 
   return (
     `${config.icon || '🏛️'} *${config.fullName || config.shortName} Değerli Üyelerimize Özel IVECO 2026 Kampanyası!*\n\n` +
     `IVECO ERC Samsun Otomotiv ile yapılan özel iş birliği kapsamında, tüm *${config.shortName}* üyelerimize 2026 model sıfır IVECO ticari araç alımlarında ${discText} tanımlanmıştır! 🚛🤝\n\n` +
     `*${config.shortName} Üyelerine Özel Dijital Ekranımızda Neler Var?*\n` +
-    `✅ Tüm araçlarda *${config.shortName} Üye İndirimi düşülmüş* net protokol fiyatlarını anında görün,\n` +
+    `✅ Tüm araçlarda *${config.shortName} Üye İndirimi düşülmüş* net protokol fiyatlarını ve *%20 İndirilecek KDV* tutarlarını anında görün,\n` +
     `🔄 Elinizdeki mevcut aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya anlaşmalı banka oranlarıyla kalan taksitinizi 10 saniyede hesaplayın,\n` +
     `📸 Takasa vereceğiniz aracın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takas ön fiyatı alın,\n` +
     `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın 👇\n\n` +

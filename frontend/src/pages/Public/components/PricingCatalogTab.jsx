@@ -122,12 +122,31 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
   const [showDetailedFilters, setShowDetailedFilters] = useState(() => Boolean(initialSector && normalizeSectorId(initialSector) !== 'all'));
   const [showAllCardDetails, setShowAllCardDetails] = useState(false);
   const [expandedCardIds, setExpandedCardIds] = useState({});
+  const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
+  const [taxModalVehicleId, setTaxModalVehicleId] = useState('daily-35c16-3750');
+  const [customTaxInvoiceTl, setCustomTaxInvoiceTl] = useState(0);
+  const [taxEntityRate, setTaxEntityRate] = useState(0.25); // 0.25 (%25 Kurumlar) | 0.35 (%35 Gelir Vergisi)
 
   const toggleCardDetail = (vehicleId) => {
     setExpandedCardIds(prev => ({
       ...prev,
       [vehicleId]: !prev[vehicleId]
     }));
+  };
+
+  const handleOpenTaxModal = (vehicle = null) => {
+    if (vehicle && !vehicle.isCustomPrice) {
+      setTaxModalVehicleId(vehicle.id);
+      setCustomTaxInvoiceTl(0);
+    }
+    setIsTaxModalOpen(true);
+    if (onTrackFootprint) {
+      onTrackFootprint(
+        '🧾 KDV & Kampanya Tablosu Açıldı',
+        vehicle?.model || 'Genel 2026 KDV & Kampanya Tablosu',
+        'Yıl Sonu %20 KDV & Tam Amortisman Hesaplayıcı'
+      );
+    }
   };
 
   const uploadedPhotoCount = REQUIRED_TRADEIN_PHOTOS.filter(p => Boolean(tradeInPhotos[p.id])).length;
@@ -351,32 +370,35 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
   };
 
   const handleShareWithPartner = (vehicle, effectiveTlPrice, vatShieldTl, remainingAfterTradeIn, monthlyPaymentEst) => {
+    const netMatrah = effectiveTlPrice > 0 ? Math.round(effectiveTlPrice - vatShieldTl) : 0;
+    const firstYearAmortisman = netMatrah > 0 ? Math.round(netMatrah * 0.20) : 0;
+    const corpTaxShield = firstYearAmortisman > 0 ? Math.round(firstYearAmortisman * 0.25) : 0;
     if (onTrackFootprint) {
       onTrackFootprint(
-        '📤 Araç Özeti Ortağa / Muhasebeye İletildi',
+        '📤 KDV & Kampanya Tablosu Mali Müşavire / Ortağa İletildi',
         vehicle.model,
-        `Peşinat: ${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL | KDV Avantajı: ${vatShieldTl.toLocaleString('tr-TR')} TL`
+        `KDV Avantajı: ${vatShieldTl.toLocaleString('tr-TR')} TL | 1.Yıl Amortisman: ${firstYearAmortisman.toLocaleString('tr-TR')} TL`
       );
     }
-    const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_ortak_paylasim`;
+    const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_muhasebe_paylasim`;
     const priceLine = (vehicle.segment === 'T-Way' || vehicle.isCustomPrice)
       ? `💰 *Fiyat:* Özel Şantiye / Proje Teklifi`
       : vehicle.currency === 'EUR'
-        ? `💰 *Net Fiyat:* €${(vehicle.eurPrice || vehicle.cashPrice || 0).toLocaleString('tr-TR')} (+KDV)`
-        : `💰 *Net Fiyat (KDV Dahil):* ${effectiveTlPrice.toLocaleString('tr-TR')} TL`;
+        ? `💰 *Net Fiyat:* €${(vehicle.eurPrice || vehicle.cashPrice || 0).toLocaleString('tr-TR')} (+%20 KDV)`
+        : `💰 *Fatura Toplamı (KDV Dahil):* ${effectiveTlPrice.toLocaleString('tr-TR')} TL\n📐 *KDV Hariç Net Matrah:* ~${netMatrah.toLocaleString('tr-TR')} TL`;
     const vatLine = vatShieldTl > 0
-      ? `\n🧾 *İndirilebilir %20 KDV Avantajı:* ~${vatShieldTl.toLocaleString('tr-TR')} TL (Doğrudan vergiden düşülebilir)`
+      ? `\n🧾 *İndirilecek %20 KDV (Tek Seferde Mahsup):* ~${vatShieldTl.toLocaleString('tr-TR')} TL\n📉 *1. Yıl Tam Amortisman Gideri (%20 - Ticari Şaside Kıst Amortisman Yok):* ~${firstYearAmortisman.toLocaleString('tr-TR')} TL (~${corpTaxShield.toLocaleString('tr-TR')} TL Kurumlar Vergisi Avantajı)\n⚡ *Yıl Sonu Fatura Notu:* Üstyapının (kasa/frigo/tente) tamamlanmasını beklemeden *ŞASİ faturası hemen kesilip* 2026 KDV ve amortisman hakkı kullanılabilir.`
       : '';
     const loanLine = (!vehicle.isCustomPrice && vehicle.currency !== 'EUR' && remainingAfterTradeIn > 0)
-      ? `\n🔄 *${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat/Takas Sonrası Kalan:* ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)`
-      : '';
+      ? `\n💳 *Kampanya Özeti:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) | ${Number(tradeInValue || 0).toLocaleString('tr-TR')} TL Peşinat/Takas Sonrası Kalan: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)`
+      : `\n💳 *Kampanya Özeti:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay) veya 6 Ay Ödemesiz Ticari Kredi`;
 
     const text =
-      `📋 *2026 IVECO Araç & Muhasebe Özeti*\n` +
+      `📋 *2026 IVECO Yıl Sonu KDV, Amortisman & Kampanya Tablosu (Mali Müşavir / Muhasebe Özeti)*\n` +
       `🚛 *Model:* ${vehicle.model} (${vehicle.category})\n` +
       `${priceLine}${vatLine}${loanLine}\n` +
-      `👤 *Not / Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n\n` +
-      `👇 Canlı kredi, kasa ve kantar detaylarını buradan inceleyebilirsin:\n\n` +
+      `👤 *Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n\n` +
+      `👇 Tüm modellerin KDV tablosu, kredi ve kantar detaylarını buradan inceleyebilirsin:\n\n` +
       `${shareUrl}`;
 
     const waShareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
@@ -1095,11 +1117,11 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           })}
         </div>
 
-        {/* İsteğe Bağlı Detaylı Filtre & Kart Detay Görünümü Çubuğu */}
+        {/* İsteğe Bağlı Detaylı Filtre, KDV & Kampanya Tablosu ve Kart Detay Görünümü Çubuğu */}
         <div style={isMobileView ? {
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '6px'
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: '5px'
         } : {
           display: 'flex',
           alignItems: 'center',
@@ -1123,30 +1145,30 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 : '#cbd5e1',
               border: '1px solid rgba(56, 189, 248, 0.35)',
               borderRadius: '8px',
-              padding: isMobileView ? '8px 6px' : '6px 11px',
-              fontSize: isMobileView ? '0.73rem' : '0.75rem',
+              padding: isMobileView ? '8px 4px' : '6px 11px',
+              fontSize: isMobileView ? '0.68rem' : '0.75rem',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '5px',
+              gap: '4px',
               minWidth: 0
             }}
           >
-            <FiFilter size={12} style={{ flexShrink: 0 }} />
+            <FiFilter size={11} style={{ flexShrink: 0 }} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {isMobileView
-                ? (showDetailedFilters ? 'Filtreyi Gizle ▴' : 'Sektör & Ara ▾')
+                ? (showDetailedFilters ? 'Filtre ▴' : 'Sektör/Ara ▾')
                 : (showDetailedFilters ? 'Detaylı Filtreleri Gizle ▴' : 'Sektöre Göre Süz / Model Ara ▾')}
             </span>
             {(selectedSectorFilter !== 'all' || onlyDoubleWheels || searchQuery) && (
               <span style={{
                 background: '#10b981',
                 color: '#0f172a',
-                padding: '1px 5px',
+                padding: '1px 4px',
                 borderRadius: '8px',
-                fontSize: '0.62rem',
+                fontSize: '0.60rem',
                 fontWeight: 900,
                 flexShrink: 0
               }}>
@@ -1157,14 +1179,36 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
 
           <button
             type="button"
+            onClick={() => handleOpenTaxModal(null)}
+            style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.24) 0%, rgba(16, 185, 129, 0.22) 100%)',
+              color: '#fde68a',
+              border: '1px solid rgba(245, 158, 11, 0.55)',
+              borderRadius: '8px',
+              padding: isMobileView ? '8px 4px' : '6px 12px',
+              fontSize: isMobileView ? '0.68rem' : '0.75rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              textAlign: 'center',
+              minWidth: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {isMobileView ? '🧾 KDV & Kampanya' : '🧾 Yıl Sonu KDV Hesaplama & Kampanya Tablosu'}
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowAllCardDetails(prev => !prev)}
             style={{
               background: showAllCardDetails ? 'rgba(16, 185, 129, 0.22)' : 'rgba(15, 28, 50, 0.85)',
               color: showAllCardDetails ? '#4ade80' : '#cbd5e1',
               border: showAllCardDetails ? '1px solid rgba(16, 185, 129, 0.5)' : '1px solid rgba(148, 163, 184, 0.28)',
               borderRadius: '8px',
-              padding: isMobileView ? '8px 6px' : '6px 11px',
-              fontSize: isMobileView ? '0.73rem' : '0.74rem',
+              padding: isMobileView ? '8px 4px' : '6px 11px',
+              fontSize: isMobileView ? '0.68rem' : '0.74rem',
               fontWeight: 800,
               cursor: 'pointer',
               textAlign: 'center',
@@ -1175,7 +1219,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
             }}
           >
             {isMobileView
-              ? (showAllCardDetails ? '✓ Detaylar Açık' : '🔍 Tüm Detayları Aç')
+              ? (showAllCardDetails ? '✓ Detay Açık' : '🔍 Tüm Detaylar')
               : (showAllCardDetails ? '✓ Tüm Teknik Detaylar Açık (Özet Görünüme Dön)' : '🔍 Tüm Araçların Teknik & KDV Detaylarını Aç')}
           </button>
         </div>
@@ -1552,7 +1596,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   </div>
                 )}
 
-                {/* ÖZELLİK 2B: TEK SATIRLIK %20 KDV VERGİ AVANTAJI + CANLI PEŞİNAT/TAKAS ÖZETİ */}
+                {/* ÖZELLİK 2B: TEK SATIRLIK %20 KDV VERGİ AVANTAJI + KDV & KAMPANYA TABLOSU AÇICI */}
                 {!vehicle.isCustomPrice && vehicle.segment !== 'T-Way' && vehicle.currency !== 'EUR' && vatShieldTl > 0 && (
                   <div style={{
                     marginTop: '7px',
@@ -1563,9 +1607,25 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     gap: '3px',
                     fontSize: '0.69rem'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#fcd34d', fontWeight: 800 }}>
-                      <span>🧾 %20 İndirilebilir KDV Avantajı:</span>
-                      <span>~{vatShieldTl.toLocaleString('tr-TR')} TL</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#fcd34d', fontWeight: 800, gap: '4px' }}>
+                      <span>🧾 %20 İndirilecek KDV: ~{vatShieldTl.toLocaleString('tr-TR')} TL</span>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenTaxModal(vehicle)}
+                        style={{
+                          background: 'rgba(245, 158, 11, 0.18)',
+                          border: '1px solid rgba(245, 158, 11, 0.45)',
+                          color: '#fde68a',
+                          borderRadius: '5px',
+                          padding: '1px 6px',
+                          fontSize: '0.62rem',
+                          fontWeight: 900,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        📊 KDV Tablosu
+                      </button>
                     </div>
                     {Number(tradeInValue) > 0 && remainingAfterTradeIn > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#7dd3fc', fontWeight: 700 }}>
@@ -1599,7 +1659,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   }}
                 >
                   <span>
-                    {isDetailOpen ? 'Teknik Özellikleri Gizle' : '🔍 Motor, Beygir & Dingil Detayını Gör'}
+                    {isDetailOpen ? 'Teknik & KDV Detaylarını Gizle' : '🔍 Motor, Dingil & KDV Muhasebe Tablosu'}
                   </span>
                   <span style={{ color: '#38bdf8', fontWeight: 800 }}>
                     {isDetailOpen ? '▴' : '▾'}
@@ -1636,6 +1696,37 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
                             <span>Kredili Kampanya Fiyatı:</span>
                             <strong>{(partnerPricing ? partnerPricing.finalCampaign : vehicle.campaignPrice).toLocaleString('tr-TR')} TL</strong>
+                          </div>
+                        )}
+                        {vatShieldTl > 0 && (
+                          <div style={{
+                            background: 'rgba(5, 150, 105, 0.14)',
+                            border: '1px solid rgba(16, 185, 129, 0.35)',
+                            borderRadius: '8px',
+                            padding: '6px 8px',
+                            fontSize: '0.68rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '3px'
+                          }}>
+                            <div style={{ fontWeight: 900, color: '#34d399' }}>
+                              🧾 Yıl Sonu Mali Müşavir / KDV & Amortisman Özeti:
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#cbd5e1' }}>KDV Hariç Net Matrah:</span>
+                              <strong>{Math.round(effectiveTlPrice - vatShieldTl).toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fde047' }}>
+                              <span>İndirilecek %20 KDV (Tek Seferde):</span>
+                              <strong>{vatShieldTl.toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#86efac' }}>
+                              <span>1. Yıl %20 Tam Amortisman (Kıst Yok):</span>
+                              <strong>{Math.round((effectiveTlPrice - vatShieldTl) * 0.20).toLocaleString('tr-TR')} TL</strong>
+                            </div>
+                            <div style={{ color: '#93c5fd', fontSize: '0.64rem', marginTop: '2px' }}>
+                              ⚡ Üstyapıyı beklemeden <strong>şasi faturası hemen kesilip</strong> 2026 vergisinden düşülebilir.
+                            </div>
                           </div>
                         )}
                       </>
@@ -1731,7 +1822,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   </button>
                 </div>
 
-                {/* ÖZELLİK 3: ORTAĞINA / MUHASEBENE İLET TEK TIKLI BUTON */}
+                {/* ÖZELLİK 3: MALİ MÜŞAVİRE / MUHASEBEYE / ORTAĞA İLET TEK TIKLI BUTON */}
                 <button
                   type="button"
                   onClick={() => handleShareWithPartner(vehicle, effectiveTlPrice, vatShieldTl, remainingAfterTradeIn, monthlyPaymentEst)}
@@ -1750,9 +1841,9 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     justifyContent: 'center',
                     gap: '5px'
                   }}
-                  title="Bu aracın net fiyatını, %20 KDV avantajını ve taksit özetini WhatsApp'tan ortağına veya muhasebecine gönder"
+                  title="Bu aracın KDV matrahını, %20 KDV avantajını, tam yıl amortismanını ve kampanya tablosunu WhatsApp'tan mali müşavirine veya ortağına gönder"
                 >
-                  📤 Fiyat & KDV Özetini Ortağına / Muhasebene İlet
+                  📤 KDV & Kampanya Tablosunu Mali Müşavirime / Ortağıma İlet
                 </button>
               </div>
             </div>
@@ -1765,6 +1856,367 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           Aradığınız kriterlere uygun araç bulunamadı. Lütfen filtreleri sıfırlayın.
         </div>
       )}
+
+      {/* 🧾 YIL SONU KDV HESAPLAMA, TAM AMORTİSMAN & 2026 KAMPANYA TABLOSU MODAL */}
+      {isTaxModalOpen && (() => {
+        const selectedModalVeh = tradeInCatalogModels.find(v => v.id === taxModalVehicleId) || tradeInCatalogModels[0];
+        const modalPartnerPricing = partnerProtocol
+          ? calculatePartnerVehiclePricing(selectedModalVeh, partnerProtocol, tcmbEurRate)
+          : null;
+        const baseInvoiceTl = selectedModalVeh?.currency === 'EUR'
+          ? Math.round(((modalPartnerPricing ? modalPartnerPricing.finalEur : (selectedModalVeh.eurPrice || selectedModalVeh.cashPrice || 123000)) * tcmbEurRate) * 1.20)
+          : (modalPartnerPricing ? modalPartnerPricing.finalCash : (selectedModalVeh?.cashPrice || selectedModalVeh?.campaignPrice || 1850000));
+        const activeInvoiceTl = customTaxInvoiceTl > 0 ? Number(customTaxInvoiceTl) : baseInvoiceTl;
+        const netMatrahTl = Math.round(activeInvoiceTl / 1.20);
+        const kdvAmountTl = activeInvoiceTl - netMatrahTl;
+        const firstYearDepTl = Math.round(netMatrahTl * 0.20); // Ticari araçta kıst amortisman yok, %20 tam yıl
+        const incomeTaxShieldTl = Math.round(firstYearDepTl * taxEntityRate);
+        const totalFirstYearGainTl = kdvAmountTl + incomeTaxShieldTl;
+
+        const summaryRows = [
+          { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: 1850000, campaign: '1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)' },
+          { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: 2050000, campaign: '1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)' },
+          { label: 'Daily 70C18 / 72C18 Şasi (7.2 Ton)', gross: 2490000, campaign: '1M TL %0 Faiz veya 6 Ay Ödemesiz Kredi' },
+          { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: 'Anlaşmalı Banka & Katılım Kredisi' },
+          { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: 'İhracatçı Euro & TL Filo Finansmanı' }
+        ];
+
+        const handleShareFullTaxTable = () => {
+          if (onTrackFootprint) {
+            onTrackFootprint(
+              '👨‍💼 Yıl Sonu KDV & Kampanya Tablosu Mali Müşavire Gönderildi',
+              selectedModalVeh?.model || '2026 Kampanya Tablosu',
+              `Fatura: ${activeInvoiceTl.toLocaleString('tr-TR')} TL | KDV: ${kdvAmountTl.toLocaleString('tr-TR')} TL | Toplam 1.Yıl Vergi Avantajı: ${totalFirstYearGainTl.toLocaleString('tr-TR')} TL`
+            );
+          }
+          const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_smmm_tablo`;
+          const msg =
+            `👨‍💼 *2026 IVECO Yıl Sonu KDV, Tam Amortisman & Kampanya Tablosu (Mali Müşavir / Muhasebe Özeti)*\n\n` +
+            `🚛 *Seçilen Araç:* ${selectedModalVeh?.model || 'IVECO 2026 Ticari Şasi'}\n` +
+            `💰 *Fatura Toplamı (KDV Dahil):* ${activeInvoiceTl.toLocaleString('tr-TR')} TL\n` +
+            `📐 *KDV Hariç Net Matrah:* ${netMatrahTl.toLocaleString('tr-TR')} TL\n` +
+            `🧾 *1. İndirilecek %20 KDV (Tek Seferde Mahsup):* *${kdvAmountTl.toLocaleString('tr-TR')} TL*\n` +
+            `📉 *2. 1. Yıl Tam Amortisman Gideri (%20 - Kıst Amortisman Yok):* *${firstYearDepTl.toLocaleString('tr-TR')} TL*\n` +
+            `🏦 *3. Kurumlar/Gelir Vergisi Kalkanı (%${Math.round(taxEntityRate * 100)}):* *~${incomeTaxShieldTl.toLocaleString('tr-TR')} TL*\n` +
+            `✅ *1. Yıl Toplam KDV + Vergi Avantajı:* *~${totalFirstYearGainTl.toLocaleString('tr-TR')} TL*\n\n` +
+            `⚡ *Kritik Yıl Sonu Avantajı:* Ticari şasi alımlarında binek araçtaki kıst amortisman ve gider kısıtlaması yoktur. Üstyapının (kasa/frigo/tente) bitmesini beklemeden *ŞASİ faturası hemen kesilip* 2026 vergisinden düşülebilir.\n` +
+            `💳 *Aktif Kredi Kampanyası:* 1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)\n\n` +
+            `📞 *Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n` +
+            `👇 *Canlı katalog ve tüm modellerin KDV tablosu:*\n${shareUrl}`;
+          window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+        };
+
+        return (
+          <div
+            onClick={() => setIsTaxModalOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(2, 6, 23, 0.84)',
+              backdropFilter: 'blur(5px)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: isMobileView ? '10px' : '18px'
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '720px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                background: 'linear-gradient(165deg, #0f172a 0%, #172554 100%)',
+                border: '1.5px solid rgba(245, 158, 11, 0.55)',
+                borderRadius: '16px',
+                padding: isMobileView ? '14px' : '20px',
+                color: '#f8fafc',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.65)'
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
+                <div>
+                  <span style={{
+                    display: 'inline-block',
+                    background: 'rgba(245, 158, 11, 0.2)',
+                    border: '1px solid rgba(245, 158, 11, 0.5)',
+                    color: '#fde047',
+                    fontSize: '0.68rem',
+                    fontWeight: 900,
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    marginBottom: '4px'
+                  }}>
+                    👨‍💼 MALİ MÜŞAVİR & İŞLETME VERGİ KALKANI REHBERİ
+                  </span>
+                  <h3 style={{ margin: 0, fontSize: isMobileView ? '1rem' : '1.18rem', fontWeight: 900, color: '#ffffff' }}>
+                    🧾 Yıl Sonu %20 KDV Hesaplama & 2026 Kampanya Tablosu
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTaxModalOpen(false)}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    border: '1px solid rgba(239, 68, 68, 0.45)',
+                    color: '#fca5a5',
+                    borderRadius: '8px',
+                    padding: '5px 10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 900,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ✕ Kapat
+                </button>
+              </div>
+
+              {/* 3 Kritik Vergi & Şasi Faturası Avantajı */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobileView ? '1fr' : 'repeat(3, 1fr)',
+                gap: '8px',
+                marginBottom: '14px'
+              }}>
+                <div style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(250, 204, 21, 0.35)', borderRadius: '10px', padding: '9px 10px' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 900, color: '#fde047' }}>1️⃣ %20 KDV Tek Seferde İndirilir</div>
+                  <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '3px', lineHeight: 1.35 }}>
+                    Binek araçların aksine ticari şasi/panelvan/çekici faturasındaki <strong>%20 KDV’nin tamamı</strong> ödenecek KDV’den doğrudan mahsup edilir.
+                  </div>
+                </div>
+                <div style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(16, 185, 129, 0.35)', borderRadius: '10px', padding: '9px 10px' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 900, color: '#4ade80' }}>2️⃣ Kıst Amortisman Cezası Yoktur</div>
+                  <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '3px', lineHeight: 1.35 }}>
+                    Yılın son ayında bile alınsa <strong>1. yıl tam (%20) amortisman</strong> gider yazılır; binek araç gider kısıtlamasına takılmaz.
+                  </div>
+                </div>
+                <div style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '10px', padding: '9px 10px' }}>
+                  <div style={{ fontSize: '0.74rem', fontWeight: 900, color: '#38bdf8' }}>3️⃣ Üstyapıyı Beklemeden Şasi Faturası</div>
+                  <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '3px', lineHeight: 1.35 }}>
+                    Kasa/frigo imalatını beklemeden <strong>ŞASİ faturanızı hemen kesiyoruz</strong>; 2026 vergi avantajını kaçırmadan üstyapıyı yaptırabilirsiniz.
+                  </div>
+                </div>
+              </div>
+
+              {/* Canlı KDV & Vergi Kalkanı Hesaplama Kutusu */}
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.88)',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                borderRadius: '12px',
+                padding: isMobileView ? '11px' : '14px',
+                marginBottom: '14px'
+              }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 900, color: '#7dd3fc', marginBottom: '8px' }}>
+                  🧮 Canlı Model & Fatura KDV / Amortisman Hesaplayıcı
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.3fr 1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.68rem', color: '#94a3b8', fontWeight: 800, marginBottom: '3px' }}>
+                      1. 2026 IVECO Modeli Seçin:
+                    </label>
+                    <select
+                      value={taxModalVehicleId}
+                      onChange={(e) => {
+                        setTaxModalVehicleId(e.target.value);
+                        setCustomTaxInvoiceTl(0);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px 9px',
+                        borderRadius: '8px',
+                        background: '#020617',
+                        border: '1px solid rgba(56, 189, 248, 0.45)',
+                        color: '#fff',
+                        fontSize: '0.76rem',
+                        fontWeight: 800
+                      }}
+                    >
+                      {tradeInCatalogModels.map(m => (
+                        <option key={m.id} value={m.id}>
+                          {m.model} ({m.currency === 'EUR' ? `€${(m.eurPrice || m.cashPrice).toLocaleString('tr-TR')}+KDV` : `${(m.cashPrice || m.campaignPrice).toLocaleString('tr-TR')} TL`})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.68rem', color: '#94a3b8', fontWeight: 800, marginBottom: '3px' }}>
+                      2. Fatura Tutarı (KDV Dahil TL):
+                    </label>
+                    <input
+                      type="number"
+                      value={activeInvoiceTl}
+                      step={50000}
+                      onChange={(e) => setCustomTaxInvoiceTl(Number(e.target.value) || 0)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 9px',
+                        borderRadius: '8px',
+                        background: '#020617',
+                        border: '1px solid rgba(16, 185, 129, 0.5)',
+                        color: '#4ade80',
+                        fontSize: '0.82rem',
+                        fontWeight: 900
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.68rem', color: '#94a3b8', fontWeight: 800, marginBottom: '3px' }}>
+                      3. Vergi Mükellefiyet Türü:
+                    </label>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[
+                        { rate: 0.25, label: 'Kurumlar (%25)' },
+                        { rate: 0.35, label: 'Şahıs/Gelir (%35)' }
+                      ].map(opt => (
+                        <button
+                          key={opt.rate}
+                          type="button"
+                          onClick={() => setTaxEntityRate(opt.rate)}
+                          style={{
+                            flex: 1,
+                            padding: '8px 6px',
+                            borderRadius: '8px',
+                            border: taxEntityRate === opt.rate ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.12)',
+                            background: taxEntityRate === opt.rate ? 'rgba(245, 158, 11, 0.22)' : '#020617',
+                            color: taxEntityRate === opt.rate ? '#fde047' : '#cbd5e1',
+                            fontSize: '0.7rem',
+                            fontWeight: 800,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hesaplama Sonuç Kartları */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                  gap: '8px'
+                }}>
+                  <div style={{ background: 'rgba(2, 6, 23, 0.8)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(148,163,184,0.2)' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 700 }}>KDV Hariç Net Matrah</div>
+                    <div style={{ fontSize: '0.92rem', color: '#f8fafc', fontWeight: 900, marginTop: '2px' }}>
+                      {netMatrahTl.toLocaleString('tr-TR')} ₺
+                    </div>
+                  </div>
+                  <div style={{ background: 'rgba(245, 158, 11, 0.14)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.45)' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#fde047', fontWeight: 800 }}>🧾 İndirilecek %20 KDV</div>
+                    <div style={{ fontSize: '0.96rem', color: '#fde047', fontWeight: 900, marginTop: '2px' }}>
+                      {kdvAmountTl.toLocaleString('tr-TR')} ₺
+                    </div>
+                  </div>
+                  <div style={{ background: 'rgba(56, 189, 248, 0.14)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(56,189,248,0.4)' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#7dd3fc', fontWeight: 800 }}>📉 1. Yıl Tam Amortisman (%20)</div>
+                    <div style={{ fontSize: '0.92rem', color: '#38bdf8', fontWeight: 900, marginTop: '2px' }}>
+                      {firstYearDepTl.toLocaleString('tr-TR')} ₺
+                    </div>
+                  </div>
+                  <div style={{ background: 'rgba(16, 185, 129, 0.18)', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #10b981' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#6ee7b7', fontWeight: 800 }}>✅ 1. Yıl Toplam KDV + Vergi Kalkanı</div>
+                    <div style={{ fontSize: '0.98rem', color: '#4ade80', fontWeight: 900, marginTop: '2px' }}>
+                      ~{totalFirstYearGainTl.toLocaleString('tr-TR')} ₺
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2026 Kampanya & KDV Özet Tablosu */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 900, color: '#f8fafc', marginBottom: '6px' }}>
+                  📊 2026 IVECO Ana Segmentler KDV, Amortisman & Kredi Kampanya Tablosu
+                </div>
+                <div style={{ overflowX: 'auto', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.25)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: isMobileView ? '0.68rem' : '0.73rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(2, 6, 23, 0.9)', color: '#94a3b8' }}>
+                        <th style={{ padding: '7px 8px' }}>Segment / Model</th>
+                        <th style={{ padding: '7px 8px' }}>Örnek Fatura</th>
+                        <th style={{ padding: '7px 8px', color: '#fde047' }}>%20 İndirilecek KDV</th>
+                        <th style={{ padding: '7px 8px', color: '#4ade80' }}>1. Yıl Amortisman</th>
+                        <th style={{ padding: '7px 8px', color: '#7dd3fc' }}>Aktif Kredi Kampanyası</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {summaryRows.map((r, i) => {
+                        const net = Math.round(r.gross / 1.20);
+                        const kdv = r.gross - net;
+                        const dep = Math.round(net * 0.20);
+                        return (
+                          <tr key={i} style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: i % 2 === 0 ? 'rgba(15, 23, 42, 0.6)' : 'rgba(15, 23, 42, 0.3)' }}>
+                            <td style={{ padding: '7px 8px', fontWeight: 800, color: '#fff' }}>{r.label}</td>
+                            <td style={{ padding: '7px 8px', color: '#cbd5e1' }}>~{r.gross.toLocaleString('tr-TR')} ₺</td>
+                            <td style={{ padding: '7px 8px', fontWeight: 900, color: '#fde047' }}>~{kdv.toLocaleString('tr-TR')} ₺</td>
+                            <td style={{ padding: '7px 8px', fontWeight: 800, color: '#4ade80' }}>~{dep.toLocaleString('tr-TR')} ₺</td>
+                            <td style={{ padding: '7px 8px', color: '#bae6fd', fontWeight: 700 }}>{r.campaign}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Aksiyon Butonları */}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.3fr 1fr', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleShareFullTaxTable}
+                  style={{
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    border: 'none',
+                    color: '#052e16',
+                    fontWeight: 900,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  👨‍💼 Bu KDV & Kampanya Tablosunu Mali Müşavirime / Muhasebecime Gönder
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsTaxModalOpen(false);
+                    if (selectedModalVeh) handleVehicleQuote(selectedModalVeh);
+                  }}
+                  style={{
+                    padding: '11px 14px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontWeight: 900,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  ⚡ Yıl Bitmeden Şasi Faturası & Proforma İste (Can Murat)
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
