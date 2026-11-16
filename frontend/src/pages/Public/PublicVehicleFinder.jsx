@@ -2983,7 +2983,7 @@ IVECO ERC Samsun Otomotiv
           gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
           gap: isMobileView ? '6px' : '8px'
         }}>
-          {/* 1. 2026 Net Fiyatlar & Takas */}
+          {/* 1. 2026 Net Fiyatlar */}
           <button
             type="button"
             onClick={() => {
@@ -3009,15 +3009,49 @@ IVECO ERC Samsun Otomotiv
             <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>🏷️</span>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.18 }}>
-                2026 Net Fiyat Listesi
+                2026 Fiyat Listesi
               </div>
               <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#bae6fd', marginTop: '2px', lineHeight: 1.15 }}>
-                Peşin & kampanya fiyatları
+                Peşin & kampanyalı fiyatlar
               </div>
             </div>
           </button>
 
-          {/* 2. Banka Kredi & Taksit Hesapla */}
+          {/* 2. Kolay Araç Seçici (Tek Dokunuşla) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMainTab('secici');
+              recordCustomerFootprint('Başlangıç Kutusu', 'Kolay Araç Seçici', 'Hızlı Başlangıç');
+            }}
+            style={{
+              minWidth: 0,
+              textAlign: 'left',
+              padding: isMobileView ? '9px 8px' : '10px 14px',
+              borderRadius: '12px',
+              background: activeMainTab === 'secici'
+                ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)'
+                : 'rgba(30, 41, 59, 0.85)',
+              border: activeMainTab === 'secici' ? '2px solid #38bdf8' : '1px solid rgba(56, 189, 248, 0.4)',
+              color: '#f8fafc',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: isMobileView ? '6px' : '8px'
+            }}
+          >
+            <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>🚛</span>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.18 }}>
+                Kolay Araç Seçici
+              </div>
+              <div style={{ fontSize: isMobileView ? '0.63rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
+                Ne taşıyacağını seç, aracını gör
+              </div>
+            </div>
+          </button>
+
+          {/* 3. Banka Kredi & Taksit Hesapla */}
           <button
             type="button"
             onClick={() => {
@@ -3051,7 +3085,7 @@ IVECO ERC Samsun Otomotiv
             </div>
           </button>
 
-          {/* 3. 4 Resimle 15 Dk'da Takasla Fiyat Al */}
+          {/* 4. 4 Resimle 15 Dk'da Takasla Fiyat Al */}
           <button
             type="button"
             onClick={() => {
@@ -3087,59 +3121,43 @@ IVECO ERC Samsun Otomotiv
               </div>
             </div>
           </button>
+        </div>
 
-          {/* 4. İsteğe Bağlı Detaylı Rehberler (Tonaj, Üstyapı, TCO, SSS, Randevu) */}
+        {/* İsteğe Bağlı Ek Rehberler (Örnek Kasalar, Kıyaslama, SSS, Randevu) */}
+        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
           <button
             type="button"
             onClick={() => setShowMoreTabsMobile(prev => !prev)}
             style={{
-              minWidth: 0,
-              textAlign: 'left',
-              padding: isMobileView ? '9px 8px' : '10px 14px',
-              borderRadius: '12px',
-              background: (showMoreTabsMobile || ['secici', 'ust-yapi', 'tco', 'sss'].includes(activeMainTab))
-                ? 'rgba(56, 189, 248, 0.22)'
-                : 'rgba(30, 41, 59, 0.85)',
-              border: (showMoreTabsMobile || ['secici', 'ust-yapi', 'tco', 'sss'].includes(activeMainTab))
-                ? '1.5px solid #38bdf8'
-                : '1px solid rgba(125, 211, 252, 0.32)',
-              color: '#f8fafc',
+              width: '100%',
+              background: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(148, 163, 184, 0.22)',
+              borderRadius: '9px',
+              padding: '6px 12px',
+              color: '#cbd5e1',
+              fontSize: '0.72rem',
+              fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '4px'
+              justifyContent: 'space-between'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: isMobileView ? '6px' : '8px', minWidth: 0 }}>
-              <span style={{ fontSize: isMobileView ? '1.05rem' : '1.2rem', flexShrink: 0 }}>📚</span>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: isMobileView ? '0.75rem' : '0.82rem', fontWeight: 900, color: '#7dd3fc', lineHeight: 1.18 }}>
-                  Detaylar & Rehberler
-                </div>
-                <div style={{ fontSize: isMobileView ? '0.62rem' : '0.67rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.15 }}>
-                  {isMobileView ? 'Tonaj, Kasa, Kıyas, SSS' : 'Tonaj, Üstyapı, Kıyaslama, SSS'}
-                </div>
-              </div>
-            </div>
-            <span style={{ color: '#38bdf8', fontWeight: 900, fontSize: '0.8rem', flexShrink: 0 }}>
-              {showMoreTabsMobile ? '▴' : '▾'}
-            </span>
+            <span>📸 Örnek Kasa Fotoğrafları (24) • ⚔️ Neden IVECO? • ❓ Sorular • 📅 Fiyatı 24 Saat Kilitle</span>
+            <span style={{ color: '#38bdf8' }}>{showMoreTabsMobile ? 'Gizle ▴' : 'Aç ▾'}</span>
           </button>
         </div>
 
-        {/* Yalnızca Müşteri "Detaylar & Rehberler"e Tıkladığında Açılan Ek Sekmeler */}
-        {(showMoreTabsMobile || ['secici', 'ust-yapi', 'tco', 'sss'].includes(activeMainTab)) && (
+        {(showMoreTabsMobile || ['ust-yapi', 'tco', 'sss'].includes(activeMainTab)) && (
           <div style={{
-            marginTop: '10px',
-            paddingTop: '10px',
+            marginTop: '8px',
+            paddingTop: '8px',
             borderTop: '1px dashed rgba(125, 211, 252, 0.25)',
             display: 'flex',
             flexWrap: 'wrap',
             gap: '6px'
           }}>
             {[
-              { id: 'secici', label: '🚛 Şasi, Tonaj & Kantar Sihirbazı' },
               { id: 'ust-yapi', label: '📸 Şasi Üzeri Örnek Kasa Fotoğrafları (24)' },
               { id: 'tco', label: '⚔️ Neden IVECO? (Rakip & TCO Analizi)' },
               { id: 'sss', label: '❓ Sıkça Sorulan Sorular' }
@@ -3210,6 +3228,10 @@ IVECO ERC Samsun Otomotiv
               handleSelectVehicle(vehicle);
               setActiveMainTab('secici');
               setStep(2);
+              setTimeout(() => {
+                const resEl = document.getElementById('simple-selected-vehicle-result');
+                if (resEl) resEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }, 80);
             }}
             onDirectWhatsApp={(customMsg) => handleDirectWhatsApp(customMsg)}
             onTrackFootprint={recordCustomerFootprint}
@@ -3275,1930 +3297,819 @@ IVECO ERC Samsun Otomotiv
         </div>
       )}
 
-      {/* ── SEKME 1: AKILLI ŞASİ SEÇİCİ & KREDİ (ORİJİNAL STEPPER & KART) ── */}
-      {activeMainTab === 'secici' && (
-        <>
-          {/* ── STEPPER BAR (2 ADIM: TONAJ & METREKÜP ➔ KREDİ & TEKLİF PLANI) ── */}
-          <div style={{ maxWidth: '680px', margin: isMobileView ? '0 auto 12px' : '0 auto 20px', display: 'flex', justifyContent: 'center', gap: isMobileView ? '8px' : '14px', position: 'relative' }}>
-        {[
-          { num: 1, label: isMobileView ? '1. Araç Seçimi' : '1. Tonaj & Metreküp' },
-          { num: 2, label: isMobileView ? '2. Fiyat & Kredi' : '2. Kredi & Teklif Planı' }
-        ].map((s) => (
-          <div
-            key={s.num}
-            onClick={() => setStep(s.num)}
-            style={{
-              flex: isMobileView ? 1 : 'initial',
-              justifyContent: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              gap: isMobileView ? '8px' : '10px',
-              cursor: 'pointer',
-              padding: isMobileView ? '10px 12px' : '8px 18px',
-              borderRadius: isMobileView ? '12px' : '24px',
-              background: step === s.num ? 'rgba(2, 132, 199, 0.45)' : 'rgba(28, 48, 80, 0.78)',
-              border: step === s.num ? '2px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.25)',
-              transition: 'all 0.2s ease'
-            }}
-          >
+      {/* ── SEKME 1: ÇOK BASİT TEK EKRANLI KOLAY ARAÇ & KREDİ SEÇİCİ (KARMAŞIK SÜRGÜ YOK, ADIM DUVARI YOK) ── */}
+      {activeMainTab === 'secici' && (() => {
+        const SIMPLE_GROUPS = [
+          {
+            id: 'kamyonet',
+            title: '3.5 Ton Kamyonet',
+            subtitle: 'B Ehliyet • Kasa Konulur',
+            desc: 'Şehir içi serbest girer, otomobil ehliyetiyle kullanılır (1.5 - 3.5 Ton yük)',
+            image: '/vehicles/daily-35s-sasi.jpg',
+            defaultKey: 'chassis_35c',
+            options: [
+              { key: 'chassis_35c', label: '🛞 Çift Teker (Ağır Yük • 35C16)', sub: '2.065.000 TL’den' },
+              { key: 'chassis_35s', label: '🛞 Tek Teker (Hafif Yük • 35S16)', sub: '1.905.000 TL’den' }
+            ]
+          },
+          {
+            id: 'panelvan',
+            title: 'Kapalı Panelvan',
+            subtitle: 'B Ehliyet • Hazır Sac Kasa',
+            desc: 'Kargo, market, gıda ve koli dağıtımı için hazır kapalı sac gövde',
+            image: '/vehicles/daily-panelvan.jpg',
+            defaultKey: 'panelvan_16',
+            options: [
+              { key: 'panelvan_12', label: '🚐 Orta Boy (12 m³ • Tek Teker)', sub: '1.925.000 TL Peşin' },
+              { key: 'panelvan_16', label: '🚐 Uzun Boy (16 m³ • Tek Teker)', sub: '2.050.000 TL Peşin' },
+              { key: 'panelvan_18', label: '🚐 En Büyük Boy (18 m³ • Çift Teker)', sub: '2.320.000 TL Peşin' }
+            ]
+          },
+          {
+            id: 'daily70',
+            title: '7 Ton Kamyon (70C)',
+            subtitle: 'C Ehliyet • 4.8 Ton Net Yük',
+            desc: 'Resmi kantardan 7.970 kg ile geçer, 6.20 metreye kadar uzun kasa olur',
+            image: '/vehicles/daily-35c-72c.jpg',
+            defaultKey: 'truck_72c',
+            options: [
+              { key: 'truck_72c', label: '🚛 Daily 70C / 72C Şasi Kamyon (4.8 Ton Yük)', sub: '2.390.000 TL Peşin' }
+            ]
+          },
+          {
+            id: 'eurocargo',
+            title: 'Büyük Kamyon (10–18 Ton)',
+            subtitle: 'C Ehliyet • Eurocargo',
+            desc: '6.5 Tondan 16 Tona kadar ağır yük taşıyan 6 teker ve 10 teker kamyonlar',
+            image: '/vehicles/eurocargo-100-120.jpg',
+            defaultKey: 'truck_150e',
+            options: [
+              { key: 'truck_100e', label: '🚚 6.5 Ton Yük (Eurocargo 100E)', sub: '3.330.000 TL Peşin' },
+              { key: 'truck_120e', label: '🚚 8 Ton Yük (Eurocargo 120E)', sub: '3.820.000 TL Peşin' },
+              { key: 'truck_150e', label: '🚚 10.5 Ton Yük (Eurocargo 150E)', sub: '4.450.000 TL Peşin' },
+              { key: 'truck_160e', label: '🚚 11 Ton Yük (Eurocargo 160E)', sub: '5.100.000 TL Peşin' },
+              { key: 'truck_10teker', label: '🚚 16 Ton Yük (10 Teker Eurocargo)', sub: '5.350.000 TL Peşin' }
+            ]
+          },
+          {
+            id: 'cekici',
+            title: 'Tır Çekici (S-Way)',
+            subtitle: 'CE Ehliyet • Uzun Yol Tır',
+            desc: '40 Ton dorse çekici • Yurtiçi ve uluslararası nakliye filoları (500 / 530 / 580 BG)',
+            image: '/vehicles/sway-cekici.jpg?v=2',
+            defaultKey: 'tractor_sway',
+            options: [
+              { key: 'tractor_sway', label: '🛣️ S-Way 500 / 530 / 580 Çekici', sub: '123.000 €’dan' }
+            ]
+          },
+          {
+            id: 'hafriyat',
+            title: 'Damper & Şantiye (T-Way)',
+            subtitle: 'C Ehliyet • 10 & 12 Teker',
+            desc: 'Hafriyat, kaya damperi, maden ve hazır beton mikseri için ağır şantiye kamyonu',
+            image: '/vehicles/tway-damper.jpg',
+            defaultKey: 'tway_10teker_540',
+            options: [
+              { key: 'tway_10teker_540', label: '🚜 10 Teker 540 BG (6x4)', sub: '26 Ton Kantar' },
+              { key: 'tway_10teker_460', label: '🚜 10 Teker 460 BG (6x4)', sub: '26 Ton Kantar' },
+              { key: 'tway_12teker_540', label: '🚜 12 Teker 540 BG (8x4)', sub: '32 Ton Kantar' },
+              { key: 'tway_12teker_460', label: '🚜 12 Teker 460 BG (8x4)', sub: '32 Ton Kantar' }
+            ]
+          }
+        ];
+
+        const activeGroup = SIMPLE_GROUPS.find(g => g.options.some(o => o.key === matched.modelKey)) || SIMPLE_GROUPS[0];
+
+        return (
+          <div style={{
+            maxWidth: '760px',
+            margin: '0 auto 30px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            {/* ── ADIM 1: 6 BÜYÜK RESİMLİ HALK DİLİNDE ARAÇ GRUBU KUTUSU ── */}
             <div style={{
-              width: isMobileView ? '24px' : '26px',
-              height: isMobileView ? '24px' : '26px',
-              borderRadius: '50%',
-              background: step === s.num ? '#0284c7' : step > s.num ? '#10b981' : '#334155',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '0.8rem'
-            }}>
-              {step > s.num ? <FiCheck size={14} /> : s.num}
-            </div>
-            <span style={{ fontSize: isMobileView ? '0.84rem' : '0.84rem', color: step === s.num ? '#fff' : '#cbd5e1', fontWeight: step === s.num ? 800 : 600 }}>
-              {s.label}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* ── CARD CONTENT ────────────────────────────────────────── */}
-      <div style={{
-        maxWidth: '680px',
-        margin: '0 auto',
-        background: 'rgba(26, 44, 74, 0.88)',
-        border: '1px solid rgba(125, 211, 252, 0.28)',
-        borderRadius: '16px',
-        padding: isMobileView ? '14px 12px' : '22px 20px',
-        boxShadow: '0 8px 32px rgba(8, 15, 30, 0.32)',
-        backdropFilter: 'blur(8px)'
-      }}>
-
-        {/* ── ADIM 1: ARAÇ SEÇİMİ VEYA TONAJ & METREKÜP HESAPLAMA ───── */}
-        {step === 1 && (
-          <div>
-            <div style={{ marginBottom: isMobileView ? '10px' : '14px' }}>
-              <h2 style={{ fontSize: isMobileView ? '1.1rem' : '1.2rem', fontWeight: 800, margin: '0 0 2px', color: '#ffffff' }}>
-                1. IVECO Aracınızı Seçin
-              </h2>
-              {!isMobileView && (
-                <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
-                  İster doğrudan araç listesinden model seçin, ister taşıyacağınız yük ağırlığı ve kasa hacmine göre aratın:
-                </p>
-              )}
-            </div>
-
-            {/* Seçim Modu Değiştirici (Katalog vs. Tonaj Sürgüsü) */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-              <button
-                type="button"
-                onClick={() => setSelectorMode('catalog')}
-                style={{
-                  flex: 1,
-                  padding: isMobileView ? '13px 10px' : '10px 14px',
-                  borderRadius: '12px',
-                  background: selectorMode === 'catalog' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.08)',
-                  color: selectorMode === 'catalog' ? '#fff' : '#cbd5e1',
-                  border: '1px solid',
-                  borderColor: selectorMode === 'catalog' ? '#38bdf8' : 'rgba(255, 255, 255, 0.16)',
-                  fontWeight: 800,
-                  fontSize: isMobileView ? '0.88rem' : '0.82rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: selectorMode === 'catalog' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
-                }}
-              >
-                <FiTruck size={16} /> {isMobileView ? 'Listeden Model Seç' : 'Doğrudan Model Kataloğundan Seç'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectorMode('slider')}
-                style={{
-                  flex: 1,
-                  padding: isMobileView ? '13px 10px' : '10px 14px',
-                  borderRadius: '12px',
-                  background: selectorMode === 'slider' ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(255, 255, 255, 0.08)',
-                  color: selectorMode === 'slider' ? '#fff' : '#cbd5e1',
-                  border: '1px solid',
-                  borderColor: selectorMode === 'slider' ? '#38bdf8' : 'rgba(255, 255, 255, 0.16)',
-                  fontWeight: 800,
-                  fontSize: isMobileView ? '0.88rem' : '0.82rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: selectorMode === 'slider' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
-                }}
-              >
-                <FiMaximize2 size={16} /> {isMobileView ? 'Tonaj & Hacimle Bul' : 'Tonaj & Hacme Göre Hesapla'}
-              </button>
-            </div>
-
-            {/* SEÇENEK A: DOĞRUDAN ARAÇ KATALOĞU */}
-            {selectorMode === 'catalog' && (
-              <div style={{ marginBottom: '18px' }}>
-                {/* Kategori Filtre Çipleri — Araç Görselli, Mobilde 2x3, Masaüstünde 6 sütunlu simetrik ızgara */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(6, minmax(0, 1fr))',
-                  gap: isMobileView ? '7px' : '8px',
-                  marginBottom: isMobileView ? '12px' : '14px'
-                }}>
-                  {[
-                    {
-                      id: 'all',
-                      title: 'Tüm Modeller',
-                      licenseBadge: '(B / C / CE Ehliyet)',
-                      images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg?v=2']
-                    },
-                    {
-                      id: 'kamyonet',
-                      title: 'Daily 35 Şasi',
-                      licenseBadge: '(3.5T • B Ehliyet)',
-                      image: '/vehicles/daily-35s-sasi.jpg'
-                    },
-                    {
-                      id: 'panelvan',
-                      title: 'Daily Panelvan',
-                      licenseBadge: '(12–18m³ • B Ehliyet)',
-                      image: '/vehicles/daily-panelvan.jpg'
-                    },
-                    {
-                      id: 'kamyon',
-                      title: '72C & Eurocargo',
-                      licenseBadge: '(C1 / C Ehliyet)',
-                      image: '/vehicles/eurocargo-100-120.jpg'
-                    },
-                    {
-                      id: 'cekici',
-                      title: 'S-Way Çekici',
-                      licenseBadge: '(CE Ehliyet)',
-                      image: '/vehicles/sway-cekici.jpg?v=2'
-                    },
-                    {
-                      id: 'hafriyat',
-                      title: 'T-Way Şantiye',
-                      licenseBadge: '(6x4 / 8x4 • C Ehliyet)',
-                      image: '/vehicles/tway-damper.jpg'
-                    }
-                  ].map(cat => {
-                    const isActive = selectedCategoryTab === cat.id;
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setSelectedCategoryTab(cat.id)}
-                        style={{
-                          minWidth: 0,
-                          background: isActive ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)' : 'rgba(35, 58, 94, 0.92)',
-                          color: isActive ? '#fff' : '#e2e8f0',
-                          border: '1.5px solid',
-                          borderColor: isActive ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)',
-                          borderRadius: '11px',
-                          padding: '6px 6px 7px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '4px',
-                          boxShadow: isActive ? '0 6px 16px rgba(2, 132, 199, 0.3)' : '0 2px 6px rgba(0, 0, 0, 0.16)'
-                        }}
-                      >
-                        <div style={{
-                          width: '100%',
-                          height: isMobileView ? '44px' : '42px',
-                          background: '#ffffff',
-                          borderRadius: '8px',
-                          padding: '2px 6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '2px',
-                          overflow: 'hidden',
-                          flexShrink: 0,
-                          boxSizing: 'border-box',
-                          boxShadow: isActive
-                            ? '0 2px 6px rgba(0, 0, 0, 0.22)'
-                            : 'inset 0 0 0 1px rgba(148, 163, 184, 0.22)'
-                        }}>
-                          {cat.images ? (
-                            cat.images.map((imgSrc, idx) => (
-                              <img
-                                key={idx}
-                                src={imgSrc}
-                                alt={cat.title}
-                                loading="lazy"
-                                style={{
-                                  width: '32%',
-                                  height: '100%',
-                                  objectFit: 'contain',
-                                  display: 'block'
-                                }}
-                              />
-                            ))
-                          ) : (
-                            <img
-                              src={cat.image}
-                              alt={cat.title}
-                              loading="lazy"
-                              style={{
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                width: 'auto',
-                                height: 'auto',
-                                objectFit: 'contain',
-                                display: 'block'
-                              }}
-                            />
-                          )}
-                        </div>
-                        <span style={{
-                          fontSize: isMobileView ? '0.77rem' : '0.75rem',
-                          fontWeight: 900,
-                          color: '#ffffff',
-                          lineHeight: 1.15,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          maxWidth: '100%'
-                        }}>
-                          {cat.title}
-                        </span>
-                        <span style={{
-                          fontSize: isMobileView ? '0.65rem' : '0.63rem',
-                          fontWeight: 700,
-                          color: isActive ? '#bae6fd' : '#38bdf8',
-                          lineHeight: 1.1,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          maxWidth: '100%'
-                        }}>
-                          {cat.licenseBadge}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Model Kartları Izgarası */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-                  gap: isMobileView ? '12px' : '10px',
-                  maxHeight: isMobileView ? 'none' : '420px',
-                  overflowY: isMobileView ? 'visible' : 'auto',
-                  paddingRight: isMobileView ? 0 : '4px'
-                }}>
-                  {VEHICLE_CATALOG.filter(v => selectedCategoryTab === 'all' || v.category === selectedCategoryTab).map(v => {
-                    const isSelected = matched.key === v.key || matched.modelTitle === v.modelTitle;
-                    const sticker = getVehicleSticker(v);
-                    return (
-                      <div
-                        key={v.key}
-                        onClick={() => handleSelectVehicle(v.key)}
-                        style={{
-                          background: isSelected
-                            ? 'linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(28, 48, 82, 0.96) 100%)'
-                            : 'linear-gradient(165deg, rgba(35, 58, 94, 0.92) 0%, rgba(25, 43, 72, 0.92) 100%)',
-                          border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(125, 211, 252, 0.24)',
-                          borderRadius: '14px',
-                          padding: isMobileView ? '16px' : '12px',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          boxShadow: isSelected ? '0 0 18px rgba(56, 189, 248, 0.3)' : '0 4px 14px rgba(8, 15, 30, 0.22)'
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                            <span style={{ fontSize: isMobileView ? '0.76rem' : '0.68rem', color: '#cbd5e1', fontWeight: 700 }}>
-                              {v.categoryLabel}
-                            </span>
-                            {isSelected ? (
-                              <span style={{ background: '#10b981', color: '#0f172a', fontWeight: 800, fontSize: isMobileView ? '0.74rem' : '0.65rem', padding: '3px 10px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <FiCheck size={12} /> SEÇİLİ
-                              </span>
-                            ) : (
-                              <span style={{ fontSize: isMobileView ? '0.72rem' : '0.66rem', color: v.kantarStatus === 'exempt' ? '#7dd3fc' : '#34d399', fontWeight: 700 }}>
-                                {v.kantarStatus === 'exempt' ? 'B Ehliyet / 3.5 Ton' : 'Kantar Tescilli (C)'}
-                              </span>
-                            )}
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <h4 style={{ margin: '0 0 4px', fontSize: isMobileView ? '1.06rem' : '0.92rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
-                                {v.title}
-                              </h4>
-                              <div style={{ fontSize: isMobileView ? '0.78rem' : '0.7rem', color: '#7dd3fc', fontWeight: 600 }}>
-                                {v.badge}
-                              </div>
-                            </div>
-                            {sticker && (
-                              <div
-                                title={sticker.label}
-                                style={{
-                                  flexShrink: 0,
-                                  width: isMobileView ? '74px' : '68px',
-                                  height: isMobileView ? '50px' : '46px',
-                                  background: '#ffffff',
-                                  borderRadius: '10px',
-                                  border: '2px solid rgba(56, 189, 248, 0.7)',
-                                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255,255,255,0.12)',
-                                  padding: '3px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  overflow: 'hidden',
-                                  transform: 'rotate(-1.5deg)'
-                                }}
-                              >
-                                <img
-                                  src={sticker.src}
-                                  alt={sticker.label}
-                                  loading="lazy"
-                                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                                />
-                              </div>
-                            )}
-                          </div>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', background: 'rgba(15, 28, 50, 0.55)', border: '1px solid rgba(148, 163, 184, 0.16)', borderRadius: '8px', padding: isMobileView ? '8px' : '6px', marginBottom: '8px', textAlign: 'center', fontSize: isMobileView ? '0.76rem' : '0.66rem' }}>
-                            <div>
-                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>NET YÜK</span>
-                              <strong style={{ color: '#fff', fontSize: isMobileView ? '0.88rem' : undefined }}>{(v.payloadKg / 1000).toFixed(1)} Ton</strong>
-                            </div>
-                            <div>
-                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>HACİM</span>
-                              <strong style={{ color: '#34d399', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.volumeM3} m³</strong>
-                            </div>
-                            <div>
-                              <span style={{ color: '#94a3b8', display: 'block', fontSize: isMobileView ? '0.68rem' : undefined }}>EHLİYET</span>
-                              <strong style={{ color: '#f1f5f9', fontSize: isMobileView ? '0.88rem' : undefined }}>{v.license.split(' ')[0]}</strong>
-                            </div>
-                          </div>
-
-                          {/* 📏 DİNGİL MESAFESİ & UYUMLU KASA BOYU REHBERİ */}
-                          <div style={{
-                            background: 'rgba(56, 189, 248, 0.1)',
-                            border: '1px solid rgba(56, 189, 248, 0.28)',
-                            borderRadius: '8px',
-                            padding: isMobileView ? '8px 10px' : '6px 8px',
-                            marginBottom: '10px',
-                            fontSize: isMobileView ? '0.76rem' : '0.66rem',
-                            lineHeight: 1.35
-                          }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                              <span style={{ color: '#94a3b8' }}>
-                                📏 Dingil: <strong style={{ color: '#f8fafc' }}>{v.wheelbase.split(' (')[0]}</strong>
-                              </span>
-                              <span style={{ color: '#38bdf8', fontWeight: 800 }}>
-                                📦 Uyumlu Kasa: {v.dims?.length ? v.dims.length.replace(' (Önerilen:', ' • Önerilen:').replace(')', '') : '-'}
-                              </span>
-                            </div>
-                            {(v.key === 'chassis_35s' || v.key === 'chassis_35c') && (
-                              <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed rgba(255,255,255,0.1)', color: '#cbd5e1', fontSize: isMobileView ? '0.71rem' : '0.62rem' }}>
-                                💡 <strong>3450 Dingil:</strong> 3.50–3.80m Kasa · <strong>3750 Dingil:</strong> 4.10–4.30m Kasa · <strong>4100 Dingil:</strong> 4.50–4.80m Kasa
-                              </div>
-                            )}
-                            {v.key === 'truck_72c' && (
-                              <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed rgba(255,255,255,0.1)', color: '#cbd5e1', fontSize: isMobileView ? '0.71rem' : '0.62rem' }}>
-                                💡 <strong>3750 Dingil:</strong> 4.20m Kasa · <strong>4350 Dingil:</strong> 5.20m Kasa · <strong>4750 Dingil:</strong> 5.80–6.20m Kasa
-                              </div>
-                            )}
-                          </div>
-
-                          {/* 🏷️ 2026 ARAÇ FİYATLANDIRMA ALANI */}
-                          {v.isTway ? (
-                            <div style={{
-                              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(180, 83, 9, 0.25) 100%)',
-                              border: '1px solid rgba(245, 158, 11, 0.45)',
-                              borderRadius: '10px',
-                              padding: isMobileView ? '10px 12px' : '8px 10px',
-                              marginBottom: '10px',
-                              textAlign: 'center'
-                            }}>
-                              <div style={{ fontSize: isMobileView ? '0.7rem' : '0.64rem', fontWeight: 800, color: '#fcd34d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                🚜 ŞANTİYE & HAFRİYAT ÖZEL FİYATI
-                              </div>
-                              <div style={{ fontSize: isMobileView ? '0.94rem' : '0.84rem', fontWeight: 900, color: '#fef08a', marginTop: '3px' }}>
-                                Fiyatlandırma İçin Satış Sorumlusu Can Murat ile Görüşün
-                              </div>
-                              <div style={{ fontSize: isMobileView ? '0.74rem' : '0.66rem', color: '#cbd5e1', marginTop: '2px' }}>
-                                Satış Sorumlusu Can Murat • 0544 622 59 31
-                              </div>
-                            </div>
-                          ) : v.currency === 'EUR' ? (
-                            <div style={{
-                              background: 'rgba(59, 130, 246, 0.12)',
-                              border: '1px solid rgba(59, 130, 246, 0.35)',
-                              borderRadius: '10px',
-                              padding: isMobileView ? '10px 12px' : '8px 10px',
-                              marginBottom: '10px'
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
-                                <span style={{ fontSize: isMobileView ? '0.74rem' : '0.66rem', color: '#93c5fd', fontWeight: 700 }}>ÇEKİCİ FİYAT ARALIĞI:</span>
-                                <span style={{ fontSize: isMobileView ? '1.02rem' : '0.88rem', fontWeight: 900, color: '#60a5fa' }}>
-                                  {v.displayPrice}{' '}
-                                  <span style={{ color: '#4ade80', fontWeight: 800, fontSize: isMobileView ? '0.86rem' : '0.76rem' }}>
-                                    ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} – {Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
-                                  </span>
-                                </span>
-                              </div>
-                              <div style={{ fontSize: isMobileView ? '0.7rem' : '0.62rem', color: '#cbd5e1', marginTop: '3px', lineHeight: 1.35 }}>
-                                500 Full Plus: 123.000 € ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • 580: 126.000 € ({Math.round(126000 * tcmbEurRate).toLocaleString('tr-TR')} TL) • Diamond: 131.000 € ({Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
-                              </div>
-                              <div style={{ fontSize: isMobileView ? '0.66rem' : '0.58rem', color: '#93c5fd', marginTop: '3px', fontWeight: 700 }}>
-                                🏛️ TCMB Günlük Euro Kuru: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL
-                              </div>
-                            </div>
-                          ) : (
-                            <div style={{
-                              background: 'rgba(16, 185, 129, 0.1)',
-                              border: '1px solid rgba(16, 185, 129, 0.32)',
-                              borderRadius: '10px',
-                              padding: isMobileView ? '10px 12px' : '8px 10px',
-                              marginBottom: '10px'
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2px' }}>
-                                <span style={{ fontSize: isMobileView ? '0.74rem' : '0.65rem', color: '#94a3b8' }}>Kampanyalı:</span>
-                                <span style={{ fontSize: isMobileView ? '0.86rem' : '0.78rem', fontWeight: 700, color: '#cbd5e1', textDecoration: 'line-through' }}>{v.campaignPriceText}</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                <span style={{ fontSize: isMobileView ? '0.76rem' : '0.68rem', fontWeight: 800, color: '#34d399' }}>NET PEŞİN:</span>
-                                <span style={{ fontSize: isMobileView ? '1.14rem' : '0.96rem', fontWeight: 900, color: '#10b981' }}>{v.cashPriceText}</span>
-                              </div>
-                              {v.cashDiscountText && (
-                                <div style={{ marginTop: '4px', textAlign: 'right' }}>
-                                  <span style={{ fontSize: isMobileView ? '0.7rem' : '0.62rem', background: '#059669', color: '#fff', padding: '2px 8px', borderRadius: '4px', fontWeight: 800, display: 'inline-block' }}>
-                                    🎁 -{v.cashDiscountText} Peşin İndirimi
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectVehicle(v.key);
-                            if (isMobileView) setStep(2);
-                          }}
-                          style={{
-                            width: '100%',
-                            background: isSelected ? '#10b981' : 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-                            color: isSelected ? '#0f172a' : '#fff',
-                            border: 'none',
-                            borderRadius: '10px',
-                            padding: isMobileView ? '12px' : '6px 10px',
-                            fontSize: isMobileView ? '0.88rem' : '0.72rem',
-                            fontWeight: 800,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {isMobileView
-                            ? (isSelected ? '✓ Seçili — Kredi Planına Geç ➔' : 'Bu Aracı Seç & Krediyi Gör ➔')
-                            : (isSelected ? '✓ Seçili Araç (Krediye Geçebilirsiniz)' : 'Bu Aracı Seç')}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* SEÇENEK B: TONAJ & METREKÜP SÜRGÜLERİ */}
-            {selectorMode === 'slider' && (
-              <div>
-                {/* Net Yük Ağırlığı Sürgüsü */}
-                <div style={{
-                  background: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '14px',
-                  padding: isMobileView ? '18px 16px' : '16px',
-                  marginBottom: '16px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: isMobileView ? '0.9rem' : '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
-                      TAŞINACAK NET YÜK:
-                    </span>
-                    <span style={{ fontSize: isMobileView ? '1.35rem' : '1.15rem', fontWeight: 900, color: '#38bdf8' }}>
-                      {(payloadKg / 1000).toFixed(1)} Ton ({payloadKg.toLocaleString('tr-TR')} kg)
-                    </span>
-                  </div>
-
-                  <input
-                    type="range"
-                    min="1000"
-                    max="32000"
-                    step="250"
-                    value={payloadKg}
-                    onChange={e => handlePayloadChange(Number(e.target.value))}
-                    style={{ width: '100%', height: isMobileView ? '10px' : undefined, accentColor: '#0284c7', marginBottom: '14px' }}
-                  />
-
-                  {/* Hızlı Çipler */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobileView ? '8px' : '6px' }}>
-                    {QUICK_TONNAGES.map(qt => (
-                      <button
-                        key={qt.id}
-                        type="button"
-                        onClick={() => handlePayloadChange(qt.payloadKg)}
-                        style={{
-                          background: payloadKg === qt.payloadKg ? '#0284c7' : 'rgba(255, 255, 255, 0.06)',
-                          color: payloadKg === qt.payloadKg ? '#fff' : '#cbd5e1',
-                          border: '1px solid',
-                          borderColor: payloadKg === qt.payloadKg ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)',
-                          borderRadius: '12px',
-                          padding: isMobileView ? '8px 12px' : '4px 10px',
-                          fontSize: isMobileView ? '0.82rem' : '0.74rem',
-                          fontWeight: payloadKg === qt.payloadKg ? 800 : 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {qt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Kasa Hacmi (m³) / Boyutlar */}
-                <div style={{
-                  background: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '14px',
-                  padding: isMobileView ? '18px 16px' : '16px',
-                  marginBottom: '16px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: isMobileView ? '0.9rem' : '0.82rem', fontWeight: 800, color: '#f8fafc' }}>
-                      KASA HACMİ (m³):
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setCustomDims(!customDims)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#38bdf8',
-                        fontSize: isMobileView ? '0.8rem' : '0.74rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {customDims ? 'm³ Sürgüsüne Dön' : 'Özel Kasa Ebatı (cm) Gir'}
-                    </button>
-                  </div>
-
-                  {!customDims ? (
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span style={{ fontSize: isMobileView ? '0.82rem' : '0.75rem', color: '#94a3b8' }}>İdeal Kasa Hacmi:</span>
-                        <span style={{ fontSize: isMobileView ? '1.35rem' : '1.05rem', fontWeight: 900, color: '#10b981' }}>{volumeM3} m³</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="12"
-                        max="65"
-                        step="1"
-                        value={volumeM3}
-                        onChange={e => handleVolumeChange(Number(e.target.value))}
-                        style={{ width: '100%', height: isMobileView ? '10px' : undefined, accentColor: '#10b981', marginBottom: '8px' }}
-                      />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: isMobileView ? '0.72rem' : '0.68rem', color: '#cbd5e1' }}>
-                        <span>12 m³</span>
-                        <span>28 m³</span>
-                        <span>45 m³</span>
-                        <span>65 m³</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                      <div>
-                        <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış Boy (cm)</label>
-                        <input
-                          type="number"
-                          value={bodyLengthCm}
-                          onChange={e => setBodyLengthCm(Number(e.target.value))}
-                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 8px', color: '#fff', fontSize: '0.9rem', fontWeight: 700 }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Dış En (cm)</label>
-                        <input
-                          type="number"
-                          value={bodyWidthCm}
-                          onChange={e => setBodyWidthCm(Number(e.target.value))}
-                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 8px', color: '#fff', fontSize: '0.9rem', fontWeight: 700 }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik (cm)</label>
-                        <input
-                          type="number"
-                          value={bodyHeightCm}
-                          onChange={e => setBodyHeightCm(Number(e.target.value))}
-                          style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 8px', color: '#fff', fontSize: '0.9rem', fontWeight: 700 }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Kasa Tipi Seçimi */}
-                <div style={{
-                  background: 'rgba(15, 23, 42, 0.75)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '14px',
-                  padding: isMobileView ? '16px' : '16px',
-                  marginBottom: '18px'
-                }}>
-                  <span style={{ fontSize: isMobileView ? '0.9rem' : '0.82rem', fontWeight: 800, color: '#f8fafc', display: 'block', marginBottom: '10px' }}>
-                    KASA TİPİ VEYA GÖVDE YAPISI:
-                  </span>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' }}>
-                    {BODY_TYPES.map(b => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setSelectedBody(b.id)}
-                        style={{
-                          background: selectedBody === b.id ? 'rgba(2, 132, 199, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                          border: '1.5px solid',
-                          borderColor: selectedBody === b.id ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
-                          borderRadius: '10px',
-                          padding: isMobileView ? '12px 10px' : '10px 8px',
-                          textAlign: 'left',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <div style={{ fontSize: '1.15rem', marginBottom: '2px' }}>{b.icon}</div>
-                        <div style={{ fontSize: isMobileView ? '0.84rem' : '0.74rem', fontWeight: 700, color: selectedBody === b.id ? '#fff' : '#cbd5e1' }}>{b.name}</div>
-                        <div style={{ fontSize: isMobileView ? '0.7rem' : '0.64rem', color: '#cbd5e1', marginTop: '2px' }}>{b.tare === 0 ? 'Orijinal Sac Gövde' : `+${b.tare} kg Dara`}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ⚡ ANLIK EŞLEŞEN İDEAL ŞASİ ÖNİZLEMESİ */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%)',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
-              borderRadius: '12px',
-              padding: '14px 16px',
-              marginBottom: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '12px',
-              flexWrap: 'wrap'
-            }}>
-              <div>
-                <span style={{ fontSize: '0.68rem', color: '#93c5fd', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  {selectedModelKey ? 'SEÇİLEN MODEL:' : 'OTOMATİK EŞLEŞEN İDEAL ŞASİ:'}
-                </span>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                  {matched.modelTitle} ({matched.wheelbase})
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '3px' }}>
-                  {matched.kantarTitle} · {matched.badge}
-                </div>
-              </div>
-              <div style={{
-                background: matched.kantarStatus === 'safe' ? '#10b981' : '#38bdf8',
-                color: '#0f172a',
-                padding: '5px 12px',
-                borderRadius: '8px',
-                fontSize: '0.74rem',
-                fontWeight: 800
-              }}>
-                {matched.kantarStatus === 'safe' ? 'KANTAR UYGUN ✓' : '3.5 TON B EHLİYET'}
-              </div>
-            </div>
-
-
-            {/* İLERLEME BUTONU */}
-            <button
-              onClick={() => setStep(2)}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '16px',
-                fontWeight: 800,
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
-                position: isMobileView ? 'sticky' : 'static',
-                bottom: isMobileView ? '12px' : undefined,
-                zIndex: isMobileView ? 50 : undefined
-              }}
-            >
-              <span>{isMobileView ? `${matched.series} — Kredi Planına Geç` : 'Kredi & Taksit Kampanyalarına Geç (%0 Faiz & Çoklu Banka)'}</span>
-              <FiArrowRight size={18} />
-            </button>
-          </div>
-        )}
-
-        {/* ── ADIM 2: EŞLEŞEN ŞASİ, KASA BOYUTLARI, KANTAR & KREDİ ─ */}
-        {step === 2 && (
-          <div>
-            {/* Geri Dön Butonu */}
-            <div style={{ marginBottom: '14px' }}>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#94a3b8',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '10px',
-                  padding: '8px 14px',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                <FiArrowLeft size={14} /> Tonaj ve Metreküpü Değiştir
-              </button>
-            </div>
-
-
-            {/* Eşleşen Araç Kartı */}
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.4) 0%, rgba(16, 185, 129, 0.15) 100%)',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
-              borderRadius: '14px',
-              padding: '18px',
-              marginBottom: '18px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: 6 }}>
-                <span style={{ background: '#10b981', color: '#0f172a', fontWeight: 800, fontSize: '0.72rem', padding: '3px 8px', borderRadius: '12px' }}>
-                  ✓ İHTİYACINIZA EN UYGUN ŞASİ
-                </span>
-                <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 700 }}>
-                  {matched.badge}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontSize: isMobileView ? '1.18rem' : '1.3rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                    {matched.modelTitle}
-                  </h3>
-                  <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                    📏 Dingil: <strong style={{ color: '#38bdf8' }}>{matched.wheelbase}</strong>
-                    {matched.dims?.length && (
-                      <> · 📦 Uyumlu Kasa Boyu: <strong style={{ color: '#34d399' }}>{matched.dims.length}</strong></>
-                    )}
-                    {' '}· Ehliyet: <strong style={{ color: '#f8fafc' }}>{matched.license}</strong>
-                  </p>
-                </div>
-                {(() => {
-                  const matchedSticker = getVehicleSticker(matched);
-                  if (!matchedSticker) return null;
-                  return (
-                    <div
-                      title={matchedSticker.label}
-                      style={{
-                        flexShrink: 0,
-                        width: isMobileView ? '84px' : '94px',
-                        height: isMobileView ? '58px' : '64px',
-                        background: '#ffffff',
-                        borderRadius: '11px',
-                        border: '2px solid rgba(56, 189, 248, 0.85)',
-                        boxShadow: '0 5px 14px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255,255,255,0.16)',
-                        padding: '3px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden',
-                        transform: 'rotate(-1.5deg)'
-                      }}
-                    >
-                      <img
-                        src={matchedSticker.src}
-                        alt={matchedSticker.label}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                      />
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* 🏷️ 2026 RESMİ SATIŞ FİYATI & PEŞİN İNDİRİMİ */}
-              {matched.isTway ? (
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.28) 100%)',
-                  border: '1.5px solid rgba(245, 158, 11, 0.5)',
-                  borderRadius: '12px',
-                  padding: '14px 16px',
-                  marginBottom: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '12px'
-                }}>
-                  <div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fcd34d', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      🚜 T-WAY ŞANTİYE & HAFRİYAT ÖZEL FİYATLANDIRMA
-                    </div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fef08a', marginTop: '4px' }}>
-                      Fiyatlandırma İçin Satış Sorumlusu Can Murat ile Görüşün
-                    </div>
-                    <div style={{ fontSize: '0.76rem', color: '#cbd5e1', marginTop: '3px' }}>
-                      Satış Sorumlusu Can Murat · IVECO ERC Samsun (0544 622 59 31)
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDirectWhatsApp(`Merhaba Can Murat Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}
-                    style={{
-                      background: '#22c55e',
-                      color: '#0f172a',
-                      fontWeight: 800,
-                      fontSize: '0.82rem',
-                      padding: '9px 16px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)'
-                    }}
-                  >
-                    <FiPhoneCall size={16} /> Fiyat Sor (0544 622 59 31)
-                  </button>
-                </div>
-              ) : matched.currency === 'EUR' ? (
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%)',
-                  border: '1.5px solid rgba(59, 130, 246, 0.45)',
-                  borderRadius: '12px',
-                  padding: '14px 16px',
-                  marginBottom: '14px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase' }}>
-                        🛣️ 2026 S-WAY ÇEKİCİ RESMİ LİSTE FİYATLARI (🏛️ TCMB KUR: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL)
-                      </span>
-                      <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#60a5fa', marginTop: '2px' }}>
-                        {matched.displayPrice || '123.000 € – 131.000 €'}{' '}
-                        <span style={{ fontSize: '0.96rem', color: '#4ade80', fontWeight: 800 }}>
-                          ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL – {Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
-                        </span>
-                      </div>
-                    </div>
-                    <span style={{ background: '#1d4ed8', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '4px 10px', borderRadius: '6px' }}>
-                      EUR DÖVİZLİ / KREDİYE UYGUN
-                    </span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', marginTop: '8px' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>500 Full Plus:</span>
-                      <strong style={{ fontSize: '0.92rem', color: '#fff' }}>
-                        123.000 € <span style={{ color: '#4ade80', fontSize: '0.80rem' }}>({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
-                      </strong>
-                    </div>
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block' }}>580 Full Plus:</span>
-                      <strong style={{ fontSize: '0.92rem', color: '#fff' }}>
-                        126.000 € <span style={{ color: '#4ade80', fontSize: '0.80rem' }}>({Math.round(126000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
-                      </strong>
-                    </div>
-                    <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-                      <span style={{ fontSize: '0.68rem', color: '#fbbf24', display: 'block' }}>580 Diamond:</span>
-                      <strong style={{ fontSize: '0.92rem', color: '#fef08a' }}>
-                        131.000 € <span style={{ color: '#fde047', fontSize: '0.80rem' }}>({Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)</span>
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-              ) : matched.campaignPriceText ? (
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)',
-                  border: '1.5px solid rgba(16, 185, 129, 0.45)',
-                  borderRadius: '12px',
-                  padding: '14px 16px',
-                  marginBottom: '14px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      🏷️ 2026 RESMİ KAMPANYALI & PEŞİN SATIŞ FİYATI
-                    </span>
-                    {matched.cashDiscountText && (
-                      <span style={{ background: '#059669', color: '#fff', fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: '6px' }}>
-                        🎁 -{matched.cashDiscountText} Peşin Alım İndirimi
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginBottom: '2px' }}>KAMPANYALI / KREDİLİ FİYAT</span>
-                      <strong style={{ fontSize: '1.05rem', color: '#cbd5e1' }}>{matched.campaignPriceText}</strong>
-                    </div>
-                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#34d399', display: 'block', marginBottom: '2px', fontWeight: 700 }}>NET PEŞİN ALIM FİYATI</span>
-                      <strong style={{ fontSize: '1.25rem', color: '#10b981', fontWeight: 900 }}>{matched.cashPriceText}</strong>
-                    </div>
-                  </div>
-                  <div style={{ marginTop: '8px', fontSize: '0.62rem', color: '#cbd5e1', textAlign: 'right' }}>
-                    * Tavsiye edilen bilgilendirme fiyatıdır; resmi sözleşme ve bayi onayı ile kesinleşir.
-                  </div>
-                </div>
-              ) : null}
-
-              {/* 📐 KASA ÖLÇÜLERİ, KANTAR & TEKNİK FÖY (İsteğe Bağlı Açılır-Kapanır — Önce Sonuç, İsterse Detay) */}
-              <button
-                type="button"
-                onClick={() => setShowTechDetailsMobile(prev => !prev)}
-                style={{
-                  width: '100%',
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  border: '1px solid rgba(56, 189, 248, 0.35)',
-                  borderRadius: '10px',
-                  padding: '10px 14px',
-                  marginBottom: showTechDetailsMobile ? '10px' : '0',
-                  color: '#38bdf8',
-                  fontSize: '0.82rem',
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer'
-                }}
-              >
-                <span>📐 Şasi Kasa Ölçüleri, Kantar Analizi & Teknik Föy (PDF)</span>
-                <span>{showTechDetailsMobile ? 'Detayları Gizle ▴' : 'Detayları Gör ▾'}</span>
-              </button>
-
-              {showTechDetailsMobile && (
-                <>
-                  <div style={{
-                    background: 'rgba(10, 18, 36, 0.8)',
-                    borderRadius: '12px',
-                    padding: '12px 14px',
-                    marginBottom: '14px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)'
-                  }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', display: 'block', marginBottom: '8px', textTransform: 'uppercase' }}>
-                      📐 ŞASİYE UYGUN KASA BOYUTLARI:
-                    </span>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center' }}>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '8px', padding: '8px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 600, display: 'block' }}>KASA BOYU</span>
-                        <strong style={{ fontSize: '0.82rem', color: '#38bdf8' }}>{matched.dims.length}</strong>
-                      </div>
-                      <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '8px', padding: '8px 4px' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1', fontWeight: 600, display: 'block' }}>KASA ENİ</span>
-                        <strong style={{ fontSize: '0.82rem', color: '#38bdf8' }}>{matched.dims.width}</strong>
-                      </div>
-                      <div style={{ background: 'rgba(16, 185, 129, 0.12)', borderRadius: '8px', padding: '8px 4px', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#34d399', fontWeight: 600, display: 'block' }}>NET HACİM</span>
-                        <strong style={{ fontSize: '0.82rem', color: '#34d399' }}>{matched.dims.volume}</strong>
-                      </div>
-                    </div>
-                    <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Euro Palet Kapasitesi: <strong style={{ color: '#fff' }}>{matched.dims.pallets}</strong></span>
-                      <span>Kasa Yüksekliği: <strong style={{ color: '#38bdf8' }}>{matched.dims.height}</strong></span>
-                    </div>
-                  </div>
-
-                  {/* ⚖️ KANTAR KARNESİ & GÜVENLİK ANALİZİ */}
-                  <div style={{
-                    background: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.14)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.14)' : 'rgba(239, 68, 68, 0.14)',
-                    border: '1px solid',
-                    borderColor: matched.kantarStatus === 'safe' ? 'rgba(16, 185, 129, 0.45)' : matched.kantarStatus === 'exempt' ? 'rgba(56, 189, 248, 0.45)' : 'rgba(239, 68, 68, 0.45)',
-                    borderRadius: '12px',
-                    padding: '12px 14px',
-                    marginBottom: '14px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      {matched.kantarStatus === 'overload' ? (
-                        <FiAlertCircle size={18} style={{ color: '#ef4444' }} />
-                      ) : (
-                        <FiCheckCircle size={18} style={{ color: matched.kantarStatus === 'safe' ? '#10b981' : '#38bdf8' }} />
-                      )}
-                      <strong style={{ fontSize: '0.85rem', color: matched.kantarStatus === 'overload' ? '#ef4444' : '#fff' }}>
-                        {matched.kantarTitle}
-                      </strong>
-                    </div>
-                    <p style={{ margin: '0 0 10px', fontSize: '0.74rem', color: '#e2e8f0', lineHeight: 1.4 }}>
-                      {matched.kantarDesc}
-                    </p>
-
-                    {/* Ağırlık Dökümü */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', background: 'rgba(15, 28, 50, 0.55)', borderRadius: '8px', padding: '8px 10px', fontSize: '0.7rem' }}>
-                      <div>
-                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Araç Boş (Şoför+Yakıt):</span>
-                        <strong style={{ color: '#fff' }}>{matched.unladenWeight} kg</strong>
-                      </div>
-                      <div>
-                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Kasa Ağırlığı:</span>
-                        <strong style={{ color: '#fff' }}>+{BODY_TYPES.find(b => b.id === selectedBody)?.tare || 650} kg</strong>
-                      </div>
-                      <div>
-                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Yükünüz:</span>
-                        <strong style={{ color: '#38bdf8' }}>+{payloadKg} kg</strong>
-                      </div>
-                      <div>
-                        <span style={{ color: '#cbd5e1', fontWeight: 600, display: 'block' }}>Kantar Sınırı:</span>
-                        <strong style={{ color: '#34d399' }}>{matched.kantarLimit} kg</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 📄 TEKNİK FÖY İNDİRME BUTONU */}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                    <a
-                      href={matched.pdfUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        flex: 1,
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px',
-                        padding: '10px',
-                        color: '#fff',
-                        fontSize: '0.78rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        textDecoration: 'none'
-                      }}
-                      title="Resmi Teknik Föy PDF"
-                    >
-                      <FiDownload size={15} style={{ color: '#38bdf8' }} />
-                      <span>Resmi Teknik Föyü İndir (PDF)</span>
-                    </a>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* ── ÇOKLU BANKA KREDİ KAMPANYALARI (EKİM 2026) ─────── */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.75)',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
+              background: 'rgba(26, 44, 74, 0.92)',
+              border: '1.5px solid rgba(56, 189, 248, 0.38)',
               borderRadius: '16px',
-              padding: '18px 16px',
-              marginBottom: '20px'
+              padding: isMobileView ? '12px' : '18px',
+              boxShadow: '0 8px 28px rgba(8, 15, 30, 0.35)'
             }}>
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{
-                    background: 'rgba(56, 189, 248, 0.2)',
-                    color: '#38bdf8',
-                    padding: '6px 10px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    <FiDollarSign />
-                  </span>
-                  <div>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                      Resmi Finansman & Banka Kampanyaları
-                    </h4>
-                    <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                      IVECO Yetkili Bayi Destekli Kredi Tablosu
-                    </span>
-                  </div>
+              <div style={{ marginBottom: '10px', textAlign: 'left' }}>
+                <div style={{ fontSize: isMobileView ? '1rem' : '1.12rem', fontWeight: 900, color: '#ffffff' }}>
+                  👇 1. Hangi Tip Araç Bakıyorsunuz? (Üzerine Dokunun)
                 </div>
-                <span style={{
-                  background: loanCurrencyMode === 'EUR' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                  color: loanCurrencyMode === 'EUR' ? '#38bdf8' : '#34d399',
-                  border: loanCurrencyMode === 'EUR' ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(52, 211, 153, 0.3)',
-                  borderRadius: '20px',
-                  padding: '3px 10px',
-                  fontSize: '0.72rem',
-                  fontWeight: 700
-                }}>
-                  {loanCurrencyMode === 'EUR' ? '💶 Euro Kampanya Tablosu' : '%0 Faiz Seçenekleri'}
-                </span>
+                <div style={{ fontSize: '0.76rem', color: '#bae6fd', marginTop: '2px' }}>
+                  Karmaşık ayarlarla uğraşmayın; sadece baktığınız araç tipine dokunun, fiyatı ve kredi taksiti hemen aşağıda açılsın:
+                </div>
               </div>
 
-              {/* Para Birimi & Finansman Türü Seçimi (TL vs İhracatçı Euro) */}
-              {(!lockedBank || lockedBank.hasEurCampaigns) && (
-                <div style={{
-                  display: isMobileView ? 'grid' : 'flex',
-                  gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : undefined,
-                  gap: '6px',
-                  marginBottom: '16px',
-                  background: 'rgba(2, 6, 23, 0.65)',
-                  padding: '4px',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  width: isMobileView ? '100%' : 'fit-content',
-                  boxSizing: 'border-box'
-                }}>
-                  <button
-                    type="button"
-                    onClick={() => { setLoanCurrencyMode('TRY'); setShowAllLoansMobile(false); }}
-                    style={{
-                      minWidth: 0,
-                      background: loanCurrencyMode === 'TRY' ? '#0284c7' : 'transparent',
-                      color: loanCurrencyMode === 'TRY' ? '#fff' : '#94a3b8',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: isMobileView ? '8px 6px' : '6px 14px',
-                      fontSize: isMobileView ? '0.75rem' : '0.78rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '5px',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <span>🇹🇷</span> {lockedBank ? `${lockedBank.shortName} TL Kredi` : 'TL Ticari Kredi'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => { setLoanCurrencyMode('EUR'); setShowAllLoansMobile(false); }}
-                    style={{
-                      minWidth: 0,
-                      background: loanCurrencyMode === 'EUR' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
-                      color: loanCurrencyMode === 'EUR' ? '#fff' : '#94a3b8',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: isMobileView ? '8px 6px' : '6px 14px',
-                      fontSize: isMobileView ? '0.74rem' : '0.78rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '5px',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    <span>💶</span> {lockedBank ? `${lockedBank.shortName} Euro Kredisi` : (isMobileView ? 'Euro (EUR) Kredisi' : 'İhracatçı Euro (EUR) Kredisi')}
-                    {!isMobileView && (
-                      <span style={{ fontSize: '0.64rem', background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
-                        Düşük Döviz Faizi
-                      </span>
-                    )}
-                  </button>
-                </div>
-              )}
-
-              {loanCurrencyMode === 'EUR' ? (
-                /* ── İHRACATÇI EURO KREDİSİ GÖRÜNÜMÜ ── */
-                <div>
-                  <div style={{
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    borderRadius: '10px',
-                    padding: '10px 14px',
-                    marginBottom: '14px',
-                    fontSize: '0.76rem',
-                    color: '#cbd5e1',
-                    lineHeight: 1.45
-                  }}>
-                    🛡️ <strong style={{ color: '#4ade80' }}>S-Way / T-Way Euro Finansman Kampanyaları:</strong><br />
-                    {lockedBank ? (
-                      <>
-                        Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için yalnızca <strong>{lockedBank.name}</strong> resmi Euro kampanya tablosu gösterilmektedir.
-                      </>
-                    ) : (
-                      <>
-                        Döviz geliri olan uluslararası nakliye ve ihracatçı firmalar için <strong>Kuveyt Türk</strong> (12 aya kadar %0 kâr payı, 6 ay ödemesiz seçenekler), <strong>Garanti BBVA</strong> ve <strong>BNP Paribas</strong> (%0 faizli Euro paketler) kampanya tabloları geçerlidir.
-                      </>
-                    )}
-                  </div>
-
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px' }}>
-                    {lockedBank ? `🔒 Aktif Euro Finansman Kurumu (${lockedBank.name}):` : 'Anlaşmalı Euro Finansman Kurumu:'}
-                  </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(3, 1fr)' : 'repeat(auto-fill, minmax(140px, 1fr))', gap: '8px', marginBottom: '16px' }}>
-                    {visibleFinderEurBanks.map(bank => {
-                      const isSelected = activeFinderEurBankId === bank.id;
-                      return (
-                        <button
-                          key={bank.id}
-                          type="button"
-                          onClick={() => { setSelectedEurBankId(bank.id); setSelectedEurCampaignId(null); setShowAllLoansMobile(false); }}
-                          style={{
-                            background: isSelected ? bank.bg : 'rgba(255, 255, 255, 0.04)',
-                            border: `1.5px solid ${isSelected ? bank.color : 'rgba(255, 255, 255, 0.08)'}`,
-                            borderRadius: '10px',
-                            padding: '10px 8px',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            color: '#fff',
-                            transition: 'all 0.18s ease'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '1.2rem' }}>{bank.icon}</span>
-                            {isSelected && <span style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 800 }}>✓</span>}
-                          </div>
-                          <div style={{ fontSize: '0.78rem', fontWeight: 800, color: isSelected ? '#fff' : '#e2e8f0' }}>
-                            {bank.shortName}
-                          </div>
-                          <div style={{ fontSize: '0.64rem', color: isSelected ? bank.color : '#94a3b8', marginTop: '2px', fontWeight: 600 }}>
-                            {bank.badge}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px' }}>
-                    Euro Kredi Paketini Seçin:
-                  </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(210px, 1fr))', gap: '8px', marginBottom: '12px' }}>
-                    {(isMobileView && !showAllLoansMobile ? eurBankPresets.slice(0, 6) : eurBankPresets).map(preset => {
-                      const isChosen = activeEurCampaign?.id === preset.id;
-                      return (
-                        <div
-                          key={preset.id}
-                          onClick={() => setSelectedEurCampaignId(preset.id)}
-                          style={{
-                            background: isChosen ? 'rgba(16, 185, 129, 0.18)' : 'rgba(0, 0, 0, 0.35)',
-                            border: `1.5px solid ${isChosen ? '#10b981' : 'rgba(255, 255, 255, 0.08)'}`,
-                            borderRadius: '10px',
-                            padding: isMobileView ? '14px 12px' : '12px 10px',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                            position: 'relative'
-                          }}
-                        >
-                          {preset.tag && (
-                            <span style={{
-                              position: 'absolute',
-                              top: '-7px',
-                              right: '8px',
-                              background: '#10b981',
-                              color: '#fff',
-                              fontSize: '0.62rem',
-                              fontWeight: 800,
-                              padding: '1px 6px',
-                              borderRadius: '4px'
-                            }}>
-                              {preset.tag}
-                            </span>
-                          )}
-                          <div style={{ fontSize: isMobileView ? '0.88rem' : '0.78rem', fontWeight: 800, color: '#f8fafc', marginBottom: '4px' }}>
-                            {preset.title}
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: '6px' }}>
-                            <div>
-                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Aylık Taksit</div>
-                              <div style={{ fontSize: isMobileView ? '1.22rem' : '1.15rem', fontWeight: 900, color: '#34d399' }}>
-                                €{preset.monthly.toLocaleString('tr-TR')}
-                              </div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Döviz Faizi</div>
-                              <div style={{ fontSize: isMobileView ? '0.85rem' : '0.78rem', fontWeight: 800, color: '#38bdf8' }}>
-                                {preset.rateLabel}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {isMobileView && eurBankPresets.length > 6 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAllLoansMobile(prev => !prev)}
-                      style={{
-                        width: '100%',
-                        background: 'rgba(16, 185, 129, 0.12)',
-                        border: '1px solid rgba(16, 185, 129, 0.35)',
-                        color: '#34d399',
-                        borderRadius: '10px',
-                        padding: '10px',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        marginBottom: '14px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {showAllLoansMobile ? 'Daha Az Göster ▴' : `Tümünü Göster (${eurBankPresets.length} Paket) ▾`}
-                    </button>
-                  )}
-
-                  {/* EUR Kampanya Özeti */}
-                  {activeEurCampaign && (
-                    <div style={{
-                      background: 'rgba(0, 0, 0, 0.45)',
-                      border: '1px solid rgba(16, 185, 129, 0.35)',
-                      borderRadius: '12px',
-                      padding: '14px 16px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                            Seçilen İhracatçı Euro Kredi Planı:
-                          </div>
-                          <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#34d399' }}>
-                            €{activeEurCampaign.monthly.toLocaleString('tr-TR')} <span style={{ fontSize: '0.78rem', fontWeight: 500, color: '#cbd5e1' }}>/ ay</span>
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Finans Kuruluşu:</div>
-                          <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#38bdf8' }}>{activeEurBankMeta.name}</div>
-                        </div>
-                      </div>
-
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '6px',
-                        paddingTop: '8px',
-                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                        fontSize: '0.72rem'
-                      }}>
-                        <div>
-                          <span style={{ color: '#94a3b8' }}>Kredi Tutarı: </span>
-                          <strong style={{ color: '#fff' }}>€{activeEurCampaign.principal.toLocaleString('tr-TR')}</strong>
-                        </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <span style={{ color: '#94a3b8' }}>Vade: </span>
-                          <strong style={{ color: '#fff' }}>{activeEurCampaign.term} Ay</strong>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{ color: '#94a3b8' }}>Faiz Oranı: </span>
-                          <strong style={{ color: '#34d399' }}>{activeEurCampaign.rateLabel}</strong>
-                        </div>
-                      </div>
-                      <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '4px' }}>
-                        * 32 Sayılı Karar uyarınca döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına özeldir.
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* ── TL TİCARİ KREDİ GÖRÜNÜMÜ ── */
-                <div>
-                  <p style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '14px', lineHeight: 1.4 }}>
-                    {lockedBank ? (
-                      <>
-                        <strong>{lockedBank.name}</strong> bünyesinde <strong>{matched.series}</strong> modeline özel güncel ticari kredi oranları ve taksit seçenekleri:
-                      </>
-                    ) : (
-                      <>
-                        Çalıştığınız bankayı seçerek <strong>{matched.series}</strong> modeline özel taksit ve finansman seçeneklerini inceleyebilirsiniz:
-                      </>
-                    )}
-                  </p>
-
-              {/* 1. BANKA SEÇİCİ GRID */}
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '8px', letterSpacing: '0.5px' }}>
-                {lockedBank ? `🔒 Aktif Finansman Kurumu (${lockedBank.name}):` : 'Hangi Banka ile Çalışıyorsunuz?'}
-              </label>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(135px, 1fr))',
-                gap: '8px',
-                marginBottom: '16px'
+                gridTemplateColumns: isMobileView ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))',
+                gap: isMobileView ? '8px' : '10px'
               }}>
-                {visibleFinderBanks.map(bank => {
-                  const isSelected = activeFinderBankId === bank.id;
+                {SIMPLE_GROUPS.map(group => {
+                  const isGroupSelected = activeGroup.id === group.id;
                   return (
                     <button
-                      key={bank.id}
+                      key={group.id}
                       type="button"
                       onClick={() => {
-                        setSelectedBankId(bank.id);
-                        setSelectedCampaignId(null);
-                        setShowAllLoansMobile(false);
+                        handleSelectVehicle(group.defaultKey);
+                        recordCustomerFootprint('Kolay Araç Seçici Grubu Seçildi', group.title, group.subtitle);
                       }}
                       style={{
-                        background: isSelected ? bank.bg : 'rgba(255, 255, 255, 0.04)',
-                        border: `1.5px solid ${isSelected ? bank.color : 'rgba(255, 255, 255, 0.08)'}`,
-                        borderRadius: '10px',
-                        padding: isMobileView ? '12px 10px' : '10px 8px',
-                        textAlign: 'left',
+                        minWidth: 0,
+                        background: isGroupSelected
+                          ? 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)'
+                          : 'rgba(15, 23, 42, 0.85)',
+                        border: isGroupSelected ? '2.5px solid #4ade80' : '1px solid rgba(148, 163, 184, 0.3)',
+                        borderRadius: '14px',
+                        padding: isMobileView ? '8px' : '10px',
                         cursor: 'pointer',
-                        transition: 'all 0.18s ease',
+                        textAlign: 'center',
                         display: 'flex',
                         flexDirection: 'column',
+                        alignItems: 'center',
                         justifyContent: 'space-between',
-                        position: 'relative'
+                        gap: '5px',
+                        boxShadow: isGroupSelected ? '0 6px 18px rgba(16, 185, 129, 0.32)' : 'none',
+                        transition: 'all 0.15s ease'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '1.1rem' }}>{bank.icon}</span>
-                        {isSelected && (
-                          <span style={{
-                            background: bank.color,
-                            color: '#fff',
-                            borderRadius: '50%',
-                            width: '16px',
-                            height: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '10px',
-                            fontWeight: 800
-                          }}>✓</span>
-                        )}
-                      </div>
                       <div style={{
-                        fontSize: isMobileView ? '0.86rem' : '0.78rem',
-                        fontWeight: 800,
-                        color: isSelected ? '#fff' : '#e2e8f0',
-                        whiteSpace: 'nowrap',
+                        width: '100%',
+                        height: isMobileView ? '52px' : '58px',
+                        background: '#ffffff',
+                        borderRadius: '10px',
+                        padding: '3px 6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        boxSizing: 'border-box'
                       }}>
-                        {bank.shortName}
+                        <img
+                          src={group.image}
+                          alt={group.title}
+                          loading="lazy"
+                          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}
+                        />
                       </div>
-                      <div style={{
-                        fontSize: isMobileView ? '0.7rem' : '0.64rem',
-                        color: isSelected ? bank.color : '#94a3b8',
-                        marginTop: '2px',
-                        fontWeight: 600
-                      }}>
-                        {bank.badge}
+
+                      <div style={{ width: '100%' }}>
+                        <div style={{
+                          fontSize: isMobileView ? '0.82rem' : '0.88rem',
+                          fontWeight: 900,
+                          color: '#ffffff',
+                          lineHeight: 1.2
+                        }}>
+                          {group.title}
+                        </div>
+                        <div style={{
+                          fontSize: isMobileView ? '0.67rem' : '0.7rem',
+                          fontWeight: 800,
+                          color: isGroupSelected ? '#bbf7d0' : '#38bdf8',
+                          marginTop: '2px'
+                        }}>
+                          {group.subtitle}
+                        </div>
                       </div>
+
+                      {isGroupSelected && (
+                        <span style={{
+                          background: '#22c55e',
+                          color: '#020617',
+                          fontSize: '0.64rem',
+                          fontWeight: 900,
+                          padding: '2px 8px',
+                          borderRadius: '999px'
+                        }}>
+                          ✓ SEÇİLİ
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* 2. DİĞER / BANKAM YOK SEÇİLDİĞİNDE ÖZEL TEB CETELEM BİLGİLENDİRMESİ */}
-              {selectedBankId === 'diger_yok' && (
+              {/* Seçilen Grubun Alt Modelleri (Varsa 2-5 Büyük Kolay Buton) */}
+              {activeGroup.options.length > 1 && (
                 <div style={{
-                  background: 'rgba(139, 92, 246, 0.12)',
-                  border: '1px solid rgba(167, 139, 250, 0.35)',
-                  borderRadius: '10px',
-                  padding: '12px 14px',
-                  marginBottom: '14px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '10px'
+                  marginTop: '12px',
+                  paddingTop: '12px',
+                  borderTop: '1px dashed rgba(56, 189, 248, 0.35)',
+                  textAlign: 'left'
                 }}>
-                  <span style={{ fontSize: '1.25rem', marginTop: '2px' }}>🤝</span>
-                  <div style={{ fontSize: '0.76rem', color: '#ddd6fe', lineHeight: 1.45 }}>
-                    <strong>Anlaşmalı bankanız listede yoksa hiç sorun değil!</strong><br />
-                    IVECO resmi taşıt finansman çözüm ortağımız <strong>TEB Cetelem</strong> ile işletmenize özel <strong>%0 faizli</strong> veya <strong>48 aya varan</strong> ticari taşıt kredisi kullandırımı ERC Otomotiv yetkili bayimiz tarafından hızla onaylatılır. Aşağıdaki avantajlı planlardan dilediğinizi seçebilirsiniz:
+                  <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#fde047', marginBottom: '7px' }}>
+                    👉 {activeGroup.title} İçinden Hangisi Size Uygun?
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '7px'
+                  }}>
+                    {activeGroup.options.map(opt => {
+                      const isOptSel = matched.modelKey === opt.key;
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          onClick={() => {
+                            handleSelectVehicle(opt.key);
+                            recordCustomerFootprint('Kolay Araç Seçici Alt Model Seçildi', opt.label, opt.sub);
+                          }}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: '10px',
+                            background: isOptSel
+                              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.32) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                              : 'rgba(15, 23, 42, 0.8)',
+                            border: isOptSel ? '2px solid #22c55e' : '1px solid rgba(148, 163, 184, 0.28)',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '8px',
+                            textAlign: 'left'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>
+                            {isOptSel ? '✅ ' : ''}{opt.label}
+                          </span>
+                          <span style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 900,
+                            color: isOptSel ? '#4ade80' : '#7dd3fc',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {opt.sub}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* 3. TUTAR KATEGORİSİ FİLTRESİ (0 Faiz, Yüksek Kredi, Filo) */}
-              <div style={{ marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '0.74rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>
-                    KREDİ TUTAR KATEGORİSİ:
-                  </label>
-                  <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
-                    {availableCampaigns.length} Kampanya Listelendi
+            {/* ── ADIM 2 (AYNI EKRANDA): SEÇİLEN ARACIN NET FİYATI, KREDİSİ VE TEK TUŞLA WHATSAPP / ARAMA ── */}
+            <div
+              id="simple-selected-vehicle-result"
+              style={{
+                background: 'rgba(26, 44, 74, 0.92)',
+                border: '2px solid rgba(56, 189, 248, 0.45)',
+                borderRadius: '16px',
+                padding: isMobileView ? '14px 12px' : '20px',
+                boxShadow: '0 8px 32px rgba(8, 15, 30, 0.35)'
+              }}
+            >
+              {/* Seçilen Araç Özet Kartı */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(0, 75, 147, 0.4) 0%, rgba(16, 185, 129, 0.15) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                borderRadius: '14px',
+                padding: isMobileView ? '14px' : '18px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: 6 }}>
+                  <span style={{ background: '#10b981', color: '#0f172a', fontWeight: 900, fontSize: '0.72rem', padding: '3px 9px', borderRadius: '12px' }}>
+                    ✓ SEÇTİĞİNİZ ARAÇ ÖZETİ & FİYATI
                   </span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(135px, 1fr))', gap: '6px' }}>
-                  {categoryTiers.map(tier => {
-                    const isSelected = selectedTierId === tier.id;
-                    return (
-                      <button
-                        key={tier.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedTierId(tier.id);
-                          setSelectedCampaignId(null);
-                          setShowAllLoansMobile(false);
-                        }}
-                        style={{
-                          background: isSelected ? 'rgba(56, 189, 248, 0.18)' : 'rgba(255, 255, 255, 0.04)',
-                          border: `1.5px solid ${isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)'}`,
-                          color: isSelected ? '#38bdf8' : '#cbd5e1',
-                          padding: isMobileView ? '10px' : '8px 10px',
-                          borderRadius: '8px',
-                          fontSize: isMobileView ? '0.8rem' : '0.74rem',
-                          fontWeight: isSelected ? 800 : 600,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          gap: '2px',
-                          transition: 'all 0.15s ease',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%', justifyContent: 'space-between' }}>
-                          <span>{tier.icon} {tier.label}</span>
-                          {isSelected && <span style={{ fontSize: '10px', color: '#38bdf8' }}>●</span>}
-                        </div>
-                        <span style={{
-                          fontSize: '0.64rem',
-                          color: isSelected ? '#bae6fd' : '#94a3b8',
-                          fontWeight: 500
-                        }}>
-                          {tier.range}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 4. ARACA VE BANKAYA ÖZEL KAMPANYA SEÇENEKLERİ */}
-              <div style={{ marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.5px' }}>
-                    {currentBankMeta.name.toUpperCase()} KAMPANYA PLANLARI:
-                  </label>
-                  <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 600 }}>
-                    Araç Grubu: {matched.series}
+                  <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 800 }}>
+                    {matched.badge}
                   </span>
                 </div>
 
-                {availableCampaigns.length === 0 ? (
-                  <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem' }}>
-                    Bu model için seçilen bankada doğrudan tanımlı kampanya bulunamadı. Lütfen TEB Cetelem veya Kuveyt Türk seçeneklerini inceleyiniz.
-                  </div>
-                ) : (
-                  <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontSize: isMobileView ? '1.12rem' : '1.28rem', fontWeight: 900, color: '#f8fafc', margin: '0 0 6px' }}>
+                      {matched.modelTitle}
+                    </h3>
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(210px, 1fr))',
+                      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                      gap: '6px',
+                      background: 'rgba(15, 23, 42, 0.72)',
+                      padding: '8px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      textAlign: 'center'
+                    }}>
+                      <div>
+                        <span style={{ fontSize: '0.64rem', color: '#94a3b8', display: 'block', fontWeight: 700 }}>TAŞIMA KAPASİTESİ</span>
+                        <strong style={{ fontSize: isMobileView ? '0.82rem' : '0.9rem', color: '#4ade80' }}>~{(matched.payloadKg / 1000).toFixed(1)} Ton Yük</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.64rem', color: '#94a3b8', display: 'block', fontWeight: 700 }}>EHLİYET SINIFI</span>
+                        <strong style={{ fontSize: isMobileView ? '0.82rem' : '0.9rem', color: '#ffffff' }}>{matched.license.split(' ')[0]} Ehliyet</strong>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.64rem', color: '#94a3b8', display: 'block', fontWeight: 700 }}>KASA BOYU</span>
+                        <strong style={{ fontSize: isMobileView ? '0.78rem' : '0.86rem', color: '#38bdf8' }}>
+                          {matched.dims?.length ? matched.dims.length.split(' (')[0] : matched.wheelbase}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                  {(() => {
+                    const matchedSticker = getVehicleSticker(matched);
+                    if (!matchedSticker) return null;
+                    return (
+                      <div
+                        title={matchedSticker.label}
+                        style={{
+                          flexShrink: 0,
+                          width: isMobileView ? '80px' : '94px',
+                          height: isMobileView ? '56px' : '64px',
+                          background: '#ffffff',
+                          borderRadius: '11px',
+                          border: '2px solid rgba(56, 189, 248, 0.85)',
+                          boxShadow: '0 5px 14px rgba(0, 0, 0, 0.4)',
+                          padding: '3px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <img
+                          src={matchedSticker.src}
+                          alt={matchedSticker.label}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                        />
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* 🏷️ 2026 RESMİ SATIŞ FİYATI & PEŞİN İNDİRİMİ */}
+                {matched.isTway ? (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.28) 100%)',
+                    border: '1.5px solid rgba(245, 158, 11, 0.5)',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '10px'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fcd34d', textTransform: 'uppercase' }}>
+                        🚜 T-WAY ŞANTİYE & HAFRİYAT ÖZEL FİYATLANDIRMA
+                      </div>
+                      <div style={{ fontSize: '0.98rem', fontWeight: 900, color: '#fef08a', marginTop: '3px' }}>
+                        Proje & Filo Fiyatı İçin Satış Sorumlusu Can Murat ile Görüşün
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDirectWhatsApp(`Merhaba Can Murat Bey, ${matched.modelTitle || matched.title} T-Way aracı için özel fiyatlandırma ve şasi teslim süresi hakkında bilgi alabilir miyim?`)}
+                      style={{
+                        background: '#22c55e',
+                        color: '#0f172a',
+                        fontWeight: 900,
+                        fontSize: '0.82rem',
+                        padding: '9px 14px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <FiPhoneCall size={15} /> WhatsApp'tan Fiyat Sor
+                    </button>
+                  </div>
+                ) : matched.currency === 'EUR' ? (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%)',
+                    border: '1.5px solid rgba(59, 130, 246, 0.45)',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#93c5fd', textTransform: 'uppercase' }}>
+                      🛣️ 2026 S-WAY ÇEKİCİ RESMİ LİSTE FİYATLARI (1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL)
+                    </div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#60a5fa', marginTop: '3px' }}>
+                      {matched.displayPrice || '123.000 € – 131.000 €'}{' '}
+                      <span style={{ fontSize: '0.9rem', color: '#4ade80', fontWeight: 800 }}>
+                        ({Math.round(123000 * tcmbEurRate).toLocaleString('tr-TR')} TL – {Math.round(131000 * tcmbEurRate).toLocaleString('tr-TR')} TL)
+                      </span>
+                    </div>
+                  </div>
+                ) : matched.campaignPriceText ? (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(15, 23, 42, 0.85) 100%)',
+                    border: '1.5px solid rgba(16, 185, 129, 0.45)',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
+                      <div style={{ background: 'rgba(16, 185, 129, 0.18)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(16, 185, 129, 0.45)' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#6ee7b7', display: 'block', fontWeight: 800 }}>PEŞİN ALIM FİYATI (KDV DAHİL)</span>
+                        <strong style={{ fontSize: '1.22rem', color: '#4ade80', fontWeight: 900 }}>{matched.cashPriceText}</strong>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#cbd5e1', display: 'block', fontWeight: 700 }}>KAMPANYALI / KREDİLİ FİYAT</span>
+                        <strong style={{ fontSize: '1.05rem', color: '#f8fafc' }}>{matched.campaignPriceText}</strong>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 📐 İsteğe Bağlı Teknik Detaylar & PDF */}
+                <button
+                  type="button"
+                  onClick={() => setShowTechDetailsMobile(prev => !prev)}
+                  style={{
+                    width: '100%',
+                    background: 'rgba(15, 23, 42, 0.8)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    borderRadius: '9px',
+                    padding: '8px 12px',
+                    color: '#7dd3fc',
+                    fontSize: '0.76rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>📐 Detaylı Kasa Ölçüleri, Kantar & Teknik Broşür (PDF)</span>
+                  <span>{showTechDetailsMobile ? 'Gizle ▴' : 'Göster ▾'}</span>
+                </button>
+
+                {showTechDetailsMobile && (
+                  <div style={{ marginTop: '10px', background: 'rgba(10, 18, 36, 0.85)', borderRadius: '10px', padding: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#e2e8f0', marginBottom: '8px', lineHeight: 1.45 }}>
+                      <strong>⚖️ {matched.kantarTitle}:</strong> {matched.kantarDesc}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '0.73rem', color: '#cbd5e1', marginBottom: '10px' }}>
+                      <span>📦 Kasa Boyu: <strong style={{ color: '#38bdf8' }}>{matched.dims?.length}</strong></span>
+                      <span>📏 Kasa Eni: <strong style={{ color: '#38bdf8' }}>{matched.dims?.width}</strong></span>
+                      <span>🧱 Palet: <strong style={{ color: '#4ade80' }}>{matched.dims?.pallets}</strong></span>
+                    </div>
+                    <a
+                      href={matched.pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        border: '1px solid rgba(56, 189, 248, 0.4)',
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        color: '#fff',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <FiDownload size={14} /> Resmi Teknik Broşürü İndir (PDF)
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* ── KREDİ & TAKSİT SEÇENEKLERİ (SADELEŞTİRİLMİŞ) ── */}
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.78)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                borderRadius: '14px',
+                padding: isMobileView ? '12px' : '16px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 900, color: '#f8fafc' }}>
+                    💳 2. Bu Aracın Kredi & Taksit Seçenekleri
+                  </div>
+                  {(!lockedBank || lockedBank.hasEurCampaigns) && (
+                    <div style={{ display: 'flex', gap: '4px', background: 'rgba(2, 6, 23, 0.7)', padding: '3px', borderRadius: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => { setLoanCurrencyMode('TRY'); setShowAllLoansMobile(false); }}
+                        style={{
+                          background: loanCurrencyMode === 'TRY' ? '#0284c7' : 'transparent',
+                          color: loanCurrencyMode === 'TRY' ? '#fff' : '#94a3b8',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '5px 10px',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🇹🇷 TL Kredi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setLoanCurrencyMode('EUR'); setShowAllLoansMobile(false); }}
+                        style={{
+                          background: loanCurrencyMode === 'EUR' ? '#10b981' : 'transparent',
+                          color: loanCurrencyMode === 'EUR' ? '#fff' : '#94a3b8',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '5px 10px',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        💶 Euro Kredisi
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {loanCurrencyMode === 'EUR' ? (
+                  <div>
+                    {!lockedBank && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                        {visibleFinderEurBanks.map(bank => {
+                          const isSelected = activeFinderEurBankId === bank.id;
+                          return (
+                            <button
+                              key={bank.id}
+                              type="button"
+                              onClick={() => { setSelectedEurBankId(bank.id); setSelectedEurCampaignId(null); }}
+                              style={{
+                                background: isSelected ? bank.bg : 'rgba(255,255,255,0.04)',
+                                border: `1.5px solid ${isSelected ? bank.color : 'rgba(255,255,255,0.1)'}`,
+                                borderRadius: '8px',
+                                padding: '8px',
+                                color: '#fff',
+                                fontSize: '0.74rem',
+                                fontWeight: 800,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {bank.icon} {bank.shortName}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(2, 1fr)', gap: '8px' }}>
+                      {(showAllLoansMobile ? eurBankPresets : eurBankPresets.slice(0, 4)).map(preset => {
+                        const isChosen = activeEurCampaign?.id === preset.id;
+                        return (
+                          <div
+                            key={preset.id}
+                            onClick={() => setSelectedEurCampaignId(preset.id)}
+                            style={{
+                              background: isChosen ? 'rgba(16, 185, 129, 0.18)' : 'rgba(0,0,0,0.35)',
+                              border: `1.5px solid ${isChosen ? '#10b981' : 'rgba(255,255,255,0.1)'}`,
+                              borderRadius: '10px',
+                              padding: '10px 12px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#fff' }}>{preset.title}</div>
+                              <div style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 700 }}>{preset.rateLabel}</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: '1.08rem', fontWeight: 900, color: '#34d399' }}>€{preset.monthly.toLocaleString('tr-TR')}/Ay</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Banka Seçimi (Sadece tek banka kilidi yoksa gösterilir) */}
+                    {!lockedBank && (
+                      <div style={{ marginBottom: '10px' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700, marginBottom: '6px' }}>
+                          Çalıştığınız Bankayı Seçin:
+                        </div>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
+                          gap: '6px'
+                        }}>
+                          {visibleFinderBanks.map(bank => {
+                            const isSelected = activeFinderBankId === bank.id;
+                            return (
+                              <button
+                                key={bank.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedBankId(bank.id);
+                                  setSelectedCampaignId(null);
+                                  setShowAllLoansMobile(false);
+                                }}
+                                style={{
+                                  background: isSelected ? bank.bg : 'rgba(255, 255, 255, 0.04)',
+                                  border: `1.5px solid ${isSelected ? bank.color : 'rgba(255, 255, 255, 0.1)'}`,
+                                  borderRadius: '8px',
+                                  padding: '7px 8px',
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  color: '#fff',
+                                  fontSize: '0.74rem',
+                                  fontWeight: 800,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between'
+                                }}
+                              >
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {bank.icon} {bank.shortName}
+                                </span>
+                                {isSelected && <span style={{ color: '#4ade80' }}>✓</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Taksit Kartları */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobileView ? '1fr' : 'repeat(2, 1fr)',
                       gap: '8px'
                     }}>
-                      {(isMobileView && !showAllLoansMobile ? availableCampaigns.slice(0, 6) : availableCampaigns).map(camp => {
+                      {(showAllLoansMobile ? availableCampaigns : availableCampaigns.slice(0, 4)).map(camp => {
                         const isChosen = activeCampaign?.id === camp.id;
                         return (
                           <div
                             key={camp.id}
                             onClick={() => setSelectedCampaignId(camp.id)}
                             style={{
-                              background: isChosen ? 'rgba(56, 189, 248, 0.15)' : 'rgba(0, 0, 0, 0.35)',
-                              border: `1.5px solid ${isChosen ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)'}`,
+                              background: isChosen ? 'rgba(56, 189, 248, 0.16)' : 'rgba(0, 0, 0, 0.35)',
+                              border: `1.5px solid ${isChosen ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'}`,
                               borderRadius: '10px',
-                              padding: isMobileView ? '14px 12px' : '12px 10px',
+                              padding: '10px 12px',
                               cursor: 'pointer',
-                              transition: 'all 0.15s ease',
-                              position: 'relative'
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: '8px'
                             }}
                           >
-                            {camp.tag && (
-                              <span style={{
-                                position: 'absolute',
-                                top: '-7px',
-                                right: '8px',
-                                background: camp.highlight ? '#10b981' : '#0284c7',
-                                color: '#fff',
-                                fontSize: '0.62rem',
-                                fontWeight: 800,
-                                padding: '1px 6px',
-                                borderRadius: '4px',
-                                letterSpacing: '0.3px'
-                              }}>
-                                {camp.tag}
-                              </span>
-                            )}
-
-                            <div style={{ fontSize: isMobileView ? '0.88rem' : '0.78rem', fontWeight: 800, color: '#f8fafc', marginBottom: '4px' }}>
-                              {camp.title}
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: '6px' }}>
-                              <div>
-                                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Aylık Taksit</div>
-                                <div style={{ fontSize: isMobileView ? '1.22rem' : '1.1rem', fontWeight: 900, color: '#fbbf24' }}>
-                                  {camp.monthly.toLocaleString('tr-TR')} TL
-                                </div>
-                              </div>
-
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Faiz / Oran</div>
-                                <div style={{
-                                  fontSize: isMobileView ? '0.85rem' : '0.78rem',
-                                  fontWeight: 800,
-                                  color: camp.rate === 0 ? '#34d399' : '#e2e8f0'
-                                }}>
-                                  {camp.rateLabel}
-                                </div>
+                            <div>
+                              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc' }}>{camp.title}</div>
+                              <div style={{ fontSize: '0.7rem', color: camp.rate === 0 ? '#4ade80' : '#94a3b8', fontWeight: 700, marginTop: '2px' }}>
+                                {camp.rateLabel} {camp.gracePeriodMonths ? `• İlk ${camp.gracePeriodMonths} Ay Ödemesiz` : ''}
                               </div>
                             </div>
-
-                            {camp.gracePeriodMonths && (
-                              <div style={{ fontSize: '0.66rem', color: '#34d399', fontWeight: 700, marginTop: '4px' }}>
-                                ⚡ İlk {camp.gracePeriodMonths} ay boyunca 0 TL taksit!
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <div style={{ fontSize: '0.64rem', color: '#94a3b8' }}>Aylık Taksit</div>
+                              <div style={{ fontSize: '1.08rem', fontWeight: 900, color: '#fbbf24' }}>
+                                {camp.monthly.toLocaleString('tr-TR')} TL
                               </div>
-                            )}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
-                    {isMobileView && availableCampaigns.length > 6 && (
+
+                    {availableCampaigns.length > 4 && (
                       <button
                         type="button"
                         onClick={() => setShowAllLoansMobile(prev => !prev)}
                         style={{
                           width: '100%',
                           background: 'rgba(56, 189, 248, 0.12)',
-                          border: '1px solid rgba(56, 189, 248, 0.35)',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
                           color: '#38bdf8',
-                          borderRadius: '10px',
-                          padding: '10px',
-                          fontSize: '0.82rem',
+                          borderRadius: '8px',
+                          padding: '8px',
+                          fontSize: '0.76rem',
                           fontWeight: 800,
-                          marginTop: '10px',
+                          marginTop: '8px',
                           cursor: 'pointer'
                         }}
                       >
-                        {showAllLoansMobile ? 'Daha Az Göster ▴' : `Tümünü Göster (${availableCampaigns.length} Kampanya) ▾`}
+                        {showAllLoansMobile ? 'Daha Az Vade Göster ▴' : `Diğer Vade & Tutarları Gör (${availableCampaigns.length} Seçenek) ▾`}
                       </button>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
 
-              {/* 4. SEÇİLEN KAMPANYA ÖZETİ & DETAY HESAPLAMA KARTI */}
-              {activeCampaign && (
-                <div style={{
-                  background: 'rgba(0, 0, 0, 0.45)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
+              {/* ── TEK TUŞLA WHATSAPP VEYA TELEFON BIRAKMA ── */}
+              <button
+                type="button"
+                onClick={handleDirectWhatsApp}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                  color: '#fff',
+                  border: 'none',
                   borderRadius: '12px',
-                  padding: '14px 16px',
+                  padding: '15px',
+                  fontWeight: 900,
+                  fontSize: isMobileView ? '0.95rem' : '1.02rem',
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px'
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 18px rgba(34, 197, 94, 0.4)',
+                  marginBottom: '12px'
+                }}
+              >
+                <FiMessageSquare size={19} /> Bu Araç İçin WhatsApp'tan Hemen Fiyat & Bilgi Al
+              </button>
+
+              {!submitted ? (
+                <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.78)', border: '1px solid rgba(56, 189, 248, 0.28)', borderRadius: '12px', padding: '12px' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#f8fafc', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FiPhone size={14} color="#38bdf8" /> Veya Numaranızı Yazın, Sizi Arayıp Anlatalım:
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.2fr 0.9fr auto', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      type="tel"
+                      placeholder="Cep Telefonunuz (05XX XXX XX XX) *"
+                      required
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(formatPhoneInput(e.target.value))}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(0,0,0,0.45)',
+                        border: '1.5px solid rgba(56, 189, 248, 0.5)',
+                        borderRadius: '9px',
+                        padding: '10px 12px',
+                        color: '#38bdf8',
+                        fontWeight: 800,
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Adınız / Firma (İsteğe Bağlı)"
+                      value={customerName}
+                      onChange={(e) => {
+                        setCustomerName(e.target.value);
+                        setCustomerCompany(e.target.value);
+                      }}
+                      style={{
+                        width: '100%',
+                        background: 'rgba(0,0,0,0.35)',
+                        border: '1px solid rgba(255,255,255,0.14)',
+                        borderRadius: '9px',
+                        padding: '10px 12px',
+                        color: '#fff',
+                        fontSize: '0.84rem'
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      style={{
+                        background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '9px',
+                        padding: '10px 16px',
+                        fontWeight: 800,
+                        fontSize: '0.84rem',
+                        cursor: submitting ? 'not-allowed' : 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {submitting ? 'İletiliyor...' : '📞 Beni Arayın'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  textAlign: 'center'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                        Seçilen Kredi Planı:
-                      </div>
-                      <div style={{ fontSize: '1.35rem', fontWeight: 900, color: '#fbbf24' }}>
-                        {activeCampaign.monthly.toLocaleString('tr-TR')} TL <span style={{ fontSize: '0.78rem', fontWeight: 500, color: '#cbd5e1' }}>/ ay</span>
-                      </div>
-                    </div>
-
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                        Finans Kuruluşu:
-                      </div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#38bdf8' }}>
-                        {currentBankMeta.name}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '6px',
-                    paddingTop: '8px',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                    fontSize: '0.72rem'
-                  }}>
-                    <div>
-                      <span style={{ color: '#94a3b8' }}>Kredi Tutarı: </span>
-                      <strong style={{ color: '#fff' }}>{activeCampaign.principal.toLocaleString('tr-TR')} TL</strong>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <span style={{ color: '#94a3b8' }}>Vade: </span>
-                      <strong style={{ color: '#fff' }}>{activeCampaign.term} Ay</strong>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ color: '#94a3b8' }}>Oran: </span>
-                      <strong style={{ color: activeCampaign.rate === 0 ? '#34d399' : '#fff' }}>{activeCampaign.rateLabel}</strong>
-                    </div>
-                  </div>
-
-                  <div style={{
-                    fontSize: '0.68rem',
-                    color: '#cbd5e1',
-                    lineHeight: 1.35,
-                    marginTop: '4px'
-                  }}>
-                    🛡️ <em>Resmi IVECO anlaşmalı ticari finansman tablosudur. Özel kampanya oranları uygulanmış olup ilave masraf veya gizli komisyon yansıtılmaz.</em>
-                    <div style={{ marginTop: '4px', color: '#38bdf8', fontWeight: 800 }}>
-                      👤 Not: Satış Sorumlusu Can Murat • 📞 0544 622 59 31 (IVECO ERC Samsun Otomotiv)
-                    </div>
+                  <FiCheckCircle size={28} style={{ color: '#10b981', marginBottom: '4px' }} />
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc' }}>
+                    Numaranız Satış Sorumlusu Can Murat'a Ulaştı!
                   </div>
                 </div>
               )}
             </div>
-          )}
-        </div>
-
-            {/* Can Murat Onay - Bu Teklifi Müşteriye WhatsApp'tan Gönder Butonu (Yalnızca Admin Modunda) */}
-            {isAdminMode && (
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%)',
-                border: '1px solid #38bdf8',
-                borderRadius: '14px',
-                padding: '14px 16px',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '10px',
-                boxShadow: '0 4px 16px rgba(2, 132, 199, 0.2)'
-              }}>
-                <div>
-                  <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <FiShare2 size={16} color="#22c55e" /> Bu Teklifi Müşteriye WhatsApp'tan Gönder
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
-                    {matched.title} ({activeCampaign ? `${activeCampaign.principal.toLocaleString('tr-TR')} TL Kredi` : ''}) için zengin görsel kartı ve kişiselleştirilmiş bağlantı.
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowSendModal(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '9px 16px',
-                    fontSize: '0.78rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)'
-                  }}
-                >
-                  <FiShare2 size={14} /> Müşteriye Gönder (WhatsApp / QR)
-                </button>
-              </div>
-            )}
-
-            {/* ── TEK SATIRLIK HIZLI İLETİŞİM & TEKLİF ALMA (UZUN FORM YOK) ──────────────────────── */}
-            {!submitted ? (
-              <form onSubmit={handleSubmitLead} style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(56, 189, 248, 0.28)', borderRadius: '14px', padding: '14px', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <FiPhone size={15} color="#38bdf8" /> Sadece Numaranızı Bırakın, 15 Dk İçinde Arayalım
-                  </h4>
-                  <span style={{ fontSize: '0.68rem', color: '#4ade80', fontWeight: 700, background: 'rgba(16, 185, 129, 0.14)', padding: '2px 8px', borderRadius: '6px' }}>
-                    ⚡ Uzun Form Yok • Tek Tuş
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : '1.2fr 0.9fr auto', gap: '8px', alignItems: 'center' }}>
-                  <input
-                    type="tel"
-                    placeholder="Cep Telefonunuz (05XX XXX XX XX) *"
-                    required
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(formatPhoneInput(e.target.value))}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(0,0,0,0.45)',
-                      border: '1.5px solid rgba(56, 189, 248, 0.5)',
-                      borderRadius: '9px',
-                      padding: '11px 12px',
-                      color: '#38bdf8',
-                      fontWeight: 800,
-                      fontSize: '0.9rem'
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="İsim veya Firma (İsteğe Bağlı)"
-                    value={customerName}
-                    onChange={(e) => {
-                      setCustomerName(e.target.value);
-                      setCustomerCompany(e.target.value);
-                    }}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(0,0,0,0.35)',
-                      border: '1px solid rgba(255,255,255,0.14)',
-                      borderRadius: '9px',
-                      padding: '11px 12px',
-                      color: '#fff',
-                      fontSize: '0.84rem'
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    style={{
-                      background: 'linear-gradient(135deg, #004B93 0%, #2b7de9 100%)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '9px',
-                      padding: '11px 18px',
-                      fontWeight: 800,
-                      fontSize: '0.86rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                      cursor: submitting ? 'not-allowed' : 'pointer',
-                      whiteSpace: 'nowrap',
-                      boxShadow: '0 4px 14px rgba(43, 125, 233, 0.4)'
-                    }}
-                  >
-                    <FiPhone size={14} />
-                    {submitting ? 'İletiliyor...' : 'Beni Arayın'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div style={{
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
-                borderRadius: '14px',
-                padding: '16px',
-                textAlign: 'center',
-                marginBottom: '14px'
-              }}>
-                <FiCheckCircle size={32} style={{ color: '#10b981', marginBottom: '6px' }} />
-                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#f8fafc', margin: '0 0 4px' }}>
-                  Numaranız Satış Sorumlusuna Ulaştı!
-                </h4>
-                <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
-                  Seçtiğiniz <strong>{matched.modelTitle}</strong> için en güncel şasi ve {currentBankMeta.name} resmi kampanya tablosuyla 15 dakika içinde aranacaksınız.
-                </p>
-              </div>
-            )}
-
-            {/* Alternatif Doğrudan WhatsApp Butonu */}
-            <button
-              onClick={handleDirectWhatsApp}
-              style={{
-                width: '100%',
-                background: '#22c55e',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '14px',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)',
-                marginBottom: '12px'
-              }}
-            >
-              <FiMessageSquare size={18} /> Satış Sorumlusu Can Murat ile WhatsApp'tan Hemen Görüş
-            </button>
-
-            <button
-              onClick={() => setStep(1)}
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                color: '#94a3b8',
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                textAlign: 'center',
-                display: 'block',
-                margin: '0 auto'
-              }}
-            >
-              ← Farklı bir tonaj veya kasa ölçüsü için tekrar hesapla
-            </button>
           </div>
-        )}
-      </div>
-      </>
-      )}
+        );
+      })()}
 
       {/* ── SATIŞ SORUMLUSU CAN MURAT VIP TEST SİMÜLASYON RAPOR MODALI ── */}
       {testSimulationResult && (

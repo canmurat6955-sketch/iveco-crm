@@ -17,56 +17,56 @@ const CATEGORIES = [
   {
     id: 'all',
     title: 'Tüm Araçlar',
-    licenseBadge: '22 Model',
+    licenseBadge: 'Hepsini Gör',
     label: 'Tüm Araçlar',
     shortLabel: 'Tümü',
     images: ['/vehicles/daily-35s-sasi.jpg', '/vehicles/eurocargo-100-120.jpg', '/vehicles/sway-cekici.jpg?v=2']
   },
   {
     id: 'daily35_chassis',
-    title: 'Daily 35 Şasi',
-    licenseBadge: '(B Ehliyet)',
-    label: 'Daily 35 Şasi (B Ehliyet)',
-    shortLabel: 'Daily 35 Şasi',
+    title: 'Kamyonet Şasi',
+    licenseBadge: 'B Ehliyet • 3.5 Ton',
+    label: 'Kamyonet Şasi (B Ehliyet)',
+    shortLabel: 'Kamyonet Şasi',
     image: '/vehicles/daily-35s-sasi.jpg'
   },
   {
     id: 'daily35_van',
-    title: 'Daily Panelvan',
-    licenseBadge: '(B Ehliyet)',
-    label: 'Daily Panelvan (B Ehliyet)',
-    shortLabel: 'Daily Panelvan',
+    title: 'Kapalı Panelvan',
+    licenseBadge: 'B Ehliyet • Sac Kasa',
+    label: 'Kapalı Panelvan (B Ehliyet)',
+    shortLabel: 'Kapalı Panelvan',
     image: '/vehicles/daily-panelvan.jpg'
   },
   {
     id: 'daily70',
-    title: 'Daily 70C / 72C',
-    licenseBadge: '(7 Ton • C Ehliyet)',
-    label: 'Daily 70C / 72C (C Ehliyet)',
-    shortLabel: 'Daily 70C / 72C',
+    title: '7 Ton Kamyon',
+    licenseBadge: 'Daily 70C • C Ehliyet',
+    label: '7 Ton Kamyon (Daily 70C)',
+    shortLabel: '7 Ton Kamyon',
     image: '/vehicles/daily-35c-72c.jpg'
   },
   {
     id: 'eurocargo',
-    title: 'Eurocargo',
-    licenseBadge: '(10–18T • C Ehliyet)',
-    label: 'Eurocargo (C Ehliyet)',
-    shortLabel: 'Eurocargo',
+    title: 'Büyük Kamyon',
+    licenseBadge: '10–18 Ton • Eurocargo',
+    label: 'Büyük Kamyon (Eurocargo)',
+    shortLabel: 'Eurocargo Kamyon',
     image: '/vehicles/eurocargo-100-120.jpg'
   },
   {
     id: 'sway',
-    title: 'S-Way Çekici',
-    licenseBadge: '(CE Ehliyet)',
-    label: 'S-Way Çekici (CE Ehliyet)',
+    title: 'Tır Çekici',
+    licenseBadge: 'S-Way • Uzun Yol',
+    label: 'Tır Çekici (S-Way)',
     shortLabel: 'S-Way Çekici',
     image: '/vehicles/sway-cekici.jpg?v=2'
   },
   {
     id: 'tway',
-    title: 'T-Way Şantiye',
-    licenseBadge: '(10–12T • C Ehliyet)',
-    label: 'T-Way Şantiye (C Ehliyet)',
+    title: 'Damper / Şantiye',
+    licenseBadge: 'T-Way • 10–12 Teker',
+    label: 'Damper & Şantiye (T-Way)',
     shortLabel: 'T-Way Şantiye',
     image: '/vehicles/tway-damper.jpg'
   }
