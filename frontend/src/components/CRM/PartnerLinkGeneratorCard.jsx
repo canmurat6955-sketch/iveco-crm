@@ -8,6 +8,7 @@ import {
   buildPartnerAnnouncementText
 } from '../../data/partnerProtocols';
 import { BANK_LIST } from '../../data/bankCampaigns';
+import { REGIONAL_PROSPECTS_DIRECTORY, PROSPECT_CATEGORY_TABS } from '../../data/regionalProspectsDirectory';
 import { crmApi, discoveryApi } from '../../api/client';
 import { getPublicOrigin } from '../../utils/publicUrl';
 import { openWhatsAppChat } from '../../utils/openExternal';
@@ -683,9 +684,39 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     channelDiscountValue
   ]);
 
-  // --- SEKME 3 (MADDE 4): CRM ESKİ KAYITLAR & NİYET RADARI YIL SONU KDV TARAMASI ---
+  // --- SEKME 3 (MADDE 4): YENİ BÖLGE HEDEF LİSTELERİ (GSM & MAİL) + CRM & RADAR TARAMASI ---
   useEffect(() => {
-    if (studioMode !== 'tax_radar' || taxRadarTargets.length > 0) return;
+    const normalizePhoneKey = (p) => {
+      const digits = String(p || '').replace(/\D/g, '');
+      if (digits.length < 10) return '';
+      return digits.slice(-10);
+    };
+
+    const seedList = REGIONAL_PROSPECTS_DIRECTORY.map(item => {
+      const pKey = normalizePhoneKey(item.phone);
+      return {
+        key: item.id,
+        phoneKey: pKey || item.id,
+        phone: item.phone || '',
+        email: item.email || '',
+        isGsm: pKey.startsWith('5'),
+        customerId: null,
+        name: item.name,
+        contact: item.contact || '',
+        city: item.city || 'Samsun',
+        model: item.model || '2026 IVECO Şasi',
+        groups: item.groups || [],
+        category: item.category,
+        sourceType: 'directory',
+        sourceBadge: `🎯 ${item.subGroup}`
+      };
+    });
+
+    if (taxRadarTargets.length === 0) {
+      setTaxRadarTargets(seedList);
+    }
+
+    if (studioMode !== 'tax_radar') return;
     let active = true;
     const loadTargets = async () => {
       setTaxRadarLoading(true);
@@ -694,12 +725,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           crmApi.getCustomers({ page_size: 100 }),
           discoveryApi.getIntentSignals({ limit: 150 })
         ]);
-        const mapByPhone = new Map();
-        const normalizePhoneKey = (p) => {
-          const digits = String(p || '').replace(/\D/g, '');
-          if (digits.length < 10) return '';
-          return digits.slice(-10);
-        };
+        const mapByKey = new Map();
+        seedList.forEach(s => mapByKey.set(s.phoneKey || s.key, s));
 
         if (radarRes.status === 'fulfilled') {
           const signals = radarRes.value?.data || [];
@@ -708,15 +735,19 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
             if (!pKey) return;
             const rawName = (s.matched_customer_name || s.company_name || '').trim();
             const isAnon = !rawName || rawName.toLowerCase().includes('anonim') || rawName.toLowerCase().includes('ziyaretçi');
-            if (!mapByPhone.has(pKey)) {
-              mapByPhone.set(pKey, {
+            if (!mapByKey.has(pKey)) {
+              mapByKey.set(pKey, {
                 key: `radar_${pKey}`,
                 phoneKey: pKey,
                 phone: s.phone,
+                email: '',
+                isGsm: pKey.startsWith('5'),
                 customerId: s.matched_customer_id || null,
                 name: isAnon ? 'Niyet Radarı Ziyaretçisi' : rawName,
                 city: s.city || 'Samsun',
                 model: s.target_model || '2026 IVECO Şasi',
+                groups: [],
+                category: 'radar',
                 sourceType: 'radar',
                 sourceBadge: '📡 Niyet Radarı'
               });
@@ -728,16 +759,21 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           const items = crmRes.value?.data?.items || crmRes.value?.data || [];
           items.forEach(c => {
             const pKey = normalizePhoneKey(c.phone);
-            if (!pKey) return;
-            const existing = mapByPhone.get(pKey);
-            mapByPhone.set(pKey, {
+            const mapKey = pKey || `crm_${c.id}`;
+            const existing = mapByKey.get(mapKey);
+            if (existing && existing.sourceType === 'directory') return;
+            mapByKey.set(mapKey, {
               key: `crm_${c.id}`,
-              phoneKey: pKey,
-              phone: c.phone,
+              phoneKey: mapKey,
+              phone: c.phone || '',
+              email: c.email || existing?.email || '',
+              isGsm: pKey.startsWith('5'),
               customerId: c.id,
               name: c.company_name || c.contact_person || existing?.name || 'Kayıtlı Müşteri',
               city: c.city || existing?.city || 'Samsun',
               model: existing?.model || c.interested_model || '2026 IVECO Şasi',
+              groups: [],
+              category: 'crm',
               sourceType: existing ? 'both' : 'crm',
               sourceBadge: existing ? '🔥 CRM + Radarda İnceledi' : '🗂️ CRM Kayıtlı Müşteri'
             });
@@ -745,7 +781,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         }
 
         if (active) {
-          setTaxRadarTargets(Array.from(mapByPhone.values()));
+          setTaxRadarTargets(Array.from(mapByKey.values()));
         }
       } catch {
         // ignore
@@ -755,15 +791,18 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     };
     loadTargets();
     return () => { active = false; };
-  }, [studioMode, taxRadarTargets.length]);
+  }, [studioMode]);
 
   const buildTaxRadarCustomerLink = (target) => {
     const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
     const params = new URLSearchParams();
     if (target.customerId) params.set('cid', String(target.customerId));
     if (target.name && !target.name.includes('Ziyaretçisi')) params.set('company', target.name);
-    if (target.phoneKey) params.set('phone', target.phoneKey);
-    params.set('ref', 'yilsonu_kdv_tarama');
+    if (target.phoneKey && /^\d{10}$/.test(target.phoneKey)) params.set('phone', target.phoneKey);
+    if (Array.isArray(target.groups) && target.groups.length > 0) {
+      params.set('groups', target.groups.join(','));
+    }
+    params.set('ref', target.category === 'smmm_odalar' ? 'smmm_kanal' : 'yilsonu_kdv_tarama');
     return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
   };
 
@@ -772,6 +811,26 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     const hasRealName = target.name && !target.name.includes('Ziyaretçisi') && !target.name.includes('Kayıtlı Müşteri');
     const titlePrefix = hasRealName ? `*${target.name}* — ` : '';
     const modelNote = target.model && target.model !== 'Genel Fiyat Listesi' ? `*${target.model}* ve ` : '';
+
+    if (target.category === 'beton_hafriyat') {
+      return (
+        `${titlePrefix}Merhabalar, hayırlı işler, bol kazançlar dilerim. 🙏\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `Hazır beton, hafriyat ve şantiye yatırımlarınız için sadece *T-Way (12 Teker Mikser: 5.750.000 TL Nakit / 6.075.000 TL Liste — 12 Teker Hafriyat: 5.850.000 TL Nakit / 6.175.000 TL Liste), S-Way Çekici ve Daily Şasi* modellerimizin açık olduğu firmanıza özel fiyat ve %20 KDV mahsup ekranımızı aşağıya bıraktım 👇\n\n` +
+        `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+        `${link}`
+      );
+    }
+
+    if (target.category === 'karoser_servis') {
+      return (
+        `${titlePrefix}Ustam selamlar, hayırlı işler, kolay gelsin. 🙏\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `Sanayide yanına kasa/üstyapı yaptırmaya gelen veya elindeki eski aracına ağır masraf çıkıp takasla sıfıra geçmek isteyen müşterilerin olduğunda beraber paslaşalım. Güncel 2026 şasi ölçüleri, net peşin/kredili fiyatlarımız ve takas ekranımız aşağıda elinin altında bulunsun 👇\n\n` +
+        `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+        `${link}`
+      );
+    }
 
     if (taxRadarTemplate === 'kurumsal_vergi') {
       return (
@@ -787,7 +846,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       );
     }
 
-    if (taxRadarTemplate === 'smmm_muhasebe') {
+    if (taxRadarTemplate === 'smmm_muhasebe' || target.category === 'smmm_odalar') {
       return (
         `${titlePrefix}Merhaba, hayırlı işler dilerim. 🙏\n\n` +
         `Mali müşavirinizle yıl sonu KDV ve vergi mahsubu hesabınızı kolayca yapabilmeniz için ${modelNote}2026 model IVECO ticari araçlarımızın *KDV Hariç Net Matrah, %20 İndirilecek KDV, 1. Yıl Tam Amortisman (Kıst Amortisman Yok) ve 1M TL %0 Faiz Kampanya Tablosunu* aşağıdaki bağlantıya yükledim.\n\n` +
@@ -816,20 +875,39 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     try {
       window.localStorage.setItem(TAX_OUTREACH_SENT_KEY, JSON.stringify(updated));
     } catch {}
-    toast.success(`💬 ${target.name} için Yıl Sonu KDV & Kampanya mesajı WhatsApp'ta açıldı!`);
+    toast.success(`💬 ${target.name} için özel mesaj WhatsApp'ta açıldı!`);
+  };
+
+  const handleSendMailToTarget = (target) => {
+    const link = buildTaxRadarCustomerLink(target).replace('ref=yilsonu_kdv_tarama', 'ref=mail_kurumsal');
+    const cleanBody = buildTaxRadarCustomerMessage(target).replace(/\*/g, '').replace(buildTaxRadarCustomerLink(target), link);
+    const subject = `${target.name} — 2026 Model IVECO Özel Fiyat Listesi, %20 KDV Avantajı & Finansman Teklifi`;
+    const mailtoUrl = `mailto:${encodeURIComponent(target.email || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(cleanBody)}`;
+    window.location.href = mailtoUrl;
+    const updated = { ...sentTaxPhones, [target.phoneKey]: new Date().toISOString() };
+    setSentTaxPhones(updated);
+    try {
+      window.localStorage.setItem(TAX_OUTREACH_SENT_KEY, JSON.stringify(updated));
+    } catch {}
+    toast.success(`📧 ${target.name} için hazır kurumsal E-Posta açılıyor...`);
   };
 
   const filteredTaxRadarTargets = useMemo(() => {
     return taxRadarTargets.filter(t => {
       const isSent = Boolean(sentTaxPhones[t.phoneKey]);
       if (taxRadarFilter === 'unsent' && isSent) return false;
-      if (taxRadarFilter === 'crm' && t.sourceType === 'radar') return false;
-      if (taxRadarFilter === 'radar' && t.sourceType === 'crm') return false;
+      if (taxRadarFilter === 'crm' && t.sourceType !== 'crm' && t.sourceType !== 'both') return false;
+      if (taxRadarFilter === 'radar' && t.sourceType !== 'radar' && t.sourceType !== 'both') return false;
+      if (taxRadarFilter === 'all_new' && t.sourceType !== 'directory') return false;
+      if (['karoser_servis', 'beton_hafriyat', 'hal_gida_soguk', 'nakliye_ambar', 'smmm_odalar'].includes(taxRadarFilter)) {
+        if (t.category !== taxRadarFilter) return false;
+      }
       if (taxRadarSearch.trim()) {
         const q = taxRadarSearch.toLowerCase();
         const match =
           (t.name && t.name.toLowerCase().includes(q)) ||
           (t.phone && t.phone.toLowerCase().includes(q)) ||
+          (t.email && t.email.toLowerCase().includes(q)) ||
           (t.city && t.city.toLowerCase().includes(q)) ||
           (t.model && t.model.toLowerCase().includes(q));
         if (!match) return false;
@@ -2529,25 +2607,26 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 </div>
 
                 {/* Filtre & Arama Çubuğu */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
                   <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                     {[
-                      { id: 'unsent', label: '⏳ Henüz Gönderilmeyenler' },
-                      { id: 'all', label: '📋 Tüm Liste' },
-                      { id: 'crm', label: '🗂️ CRM Müşterileri' },
-                      { id: 'radar', label: '📡 Niyet Radarı Ziyaretçileri' }
+                      { id: 'unsent', label: '⏳ Gönderilmeyenler' },
+                      { id: 'all', label: '📋 Tümü' },
+                      ...PROSPECT_CATEGORY_TABS,
+                      { id: 'crm', label: '🗂️ CRM Kayıtları' },
+                      { id: 'radar', label: '📡 Niyet Radarı' }
                     ].map(f => (
                       <button
                         key={f.id}
                         type="button"
                         onClick={() => setTaxRadarFilter(f.id)}
                         style={{
-                          padding: '6px 10px',
+                          padding: '6px 9px',
                           borderRadius: '7px',
-                          border: taxRadarFilter === f.id ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                          border: taxRadarFilter === f.id ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
                           background: taxRadarFilter === f.id ? 'rgba(56, 189, 248, 0.24)' : 'rgba(2, 6, 23, 0.7)',
-                          color: taxRadarFilter === f.id ? '#7dd3fc' : '#94a3b8',
-                          fontSize: '0.71rem',
+                          color: taxRadarFilter === f.id ? '#7dd3fc' : '#cbd5e1',
+                          fontSize: '0.7rem',
                           fontWeight: 800,
                           cursor: 'pointer'
                         }}
@@ -2557,13 +2636,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                     ))}
                   </div>
 
-                  <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+                  <div style={{ position: 'relative', width: '100%' }}>
                     <FiSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={13} />
                     <input
                       type="text"
                       value={taxRadarSearch}
                       onChange={(e) => setTaxRadarSearch(e.target.value)}
-                      placeholder="Firma adı, telefon, şehir veya ilgilendiği modele göre ara..."
+                      placeholder="Firma adı, GSM (05xx), e-posta (@), şehir veya sektöre göre ara..."
                       style={{
                         width: '100%',
                         padding: '7px 10px 7px 28px',
@@ -2579,23 +2658,23 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
 
                 {/* Müşteri Listesi */}
                 <div style={{
-                  maxHeight: '320px',
+                  maxHeight: '360px',
                   overflowY: 'auto',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '6px',
                   paddingRight: '4px'
                 }}>
-                  {taxRadarLoading ? (
+                  {taxRadarLoading && filteredTaxRadarTargets.length === 0 ? (
                     <div style={{ padding: '24px', textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem' }}>
-                      ⏳ CRM ve Niyet Radarı müşteri kayıtları taranıyor...
+                      ⏳ Müşteri kayıtları taranıyor...
                     </div>
                   ) : filteredTaxRadarTargets.length === 0 ? (
                     <div style={{ padding: '20px', textAlign: 'center', color: '#94a3b8', fontSize: '0.76rem' }}>
-                      Bu filtrede görüntülenecek müşteri kalmadı. "📋 Tüm Liste" sekmesine geçebilirsiniz.
+                      Bu filtrede görüntülenecek müşteri kalmadı. "📋 Tümü" sekmesine geçebilirsiniz.
                     </div>
                   ) : (
-                    filteredTaxRadarTargets.slice(0, 80).map(target => {
+                    filteredTaxRadarTargets.slice(0, 120).map(target => {
                       const isSent = Boolean(sentTaxPhones[target.phoneKey]);
                       return (
                         <div
@@ -2622,12 +2701,20 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                                 fontWeight: 800,
                                 padding: '1px 6px',
                                 borderRadius: '999px',
-                                background: target.sourceType === 'both'
-                                  ? 'rgba(245, 158, 11, 0.22)'
-                                  : target.sourceType === 'radar'
-                                    ? 'rgba(56, 189, 248, 0.2)'
-                                    : 'rgba(148, 163, 184, 0.2)',
-                                color: target.sourceType === 'both' ? '#fde047' : target.sourceType === 'radar' ? '#7dd3fc' : '#cbd5e1'
+                                background: target.sourceType === 'directory'
+                                  ? 'rgba(168, 85, 247, 0.22)'
+                                  : target.sourceType === 'both'
+                                    ? 'rgba(245, 158, 11, 0.22)'
+                                    : target.sourceType === 'radar'
+                                      ? 'rgba(56, 189, 248, 0.2)'
+                                      : 'rgba(148, 163, 184, 0.2)',
+                                color: target.sourceType === 'directory'
+                                  ? '#e9d5ff'
+                                  : target.sourceType === 'both'
+                                    ? '#fde047'
+                                    : target.sourceType === 'radar'
+                                      ? '#7dd3fc'
+                                      : '#cbd5e1'
                               }}>
                                 {target.sourceBadge}
                               </span>
@@ -2645,18 +2732,27 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                               )}
                             </div>
                             <div style={{ fontSize: '0.71rem', color: '#94a3b8', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                              <span style={{ color: '#4ade80', fontWeight: 800 }}>📞 {target.phone}</span>
+                              {target.phone && (
+                                <span style={{ color: target.isGsm ? '#4ade80' : '#93c5fd', fontWeight: 800 }}>
+                                  {target.isGsm ? '📱 GSM:' : '☎️ Sabit:'} {target.phone}
+                                </span>
+                              )}
+                              {target.email && (
+                                <span style={{ color: '#d8b4fe', fontWeight: 800 }}>
+                                  📧 {target.email}
+                                </span>
+                              )}
                               <span>• 📍 {target.city}</span>
                               <span>• 🚛 {target.model}</span>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '6px' }}>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                             <button
                               type="button"
                               onClick={() => {
                                 navigator.clipboard.writeText(buildTaxRadarCustomerMessage(target));
-                                toast.success(`📋 ${target.name} için KDV mesajı + özel takip linki kopyalandı!`);
+                                toast.success(`📋 ${target.name} için mesaj + özel takip linki kopyalandı!`);
                               }}
                               style={{
                                 padding: '7px 10px',
@@ -2675,25 +2771,49 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                               <FiCopy size={12} /> Kopyala
                             </button>
 
-                            <button
-                              type="button"
-                              onClick={() => handleSendTaxRadarToTarget(target)}
-                              style={{
-                                padding: '7px 12px',
-                                borderRadius: '8px',
-                                background: isSent ? 'rgba(16, 185, 129, 0.25)' : '#22c55e',
-                                border: isSent ? '1px solid #10b981' : 'none',
-                                color: isSent ? '#4ade80' : '#052e16',
-                                fontSize: '0.73rem',
-                                fontWeight: 900,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '5px'
-                              }}
-                            >
-                              <FiSend size={12} /> {isSent ? 'Tekrar WA Gönder' : '💬 Yıl Sonu KDV Linki Gönder'}
-                            </button>
+                            {target.email && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendMailToTarget(target)}
+                                style={{
+                                  padding: '7px 11px',
+                                  borderRadius: '8px',
+                                  background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+                                  border: 'none',
+                                  color: '#ffffff',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 900,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px'
+                                }}
+                              >
+                                📧 Mail Gönder
+                              </button>
+                            )}
+
+                            {(target.isGsm || !target.email) && target.phone && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendTaxRadarToTarget(target)}
+                                style={{
+                                  padding: '7px 12px',
+                                  borderRadius: '8px',
+                                  background: isSent ? 'rgba(16, 185, 129, 0.25)' : '#22c55e',
+                                  border: isSent ? '1px solid #10b981' : 'none',
+                                  color: isSent ? '#4ade80' : '#052e16',
+                                  fontSize: '0.73rem',
+                                  fontWeight: 900,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px'
+                                }}
+                              >
+                                <FiSend size={12} /> {isSent ? 'Tekrar WA' : '💬 WhatsApp Gönder'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       );
