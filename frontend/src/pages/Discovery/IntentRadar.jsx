@@ -53,6 +53,7 @@ const SOURCE_META = {
   fb_grup: { label: 'Facebook Kamyoncu / Nakliye Grubu', short: '📘 Facebook Grubu', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   facebook: { label: 'Facebook Paylaşım Linki', short: '📘 Facebook', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   smmm_kanal: { label: 'Mali Müşavir / SMMM KDV Tablosu Linki', short: '👨‍💼 Mali Müşavir / SMMM', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
+  mail_kurumsal: { label: 'Kurumsal E-Posta / Mail Teklif Linki', short: '📧 Kurumsal E-Posta', color: '#c084fc', bg: 'rgba(168, 85, 247, 0.18)', border: 'rgba(168, 85, 247, 0.45)' },
   banka_kanal: { label: 'Bankaya Özel Kredi Oranlı Link', short: '🏦 Banka Özel Linki', color: '#38bdf8', bg: 'rgba(2, 132, 199, 0.2)', border: 'rgba(56, 189, 248, 0.48)' },
   yilsonu_kdv_tarama: { label: 'Yıl Sonu %20 KDV & Şasi Faturası Taraması', short: '🧾 Yıl Sonu KDV Taraması', color: '#fde047', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
   wa_muhasebe_paylasim: { label: 'Müşterinin Mali Müşavirine Gönderdiği KDV Özeti', short: '📤 Muhasebeciye İletilen KDV', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
@@ -71,6 +72,9 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   const combined = `${source || ''} ${notesOrCampaign || ''} ${pageUrl || ''}`.toLowerCase();
   if (source === 'proforma_link' || combined.includes('/p/')) {
     return SOURCE_META.proforma_link;
+  }
+  if (combined.includes('mail_kurumsal') || combined.includes('ref=mail') || combined.includes('e-posta ziyaretçisi')) {
+    return SOURCE_META.mail_kurumsal;
   }
   if (combined.includes('banka_') || combined.includes('bank=') || combined.includes('banka=')) {
     return SOURCE_META.banka_kanal;

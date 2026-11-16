@@ -71,6 +71,14 @@ const SOCIAL_CHANNELS = [
     color: '#f59e0b'
   },
   {
+    id: 'mail_kurumsal',
+    label: '📧 E-Posta / Kurumsal Mail',
+    shortDesc: 'Satın alma, filo ve muhasebe birimlerine hazır konu başlığı + kurumsal mail metni + takip linki',
+    refCode: 'mail_kurumsal',
+    badgeText: '📧 Kurumsal E-Posta Ziyaretçisi',
+    color: '#a855f7'
+  },
+  {
     id: 'banka_kanal',
     label: '🏦 Bankacılara Özel (Tek Banka Linki)',
     shortDesc: 'Sadece seçilen bankanın (Garanti, DenizBank vb.) kredi oranlarını gösterir',
@@ -126,15 +134,17 @@ const TAX_OUTREACH_SENT_KEY = 'iveco_year_end_tax_sent_v1';
 
 export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [isExpanded, setIsExpanded] = useState(true);
-  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Bankacılara Özel / Mali Müşavir / FB Grupları / Instagram / LinkedIn
+  // 'channels' = WhatsApp Durum / Müşteri / Özel Müşteri / Kurumsal Mail / Bankacılara Özel / Mali Müşavir / FB Grupları / Instagram / LinkedIn
   // 'partners' = Dernek, Oda & Birlik Protokolleri (SİMDER, SMMM, Arıcılar Birliği vb.)
   // 'tax_radar' = Madde 4: CRM'deki Eski Kayıtlara & Niyet Radarı'na "Yıl Sonu KDV / Vergi Uyarısı" Hızlı Tarama
   const [studioMode, setStudioMode] = useState('channels');
 
-  // --- SEKME 1: SOSYAL MEDYA & WHATSAPP MÜŞTERİ LİNK ÜRETİCİ STATE'LERİ ---
+  // --- SEKME 1: SOSYAL MEDYA, E-POSTA & WHATSAPP MÜŞTERİ LİNK ÜRETİCİ STATE'LERİ ---
   const [selectedChannelId, setSelectedChannelId] = useState('wa_durum');
   const [selectedBankChannelId, setSelectedBankChannelId] = useState('garanti');
   const [bankOpenTab, setBankOpenTab] = useState('krediler'); // 'krediler' | 'fiyatlar'
+  const [mailTemplate, setMailTemplate] = useState('kurumsal_filo'); // 'kurumsal_filo' | 'beton_santiye' | 'kdv_muhasebe' | 'takas_yenileme'
+  const [vipEmail, setVipEmail] = useState('');
   const [hookStyle, setHookStyle] = useState('curiosity_short'); // 'curiosity_short' | 'tradein_hook' | 'tax_hook' | 'detailed'
   const [channelSector, setChannelSector] = useState('all');
   const [selectedVehicleGroups, setSelectedVehicleGroups] = useState([]); // [] = Tümü açık, örn: ['tway','sway','daily35_chassis']
@@ -298,6 +308,23 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     channelDiscountTitle
   ]);
 
+  const mailSubject = useMemo(() => {
+    const compPrefix = vipCompanyName.trim() ? `${vipCompanyName.trim()} — ` : '';
+    const discNote = enableChannelDiscount && Number(channelDiscountValue) > 0
+      ? (channelDiscountType === 'percent' ? ` (%${channelDiscountValue} Özel İskonto)` : ` (-${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim)`)
+      : '';
+    if (mailTemplate === 'beton_santiye' || (selectedVehicleGroups.includes('tway') && selectedVehicleGroups.length <= 3)) {
+      return `${compPrefix}2026 IVECO 12 Teker Beton Mikseri, Ağır Hafriyat Damperi & Çekici Özel Fiyat Teklifi${discNote}`;
+    }
+    if (mailTemplate === 'kdv_muhasebe') {
+      return `${compPrefix}2026 IVECO Yıl Sonu %20 KDV Mahsubu, Tam Amortisman & Şasi Faturası Tablosu${discNote}`;
+    }
+    if (mailTemplate === 'takas_yenileme') {
+      return `${compPrefix}Filo Yenileme, Takas Değerleme & 1.000.000 TL %0 Faizli 2026 IVECO Teklifi${discNote}`;
+    }
+    return `${compPrefix}2026 Model IVECO Ticari Araç Fiyat Listesi, Filo İskontosu & Kredi Simülasyonu${discNote}`;
+  }, [vipCompanyName, mailTemplate, selectedVehicleGroups, enableChannelDiscount, channelDiscountValue, channelDiscountType]);
+
   // Sekme 1 için üretilen Hazır Paylaşım Mesajı
   const channelGeneratedMessage = useMemo(() => {
     const link = channelGeneratedLink;
@@ -311,6 +338,88 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           ? `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *%${channelDiscountValue} Özel İskonto* fiyatlardan otomatik düşülmüştür!\n`
           : `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *Araç Başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim* fiyatlardan otomatik düşülmüştür!\n`)
       : '';
+
+    // 📧 KURUMSAL E-POSTA / MAİL ŞABLONLARI (Düz Metin, Resmi Hitap, İmza Bloğu ve Özel Link)
+    if (selectedChannelId === 'mail_kurumsal') {
+      const targetCompany = vipCompanyName.trim() ? `Sayın ${vipCompanyName.trim()} Yönetimi / Satın Alma ve Finans Müdürlüğü,` : 'Sayın Yetkili,';
+      const plainDiscountLine = enableChannelDiscount && Number(channelDiscountValue) > 0
+        ? (channelDiscountType === 'percent'
+            ? `\n• FİRMANIZA ÖZEL TANIMLI İSKONTO: Aşağıdaki bağlantıda tüm 2026 model araçlarımızda firmanıza özel %${channelDiscountValue} kurumsal filo iskontosu fiyatlardan otomatik olarak düşülmüştür.\n`
+            : `\n• FİRMANIZA ÖZEL TANIMLI İNDİRİM: Aşağıdaki bağlantıda tüm 2026 model araçlarımızda firmanıza özel araç başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL kurumsal indirim fiyatlardan otomatik olarak düşülmüştür.\n`)
+        : '';
+
+      const groupLabels = selectedVehicleGroups.length > 0
+        ? VEHICLE_GROUP_OPTIONS.filter(g => selectedVehicleGroups.includes(g.id)).map(g => g.label.replace(/^[^\s]+\s/, '')).join(', ')
+        : 'Daily (3.5T - 7T), Eurocargo (10T - 18T), S-Way Çekici ve T-Way (Mikser / Hafriyat)';
+
+      const signatureBlock =
+        `\nSaygılarımla,\n\n` +
+        `Can Murat\n` +
+        `Ticari Araç Satış Sorumlusu\n` +
+        `IVECO ERC Samsun Otomotiv Yetkili Bayii\n` +
+        `GSM / WhatsApp: 0544 622 59 31`;
+
+      if (mailTemplate === 'beton_santiye') {
+        return (
+          `${targetCompany}\n\n` +
+          `2026 yılı hazır beton, inşaat, maden ve şantiye yatırımlarınız kapsamında; IVECO ERC Samsun Otomotiv olarak hazırladığımız güncel 12 Teker (8x4) T-Way, S-Way Çekici ve Daily şasi fiyatlarımızı bilgilerinize sunarız:\n` +
+          plainDiscountLine +
+          `\n• 12 Teker (8x4) T-Way AD410T46 (460 BG) Beton Mikseri Şasisi:\n` +
+          `  - Kampanyalı Liste Fiyatı: 6.075.000 TL (KDV Dahil)\n` +
+          `  - Nakit / Peşin Alım Özel Fiyatı: 5.750.000 TL (-325.000 TL Nakit İndirimi)\n` +
+          `• 12 Teker (8x4) T-Way AD410T54 (540 BG) Ağır Hafriyat / Kaya Damperi Şasisi:\n` +
+          `  - Kampanyalı Liste Fiyatı: 6.175.000 TL (KDV Dahil)\n` +
+          `  - Nakit / Peşin Alım Özel Fiyatı: 5.850.000 TL (-325.000 TL Nakit İndirimi)\n` +
+          `• Vergi & Amortisman Avantajı: Fatura içindeki %20 KDV'nin tamamı doğrudan ödenecek KDV'den mahsup edilir ve binek araçlardaki kıst amortisman sınırı olmaksızın 1. yıl %20 tam amortisman gider yazılır. Üstyapı imalatını beklemeden hemen şasi faturası kesebilmekteyiz.\n\n` +
+          `Firmanız için filtrelenmiş canlı fiyat listesini, %20 KDV & amortisman tablosunu ve ticari kredi simülasyonunu aşağıdaki kurumsal bağlantımızdan inceleyebilirsiniz:\n\n` +
+          `${link}\n` +
+          signatureBlock
+        );
+      }
+
+      if (mailTemplate === 'kdv_muhasebe') {
+        return (
+          `${targetCompany}\n\n` +
+          `Vergi ve nakit akışı planlaması döneminde yüksek KDV veya Kurumlar/Gelir Vergisi ödemek yerine ticari araç filonuzu yenileyebilmeniz adına hazırladığımız "2026 IVECO %20 KDV Mahsubu, Tam Amortisman & Kampanya Tablomuzu" bilgilerinize sunarız:\n` +
+          plainDiscountLine +
+          `\n1. %20 İndirilecek KDV Kalkanı: Ticari şasi, panelvan, kamyon ve çekici faturalarımızdaki %20 KDV'nin tamamı tek seferde ödenecek KDV'nizden mahsup edilir.\n` +
+          `2. Kıst Amortisman Muafiyeti: Binek araçların aksine ticari araçlarımızda kıst amortisman kısıtlaması yoktur; yılın hangi ayında fatura kesilirse kesilsin 1. yıl %20 tam amortisman doğrudan gider yazılır.\n` +
+          `3. Üstyapıyı Beklemeden Hemen Şasi Faturası: Kasa, frigo, damper veya mikser imalat sırasını beklemeden ŞASİ faturanızı hemen keserek vergi avantajını anında kullanmanızı sağlıyoruz.\n` +
+          `4. Finansman Desteği: 1.000.000 TL 12 Ay %0 Faiz (Aylık 83.333 TL) veya anlaşmalı banka ticari kredi paketleri.\n\n` +
+          `Mali müşaviriniz ve finans departmanınızla birlikte model bazlı KDV matrahlarını ve aylık ödeme tablosunu aşağıdaki canlı bağlantımızdan inceleyebilirsiniz:\n\n` +
+          `${link}\n` +
+          signatureBlock
+        );
+      }
+
+      if (mailTemplate === 'takas_yenileme') {
+        return (
+          `${targetCompany}\n\n` +
+          `Filonuzda bulunan mevcut ticari araçlarınızı değerinde takasa vererek 2026 model sıfır kilometre IVECO (${groupLabels}) araçlarla yenileyebilmeniz için hazırladığımız dijital hesaplama ekranımızı bilgilerinize sunarız:\n` +
+          plainDiscountLine +
+          `\n• Canlı Takas + Kredi Simülasyonu: Mevcut aracınızın tahmini takas bedelini peşinata sayarak, kalan tutar için 1.000.000 TL 12 Ay %0 Faiz ve anlaşmalı banka ticari kredi taksitlerini anında hesaplayabilirsiniz.\n` +
+          `• 4 Fotoğrafla 15 Dakikada Takas Ön Değerleme: Aracınızı bayimize getirmeden ekran üzerinden 4 fotoğraf (dıştan, içten, KM ve ruhsat) yükleyerek 15 dakika içinde resmi takas ön teklifimizi alabilirsiniz.\n` +
+          `• 24 Saat Ücretsiz Şasi & Fiyat Blokajı: Yönetim ve muhasebe onay süreciniz boyunca seçtiğiniz aracı 24 saat ücretsiz olarak firmanız adına opsiyonlayabilirsiniz.\n\n` +
+          `Firmanıza özel hazırlanan dijital katalog ve takas/kredi simülasyon bağlantısı:\n\n` +
+          `${link}\n` +
+          signatureBlock
+        );
+      }
+
+      // Default: 'kurumsal_filo'
+      return (
+        `${targetCompany}\n\n` +
+        `2026 yılı ticari araç ve filo yatırımlarınız kapsamında; IVECO ERC Samsun Otomotiv olarak firmanız için hazırladığımız güncel dijital fiyat listemizi, %20 KDV vergi kalkanı & amortisman tablomuzu ve ticari kredi simülasyon bağlantımızı bilgilerinize sunarız:\n` +
+        plainDiscountLine +
+        `\n• Kapsanan Araç Grupları: ${groupLabels}\n` +
+        `• Canlı Finansman & Takas Hesaplayıcı: 1.000.000 TL 12 Ay %0 Faiz kampanyamız ve anlaşmalı banka ticari kredi oranlarıyla aylık ödeme planınızı ekran üzerinden anında oluşturabilirsiniz.\n` +
+        `• %20 KDV & Tam Amortisman Tablosu: Üstyapı imalatını beklemeden hemen şasi faturası kesim imkanı, %20 KDV mahsubu ve 1. yıl tam amortisman dökümünü tek tıkla muhasebe biriminize aktarabilirsiniz.\n` +
+        `• Resmi Proforma & 24 Saat Fiyat Blokajı: İlgilendiğiniz modeller için aynı gün resmi banka proforması oluşturabilir veya fiyatı 24 saat ücretsiz sabitleyebilirsiniz.\n\n` +
+        `Firmanıza özel hazırlanan canlı katalog ve hesaplama bağlantısı:\n\n` +
+        `${link}\n` +
+        signatureBlock
+      );
+    }
 
     // 🏦 BANKACILARA ÖZEL (SADECE SEÇİLEN BANKANIN ORANLARI GÖRÜNEN TEK BANKA LİNKİ)
     if (selectedChannelId === 'banka_kanal') {
@@ -563,6 +672,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   }, [
     selectedChannelId,
     selectedBankObj,
+    mailTemplate,
+    selectedVehicleGroups,
     hookStyle,
     channelGeneratedLink,
     vipCompanyName,
@@ -1243,6 +1354,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                                 setVipSelectedCustomer(c);
                                 setVipCompanyName(c.company_name || '');
                                 setVipPhone(c.phone || '');
+                                if (c.email) setVipEmail(c.email);
                                 setVipCustomerSearch('');
                                 setVipMatchedCustomers([]);
                                 toast.success(`✅ ${c.company_name} seçildi!`);
@@ -1259,7 +1371,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                               }}
                             >
                               <strong>{c.company_name}</strong>
-                              <span style={{ color: '#38bdf8' }}>{c.phone || c.city}</span>
+                              <span style={{ color: '#38bdf8' }}>{c.email || c.phone || c.city}</span>
                             </div>
                           ))}
                         </div>
@@ -1280,7 +1392,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                           ? 'Facebook Grup Adı yazın veya boş bırakın (Opsiyonel)'
                           : selectedChannelId === 'banka_kanal'
                             ? `${selectedBankObj.shortName} Şube veya Bankacı Adı (Opsiyonel)`
-                            : 'Firma veya Müşteri Adı (Opsiyonel)'
+                            : selectedChannelId === 'mail_kurumsal'
+                              ? 'Kurumsal Firma veya Satın Alma Yetkilisi Adı (Opsiyonel)'
+                              : 'Firma veya Müşteri Adı (Opsiyonel)'
                       }
                       style={{
                         padding: '8px 10px',
@@ -1292,7 +1406,23 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                         fontWeight: 700
                       }}
                     />
-                    {selectedChannelId !== 'fb_grup' && (
+                    {selectedChannelId === 'mail_kurumsal' ? (
+                      <input
+                        type="email"
+                        value={vipEmail}
+                        onChange={(e) => setVipEmail(e.target.value)}
+                        placeholder="Alıcı E-Posta (Örn: satinalma@firma.com)"
+                        style={{
+                          padding: '8px 10px',
+                          borderRadius: '8px',
+                          background: 'rgba(2, 6, 23, 0.85)',
+                          border: '1px solid rgba(168, 85, 247, 0.45)',
+                          color: '#d8b4fe',
+                          fontSize: '0.78rem',
+                          fontWeight: 700
+                        }}
+                      />
+                    ) : selectedChannelId !== 'fb_grup' ? (
                       <input
                         type="tel"
                         value={vipPhone}
@@ -1308,7 +1438,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                           fontWeight: 700
                         }}
                       />
-                    )}
+                    ) : null}
                   </div>
 
                   {selectedChannelId === 'wa_ozel' && (
@@ -1572,41 +1702,123 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   {channelGeneratedLink}
                 </div>
 
-                {/* 🎯 Sıkmayan / Merak Uyandıran Kanca Seçici */}
-                <div>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fbbf24', marginBottom: '5px' }}>
-                    🎯 Müşteriyi Sıkmadan Tıklatan Mesaj Kancası Seç:
+                {/* 🎯 Sıkmayan / Merak Uyandıran Kanca Seçici veya Kurumsal Mail Şablon Seçici */}
+                {selectedChannelId === 'mail_kurumsal' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#d8b4fe', marginBottom: '5px' }}>
+                        📧 Hazır Kurumsal E-Posta Şablonu & Konusu Seç:
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
+                        {[
+                          { id: 'kurumsal_filo', label: '🏢 Kurumsal Satın Alma & Filo' },
+                          { id: 'beton_santiye', label: '🏗️ Beton Santrali & Hafriyat (12 Teker)' },
+                          { id: 'kdv_muhasebe', label: '🧾 Muhasebe / %20 KDV & Amortisman' },
+                          { id: 'takas_yenileme', label: '🔄 Filo Yenileme, Takas & %0 Faiz' }
+                        ].map(tpl => {
+                          const active = mailTemplate === tpl.id;
+                          return (
+                            <button
+                              key={tpl.id}
+                              type="button"
+                              onClick={() => {
+                                setMailTemplate(tpl.id);
+                                if (tpl.id === 'beton_santiye') {
+                                  setSelectedVehicleGroups(['tway', 'sway', 'daily35_chassis']);
+                                }
+                              }}
+                              style={{
+                                padding: '6px 8px',
+                                borderRadius: '7px',
+                                border: active ? '1.5px solid #a855f7' : '1px solid rgba(255,255,255,0.1)',
+                                background: active ? 'rgba(168, 85, 247, 0.25)' : 'rgba(15, 23, 42, 0.7)',
+                                color: active ? '#e9d5ff' : '#cbd5e1',
+                                fontSize: '0.7rem',
+                                fontWeight: active ? 900 : 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {tpl.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* E-Posta Konu Başlığı (Subject) Kutusu */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                      padding: '7px 10px',
+                      borderRadius: '8px',
+                      background: 'rgba(88, 28, 135, 0.28)',
+                      border: '1px solid rgba(168, 85, 247, 0.45)',
+                      flexWrap: 'wrap'
+                    }}>
+                      <div style={{ fontSize: '0.74rem', color: '#f3e8ff', fontWeight: 800, flex: 1 }}>
+                        <span style={{ color: '#c084fc', marginRight: '6px' }}>📌 E-Posta Konusu:</span>
+                        {mailSubject}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(mailSubject);
+                          toast.success('📌 E-Posta konu başlığı kopyalandı!');
+                        }}
+                        style={{
+                          padding: '4px 9px',
+                          borderRadius: '6px',
+                          background: 'rgba(168, 85, 247, 0.3)',
+                          border: '1px solid rgba(216, 180, 254, 0.5)',
+                          color: '#f3e8ff',
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        📋 Konuyu Kopyala
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
-                    {[
-                      { id: 'curiosity_short', label: '⚡ 2 Cümle Merak (Sıfır Reklam)' },
-                      { id: 'tradein_hook', label: '🔄 "Aracım Kaç Para Eder?" Kancası' },
-                      { id: 'tax_hook', label: '🧾 "%20 KDV Vergi Kalkanı" Kancası' },
-                      { id: 'detailed', label: '📋 Detaylı Tanıtım Metni' }
-                    ].map(h => {
-                      const active = hookStyle === h.id;
-                      return (
-                        <button
-                          key={h.id}
-                          type="button"
-                          onClick={() => setHookStyle(h.id)}
-                          style={{
-                            padding: '6px 8px',
-                            borderRadius: '7px',
-                            border: active ? '1.5px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
-                            background: active ? 'rgba(16, 185, 129, 0.22)' : 'rgba(15, 23, 42, 0.7)',
-                            color: active ? '#4ade80' : '#cbd5e1',
-                            fontSize: '0.7rem',
-                            fontWeight: active ? 900 : 700,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {h.label}
-                        </button>
-                      );
-                    })}
+                ) : (
+                  <div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fbbf24', marginBottom: '5px' }}>
+                      🎯 Müşteriyi Sıkmadan Tıklatan Mesaj Kancası Seç:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
+                      {[
+                        { id: 'curiosity_short', label: '⚡ 2 Cümle Merak (Sıfır Reklam)' },
+                        { id: 'tradein_hook', label: '🔄 "Aracım Kaç Para Eder?" Kancası' },
+                        { id: 'tax_hook', label: '🧾 "%20 KDV Vergi Kalkanı" Kancası' },
+                        { id: 'detailed', label: '📋 Detaylı Tanıtım Metni' }
+                      ].map(h => {
+                        const active = hookStyle === h.id;
+                        return (
+                          <button
+                            key={h.id}
+                            type="button"
+                            onClick={() => setHookStyle(h.id)}
+                            style={{
+                              padding: '6px 8px',
+                              borderRadius: '7px',
+                              border: active ? '1.5px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                              background: active ? 'rgba(16, 185, 129, 0.22)' : 'rgba(15, 23, 42, 0.7)',
+                              color: active ? '#4ade80' : '#cbd5e1',
+                              fontSize: '0.7rem',
+                              fontWeight: active ? 900 : 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {h.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Hazır Paylaşım Metni Önizleme */}
                 <div style={{
@@ -1617,14 +1829,22 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   color: '#cbd5e1',
                   fontSize: '0.73rem',
                   whiteSpace: 'pre-wrap',
-                  maxHeight: '115px',
+                  maxHeight: selectedChannelId === 'mail_kurumsal' ? '150px' : '115px',
                   overflowY: 'auto',
                   lineHeight: 1.4
                 }}>
                   {channelGeneratedMessage}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.3fr 1fr', gap: '8px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile
+                    ? '1fr'
+                    : selectedChannelId === 'mail_kurumsal'
+                      ? '1fr 1.2fr 1.1fr 1.1fr'
+                      : '1fr 1.3fr 1fr',
+                  gap: '8px'
+                }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -1670,46 +1890,102 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       gap: '6px'
                     }}
                   >
-                    <FiCopy size={14} /> 📋 Hazır Metni + Linki Kopyala
+                    <FiCopy size={14} /> {selectedChannelId === 'mail_kurumsal' ? '📋 Mail Metni + Linki Kopyala' : '📋 Hazır Metni + Linki Kopyala'}
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (selectedChannelId === 'fb_grup') {
-                        navigator.clipboard.writeText(channelGeneratedMessage);
-                        toast.success('📋 Gönderi metni kopyalandı! Facebook grubunda "Ctrl+V / Yapıştır" yapabilirsiniz.');
-                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(channelGeneratedLink)}`, '_blank', 'noopener,noreferrer');
-                        return;
-                      }
-                      const clean = vipPhone.replace(/\D/g, '');
-                      if (clean.length >= 10) {
-                        openWhatsAppChat(clean, channelGeneratedMessage);
-                        toast.success('💬 WhatsApp açılıyor...');
-                      } else {
-                        navigator.clipboard.writeText(channelGeneratedMessage);
-                        toast.success('📋 Metin kopyalandı! (Doğrudan kişiye açmak için yukarıya telefon numarası yazabilirsin)');
-                      }
-                    }}
-                    style={{
-                      padding: '10px 12px',
-                      borderRadius: '9px',
-                      background: selectedChannelId === 'fb_grup' ? '#1877F2' : '#22c55e',
-                      border: 'none',
-                      color: selectedChannelId === 'fb_grup' ? '#ffffff' : '#052e16',
-                      fontWeight: 900,
-                      fontSize: '0.76rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <FiSend size={14} /> {selectedChannelId === 'fb_grup'
-                      ? '📘 Kopyala & Facebook’ta Paylaş'
-                      : (vipPhone.replace(/\D/g, '').length >= 10 ? '💬 WhatsApp’tan Gönder' : '💬 Kopyala & Paylaş')}
-                  </button>
+                  {selectedChannelId === 'mail_kurumsal' ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const toAddr = vipEmail.trim();
+                          const mailtoUrl = `mailto:${encodeURIComponent(toAddr)}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(channelGeneratedMessage)}`;
+                          window.location.href = mailtoUrl;
+                          toast.success('📧 Varsayılan E-Posta uygulamanız (Outlook / Mail) konu ve metin hazır olarak açılıyor...');
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: '9px',
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+                          border: 'none',
+                          color: '#ffffff',
+                          fontWeight: 900,
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <FiSend size={14} /> 📧 Mail Uygulamasında Aç
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const toAddr = vipEmail.trim();
+                          const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toAddr)}&su=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(channelGeneratedMessage)}`;
+                          window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+                          toast.success('📨 Gmail yeni mesaj ekranı konu + metin + link hazır olarak açıldı!');
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: '9px',
+                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          border: 'none',
+                          color: '#ffffff',
+                          fontWeight: 900,
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        📨 Gmail’de Hazır Aç
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (selectedChannelId === 'fb_grup') {
+                          navigator.clipboard.writeText(channelGeneratedMessage);
+                          toast.success('📋 Gönderi metni kopyalandı! Facebook grubunda "Ctrl+V / Yapıştır" yapabilirsiniz.');
+                          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(channelGeneratedLink)}`, '_blank', 'noopener,noreferrer');
+                          return;
+                        }
+                        const clean = vipPhone.replace(/\D/g, '');
+                        if (clean.length >= 10) {
+                          openWhatsAppChat(clean, channelGeneratedMessage);
+                          toast.success('💬 WhatsApp açılıyor...');
+                        } else {
+                          navigator.clipboard.writeText(channelGeneratedMessage);
+                          toast.success('📋 Metin kopyalandı! (Doğrudan kişiye açmak için yukarıya telefon numarası yazabilirsin)');
+                        }
+                      }}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '9px',
+                        background: selectedChannelId === 'fb_grup' ? '#1877F2' : '#22c55e',
+                        border: 'none',
+                        color: selectedChannelId === 'fb_grup' ? '#ffffff' : '#052e16',
+                        fontWeight: 900,
+                        fontSize: '0.76rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <FiSend size={14} /> {selectedChannelId === 'fb_grup'
+                        ? '📘 Kopyala & Facebook’ta Paylaş'
+                        : (vipPhone.replace(/\D/g, '').length >= 10 ? '💬 WhatsApp’tan Gönder' : '💬 Kopyala & Paylaş')}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

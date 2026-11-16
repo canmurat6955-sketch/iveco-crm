@@ -1504,6 +1504,7 @@ export default function PublicVehicleFinder() {
     if (activePartner && activePartner.id !== 'vip_ozel') {
       return `${activePartner.icon || '🏛️'} ${activePartner.shortName} Üyesi Ziyaretçisi`;
     }
+    if (code.includes('mail') || code.includes('eposta')) return '📧 Kurumsal E-Posta Ziyaretçisi';
     if (code.includes('smmm')) return '👨‍💼 Mali Müşavir / SMMM Linki Ziyaretçisi';
     if (code.includes('fb_grup')) return '📘 Facebook Grubu Ziyaretçisi';
     if (code.includes('face') || code.includes('fb')) return '📘 Facebook Ziyaretçisi';
