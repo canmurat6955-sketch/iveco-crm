@@ -608,8 +608,52 @@ export const IVECO_PRICING_CATALOG = [
   },
 
   // ==========================================
-  // GRUP 5: 2026 MODEL T-WAY AĞIR ŞANTİYE & HAFRİYAT (10 & 12 TEKER)
+  // GRUP 6: 2026 MODEL T-WAY AĞIR ŞANTİYE, MİKSER & HAFRİYAT (12 TEKER & 10 TEKER)
+  // 12 Teker (8x4) Mikser: 6.075.000 TL Liste / 5.750.000 TL Nakit Alım (-325.000 TL Nakit Avantajı)
+  // 12 Teker (8x4) Hafriyat: 6.175.000 TL Liste / 5.850.000 TL Nakit Alım (-325.000 TL Nakit Avantajı)
   // ==========================================
+  {
+    id: 'tway-ad410t46-8x4',
+    segment: 'T-Way',
+    category: '8x4 Beton Mikseri Şasisi (12 Teker)',
+    model: 'IVECO T-WAY AD 410T 46 8x4 (12 Teker 460 BG Beton Mikseri Şasisi)',
+    engine: 'Cursor 11/13 (11.1L)',
+    power: '11120 CM3 338 KW (460 BG) - 2150 Nm',
+    transmission: '16 İleri Hi-Tronix (Rocking Mode)',
+    wheelbase: 4350,
+    bodyLength: '10–12 m³ Beton Mikseri Şasisi',
+    tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
+    year: '2026',
+    campaignPrice: 6075000,
+    cashDiscount: 325000,
+    cashPrice: 5750000,
+    isCustomPrice: false,
+    currency: 'TRY',
+    otvRate: 4.0,
+    kdvRate: 20.0,
+    finderKey: 'tway_12teker_460'
+  },
+  {
+    id: 'tway-ad410t54-8x4',
+    segment: 'T-Way',
+    category: '8x4 Ağır Hafriyat Damperi (12 Teker)',
+    model: 'IVECO T-WAY AD 410T 54 8x4 (12 Teker 540 BG Ağır Hafriyat / Kaya Damperi)',
+    engine: 'Cursor 13 (12.9L)',
+    power: '12882 CM3 397 KW (540 BG) - 2500 Nm',
+    transmission: '16 İleri Hi-Tronix (Rocking Mode)',
+    wheelbase: 4350,
+    bodyLength: '6.40 m Damper (22–24 m³)',
+    tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
+    year: '2026',
+    campaignPrice: 6175000,
+    cashDiscount: 325000,
+    cashPrice: 5850000,
+    isCustomPrice: false,
+    currency: 'TRY',
+    otvRate: 4.0,
+    kdvRate: 20.0,
+    finderKey: 'tway_12teker_540'
+  },
   {
     id: 'tway-ad380t54-6x4',
     segment: 'T-Way',
@@ -623,7 +667,7 @@ export const IVECO_PRICING_CATALOG = [
     tonnage: '26000 KG (Kantar) / 41000 KG (GVW)',
     year: '2026',
     isCustomPrice: true,
-    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Satış Sorumlusu ile Görüşün",
+    customPricePrompt: "10 Teker Proje Fiyatı İçin Satış Sorumlusu ile Görüşün",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
@@ -642,49 +686,11 @@ export const IVECO_PRICING_CATALOG = [
     tonnage: '26000 KG (Kantar) / 41000 KG (GVW)',
     year: '2026',
     isCustomPrice: true,
-    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Satış Sorumlusu ile Görüşün",
+    customPricePrompt: "10 Teker Proje Fiyatı İçin Satış Sorumlusu ile Görüşün",
     currency: 'EUR',
     otvRate: 4.0,
     kdvRate: 20.0,
     finderKey: 'tway_10teker_460'
-  },
-  {
-    id: 'tway-ad410t54-8x4',
-    segment: 'T-Way',
-    category: '8x4 Ağır Hafriyat (12 Teker Kaya Damperi)',
-    model: 'IVECO T-WAY AD 410T 54 8x4 (12 Teker 540 BG Kaya Damperi)',
-    engine: 'Cursor 13 (12.9L)',
-    power: '12882 CM3 397 KW (540 BG) - 2500 Nm',
-    transmission: '16 İleri Hi-Tronix (Rocking Mode)',
-    wheelbase: 4350,
-    bodyLength: '6.40 m Damper (22–24 m³)',
-    tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
-    year: '2026',
-    isCustomPrice: true,
-    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Satış Sorumlusu ile Görüşün",
-    currency: 'EUR',
-    otvRate: 4.0,
-    kdvRate: 20.0,
-    finderKey: 'tway_12teker_540'
-  },
-  {
-    id: 'tway-ad410t46-8x4',
-    segment: 'T-Way',
-    category: '8x4 Ağır Şantiye (12 Teker Mikser / Damper)',
-    model: 'IVECO T-WAY AD 410T 46 8x4 (12 Teker 460 BG Mikser/Damper)',
-    engine: 'Cursor 11/13 (11.1L)',
-    power: '11120 CM3 338 KW (460 BG) - 2150 Nm',
-    transmission: '16 İleri Hi-Tronix (Rocking Mode)',
-    wheelbase: 4350,
-    bodyLength: '6.40 m Damper / 10–12 m³ Mikser',
-    tonnage: '32000 KG (Kantar) / 50000 KG (GVW)',
-    year: '2026',
-    isCustomPrice: true,
-    customPricePrompt: "Özel Proje & Filo Fiyatı İçin Satış Sorumlusu ile Görüşün",
-    currency: 'EUR',
-    otvRate: 4.0,
-    kdvRate: 20.0,
-    finderKey: 'tway_12teker_460'
   }
 ];
 
@@ -702,7 +708,7 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
   let basePrice = 0;
   let discount = 0;
   let finalPrice = 0;
-  if (vehicle.isCustomPrice || vehicle.segment === 'T-Way') {
+  if (vehicle.isCustomPrice) {
     return {
       currency: 'EUR',
       isCustomPrice: true,

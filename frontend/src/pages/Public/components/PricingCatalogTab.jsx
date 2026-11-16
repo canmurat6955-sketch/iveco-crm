@@ -97,9 +97,25 @@ function normalizeSectorId(rawSector) {
   return 'all';
 }
 
-export default function PricingCatalogTab({ initialSector = '', partnerProtocol = null, lockedBank = null, onSelectVehicle, onOpenLoanTab, onDirectWhatsApp, onTrackFootprint, salesRep }) {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => normalizeSectorId(initialSector));
+function getVehicleGroupKey(v) {
+  if (!v) return 'all';
+  if (v.segment === 'Daily 35' && v.category.includes('Panelvan')) return 'daily35_van';
+  if (v.segment === 'Daily 35') return 'daily35_chassis';
+  if (v.segment === 'Daily 70 C' || v.segment === 'Daily 70' || v.segment.includes('70') || v.segment.includes('72')) return 'daily70';
+  if (v.segment === 'Eurocargo') return 'eurocargo';
+  if (v.segment === 'S-Way') return 'sway';
+  if (v.segment === 'T-Way') return 'tway';
+  return 'all';
+}
+
+export default function PricingCatalogTab({ initialSector = '', allowedGroups = [], partnerProtocol = null, lockedBank = null, onSelectVehicle, onOpenLoanTab, onDirectWhatsApp, onTrackFootprint, salesRep }) {
+  const hasGroupRestriction = Array.isArray(allowedGroups) && allowedGroups.length > 0;
+  const [selectedCategory, setSelectedCategory] = useState(() => (
+    hasGroupRestriction && allowedGroups.length === 1 ? allowedGroups[0] : 'all'
+  ));
+  const [selectedSectorFilter, setSelectedSectorFilter] = useState(() => (
+    hasGroupRestriction ? 'all' : normalizeSectorId(initialSector)
+  ));
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyDoubleWheels, setOnlyDoubleWheels] = useState(false);
   const [showTradeInBox, setShowTradeInBox] = useState(false);
@@ -119,13 +135,21 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
   const [fleetTargetModel, setFleetTargetModel] = useState('Daily 35C16 Çift Teker Şasi');
   const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
   const [tcmbEurRate, setTcmbEurRate] = useState(38.50);
-  const [showDetailedFilters, setShowDetailedFilters] = useState(() => Boolean(initialSector && normalizeSectorId(initialSector) !== 'all'));
+  const [showDetailedFilters, setShowDetailedFilters] = useState(() => Boolean(!hasGroupRestriction && initialSector && normalizeSectorId(initialSector) !== 'all'));
   const [showAllCardDetails, setShowAllCardDetails] = useState(false);
   const [expandedCardIds, setExpandedCardIds] = useState({});
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [taxModalVehicleId, setTaxModalVehicleId] = useState('daily-35c16-3750');
   const [customTaxInvoiceTl, setCustomTaxInvoiceTl] = useState(0);
   const [taxEntityRate, setTaxEntityRate] = useState(0.25); // 0.25 (%25 Kurumlar) | 0.35 (%35 Gelir Vergisi)
+
+  const visibleCategories = useMemo(() => {
+    if (!hasGroupRestriction) return CATEGORIES;
+    if (allowedGroups.length === 1) {
+      return CATEGORIES.filter(c => c.id === allowedGroups[0]);
+    }
+    return CATEGORIES.filter(c => c.id === 'all' || allowedGroups.includes(c.id));
+  }, [hasGroupRestriction, allowedGroups]);
 
   const toggleCardDetail = (vehicleId) => {
     setExpandedCardIds(prev => ({
@@ -177,10 +201,17 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
   }, []);
 
   useEffect(() => {
-    if (initialSector) {
+    if (hasGroupRestriction) {
+      setSelectedSectorFilter('all');
+      if (allowedGroups.length === 1) {
+        setSelectedCategory(allowedGroups[0]);
+      } else if (selectedCategory !== 'all' && !allowedGroups.includes(selectedCategory)) {
+        setSelectedCategory('all');
+      }
+    } else if (initialSector) {
       setSelectedSectorFilter(normalizeSectorId(initialSector));
     }
-  }, [initialSector]);
+  }, [initialSector, hasGroupRestriction, allowedGroups, selectedCategory]);
 
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 768);
@@ -190,8 +221,14 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
 
   const filteredVehicles = useMemo(() => {
     return IVECO_PRICING_CATALOG.filter(v => {
+      // Linkten belirli araç grupları seçildiyse (?groups=sway,tway,daily35_chassis vb.) sadece o grupları göster
+      if (hasGroupRestriction) {
+        const vGroup = getVehicleGroupKey(v);
+        if (!allowedGroups.includes(vGroup)) return false;
+      }
+
       // Sector filter (Madde 1: İşinize Göre Hızlı Araç Filtresi)
-      if (selectedSectorFilter !== 'all') {
+      if (!hasGroupRestriction && selectedSectorFilter !== 'all') {
         const isVan = v.category.toLowerCase().includes('panelvan');
         const isDoubleWheel35 = v.segment === 'Daily 35' && !isVan && (v.category.toLowerCase().includes('çift teker') || v.model.toLowerCase().includes('35 c'));
         const isSingleWheel35 = v.segment === 'Daily 35' && !isVan && !isDoubleWheel35;
@@ -252,7 +289,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
 
       return true;
     });
-  }, [selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
+  }, [hasGroupRestriction, allowedGroups, selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
 
   const tradeInCatalogModels = useMemo(() => {
     return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && (v.campaignPrice || v.cashPrice || v.eurPrice));
@@ -325,7 +362,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
         : lockedBank
           ? ` [🏦 *${lockedBank.name}* Özel Finansman]`
           : '';
-      if (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) {
+      if (vehicle.isCustomPrice) {
         const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat)${protocolPrefix} için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
         onDirectWhatsApp(msg);
         return;
@@ -384,7 +421,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
     }
     const bankQuery = lockedBank ? `&bank=${lockedBank.id}` : '';
     const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_muhasebe_paylasim${bankQuery}`;
-    const priceLine = (vehicle.segment === 'T-Way' || vehicle.isCustomPrice)
+    const priceLine = vehicle.isCustomPrice
       ? `💰 *Fiyat:* Özel Şantiye / Proje Teklifi`
       : vehicle.currency === 'EUR'
         ? `💰 *Net Fiyat:* €${(vehicle.eurPrice || vehicle.cashPrice || 0).toLocaleString('tr-TR')} (+%20 KDV)`
@@ -999,12 +1036,12 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           gap: '7px'
         } : {
           display: 'grid',
-          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+          gridTemplateColumns: `repeat(${visibleCategories.length}, minmax(0, 1fr))`,
           gap: '8px'
         }}>
-          {CATEGORIES.map(cat => {
+          {visibleCategories.map(cat => {
             const isSelected = selectedCategory === cat.id;
-            const isAllMobile = isMobileView && cat.id === 'all';
+            const isAllMobile = isMobileView && (cat.id === 'all' || (visibleCategories.length % 2 === 1 && cat.id === visibleCategories[0].id));
             return (
               <button
                 key={cat.id}
@@ -1101,7 +1138,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     textOverflow: 'ellipsis',
                     maxWidth: '100%'
                   }}>
-                    {cat.title}
+                    {cat.id === 'all' && hasGroupRestriction ? 'Seçilen Araçlar' : cat.title}
                   </span>
                   <span style={{
                     fontSize: isMobileView ? '0.66rem' : '0.64rem',
@@ -1113,7 +1150,9 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     textOverflow: 'ellipsis',
                     maxWidth: '100%'
                   }}>
-                    {cat.id === 'all' ? `(${IVECO_PRICING_CATALOG.length} Araç)` : cat.licenseBadge}
+                    {cat.id === 'all'
+                      ? (hasGroupRestriction ? `(${filteredVehicles.length} Araç)` : `(${IVECO_PRICING_CATALOG.length} Araç)`)
+                      : cat.licenseBadge}
                   </span>
                 </div>
               </button>
@@ -1359,7 +1398,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           const vatShieldTl = effectiveTlPrice > 0 ? Math.round(effectiveTlPrice - (effectiveTlPrice / 1.20)) : 0;
           const isDetailOpen = showAllCardDetails || Boolean(expandedCardIds[vehicle.id]);
           const compactProfileBadge = getCompactProfileBadge(vehicle);
-          const remainingAfterTradeIn = (!vehicle.isCustomPrice && vehicle.segment !== 'T-Way' && vehicle.currency !== 'EUR' && effectiveTlPrice > 0)
+          const remainingAfterTradeIn = (!vehicle.isCustomPrice && vehicle.currency !== 'EUR' && effectiveTlPrice > 0)
             ? Math.max(0, effectiveTlPrice - (Number(tradeInValue) || 0))
             : 0;
           const isZeroInterestEligible = remainingAfterTradeIn > 0 && remainingAfterTradeIn <= 1000000;
@@ -1420,9 +1459,9 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     borderRadius: '6px',
                     border: '1px solid rgba(34, 197, 94, 0.35)'
                   }}>
-                    -{vehicle.cashDiscount.toLocaleString('tr-TR')} TL İndirim
+                    -{vehicle.cashDiscount.toLocaleString('tr-TR')} TL Nakit İndirimi
                   </span>
-                ) : (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? (
+                ) : vehicle.isCustomPrice ? (
                   <span style={{
                     fontSize: '0.66rem',
                     fontWeight: 800,
@@ -1541,10 +1580,10 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 padding: isMobileView ? '11px 12px' : '10px 12px',
                 marginBottom: '10px'
               }}>
-                {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? (
+                {vehicle.isCustomPrice ? (
                   <div style={{ textAlign: 'center', padding: '4px 0' }}>
                     <div style={{ fontSize: '0.67rem', color: '#fbbf24', fontWeight: 800, textTransform: 'uppercase' }}>
-                      ⭐ {partnerProtocol ? `${partnerProtocol.shortName} ÖZEL ŞANTİYE PROTOKOLÜ` : 'PROJEYE ÖZEL ŞANTİYE FİYATI'}
+                      ⭐ {partnerProtocol ? `${partnerProtocol.shortName} ÖZEL ŞANTİYE PROTOKOLÜ` : '10 TEKER PROJEYE ÖZEL ŞANTİYE FİYATI'}
                     </div>
                     <div style={{ fontSize: isMobileView ? '1.04rem' : '0.98rem', fontWeight: 900, color: '#fef08a', marginTop: '2px' }}>
                       Satış Sorumlusu Can Murat ile Görüşün
@@ -1582,11 +1621,11 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
                     <div>
                       <span style={{ fontSize: '0.69rem', color: vehicle.cashDiscount > 0 ? '#4ade80' : '#38bdf8', fontWeight: 900, display: 'block' }}>
-                        {vehicle.cashDiscount > 0 ? 'NET PEŞİN FİYAT (KDV Dahil):' : 'KREDİLİ / NET FİYAT (KDV Dahil):'}
+                        {vehicle.cashDiscount > 0 ? 'NAKİT / PEŞİN ALIM FİYATI:' : 'KREDİLİ / NET FİYAT (KDV Dahil):'}
                       </span>
                       {vehicle.cashDiscount > 0 && (
                         <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-                          Liste: {vehicle.campaignPrice.toLocaleString('tr-TR')} TL
+                          Liste / Vadeli: {vehicle.campaignPrice.toLocaleString('tr-TR')} TL
                         </span>
                       )}
                     </div>
@@ -1601,7 +1640,7 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                 )}
 
                 {/* ÖZELLİK 2B: TEK SATIRLIK %20 KDV VERGİ AVANTAJI + KDV & KAMPANYA TABLOSU AÇICI */}
-                {!vehicle.isCustomPrice && vehicle.segment !== 'T-Way' && vehicle.currency !== 'EUR' && vatShieldTl > 0 && (
+                {!vehicle.isCustomPrice && vehicle.currency !== 'EUR' && vatShieldTl > 0 && (
                   <div style={{
                     marginTop: '7px',
                     paddingTop: '6px',
@@ -1806,8 +1845,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                     onClick={() => handleVehicleQuote(vehicle)}
                     style={{
                       minWidth: 0,
-                      background: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#f59e0b' : '#22c55e',
-                      color: (vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? '#000' : '#fff',
+                      background: vehicle.isCustomPrice ? '#f59e0b' : '#22c55e',
+                      color: vehicle.isCustomPrice ? '#000' : '#fff',
                       border: 'none',
                       borderRadius: '10px',
                       padding: isMobileView ? '10px 4px' : '8px 10px',
@@ -1820,9 +1859,9 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
                       gap: '4px',
                       whiteSpace: 'nowrap'
                     }}
-                    title={(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? "Satış Sorumlusu Can Murat ile Özel Fiyat Görüş" : "WhatsApp'tan Teklif Al"}
+                    title={vehicle.isCustomPrice ? "Satış Sorumlusu Can Murat ile Özel Fiyat Görüş" : "WhatsApp'tan Teklif Al"}
                   >
-                    <FiMessageSquare size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {(vehicle.segment === 'T-Way' || vehicle.isCustomPrice) ? 'Özel Fiyat' : 'Teklif Al'}
+                    <FiMessageSquare size={isMobileView ? 13 : 12} style={{ flexShrink: 0 }} /> {vehicle.isCustomPrice ? 'Özel Fiyat' : 'Teklif Al'}
                   </button>
                 </div>
 
@@ -1883,6 +1922,8 @@ export default function PricingCatalogTab({ initialSector = '', partnerProtocol 
           { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: 2050000, campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
           { label: 'Daily 70C18 / 72C18 Şasi (7.2 Ton)', gross: 2490000, campaign: `${bankTag}1M TL %0 Faiz veya 6 Ay Ödemesiz Kredi` },
           { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Özel Ticari Kredisi` : 'Anlaşmalı Banka & Katılım Kredisi' },
+          { label: 'T-Way 12 Teker Beton Mikseri (8x4)', gross: 5750000, campaign: `${bankTag}5.750.000 TL Nakit / 6.075.000 TL Liste` },
+          { label: 'T-Way 12 Teker Hafriyat Damper (8x4)', gross: 5850000, campaign: `${bankTag}5.850.000 TL Nakit / 6.175.000 TL Liste` },
           { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Filo Finansmanı` : 'İhracatçı Euro & TL Filo Finansmanı' }
         ];
 

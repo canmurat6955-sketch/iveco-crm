@@ -28,6 +28,23 @@ const SECTOR_OPTIONS = [
   { id: 'agir_nakliye', label: '🛣️ Uzun Yol & Uluslararası Tır' }
 ];
 
+const VEHICLE_GROUP_OPTIONS = [
+  { id: 'daily35_chassis', label: '🛻 Daily 3.5T Şasi' },
+  { id: 'daily35_van', label: '🚐 Daily Panelvan' },
+  { id: 'daily70', label: '🚛 Daily 70C (7 Ton)' },
+  { id: 'eurocargo', label: '🚚 Eurocargo (10–18T)' },
+  { id: 'sway', label: '🛣️ S-Way Çekici' },
+  { id: 'tway', label: '🚜 T-Way (Mikser/Hafriyat)' }
+];
+
+const VEHICLE_GROUP_PRESETS = [
+  { id: 'all', label: '🌟 Tümü Açık', groups: [] },
+  { id: 'beton_insaat', label: '🏗️ Beton Santrali & İnşaat (S-Way + T-Way + Daily)', groups: ['tway', 'sway', 'daily35_chassis'] },
+  { id: 'santiye', label: '🚜 Sadece Şantiye (T-Way + S-Way)', groups: ['tway', 'sway'] },
+  { id: 'lojistik', label: '🛣️ Lojistik Filo (S-Way + Eurocargo + 70C)', groups: ['sway', 'eurocargo', 'daily70'] },
+  { id: 'esnaf', label: '📦 Şehir İçi Dağıtım (Daily Şasi + Panelvan + 70C)', groups: ['daily35_chassis', 'daily35_van', 'daily70'] }
+];
+
 const SOCIAL_CHANNELS = [
   {
     id: 'wa_durum',
@@ -120,6 +137,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [bankOpenTab, setBankOpenTab] = useState('krediler'); // 'krediler' | 'fiyatlar'
   const [hookStyle, setHookStyle] = useState('curiosity_short'); // 'curiosity_short' | 'tradein_hook' | 'tax_hook' | 'detailed'
   const [channelSector, setChannelSector] = useState('all');
+  const [selectedVehicleGroups, setSelectedVehicleGroups] = useState([]); // [] = Tümü açık, örn: ['tway','sway','daily35_chassis']
   const [vipTone, setVipTone] = useState('friendly'); // 'friendly' | 'new_lead' | 'corporate'
   const [vipCustomerSearch, setVipCustomerSearch] = useState('');
   const [vipMatchedCustomers, setVipMatchedCustomers] = useState([]);
@@ -191,6 +209,15 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     [selectedBankChannelId]
   );
 
+  const toggleVehicleGroup = (groupId) => {
+    setSelectedVehicleGroups(prev => {
+      const exists = prev.includes(groupId);
+      const next = exists ? prev.filter(id => id !== groupId) : [...prev, groupId];
+      if (next.length === VEHICLE_GROUP_OPTIONS.length) return [];
+      return next;
+    });
+  };
+
   // Sekme 1 için üretilen Link
   const channelGeneratedLink = useMemo(() => {
     const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
@@ -209,7 +236,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       if (cleanPhone.length >= 10) {
         params.set('phone', cleanPhone);
       }
-      if (channelSector && channelSector !== 'all') {
+      if (selectedVehicleGroups.length > 0) {
+        params.set('groups', selectedVehicleGroups.join(','));
+      } else if (channelSector && channelSector !== 'all') {
         params.set('sector', channelSector);
       }
       if (enableChannelDiscount && Number(channelDiscountValue) > 0) {
@@ -234,7 +263,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     if (cleanPhone.length >= 10) {
       params.set('phone', cleanPhone);
     }
-    if (channelSector && channelSector !== 'all') {
+    if (selectedVehicleGroups.length > 0) {
+      params.set('groups', selectedVehicleGroups.join(','));
+    } else if (channelSector && channelSector !== 'all') {
       params.set('sector', channelSector);
     }
     if (enableChannelDiscount && Number(channelDiscountValue) > 0) {
@@ -260,6 +291,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     vipCompanyName,
     vipPhone,
     channelSector,
+    selectedVehicleGroups,
     enableChannelDiscount,
     channelDiscountValue,
     channelDiscountType,
@@ -1309,30 +1341,99 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                   )}
                 </div>
 
-                {/* Sağ Kutu: Sektör Filtresi & İsteğe Bağlı Özel İndirim Tanımlama */}
+                {/* Sağ Kutu: Çoklu Araç Grubu Seçici & İsteğe Bağlı Özel İndirim Tanımlama */}
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '8px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.73rem', fontWeight: 800, color: '#94a3b8', marginBottom: '4px' }}>
-                      Açılışta Gösterilecek Araç / Sektör Vitrini:
-                    </label>
-                    <select
-                      value={channelSector}
-                      onChange={(e) => setChannelSector(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        background: 'rgba(2, 6, 23, 0.85)',
-                        border: '1px solid rgba(148, 163, 184, 0.3)',
-                        color: '#f8fafc',
-                        fontSize: '0.78rem',
-                        fontWeight: 700
-                      }}
-                    >
-                      {SECTOR_OPTIONS.map(s => (
-                        <option key={s.id} value={s.id}>{s.label}</option>
-                      ))}
-                    </select>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px', flexWrap: 'wrap', gap: '4px' }}>
+                      <label style={{ fontSize: '0.74rem', fontWeight: 900, color: '#38bdf8' }}>
+                        🚛 Linkte Hangi Araç Grupları Gözüksün?
+                      </label>
+                      <span style={{ fontSize: '0.66rem', color: selectedVehicleGroups.length > 0 ? '#4ade80' : '#94a3b8', fontWeight: 800 }}>
+                        {selectedVehicleGroups.length === 0
+                          ? '🌟 Tüm Araç Grupları Açık'
+                          : `🔒 Sadece ${selectedVehicleGroups.length} Grup Gösterilecek`}
+                      </span>
+                    </div>
+
+                    {/* Hızlı Hazır Paketler (Örn: Beton Santrali = S-Way + T-Way + Daily) */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '7px' }}>
+                      {VEHICLE_GROUP_PRESETS.map(preset => {
+                        const isPresetActive =
+                          preset.groups.length === selectedVehicleGroups.length &&
+                          preset.groups.every(g => selectedVehicleGroups.includes(g));
+                        return (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVehicleGroups(preset.groups);
+                              setChannelSector('all');
+                            }}
+                            style={{
+                              padding: '4px 7px',
+                              borderRadius: '6px',
+                              border: isPresetActive ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.12)',
+                              background: isPresetActive ? 'rgba(245, 158, 11, 0.25)' : 'rgba(2, 6, 23, 0.65)',
+                              color: isPresetActive ? '#fde047' : '#cbd5e1',
+                              fontSize: '0.66rem',
+                              fontWeight: 800,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {preset.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Tek Tek Araç Grubu Seçme Kutucukları */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                      gap: '5px'
+                    }}>
+                      {VEHICLE_GROUP_OPTIONS.map(grp => {
+                        const isChecked = selectedVehicleGroups.length === 0 || selectedVehicleGroups.includes(grp.id);
+                        const isExplicitlyPicked = selectedVehicleGroups.includes(grp.id);
+                        return (
+                          <button
+                            key={grp.id}
+                            type="button"
+                            onClick={() => toggleVehicleGroup(grp.id)}
+                            style={{
+                              padding: '6px 8px',
+                              borderRadius: '7px',
+                              border: isExplicitlyPicked
+                                ? '1.5px solid #22c55e'
+                                : isChecked
+                                  ? '1px solid rgba(56, 189, 248, 0.35)'
+                                  : '1px solid rgba(255,255,255,0.08)',
+                              background: isExplicitlyPicked
+                                ? 'rgba(16, 185, 129, 0.22)'
+                                : isChecked
+                                  ? 'rgba(15, 23, 42, 0.85)'
+                                  : 'rgba(2, 6, 23, 0.45)',
+                              color: isChecked ? '#f8fafc' : '#64748b',
+                              fontSize: '0.7rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '4px',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {grp.label}
+                            </span>
+                            <span style={{ color: isChecked ? '#4ade80' : '#475569', fontSize: '0.72rem', fontWeight: 900 }}>
+                              {isChecked ? '✓' : '○'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Bu Linke Özel İndirim / Oran Aç-Kapat */}

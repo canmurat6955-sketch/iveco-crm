@@ -49,7 +49,7 @@ function isSharedPortalVisit(location) {
   const search = location?.search || '';
   if (search) {
     const params = new URLSearchParams(search);
-    const portalKeys = ['ref', 'src', 'source', 'partner', 'protokol', 'dernek', 'oda', 'cid', 'customer_id', 'company', 'firma', 'phone', 'tel', 'sector', 'model', 'arac', 'tab', 'discount', 'indirim', 'bank', 'banka'];
+    const portalKeys = ['ref', 'src', 'source', 'partner', 'protokol', 'dernek', 'oda', 'cid', 'customer_id', 'company', 'firma', 'phone', 'tel', 'sector', 'model', 'arac', 'tab', 'discount', 'indirim', 'bank', 'banka', 'groups', 'araclar'];
     if (portalKeys.some(k => params.has(k))) return true;
   }
   if (typeof document !== 'undefined' && document.referrer) {

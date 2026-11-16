@@ -203,7 +203,7 @@ export function resolvePartnerFromSearchParams(searchParams) {
  * Bir aracın fiyatına dernek/oda protokol indirimini uygular.
  */
 export function calculatePartnerVehiclePricing(vehicle, partnerProtocol, tcmbEurRate = 38.5) {
-  if (!vehicle || !partnerProtocol || vehicle.isCustomPrice || vehicle.segment === 'T-Way') {
+  if (!vehicle || !partnerProtocol || vehicle.isCustomPrice) {
     return null;
   }
 

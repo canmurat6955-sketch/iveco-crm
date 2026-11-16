@@ -548,7 +548,7 @@ const VEHICLE_CATALOG = [
     key: 'tway_12teker_540',
     category: 'hafriyat',
     categoryLabel: '🚜 12 Teker Hafriyat (T-Way)',
-    title: 'T-Way 12 Teker Hafriyat 540 BG (8x4)',
+    title: 'T-Way 12 Teker Ağır Hafriyat 540 BG (8x4)',
     fullTitle: 'IVECO T-Way AD 410T 54 (8x4 - 12 Teker 540 BG Ağır Hafriyat Damperi)',
     modelTitle: 'IVECO T-Way AD 410T 54 8x4 (12 Teker 540 BG Ağır Hafriyat)',
     series: 'T-Way 12 Teker 540',
@@ -571,42 +571,48 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/t-way-ad410t54-tipper.pdf',
     pdfName: 'Teknik Foy_T-Way_AD410T54_Rigid_8x4_Tipper.pdf',
-    priceRange: "Fiyatlandırma İçin Satış Sorumlusu ile Görüşün",
-    isTway: true,
-    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu ile Görüşün",
+    priceRange: '5.850.000 TL (Nakit) / 6.175.000 TL (Liste)',
+    campaignPriceText: '6.175.000 TL',
+    cashPriceText: '5.850.000 TL',
+    cashDiscountText: '325.000 TL',
+    currency: 'TRY',
+    isTway: false,
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
   {
     key: 'tway_12teker_460',
     category: 'hafriyat',
-    categoryLabel: '🚜 12 Teker Hafriyat (T-Way)',
-    title: 'T-Way 12 Teker Hafriyat 460 BG (8x4)',
-    fullTitle: 'IVECO T-Way AD 410T 46 (8x4 - 12 Teker 460 BG Hafriyat / Mikser)',
-    modelTitle: 'IVECO T-Way AD 410T 46 8x4 (12 Teker 460 BG Hafriyat)',
+    categoryLabel: '🔄 12 Teker Beton Mikseri (T-Way)',
+    title: 'T-Way 12 Teker Beton Mikseri 460 BG (8x4)',
+    fullTitle: 'IVECO T-Way AD 410T 46 (8x4 - 12 Teker 460 BG Beton Mikseri Şasisi)',
+    modelTitle: 'IVECO T-Way AD 410T 46 8x4 (12 Teker 460 BG Beton Mikseri Şasisi)',
     series: 'T-Way 12 Teker 460',
     wheelbase: '4350 - 4750 mm (10 mm Şasi)',
     payloadKg: 18000,
     volumeM3: 24,
-    badge: '8x4 Çift Çeker • 460 BG Cursor 11/13 • 12 Teker Hafriyat',
+    badge: '8x4 Çift Çeker • 460 BG Cursor 11/13 • 12 Teker Beton Mikseri',
     license: 'C Sınıfı Kamyon',
     kantarLimit: 32000,
     unladenWeight: 13800,
     kantarStatus: 'safe',
     kantarTitle: '32.000 kg Karayolları Kantarı / 50.000 kg Şantiye GVW',
-    kantarDesc: 'Cursor 11/13 (460 BG / 2.150 Nm Tork), 16 ileri Hi-Tronix, 8x4 çift çeker 4 aks, 20-24 m³ Hardox hafriyat damperi veya 10-12 m³ beton mikseri şasisi.',
+    kantarDesc: 'Cursor 11/13 (460 BG / 2.150 Nm Tork), 16 ileri Hi-Tronix, 8x4 çift çeker 4 aks, 10-12 m³ hazır beton mikseri üstyapısına tam uyumlu ağır şantiye şasisi.',
     dims: {
-      length: '640 cm (Damper Kasa)',
+      length: '10–12 m³ Beton Mikseri',
       width: '240 cm',
       height: '160 cm',
-      volume: '20.0 - 24.0 m³',
-      pallets: 'Hardox Damper / Mikser'
+      volume: '10 - 12 m³ Mikser',
+      pallets: 'Beton Mikseri Şasisi'
     },
     pdfUrl: '/specs/t-way-ad410t46b-mixer.pdf',
     pdfName: 'Teknik Foy_TW_Rigid_8x4_AD410T46.pdf',
-    priceRange: "Fiyatlandırma İçin Satış Sorumlusu ile Görüşün",
-    isTway: true,
-    consultPrompt: "Fiyatlandırma İçin Satış Sorumlusu ile Görüşün",
+    priceRange: '5.750.000 TL (Nakit) / 6.075.000 TL (Liste)',
+    campaignPriceText: '6.075.000 TL',
+    cashPriceText: '5.750.000 TL',
+    cashDiscountText: '325.000 TL',
+    currency: 'TRY',
+    isTway: false,
     defaultLoan: 3000000,
     bodyType: 'damper'
   },
@@ -667,6 +673,21 @@ export default function PublicVehicleFinder() {
   const nameParam = searchParams.get('name') || searchParams.get('yetkili') || '';
   const phoneParam = searchParams.get('phone') || searchParams.get('tel') || '';
   const sectorParam = searchParams.get('sector') || '';
+  const groupsParam = searchParams.get('groups') || searchParams.get('araclar') || '';
+  const allowedGroups = useMemo(() => {
+    if (!groupsParam) return [];
+    const tokens = groupsParam.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+    const out = new Set();
+    tokens.forEach(t => {
+      if (t === 'daily' || t === 'daily35' || t === 'daily35_chassis' || t === 'kamyonet') out.add('daily35_chassis');
+      if (t === 'panelvan' || t === 'daily35_van' || t === 'van') out.add('daily35_van');
+      if (t === 'daily70' || t === '70c' || t === '72c') out.add('daily70');
+      if (t === 'eurocargo' || t === 'kamyon') out.add('eurocargo');
+      if (t === 'sway' || t === 's-way' || t === 'cekici' || t === 'tir') out.add('sway');
+      if (t === 'tway' || t === 't-way' || t === 'mikser' || t === 'hafriyat' || t === 'santiye') out.add('tway');
+    });
+    return Array.from(out);
+  }, [groupsParam]);
   const payloadParam = searchParams.get('payload') || searchParams.get('tonaj') || '';
   const volumeParam = searchParams.get('volume') || searchParams.get('hacim') || '';
   const bodyParam = searchParams.get('body') || searchParams.get('kasa') || '';
@@ -1444,15 +1465,34 @@ export default function PublicVehicleFinder() {
     return eurBankPresets.find(p => p.id === selectedEurCampaignId) || eurBankPresets[0] || null;
   }, [eurBankPresets, selectedEurCampaignId]);
 
-  // Model değişiminde EUR aracı (S-Way, T-Way) otomatik olarak Euro Kredisi modunu aktif eder
-  // (Ancak tek banka kilidi aktifse ve o bankanın Euro tablosu yoksa TRY modunda kalır)
+  // Eğer linkte sadece belirli araç grupları (?groups=...) seçilmişse, Araç Seçici'de ilk seçili grubun aracını varsayılan yap
+  useEffect(() => {
+    if (allowedGroups.length > 0 && !modelParam && !selectedModelKey) {
+      const firstGroup = allowedGroups[0];
+      const mapDefault = {
+        tway: 'tway_12teker_460',
+        sway: 'tractor_sway',
+        daily35_chassis: 'chassis_35c',
+        daily35_van: 'panelvan_16',
+        daily70: 'truck_72c',
+        eurocargo: 'truck_150e'
+      };
+      if (mapDefault[firstGroup]) {
+        setSelectedModelKey(mapDefault[firstGroup]);
+      }
+    }
+  }, [allowedGroups, modelParam, selectedModelKey]);
+
+  // Model değişiminde EUR aracı (S-Way vb.) Euro Kredisi moduna, TL aracı (Daily, Eurocargo, 12 Teker T-Way) TL Kredisi moduna geçer
   useEffect(() => {
     if (lockedBank && !lockedBank.hasEurCampaigns) {
       setLoanCurrencyMode('TRY');
       return;
     }
-    if (matched && (matched.currency === 'EUR' || matched.key === 'tractor_sway' || (matched.key && matched.key.startsWith('tway_')))) {
+    if (matched && (matched.currency === 'EUR' || matched.key === 'tractor_sway')) {
       setLoanCurrencyMode('EUR');
+    } else if (matched && matched.currency === 'TRY') {
+      setLoanCurrencyMode('TRY');
     }
   }, [matched?.key, matched?.currency, lockedBank]);
 
@@ -3217,6 +3257,7 @@ IVECO ERC Samsun Otomotiv
         <div style={{ maxWidth: '1080px', margin: '0 auto 30px' }}>
           <PricingCatalogTab
             initialSector={sectorParam || activePartner?.defaultSector || ''}
+            allowedGroups={allowedGroups}
             partnerProtocol={activePartner}
             lockedBank={lockedBank}
             onOpenLoanTab={() => {
@@ -3299,9 +3340,10 @@ IVECO ERC Samsun Otomotiv
 
       {/* ── SEKME 1: ÇOK BASİT TEK EKRANLI KOLAY ARAÇ & KREDİ SEÇİCİ (KARMAŞIK SÜRGÜ YOK, ADIM DUVARI YOK) ── */}
       {activeMainTab === 'secici' && (() => {
-        const SIMPLE_GROUPS = [
+        const ALL_SIMPLE_GROUPS = [
           {
             id: 'kamyonet',
+            groupCode: 'daily35_chassis',
             title: '3.5 Ton Kamyonet',
             subtitle: 'B Ehliyet • Kasa Konulur',
             desc: 'Şehir içi serbest girer, otomobil ehliyetiyle kullanılır (1.5 - 3.5 Ton yük)',
@@ -3314,6 +3356,7 @@ IVECO ERC Samsun Otomotiv
           },
           {
             id: 'panelvan',
+            groupCode: 'daily35_van',
             title: 'Kapalı Panelvan',
             subtitle: 'B Ehliyet • Hazır Sac Kasa',
             desc: 'Kargo, market, gıda ve koli dağıtımı için hazır kapalı sac gövde',
@@ -3327,6 +3370,7 @@ IVECO ERC Samsun Otomotiv
           },
           {
             id: 'daily70',
+            groupCode: 'daily70',
             title: '7 Ton Kamyon (70C)',
             subtitle: 'C Ehliyet • 4.8 Ton Net Yük',
             desc: 'Resmi kantardan 7.970 kg ile geçer, 6.20 metreye kadar uzun kasa olur',
@@ -3338,6 +3382,7 @@ IVECO ERC Samsun Otomotiv
           },
           {
             id: 'eurocargo',
+            groupCode: 'eurocargo',
             title: 'Büyük Kamyon (10–18 Ton)',
             subtitle: 'C Ehliyet • Eurocargo',
             desc: '6.5 Tondan 16 Tona kadar ağır yük taşıyan 6 teker ve 10 teker kamyonlar',
@@ -3353,6 +3398,7 @@ IVECO ERC Samsun Otomotiv
           },
           {
             id: 'cekici',
+            groupCode: 'sway',
             title: 'Tır Çekici (S-Way)',
             subtitle: 'CE Ehliyet • Uzun Yol Tır',
             desc: '40 Ton dorse çekici • Yurtiçi ve uluslararası nakliye filoları (500 / 530 / 580 BG)',
@@ -3364,21 +3410,26 @@ IVECO ERC Samsun Otomotiv
           },
           {
             id: 'hafriyat',
-            title: 'Damper & Şantiye (T-Way)',
-            subtitle: 'C Ehliyet • 10 & 12 Teker',
-            desc: 'Hafriyat, kaya damperi, maden ve hazır beton mikseri için ağır şantiye kamyonu',
+            groupCode: 'tway',
+            title: 'Mikser & Hafriyat (T-Way)',
+            subtitle: '12 Teker & 10 Teker Şantiye',
+            desc: '12 Teker Beton Mikseri (5.750.000 TL Nakit) ve 12 Teker Hafriyat Damperi (5.850.000 TL Nakit)',
             image: '/vehicles/tway-damper.jpg',
-            defaultKey: 'tway_10teker_540',
+            defaultKey: 'tway_12teker_460',
             options: [
-              { key: 'tway_10teker_540', label: '🚜 10 Teker 540 BG (6x4)', sub: '26 Ton Kantar' },
-              { key: 'tway_10teker_460', label: '🚜 10 Teker 460 BG (6x4)', sub: '26 Ton Kantar' },
-              { key: 'tway_12teker_540', label: '🚜 12 Teker 540 BG (8x4)', sub: '32 Ton Kantar' },
-              { key: 'tway_12teker_460', label: '🚜 12 Teker 460 BG (8x4)', sub: '32 Ton Kantar' }
+              { key: 'tway_12teker_460', label: '🔄 12 Teker Beton Mikseri 460 BG (8x4)', sub: '5.750.000 TL Nakit / 6.075.000 TL Liste' },
+              { key: 'tway_12teker_540', label: '🚜 12 Teker Ağır Hafriyat 540 BG (8x4)', sub: '5.850.000 TL Nakit / 6.175.000 TL Liste' },
+              { key: 'tway_10teker_540', label: '🚜 10 Teker Hafriyat 540 BG (6x4)', sub: '26 Ton Kantar (Özel Proje)' },
+              { key: 'tway_10teker_460', label: '🚜 10 Teker Hafriyat 460 BG (6x4)', sub: '26 Ton Kantar (Özel Proje)' }
             ]
           }
         ];
 
-        const activeGroup = SIMPLE_GROUPS.find(g => g.options.some(o => o.key === matched.modelKey)) || SIMPLE_GROUPS[0];
+        const SIMPLE_GROUPS = allowedGroups.length > 0
+          ? ALL_SIMPLE_GROUPS.filter(g => allowedGroups.includes(g.groupCode))
+          : ALL_SIMPLE_GROUPS;
+
+        const activeGroup = SIMPLE_GROUPS.find(g => g.options.some(o => o.key === matched.modelKey)) || SIMPLE_GROUPS[0] || ALL_SIMPLE_GROUPS[0];
 
         return (
           <div style={{
