@@ -2100,12 +2100,12 @@ IVECO ERC Samsun Otomotiv
       background: 'radial-gradient(ellipse at 50% 0%, #233d63 0%, #192d4b 48%, #13233b 100%)',
       color: '#f1f5f9',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-      padding: isMobileView ? '12px 10px 60px' : '16px 12px 60px'
+      padding: isMobileView ? 'max(18px, calc(env(safe-area-inset-top, 18px) + 10px)) 10px 88px' : '16px 12px 60px'
     }}>
       <Toaster position="top-center" />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
-      <div style={{ maxWidth: '680px', margin: '0 auto 20px', textAlign: 'center' }}>
+      <div style={{ maxWidth: '680px', margin: isMobileView ? '0 auto 8px' : '0 auto 20px', textAlign: 'center' }}>
         
         {/* Can Murat Onay VIP Test & Canlı Simülasyon Dock'u (Sadece ?admin=true olduğunda) */}
         {isAdminMode && showTestPanel && (
@@ -2434,21 +2434,21 @@ IVECO ERC Samsun Otomotiv
         )}
 
         {isMobileView ? (
-          /* ── MOBİL SADE ÜST KART (TAM OKUNAKLI TEMSİLCİ & TEK TIK İLETİŞİM) ── */
+          /* ── MOBİL KOMPAKT ÜST KİMLİK KARTI (ALTTAKİ BUTONLARI TEKRARLAMAZ, EKRAN YERİ KAZANDIRIR) ── */
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
-            marginBottom: '6px'
+            gap: '6px',
+            marginBottom: '2px'
           }}>
             {isVipCustomer && (
               <div style={{
-                background: 'rgba(2, 132, 199, 0.18)',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
+                background: 'rgba(2, 132, 199, 0.22)',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
                 borderRadius: '10px',
-                padding: '7px 12px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
+                padding: '6px 10px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
                 color: '#f8fafc',
                 textAlign: 'left'
               }}>
@@ -2456,91 +2456,47 @@ IVECO ERC Samsun Otomotiv
               </div>
             )}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(30, 52, 86, 0.94) 0%, rgba(18, 48, 89, 0.88) 100%)',
-              border: '1px solid rgba(56, 189, 248, 0.42)',
-              borderRadius: '14px',
-              padding: '10px 12px',
+              background: '#0f172a',
+              border: '1.5px solid rgba(56, 189, 248, 0.48)',
+              borderRadius: '12px',
+              padding: '8px 11px',
               display: 'flex',
-              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               gap: '8px',
-              boxShadow: '0 6px 20px rgba(8, 15, 30, 0.25)'
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)'
             }}>
-              {/* Üst Satır: IVECO Logosu + Satış Sorumlusu Can Murat Bilgisi */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', textAlign: 'left' }}>
-                  <div style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 900,
-                    fontSize: '0.82rem',
-                    flexShrink: 0,
-                    border: '1px solid rgba(56, 189, 248, 0.4)'
-                  }}>
-                    {SALES_REP.initials}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left', minWidth: 0 }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #004B93 100%)',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: '0.76rem',
+                  flexShrink: 0,
+                  border: '1px solid rgba(56, 189, 248, 0.5)'
+                }}>
+                  {SALES_REP.initials}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: '0.84rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {SALES_REP.name}
                   </div>
-                  <div>
-                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
-                      {SALES_REP.name}
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: '#7dd3fc', fontWeight: 700, marginTop: '1px' }}>
-                      IVECO ERC Samsun · {SALES_REP.phoneDisplay}
-                    </div>
+                  <div style={{ fontSize: '0.69rem', color: '#4ade80', fontWeight: 800, marginTop: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    IVECO ERC Samsun · {SALES_REP.phoneDisplay}
                   </div>
                 </div>
-                <img
-                  src="/logo-iveco-white.png"
-                  alt="IVECO"
-                  style={{ height: '16px', width: 'auto', maxWidth: '78px', objectFit: 'contain', flexShrink: 0, opacity: 0.95 }}
-                />
               </div>
-
-              {/* Alt Satır: Tam Genişlik Hızlı Ara & WhatsApp Butonları */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <a
-                  href={`tel:${SALES_REP.phoneClean}`}
-                  style={{
-                    background: '#0284c7',
-                    color: '#fff',
-                    borderRadius: '10px',
-                    padding: '9px 10px',
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <FiPhone size={14} /> Hemen Ara
-                </a>
-                <button
-                  type="button"
-                  onClick={handleDirectWhatsApp}
-                  style={{
-                    background: '#22c55e',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '9px 10px',
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <FiMessageSquare size={14} /> WhatsApp
-                </button>
-              </div>
+              <img
+                src="/logo-iveco-white.png"
+                alt="IVECO"
+                style={{ height: '15px', width: 'auto', maxWidth: '68px', objectFit: 'contain', flexShrink: 0 }}
+              />
             </div>
           </div>
         ) : (
@@ -4699,7 +4655,7 @@ IVECO ERC Samsun Otomotiv
         </p>
       </div>
 
-      {/* ── 📱 MOBİL SABİT HIZLI İLETİŞİM BARI (SADECE 2 NET BUTON: HEMEN ARA & WHATSAPP) ── */}
+      {/* ── 📱 MOBİL SABİT HIZLI İLETİŞİM BARI (TEK BAR: ÜST ÜSTE BİNMEZ, NET 2 BUTON) ── */}
       {isMobileView && !showSendModal && (
         <div style={{
           position: 'fixed',
@@ -4707,62 +4663,82 @@ IVECO ERC Samsun Otomotiv
           left: 0,
           right: 0,
           zIndex: 9980,
-          background: 'rgba(11, 21, 38, 0.96)',
+          background: 'rgba(11, 21, 38, 0.97)',
           backdropFilter: 'blur(12px)',
-          borderTop: '1.5px solid rgba(56, 189, 248, 0.42)',
+          borderTop: '1.5px solid rgba(34, 197, 94, 0.5)',
           boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.65)',
-          padding: '8px 10px calc(8px + env(safe-area-inset-bottom, 0px))',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.3fr',
-          gap: '8px',
-          alignItems: 'center'
+          padding: '6px 10px calc(8px + env(safe-area-inset-bottom, 0px))',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '5px'
         }}>
-          <a
-            href={`tel:${SALES_REP.phoneClean}`}
-            onClick={() => recordCustomerFootprint('Mobil Alt Bar: Telefonla Ara', matched?.modelTitle, SALES_REP.phoneDisplay)}
-            style={{
-              background: '#0284c7',
-              color: '#fff',
-              borderRadius: '10px',
-              padding: '11px 8px',
-              fontSize: '0.8rem',
-              fontWeight: 900,
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <FiPhone size={14} /> Hemen Ara
-          </a>
+          <div style={{
+            fontSize: '0.67rem',
+            fontWeight: 800,
+            color: '#86efac',
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            🔥 Peşin, takaslı veya referanslı alıma özel ekstra bayi iskontosu (son dip fiyat) tanımlıdır
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              recordCustomerFootprint('Mobil Alt Bar: WhatsApp Görüşme', matched?.modelTitle, 'Doğrudan WhatsApp');
-              handleDirectWhatsApp();
-            }}
-            style={{
-              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '11px 8px',
-              fontSize: '0.8rem',
-              fontWeight: 900,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 3px 10px rgba(34, 197, 94, 0.35)'
-            }}
-          >
-            <FiMessageSquare size={15} /> WhatsApp (Can Murat)
-          </button>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.45fr',
+            gap: '8px',
+            alignItems: 'center'
+          }}>
+            <a
+              href={`tel:${SALES_REP.phoneClean}`}
+              onClick={() => recordCustomerFootprint('Mobil Alt Bar: Telefonla Ara', matched?.modelTitle, SALES_REP.phoneDisplay)}
+              style={{
+                background: '#0284c7',
+                color: '#fff',
+                borderRadius: '10px',
+                padding: '10px 8px',
+                fontSize: '0.78rem',
+                fontWeight: 900,
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FiPhone size={14} /> Hemen Ara
+            </a>
+
+            <button
+              type="button"
+              onClick={() => {
+                recordCustomerFootprint('Mobil Alt Bar: Son Dip Fiyat Soruldu', matched?.modelTitle, 'Doğrudan WhatsApp');
+                handleDirectWhatsApp(
+                  `Merhaba ${SALES_REP.name}, 2026 Fiyat Listesindeki araçlarınızı inceledim. Peşin, kredili veya takaslı alımda bana özel yapabileceğiniz son olur / dip fiyat ve ekstra bayi iskontosu nedir?`
+                );
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '10px 8px',
+                fontSize: '0.78rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 3px 10px rgba(34, 197, 94, 0.35)'
+              }}
+            >
+              <FiMessageSquare size={14} /> Son Dip Fiyatı Sor (WA)
+            </button>
+          </div>
         </div>
       )}
     </div>

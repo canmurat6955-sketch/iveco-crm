@@ -1157,7 +1157,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
 
       {/* 1. TEK ADIMLI SADE ARAÇ GRUBU SEÇİCİ */}
       {visibleCategories.length > 1 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: isMobileView ? '12px' : '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: isMobileView ? '8px' : '16px' }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -1165,8 +1165,8 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             flexWrap: 'wrap',
             gap: '6px'
           }}>
-            <div style={{ fontSize: isMobileView ? '0.82rem' : '0.9rem', fontWeight: 900, color: '#fde047' }}>
-              👇 Hangi Araç Grubuna Bakıyorsunuz? (Gruba Dokunun):
+            <div style={{ fontSize: isMobileView ? '0.78rem' : '0.9rem', fontWeight: 900, color: '#fde047' }}>
+              👇 Hangi Araç Grubuna Bakıyorsunuz?
             </div>
             <button
               type="button"
@@ -1175,21 +1175,21 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                 background: selectedCategory === 'all' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(15, 23, 42, 0.7)',
                 color: selectedCategory === 'all' ? '#7dd3fc' : '#cbd5e1',
                 border: '1px solid rgba(148, 163, 184, 0.3)',
-                borderRadius: '8px',
-                padding: '4px 10px',
-                fontSize: '0.7rem',
+                borderRadius: '7px',
+                padding: '3px 9px',
+                fontSize: '0.68rem',
                 fontWeight: 800,
                 cursor: 'pointer'
               }}
             >
-              {selectedCategory === 'all' ? '✓ Tüm Modeller Açık' : 'Tüm Modelleri Alt Alta Gör'}
+              {selectedCategory === 'all' ? '✓ Tümü Açık' : 'Tümünü Listele'}
             </button>
           </div>
 
           <div style={isMobileView ? {
             display: 'grid',
             gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-            gap: '8px'
+            gap: '6px'
           } : {
             display: 'grid',
             gridTemplateColumns: `repeat(${visibleCategories.length}, minmax(0, 1fr))`,
@@ -1206,6 +1206,14 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     if (onTrackFootprint) {
                       onTrackFootprint('Araç Grubu Seçildi', cat.title, cat.licenseBadge);
                     }
+                    if (isMobileView) {
+                      setTimeout(() => {
+                        const anchor = document.getElementById('vehicle-cards-grid-anchor');
+                        if (anchor) {
+                          anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }, 60);
+                    }
                   }}
                   style={{
                     background: isSelected
@@ -1213,8 +1221,8 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       : 'rgba(30, 48, 80, 0.92)',
                     color: '#fff',
                     border: isSelected ? '2px solid #fde047' : '1px solid rgba(148, 163, 184, 0.32)',
-                    borderRadius: '12px',
-                    padding: isMobileView ? '8px 7px' : '8px 8px',
+                    borderRadius: '11px',
+                    padding: isMobileView ? '6px 6px' : '8px 8px',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.18s',
@@ -1222,17 +1230,17 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '5px',
+                    gap: isMobileView ? '4px' : '5px',
                     minWidth: 0,
-                    boxShadow: isSelected ? '0 6px 18px rgba(2, 132, 199, 0.4)' : '0 2px 6px rgba(0, 0, 0, 0.18)'
+                    boxShadow: isSelected ? '0 4px 14px rgba(2, 132, 199, 0.4)' : '0 2px 6px rgba(0, 0, 0, 0.18)'
                   }}
                 >
                   <div style={{
                     width: '100%',
-                    height: isMobileView ? '46px' : '44px',
+                    height: isMobileView ? '34px' : '44px',
                     background: '#ffffff',
-                    borderRadius: '8px',
-                    padding: '2px 6px',
+                    borderRadius: '7px',
+                    padding: '2px 5px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1265,10 +1273,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     width: '100%'
                   }}>
                     <span style={{
-                      fontSize: isMobileView ? '0.8rem' : '0.78rem',
+                      fontSize: isMobileView ? '0.76rem' : '0.78rem',
                       fontWeight: 900,
                       color: isSelected ? '#fde047' : '#ffffff',
-                      lineHeight: 1.2,
+                      lineHeight: 1.15,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -1277,10 +1285,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       {cat.title}
                     </span>
                     <span style={{
-                      fontSize: isMobileView ? '0.67rem' : '0.65rem',
+                      fontSize: isMobileView ? '0.63rem' : '0.65rem',
                       fontWeight: 700,
                       color: isSelected ? '#e0f2fe' : '#93c5fd',
-                      lineHeight: 1.15,
+                      lineHeight: 1.1,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -1296,31 +1304,34 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         </div>
       )}
 
-      {/* 🎟️ ÖZEL BAYİ / REFERANS İSKONTOSU MERAK KANCASI BANNERI */}
+      {/* 🎟️ ÖZEL BAYİ / REFERANS İSKONTOSU MERAK KANCASI BANNERI (Mobilde Kompakt 2 Satır) */}
+      <div id="vehicle-cards-grid-anchor" style={{ scrollMarginTop: '12px' }} />
       {referralBannerInfo && (
         <div style={{
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.94) 100%)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(15, 23, 42, 0.94) 100%)',
           border: '1.5px solid rgba(16, 185, 129, 0.5)',
-          borderRadius: '12px',
-          padding: isMobileView ? '10px 12px' : '11px 16px',
-          marginBottom: isMobileView ? '12px' : '14px',
+          borderRadius: '11px',
+          padding: isMobileView ? '8px 10px' : '11px 16px',
+          marginBottom: isMobileView ? '10px' : '14px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '10px',
-          boxShadow: '0 4px 16px rgba(16, 185, 129, 0.15)'
+          flexWrap: isMobileView ? 'nowrap' : 'wrap',
+          gap: '8px',
+          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.14)'
         }}>
-          <div style={{ flex: '1 1 260px' }}>
-            <div style={{ fontSize: '0.68rem', fontWeight: 900, color: '#4ade80', letterSpacing: '0.3px' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: isMobileView ? '0.65rem' : '0.68rem', fontWeight: 900, color: '#4ade80', letterSpacing: '0.2px' }}>
               {referralBannerInfo.badge}
             </div>
-            <div style={{ fontSize: isMobileView ? '0.84rem' : '0.9rem', fontWeight: 900, color: '#ffffff', marginTop: '2px' }}>
+            <div style={{ fontSize: isMobileView ? '0.76rem' : '0.9rem', fontWeight: 900, color: '#ffffff', marginTop: '1px', lineHeight: 1.25 }}>
               {referralBannerInfo.title}
             </div>
-            <div style={{ fontSize: '0.73rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.35 }}>
-              {referralBannerInfo.desc}
-            </div>
+            {!isMobileView && (
+              <div style={{ fontSize: '0.73rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.35 }}>
+                {referralBannerInfo.desc}
+              </div>
+            )}
           </div>
 
           <button
@@ -1333,19 +1344,20 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
               background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
               color: '#ffffff',
               border: 'none',
-              borderRadius: '9px',
-              padding: '9px 14px',
-              fontSize: '0.76rem',
+              borderRadius: '8px',
+              padding: isMobileView ? '7px 10px' : '9px 14px',
+              fontSize: isMobileView ? '0.7rem' : '0.76rem',
               fontWeight: 900,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
               whiteSpace: 'nowrap',
-              boxShadow: '0 4px 12px rgba(34, 197, 94, 0.35)'
+              flexShrink: 0,
+              boxShadow: '0 3px 10px rgba(34, 197, 94, 0.35)'
             }}
           >
-            <FiMessageSquare size={14} /> Özel Dip Fiyatımı Sor (Can Murat)
+            <FiMessageSquare size={13} /> {isMobileView ? 'Dip Fiyat Sor' : 'Özel Dip Fiyatımı Sor (Can Murat)'}
           </button>
         </div>
       )}
@@ -1990,12 +2002,12 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         </div>
       )}
 
-      {/* 👋 12. SANİYEDE ALTTAN ÇIKAN AKILLI CAN MURAT ÖZEL TEKLİF ÇUBUĞU */}
-      {showSmartNudge && !dismissedSmartNudge && (
+      {/* 👋 12. SANİYEDE ALTTAN ÇIKAN AKILLI CAN MURAT ÖZEL TEKLİF ÇUBUĞU (Sadece Masaüstünde; Mobilde Sabit Alt Barda Entegre) */}
+      {showSmartNudge && !dismissedSmartNudge && !isMobileView && (
         <div style={{
           position: 'fixed',
-          bottom: isMobileView ? '10px' : '16px',
-          left: isMobileView ? '10px' : '50%',
+          bottom: '16px',
+          left: '50%',
           right: isMobileView ? '10px' : 'auto',
           transform: isMobileView ? 'none' : 'translateX(-50%)',
           width: isMobileView ? 'auto' : 'min(92vw, 680px)',
