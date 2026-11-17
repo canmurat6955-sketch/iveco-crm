@@ -455,19 +455,21 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         }
       }
 
-      // Category filter
-      if (selectedCategory === 'daily35_chassis') {
-        if (v.segment !== 'Daily 35' || v.category.includes('Panelvan')) return false;
-      } else if (selectedCategory === 'daily35_van') {
-        if (v.segment !== 'Daily 35' || !v.category.includes('Panelvan')) return false;
-      } else if (selectedCategory === 'daily70') {
-        if (v.segment !== 'Daily 70 C' && v.segment !== 'Daily 70' && !v.segment.includes('70') && !v.segment.includes('72')) return false;
-      } else if (selectedCategory === 'eurocargo') {
-        if (v.segment !== 'Eurocargo') return false;
-      } else if (selectedCategory === 'sway') {
-        if (v.segment !== 'S-Way') return false;
-      } else if (selectedCategory === 'tway') {
-        if (v.segment !== 'T-Way') return false;
+      // Category filter (Arama kutusuna bir şey yazıldığında tüm gruplarda arar!)
+      if (!searchQuery.trim()) {
+        if (selectedCategory === 'daily35_chassis') {
+          if (v.segment !== 'Daily 35' || v.category.includes('Panelvan')) return false;
+        } else if (selectedCategory === 'daily35_van') {
+          if (v.segment !== 'Daily 35' || !v.category.includes('Panelvan')) return false;
+        } else if (selectedCategory === 'daily70') {
+          if (v.segment !== 'Daily 70 C' && v.segment !== 'Daily 70' && !v.segment.includes('70') && !v.segment.includes('72')) return false;
+        } else if (selectedCategory === 'eurocargo') {
+          if (v.segment !== 'Eurocargo') return false;
+        } else if (selectedCategory === 'sway') {
+          if (v.segment !== 'S-Way') return false;
+        } else if (selectedCategory === 'tway') {
+          if (v.segment !== 'T-Way') return false;
+        }
       }
 
       // Double wheel filter
@@ -477,15 +479,18 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         }
       }
 
-      // Search query
+      // Search query (Hem halk dili başlığında hem fabrika kodunda arar)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
+        const friendly = getFriendlyVehicleDisplay(v);
+        const matchFriendlyTitle = (friendly.title || '').toLowerCase().includes(q);
+        const matchFriendlySub = (friendly.subtitle || '').toLowerCase().includes(q);
         const matchModel = v.model.toLowerCase().includes(q);
         const matchCat = v.category.toLowerCase().includes(q);
         const matchEngine = (v.engine || '').toLowerCase().includes(q);
         const matchPower = (v.power || '').toLowerCase().includes(q);
         const matchTrans = (v.transmission || '').toLowerCase().includes(q);
-        if (!matchModel && !matchCat && !matchEngine && !matchPower && !matchTrans) return false;
+        if (!matchFriendlyTitle && !matchFriendlySub && !matchModel && !matchCat && !matchEngine && !matchPower && !matchTrans) return false;
       }
 
       return true;
@@ -1154,6 +1159,64 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         )}
       </div>
       )}
+
+      {/* 🔍 HIZLI ARAÇ / TONAJ / MODEL ARAMA ÇUBUĞU (Kaybolmaz, Her Zaman Görünür) */}
+      <div style={{
+        position: 'relative',
+        marginBottom: isMobileView ? '8px' : '12px'
+      }}>
+        <FiSearch
+          size={15}
+          color="#38bdf8"
+          style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none'
+          }}
+        />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Hızlı Araç, Tonaj veya Model Ara (Örn: 7 Ton, Mikser, Panelvan, Otomatik)..."
+          style={{
+            width: '100%',
+            padding: isMobileView ? '9px 34px 9px 34px' : '10px 36px 10px 36px',
+            background: 'rgba(15, 23, 42, 0.92)',
+            border: '1.5px solid rgba(56, 189, 248, 0.42)',
+            borderRadius: '10px',
+            color: '#ffffff',
+            fontSize: isMobileView ? '0.78rem' : '0.84rem',
+            fontWeight: 700,
+            outline: 'none',
+            boxSizing: 'border-box'
+          }}
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            style={{
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'rgba(255,255,255,0.12)',
+              border: 'none',
+              color: '#cbd5e1',
+              borderRadius: '6px',
+              padding: '2px 7px',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
       {/* 1. TEK ADIMLI SADE ARAÇ GRUBU SEÇİCİ */}
       {visibleCategories.length > 1 && (

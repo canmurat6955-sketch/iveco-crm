@@ -1,4 +1,4 @@
-const CACHE_NAME = 'erc-portal-cache-v6';
+const CACHE_NAME = 'erc-portal-cache-v8';
 const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/favicon.ico',
@@ -43,8 +43,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const isHtmlNav = event.request.mode === 'navigate' || (event.request.headers.get('accept') || '').includes('text/html');
+  const fetchReq = isHtmlNav ? new Request(event.request.url, { cache: 'no-cache' }) : event.request;
+
   event.respondWith(
-    fetch(event.request)
+    fetch(fetchReq)
       .then((response) => {
         // Cache successful network responses
         if (response && response.status === 200) {

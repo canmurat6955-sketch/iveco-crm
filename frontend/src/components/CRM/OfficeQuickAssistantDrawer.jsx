@@ -56,8 +56,9 @@ export default function OfficeQuickAssistantDrawer() {
 
   // Cheatsheet state
   const [priceSearch, setPriceSearch] = useState('');
+  const [isMobileView, setIsMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
 
-  // Klavye kısayolu: Alt + K
+  // Klavye kısayolu: Alt + K ve Mobil Üst Bar Tetikleyicisi
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.altKey && (e.key === 'k' || e.key === 'K')) {
@@ -65,8 +66,16 @@ export default function OfficeQuickAssistantDrawer() {
         setIsOpen(prev => !prev);
       }
     };
+    const onOpenCustom = () => setIsOpen(true);
+    const onResize = () => setIsMobileView(window.innerWidth <= 768);
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener('open-office-quick-assistant', onOpenCustom);
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('open-office-quick-assistant', onOpenCustom);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
   // Yazılan/yapıştırılan metinden telefon veya isim ayıkla ve CRM'de ara
@@ -204,42 +213,44 @@ export default function OfficeQuickAssistantDrawer() {
 
   return (
     <>
-      {/* Sağ Alt Sabit Hızlı Asistan Butonu */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        title="Hızlı Görüşme Kaydı & Telefon Kopya Kağıdı (Kısayol: Alt + K)"
-        style={{
-          position: 'fixed',
-          right: '20px',
-          bottom: '20px',
-          zIndex: 1100,
-          background: 'linear-gradient(135deg, #0284c7 0%, #0f172a 100%)',
-          color: '#f8fafc',
-          border: '1.5px solid rgba(56, 189, 248, 0.55)',
-          borderRadius: '999px',
-          padding: '11px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '9px',
-          fontWeight: 800,
-          fontSize: '0.82rem',
-          cursor: 'pointer',
-          boxShadow: '0 10px 28px rgba(2, 132, 199, 0.38)'
-        }}
-      >
-        <FiPhoneCall size={16} color="#38bdf8" />
-        <span>📞 Hızlı Görüşme Kaydı & Kopya Kağıdı</span>
-        <span style={{
-          background: 'rgba(56, 189, 248, 0.2)',
-          color: '#7dd3fc',
-          padding: '2px 6px',
-          borderRadius: '6px',
-          fontSize: '0.68rem'
-        }}>
-          Alt+K
-        </span>
-      </button>
+      {/* Sağ Alt Sabit Hızlı Asistan Butonu (Sadece Masaüstünde; Mobilde Üst Sabit Arama Barının Yanındadır) */}
+      {!isMobileView && (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          title="Hızlı Görüşme Kaydı & Telefon Kopya Kağıdı (Kısayol: Alt + K)"
+          style={{
+            position: 'fixed',
+            right: '20px',
+            bottom: '20px',
+            zIndex: 1100,
+            background: 'linear-gradient(135deg, #0284c7 0%, #0f172a 100%)',
+            color: '#f8fafc',
+            border: '1.5px solid rgba(56, 189, 248, 0.55)',
+            borderRadius: '999px',
+            padding: '11px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '9px',
+            fontWeight: 800,
+            fontSize: '0.82rem',
+            cursor: 'pointer',
+            boxShadow: '0 10px 28px rgba(2, 132, 199, 0.38)'
+          }}
+        >
+          <FiPhoneCall size={16} color="#38bdf8" />
+          <span>📞 Hızlı Görüşme Kaydı & Kopya Kağıdı</span>
+          <span style={{
+            background: 'rgba(56, 189, 248, 0.2)',
+            color: '#7dd3fc',
+            padding: '2px 6px',
+            borderRadius: '6px',
+            fontSize: '0.68rem'
+          }}>
+            Alt+K
+          </span>
+        </button>
+      )}
 
       {/* Sağ Çekmece (Drawer) */}
       {isOpen && (
@@ -271,7 +282,9 @@ export default function OfficeQuickAssistantDrawer() {
           >
             {/* Üst Başlık */}
             <div style={{
-              padding: '16px 18px',
+              padding: isMobileView
+                ? 'max(48px, calc(env(safe-area-inset-top, 40px) + 12px)) 16px 14px'
+                : '16px 18px',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               display: 'flex',
               justifyContent: 'space-between',

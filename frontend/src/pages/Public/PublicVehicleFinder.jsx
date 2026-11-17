@@ -2091,6 +2091,11 @@ IVECO ERC Samsun Otomotiv
     }
   };
 
+  const isIOSDevice = typeof navigator !== 'undefined' && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -2100,8 +2105,22 @@ IVECO ERC Samsun Otomotiv
       background: 'radial-gradient(ellipse at 50% 0%, #233d63 0%, #192d4b 48%, #13233b 100%)',
       color: '#f1f5f9',
       fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif",
-      padding: isMobileView ? 'max(18px, calc(env(safe-area-inset-top, 18px) + 10px)) 10px 88px' : '16px 12px 60px'
+      padding: isMobileView
+        ? `${isIOSDevice ? 'max(52px, calc(env(safe-area-inset-top, 44px) + 10px))' : 'max(18px, calc(env(safe-area-inset-top, 14px) + 10px))'} 10px 88px`
+        : '16px 12px 60px'
     }}>
+      {isMobileView && isIOSDevice && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 'max(46px, env(safe-area-inset-top, 46px))',
+          background: '#0f172a',
+          zIndex: 9990,
+          pointerEvents: 'none'
+        }} />
+      )}
       <Toaster position="top-center" />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}

@@ -79,7 +79,7 @@ export default function VehicleAISearchModal({ isOpen, onClose }) {
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(6px)',
       display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-      zIndex: 99999, padding: '3rem 1rem 1rem 1rem'
+      zIndex: 99999, padding: 'max(3.2rem, calc(env(safe-area-inset-top, 44px) + 12px)) 0.75rem 1rem'
     }}>
       <div className="modal-card animate-in" style={{
         background: '#0f172a', border: '1px solid rgba(59, 130, 246, 0.3)',
