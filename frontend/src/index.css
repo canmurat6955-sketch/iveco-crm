@@ -1117,8 +1117,10 @@ a:hover { text-decoration: underline; }
 .mobile-layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   background: var(--bg-primary);
 }
 
@@ -1903,6 +1905,23 @@ a:hover { text-decoration: underline; }
 }
 
 @media (max-width: 768px) {
+  html, body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .modal-overlay {
+    z-index: 1200;
+    padding: max(48px, calc(env(safe-area-inset-top, 40px) + 8px)) 10px max(16px, env(safe-area-inset-bottom, 16px));
+  }
+  .modal {
+    padding: 16px;
+    width: 96%;
+    max-height: calc(88dvh - env(safe-area-inset-top, 24px) - env(safe-area-inset-bottom, 16px));
+    border-radius: 14px;
+  }
+  .card {
+    padding: 14px;
+  }
   .hide-on-mobile {
     display: none !important;
   }

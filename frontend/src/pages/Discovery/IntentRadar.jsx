@@ -55,6 +55,13 @@ const SOURCE_META = {
   smmm_kanal: { label: 'Mali Müşavir / SMMM KDV Tablosu Linki', short: '👨‍💼 Mali Müşavir / SMMM', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
   mail_kurumsal: { label: 'Kurumsal E-Posta / Mail Teklif Linki', short: '📧 Kurumsal E-Posta', color: '#c084fc', bg: 'rgba(168, 85, 247, 0.18)', border: 'rgba(168, 85, 247, 0.45)' },
   banka_kanal: { label: 'Bankaya Özel Kredi Oranlı Link', short: '🏦 Banka Özel Linki', color: '#38bdf8', bg: 'rgba(2, 132, 199, 0.2)', border: 'rgba(56, 189, 248, 0.48)' },
+  kasaci_kanal: { label: 'Kasacı & Üstyapıcı Referans Linki', short: '🏗️ Kasacı / Üstyapıcı', color: '#fb923c', bg: 'rgba(249, 115, 22, 0.18)', border: 'rgba(249, 115, 22, 0.45)' },
+  beton_agrega: { label: 'Hazır Beton, Hafriyat & Şantiye Özel Linki', short: '🧱 Beton & Hafriyat', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
+  gida_toptan: { label: 'Market Zinciri, Hal & Gıda Dağıtım Linki', short: '🛒 Market & Gıda', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.18)', border: 'rgba(34, 197, 94, 0.45)' },
+  tarim_yem: { label: 'Un, Yem, Çeltik & Fındık Sektör Linki', short: '🌾 Un / Yem / Çeltik', color: '#fde047', bg: 'rgba(234, 179, 8, 0.18)', border: 'rgba(234, 179, 8, 0.45)' },
+  insaat_kereste: { label: 'Kereste, Demir & İnşaat Malzemesi Linki', short: '🪵 Kereste & İnşaat', color: '#f97316', bg: 'rgba(249, 115, 22, 0.18)', border: 'rgba(249, 115, 22, 0.45)' },
+  mobilya_nakliyat: { label: 'Evden Eve Nakliyat & Mobilya Linki', short: '🛋️ Mobilya & Nakliyat', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.18)', border: 'rgba(56, 189, 248, 0.45)' },
+  catering_dagitim: { label: 'Yemek Fabrikası (Catering) & Dağıtım Linki', short: '🍱 Catering & Dağıtım', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.18)', border: 'rgba(45, 212, 191, 0.45)' },
   yilsonu_kdv_tarama: { label: 'Yıl Sonu %20 KDV & Şasi Faturası Taraması', short: '🧾 Yıl Sonu KDV Taraması', color: '#fde047', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
   wa_muhasebe_paylasim: { label: 'Müşterinin Mali Müşavirine Gönderdiği KDV Özeti', short: '📤 Muhasebeciye İletilen KDV', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
   instagram: { label: 'Instagram Biyografi / Hikaye / Reels', short: '📸 Instagram', color: '#f472b6', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(236, 72, 153, 0.4)' },
@@ -75,6 +82,27 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   }
   if (combined.includes('mail_kurumsal') || combined.includes('ref=mail') || combined.includes('e-posta ziyaretçisi')) {
     return SOURCE_META.mail_kurumsal;
+  }
+  if (combined.includes('kasaci') || combined.includes('karoser') || combined.includes('üstyapı')) {
+    return SOURCE_META.kasaci_kanal;
+  }
+  if (combined.includes('beton_agrega') || combined.includes('ref=beton')) {
+    return SOURCE_META.beton_agrega;
+  }
+  if (combined.includes('gida_toptan') || combined.includes('ref=gida') || combined.includes('ref=market')) {
+    return SOURCE_META.gida_toptan;
+  }
+  if (combined.includes('tarim_yem') || combined.includes('ref=tarim')) {
+    return SOURCE_META.tarim_yem;
+  }
+  if (combined.includes('insaat_kereste') || combined.includes('ref=insaat')) {
+    return SOURCE_META.insaat_kereste;
+  }
+  if (combined.includes('mobilya_nakliyat') || combined.includes('ref=mobilya')) {
+    return SOURCE_META.mobilya_nakliyat;
+  }
+  if (combined.includes('catering_dagitim') || combined.includes('ref=catering')) {
+    return SOURCE_META.catering_dagitim;
   }
   if (combined.includes('banka_') || combined.includes('bank=') || combined.includes('banka=')) {
     return SOURCE_META.banka_kanal;
@@ -159,12 +187,31 @@ function describeClickedLink(signal) {
   }
 
   let companyInUrl = '';
-  const compMatch = shortPath.match(/[?&]company=([^&#]+)/i);
+  const compMatch = shortPath.match(/[?&](?:company|firma|kisi)=([^&#]+)/i);
   if (compMatch && compMatch[1]) {
     try {
       companyInUrl = decodeURIComponent(compMatch[1].replace(/\+/g, ' ')).trim();
     } catch {
       companyInUrl = compMatch[1].replace(/\+/g, ' ').trim();
+    }
+  }
+
+  let groupsLabel = '';
+  const groupsMatch = shortPath.match(/[?&]groups=([^&#]+)/i);
+  if (groupsMatch && groupsMatch[1]) {
+    try {
+      const rawGroups = decodeURIComponent(groupsMatch[1]).split(',').map(s => s.trim().toLowerCase());
+      const groupNameMap = {
+        daily35_chassis: '3.5T Kamyonet',
+        daily35_van: 'Panelvan',
+        daily70: '7T Kamyon',
+        eurocargo: 'Eurocargo',
+        sway: 'S-Way Çekici',
+        tway: 'T-Way Mikser/Hafriyat'
+      };
+      groupsLabel = rawGroups.map(g => groupNameMap[g] || g.toUpperCase()).join(' + ');
+    } catch {
+      groupsLabel = groupsMatch[1];
     }
   }
 
@@ -192,10 +239,38 @@ function describeClickedLink(signal) {
       isPartner: true
     };
   }
+  if (lowerUrl.includes('ref=mail_kurumsal') || signal.source === 'mail_kurumsal') {
+    return {
+      linkTitle: companyInUrl ? `📧 Kurumsal Mail Teklifi (${companyInUrl})` : '📧 Kurumsal E-Posta Teklif Linki',
+      linkSub: groupsLabel ? `Filtreli: ${groupsLabel}` : '/fiyat-listesi?ref=mail_kurumsal',
+      isPartner: false
+    };
+  }
+  if (lowerUrl.includes('kasaci') || lowerUrl.includes('karoser')) {
+    return {
+      linkTitle: companyInUrl ? `🏗️ Kasacı / Üstyapıcı: ${companyInUrl}` : '🏗️ Kasacı & Üstyapıcı Referans Linki',
+      linkSub: groupsLabel ? `Filtreli: ${groupsLabel}` : '/fiyat-listesi (Kasacı / Üstyapıcı)',
+      isPartner: true
+    };
+  }
+  if (lowerUrl.includes('beton_agrega') || lowerUrl.includes('ref=beton')) {
+    return {
+      linkTitle: companyInUrl ? `🧱 Beton & Hafriyat: ${companyInUrl}` : '🧱 Beton Santrali & Hafriyat Özel Linki',
+      linkSub: groupsLabel ? `Sadece: ${groupsLabel}` : 'T-Way + S-Way + Daily',
+      isPartner: false
+    };
+  }
+  if (lowerUrl.includes('gida_toptan') || lowerUrl.includes('ref=gida') || lowerUrl.includes('ref=market')) {
+    return {
+      linkTitle: companyInUrl ? `🛒 Market & Gıda: ${companyInUrl}` : '🛒 Market Zinciri & Gıda Dağıtım Linki',
+      linkSub: groupsLabel ? `Sadece: ${groupsLabel}` : 'Panelvan + 3.5T + 7T Kamyon',
+      isPartner: false
+    };
+  }
   if (lowerUrl.includes('ref=yilsonu_kdv_tarama')) {
     return {
       linkTitle: companyInUrl ? `🧾 Yıl Sonu KDV Taraması (${companyInUrl})` : '🧾 Yıl Sonu KDV & Şasi Faturası Taraması',
-      linkSub: '/fiyat-listesi?ref=yilsonu_kdv_tarama',
+      linkSub: groupsLabel ? `Filtreli: ${groupsLabel}` : '/fiyat-listesi?ref=yilsonu_kdv_tarama',
       isPartner: false
     };
   }
@@ -209,7 +284,7 @@ function describeClickedLink(signal) {
   if (lowerUrl.includes('ref=fb_grup') || signal.source === 'fb_grup') {
     return {
       linkTitle: companyInUrl ? `📘 Facebook Grubu: ${companyInUrl}` : '📘 Facebook Kamyoncu / Nakliye Grubu Linki',
-      linkSub: '/fiyat-listesi?ref=fb_grup',
+      linkSub: groupsLabel ? `Filtreli: ${groupsLabel}` : '/fiyat-listesi?ref=fb_grup',
       isPartner: false
     };
   }
@@ -230,7 +305,14 @@ function describeClickedLink(signal) {
   if (companyInUrl) {
     return {
       linkTitle: `Özel Müşteri Linki (${companyInUrl})`,
-      linkSub: shortPath.split('?')[0] || '/fiyat-listesi',
+      linkSub: groupsLabel ? `Sadece: ${groupsLabel}` : (shortPath.split('?')[0] || '/fiyat-listesi'),
+      isPartner: false
+    };
+  }
+  if (groupsLabel) {
+    return {
+      linkTitle: `🎯 Filtreli Araç Linki (${groupsLabel})`,
+      linkSub: shortPath,
       isPartner: false
     };
   }

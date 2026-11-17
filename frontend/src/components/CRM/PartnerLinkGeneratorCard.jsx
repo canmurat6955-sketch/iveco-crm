@@ -527,7 +527,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     if (hookStyle === 'tradein_hook') {
       return (
         `🔄 *"Elimdeki aracı takasa versem ne kadar sayarlar, üstüne ayda kaç TL öderim?"* diye merak edenler için canlı ekran açtık!${discountShortNote}\n\n` +
-        `İster ekrandaki sürgüden aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle* kalan taksitinizi görün, isterseniz mevcut aracınızın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyin 15 dakikada takas ön fiyatınızı cebinize gönderelim 👇\n\n` +
+        `İster araç kartındaki *"💳 Taksit & Takas Hesapla"* tuşundan aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle* kalan taksitinizi görün, isterseniz *"💬 Son Oluru / Dip Fiyatı Sor"* tuşuyla 15 dakikada takas ön fiyatınızı cebinize gönderelim 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
       );
@@ -555,7 +555,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `✅ Fatura içindeki *%20 KDV'nin tamamını* doğrudan ödenecek KDV'nizden düşebilir,\n` +
         `✅ Binek araçtaki kıst amortisman cezasına takılmadan *1. yıl %20 tam amortisman* gider yazabilir,\n` +
         `✅ Kasa/üstyapı sırasını beklemeden *ŞASİ faturanızı hemen kestirip* *1.000.000 TL 12 Ay %0 Faiz* avantajından yararlanabilirsiniz${discountShortNote}!\n\n` +
-        `📊 Ekrandaki *"🧾 KDV & Kampanya"* butonundan kendi faturanızı hesaplayıp mali müşavirinize tek tuşla gönderebilirsiniz 👇\n\n` +
+        `📊 Her araç kartındaki *"Teknik & KDV Detayı"* bölümünden kendi faturanızı hesaplayıp mali müşavirinize tek tuşla gönderebilirsiniz 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
       );
