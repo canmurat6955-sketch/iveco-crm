@@ -43,7 +43,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 1 / 4 • 6 ARAÇ GRUBUNDAN BİRİNE DOKUNUN',
         title: '1. İlgilendiğiniz Araç Grubunu Seçin & Fiyatı Görün',
         subtitle: '3.5T Kamyonet, Panelvan, 7T Kamyon, Eurocargo, S-Way Çekici veya T-Way Mikser/Hafriyat.',
-        voiceover: 'Sürgüyü kaydırıp peşinat veya takas tutarınızı kolayca seçin.',
+        voiceover: 'Üstteki altı araç grubundan işinize uygun olanı tek dokunuşla seçin.',
         audioUrl: '/audio/wa-scenarios/kilavuz_1.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
@@ -52,7 +52,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 2 / 4 • KART İÇİ "TAKSİT & TAKAS HESAPLA"',
         title: "2. '💳 Taksit & Takas Hesapla' Tuşuna Dokunun",
         subtitle: 'Başka sayfaya zıplamadan, aynı kartın içinde peşinatınızı ve 12-24-36 ay vadeyi seçin.',
-        voiceover: 'Beş bankanın sıfır faizli ve ödemesiz taksitlerini anında karşılaştırın.',
+        voiceover: 'Kartın içindeki taksit ve takas hesaplayıcıyla aylık ödemenizi görün.',
         audioUrl: '/audio/wa-scenarios/kilavuz_2.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
@@ -61,7 +61,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ADIM 3 / 4 • %20 KDV VERGİ İNDİRİMİ & 2 NET BUTON',
         title: "3. %20 KDV İndirimini Görün & WhatsApp'tan Sorun",
         subtitle: 'Her araçta sadece 2 net tuş var: Taksit & Takas Hesapla veya WhatsApp’tan Can Murat’a Sor!',
-        voiceover: 'Yüzde yirmi KDV vergi avantajınızı görüp muhasebenize gönderin.',
+        voiceover: 'Yüzde yirmi KDV vergi avantajınızı görüp WhatsApp’tan bize ulaşın.',
         audioUrl: '/audio/wa-scenarios/kilavuz_3.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
@@ -140,8 +140,8 @@ const VIDEO_SCENARIOS = [
       {
         badge: 'FİNANSMAN 1 / 4 • NAKİT AKIŞINIZI KORUYUN',
         title: 'Aracı Şimdi Alın, İlk Taksiti 3-6 Ay Sonra Ödeyin!',
-        subtitle: 'Araç hemen para kazanmaya başlasın; ödemeniz 3 veya 6 ay sonra başlasın.',
-        voiceover: 'Aracınızı bugün işe koşun, ilk taksiti altı ay sonra ödeyin!',
+        subtitle: 'Aracınız hemen kazandırmaya başlasın; ödemeniz 3 veya 6 ay sonra başlasın.',
+        voiceover: 'Aracınızı bugün teslim alın, ilk taksitini altı ay sonra ödeyin!',
         audioUrl: '/audio/wa-scenarios/odemesiz_1.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
@@ -159,7 +159,7 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 3 / 4 • 1 MİLYON TL %0 FAİZ PAKETLERİ',
         title: 'Garanti, Akbank, İş Bankası, DenizBank & Yapı Kredi',
         subtitle: '1.000.000 TL %0 Faiz veya 2M - 5M TL yüksek limitli ticari kredi paketleri.',
-        voiceover: 'Dört büyük bankada bir milyon lira sıfır faiz fırsatını görün.',
+        voiceover: 'Anlaşmalı bankalarda bir milyon lira sıfır faiz fırsatını görün.',
         audioUrl: '/audio/wa-scenarios/odemesiz_3.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
@@ -168,7 +168,7 @@ const VIDEO_SCENARIOS = [
         badge: 'FİNANSMAN 4 / 4 • TÜM BANKALAR TEK EKRANDA',
         title: 'Şubeye Gitmeden Bankaları Telefonunuzda Kıyaslayın!',
         subtitle: 'Aşağıdaki linke tıklayın, istediğiniz kredi tutarını seçip taksitleri canlı görün.',
-        voiceover: 'Şubeye gitmeden beş bankayı kıyaslamak için aşağıdaki linke dokunun!',
+        voiceover: 'Şubeye gitmeden tüm bankaları kıyaslamak için aşağıdaki linke dokunun!',
         audioUrl: '/audio/wa-scenarios/odemesiz_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
@@ -199,7 +199,7 @@ const VIDEO_SCENARIOS = [
         badge: 'MUHASEBE 2 / 4 • 325.000 TL’YE VARAN NAKİT İNDİRİMİ',
         title: 'Daily’de 260 Bin, 12 Teker T-Way’de 325 Bin TL İndirim!',
         subtitle: '12 Teker Mikser 5.750.000 TL Nakit, 12 Teker Hafriyat 5.850.000 TL Nakit fırsatıyla.',
-        voiceover: 'Daily serisinde iki yüz altmış bin lira nakit indirimini yakalayın.',
+        voiceover: 'Üç yüz yirmi beş bin liraya varan nakit alım indirimini yakalayın.',
         audioUrl: '/audio/wa-scenarios/kdv_2.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
@@ -239,7 +239,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ARAÇ GRUBU 1 / 4 • B EHLİYET 3.5 TON KAMYONET & VAN',
         title: 'Daily 3.5 Ton Tek/Çift Teker & Kapalı Panelvan',
         subtitle: 'Halk diliyle net kasa ölçüleri: Kısa, Orta ve Uzun Şasi (1.905.000 TL’den başlayan peşin).',
-        voiceover: 'B ehliyetle kullanılan takograf muafiyetli Daily otuz beş C mi?',
+        voiceover: 'B ehliyetle kullanılan takograf muafiyetli üç buçuk ton kamyonet mi?',
         audioUrl: '/audio/wa-scenarios/kantar_1.mp3',
         accent: '#3b82f6',
         accentBg: 'rgba(59, 130, 246, 0.22)'
@@ -248,7 +248,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ARAÇ GRUBU 2 / 4 • 7 TON DAILY 70C & EUROCARGO',
         title: 'Daily 7 Ton Kamyon: 4.8 Ton Yük & 260 Bin İndirim!',
         subtitle: '10-12 Euro Palet kapasiteli uzun şasi; 260.000 TL nakit indirimiyle 2.420.000 TL net peşin.',
-        voiceover: 'Yoksa beş tona yakın yük taşıyan indirimli yetmiş C mi?',
+        voiceover: 'Beş tona yakın yük taşıyan indirimli yedi ton kamyon mu?',
         audioUrl: '/audio/wa-scenarios/kantar_2.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
@@ -257,7 +257,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ARAÇ GRUBU 3 / 4 • 12 TEKER T-WAY MİKSER & HAFRİYAT',
         title: '12 Teker Mikser 5.750.000 TL • Hafriyat 5.850.000 TL!',
         subtitle: 'Liste 6.075.000 TL / 6.175.000 TL yerine tam 325.000 TL Nakit Alım İndirimiyle!',
-        voiceover: 'Üç buçuk tondan kırk tona tüm şasi fiyatlarını inceleyin.',
+        voiceover: 'Yoksa on iki teker mikser ve hafriyat serisi mi? Hepsini inceleyin.',
         audioUrl: '/audio/wa-scenarios/kantar_3.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
@@ -266,7 +266,7 @@ const VIDEO_SCENARIOS = [
         badge: 'ARAÇ GRUBU 4 / 4 • KENDİ ARACINIZI SEÇİN',
         title: 'Aşağıdaki Linke Dokunun, Grubunuzu Seçip İnceleyin!',
         subtitle: '6 araç grubundan işinize uygun olana dokunun, peşin ve vadeli fiyatı anında görün.',
-        voiceover: 'Aşağıdaki linke dokunun, işinize en uygun şasiyi canlı karşılaştırın!',
+        voiceover: 'Aşağıdaki linke dokunun, işinize en uygun aracı canlı karşılaştırın!',
         audioUrl: '/audio/wa-scenarios/kantar_4.mp3',
         accent: '#22c55e',
         accentBg: 'rgba(34, 197, 94, 0.25)'
@@ -608,7 +608,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
           },
           {
             title: '🔥 6 AY ÖDEMESİZ DÖNEM SEÇENEĞİ',
-            sub: 'Aracı hemen işe koşun, tam 6 ay boyunca taksit ödemeyin!',
+            sub: 'Aracınızı hemen teslim alın, ilk 6 ay boyunca taksit ödemeyin!',
             detail: '1.000.000 TL - 5.000.000 TL Arası Kredi • %2,85 - %2,91 Oran • 12-36 Ay Vade',
             color: '#fbbf24',
             border: '#f59e0b'
@@ -1290,7 +1290,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
   const loadStepAudioBuffer = async (audioUrl) => {
     if (!audioUrl) return null;
-    const cacheKey = `${audioUrl}?v=ahmet_male_v3`;
+    const cacheKey = `${audioUrl}?v=ahmet_male_v4`;
     if (audioBufferCacheRef.current[cacheKey]) {
       return audioBufferCacheRef.current[cacheKey];
     }
