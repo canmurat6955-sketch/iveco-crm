@@ -304,6 +304,49 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
   const [taxModalVehicleId, setTaxModalVehicleId] = useState('daily-35c16-3750-30');
   const [customTaxInvoiceTl, setCustomTaxInvoiceTl] = useState(0);
   const [taxEntityRate, setTaxEntityRate] = useState(0.25); // 0.25 (%25 Kurumlar) | 0.35 (%35 Gelir Vergisi)
+  const [showSmartNudge, setShowSmartNudge] = useState(false);
+  const [dismissedSmartNudge, setDismissedSmartNudge] = useState(false);
+
+  const referralBannerInfo = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    const ref = (params.get('ref') || '').toLowerCase();
+    const company = params.get('company') || params.get('firma') || params.get('kisi') || '';
+
+    if (ref.includes('kasaci') || ref.includes('karoser') || ref.includes('servis')) {
+      return {
+        badge: '🎟️ ÜSTYAPICI & KASACI REFERANS İNDİRİMİ AKTİF',
+        title: `${company ? `${company} — ` : ''}Şasi + Üstyapı Özel Referans İskontosu Tanımlandı!`,
+        desc: 'Ekrandaki standart fiyatlara ek olarak kasacı/üstyapıcı referansına özel "Son Dip Fiyat" hakkınızı her aracın altındaki yeşil tuşla Can Murat’a sorabilirsiniz.'
+      };
+    }
+    if (ref.includes('smmm') || ref.includes('kdv') || ref.includes('muhasebe') || ref.includes('vergi')) {
+      return {
+        badge: '🎟️ MALİ MÜŞAVİR & VERGİ KALKANI ÖZEL İSKONTOSU AKTİF',
+        title: `${company ? `${company} — ` : ''}%20 KDV Mahsubu + Ekstra Bayi İskontosu Tanımlandı!`,
+        desc: 'Üstyapıyı beklemeden hemen şasi faturası kesim avantajı ve mükelleflere özel "Son Dip Fiyat" iskontosunu kartlardaki yeşil tuşla isteyebilirsiniz.'
+      };
+    }
+    if (ref.includes('koop') || ref.includes('nakliye') || ref.includes('beton') || ref.includes('gida') || ref.includes('garaj')) {
+      return {
+        badge: '🎟️ SEKTÖR & KOOPERATİF ÖZEL FİLO İSKONTOSU AKTİF',
+        title: `${company ? `${company} — ` : ''}Sektörünüze Özel Ekstra Şasi İndirimi Tanımlandı!`,
+        desc: 'Ekrandaki standart liste/kampanya fiyatlarının altındaki "Sektör Özel Son Olur Fiyatı"nı her araç kartındaki yeşil tuşla Can Murat’a sorabilirsiniz.'
+      };
+    }
+    return {
+      badge: '🤫 IVECO SAMSUN ÖZEL BAYİ İSKONTOSU & TAKAS DESTEĞİ',
+      title: `${company ? `${company} — ` : ''}Liste Fiyatının Altındaki "Özel Dip Fiyatı" Öğrenin!`,
+      desc: 'Ekrandaki rakamlar standart kampanya fiyatlarıdır. Peşin, kredili veya takaslı alımda size özel ekstra bayi indirimini karttaki yeşil "Son Oluru / Dip Fiyatı Sor" tuşuyla anında öğrenin.'
+    };
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSmartNudge(true);
+    }, 12000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const visibleCategories = useMemo(() => {
     if (!hasGroupRestriction) return CATEGORIES.filter(c => c.id !== 'all');
@@ -505,10 +548,11 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
     const partnerPricing = partnerProtocol
       ? calculatePartnerVehiclePricing(vehicle, partnerProtocol, tcmbEurRate)
       : null;
+    const friendlyInfo = getFriendlyVehicleDisplay(vehicle);
     if (onTrackFootprint) {
       onTrackFootprint(
-        partnerProtocol ? `${partnerProtocol.shortName} Üye Teklif İsteği` : 'Fiyat Kartı Teklif İsteği',
-        vehicle.model,
+        partnerProtocol ? `${partnerProtocol.shortName} Üye Son Fiyat İsteği` : '🔥 Son Oluru / Dip Fiyatı Sor Tıklandı',
+        `${friendlyInfo.title} (${vehicle.model})`,
         partnerPricing
           ? `${(partnerPricing.finalCash || partnerPricing.finalEur || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'} (${partnerProtocol.shortName} İndirimli)`
           : `${(vehicle.cashPrice || vehicle.campaignPrice || 0).toLocaleString('tr-TR')} ${vehicle.currency || 'TL'}`
@@ -521,20 +565,20 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           ? ` [🏦 *${lockedBank.name}* Özel Finansman]`
           : '';
       if (vehicle.isCustomPrice) {
-        const msg = `Merhaba ${salesRep?.name || 'Can Bey'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (Ağır Şantiye / Hafriyat)${protocolPrefix} için şantiye ve proje ihtiyacımıza özel filo fiyat teklifi ve teslimat kotası hakkında bilgi almak istiyorum.`;
+        const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, 2026 Fiyat Listesindeki *${friendlyInfo.title}* (${vehicle.model})${protocolPrefix} için şantiye/proje ihtiyacımıza özel yapabileceğiniz son dip fiyat ve teslimat bilgisi nedir?`;
         onDirectWhatsApp(msg);
         return;
       }
       const eurVal = partnerPricing?.isEur ? partnerPricing.finalEur : (vehicle.eurPrice || vehicle.cashPrice || 0);
       const tryEq = Math.round(eurVal * tcmbEurRate);
       const priceText = vehicle.currency === 'EUR'
-        ? `€${eurVal.toLocaleString('tr-TR')} (${tryEq.toLocaleString('tr-TR')} TL - TCMB Kur: ${tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL) + KDV`
+        ? `€${eurVal.toLocaleString('tr-TR')} (${tryEq.toLocaleString('tr-TR')} TL) + KDV`
         : partnerPricing
-          ? `${partnerPricing.finalCash.toLocaleString('tr-TR')} TL (${partnerProtocol.shortName} Üye İndirimli Net Fiyat)`
+          ? `${partnerPricing.finalCash.toLocaleString('tr-TR')} TL (${partnerProtocol.shortName} Üye Fiyatı)`
           : (vehicle.cashDiscount > 0
-              ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Peşin`
-              : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Kredili Fiyat`);
-      const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, 2026 Model Fiyat Listesindeki *${vehicle.model}* (${priceText})${protocolPrefix} hakkında detaylı proforma ve teslimat bilgisi almak istiyorum.`;
+              ? `${vehicle.cashPrice.toLocaleString('tr-TR')} TL Nakit / ${vehicle.campaignPrice.toLocaleString('tr-TR')} TL Liste`
+              : `${(vehicle.campaignPrice || vehicle.cashPrice).toLocaleString('tr-TR')} TL Liste`);
+      const msg = `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, 2026 Fiyat Listesindeki *${friendlyInfo.title}* (${vehicle.model} — ${priceText})${protocolPrefix} aracınızı inceledim. Bu araçta peşin, kredili veya takaslı alımda bana özel yapabileceğiniz son olur / dip fiyat ve ekstra bayi iskontosu nedir?`;
       onDirectWhatsApp(msg);
     }
   };
@@ -1252,6 +1296,59 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         </div>
       )}
 
+      {/* 🎟️ ÖZEL BAYİ / REFERANS İSKONTOSU MERAK KANCASI BANNERI */}
+      {referralBannerInfo && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.94) 100%)',
+          border: '1.5px solid rgba(16, 185, 129, 0.5)',
+          borderRadius: '12px',
+          padding: isMobileView ? '10px 12px' : '11px 16px',
+          marginBottom: isMobileView ? '12px' : '14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '10px',
+          boxShadow: '0 4px 16px rgba(16, 185, 129, 0.15)'
+        }}>
+          <div style={{ flex: '1 1 260px' }}>
+            <div style={{ fontSize: '0.68rem', fontWeight: 900, color: '#4ade80', letterSpacing: '0.3px' }}>
+              {referralBannerInfo.badge}
+            </div>
+            <div style={{ fontSize: isMobileView ? '0.84rem' : '0.9rem', fontWeight: 900, color: '#ffffff', marginTop: '2px' }}>
+              {referralBannerInfo.title}
+            </div>
+            <div style={{ fontSize: '0.73rem', color: '#cbd5e1', marginTop: '2px', lineHeight: 1.35 }}>
+              {referralBannerInfo.desc}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              const firstVeh = filteredVehicles[0] || IVECO_PRICING_CATALOG[0];
+              if (firstVeh) handleVehicleQuote(firstVeh);
+            }}
+            style={{
+              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '9px',
+              padding: '9px 14px',
+              fontSize: '0.76rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 12px rgba(34, 197, 94, 0.35)'
+            }}
+          >
+            <FiMessageSquare size={14} /> Özel Dip Fiyatımı Sor (Can Murat)
+          </button>
+        </div>
+      )}
 
       {/* Vehicle Grid — ÖNCE SONUÇ, MÜŞTERİ İSTERSE DETAY */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '14px' }}>
@@ -1478,36 +1575,55 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     paddingTop: '6px',
                     borderTop: '1px solid rgba(148, 163, 184, 0.16)',
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '6px',
-                    flexWrap: 'wrap'
+                    flexDirection: 'column',
+                    gap: '4px'
                   }}>
-                    {vatShieldTl > 0 ? (
-                      <span style={{ fontSize: '0.71rem', color: '#fcd34d', fontWeight: 800 }}>
-                        🧾 Vergiden Düşülen %20 KDV: ~{vatShieldTl.toLocaleString('tr-TR')} TL
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '0.7rem', color: '#93c5fd', fontWeight: 700 }}>
-                        💶 TCMB Kur: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL
-                      </span>
-                    )}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '6px',
+                      flexWrap: 'wrap'
+                    }}>
+                      {vatShieldTl > 0 ? (
+                        <span style={{ fontSize: '0.71rem', color: '#fcd34d', fontWeight: 800 }}>
+                          🧾 Vergiden Düşülen %20 KDV: ~{vatShieldTl.toLocaleString('tr-TR')} TL
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '0.7rem', color: '#93c5fd', fontWeight: 700 }}>
+                          💶 TCMB Kur: 1 € = {tcmbEurRate.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL
+                        </span>
+                      )}
 
-                    <button
-                      type="button"
-                      onClick={() => toggleCardDetail(vehicle.id)}
+                      <button
+                        type="button"
+                        onClick={() => toggleCardDetail(vehicle.id)}
+                        style={{
+                          border: 'none',
+                          background: 'transparent',
+                          color: isDetailOpen ? '#38bdf8' : '#94a3b8',
+                          fontSize: '0.69rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          padding: 0
+                        }}
+                      >
+                        {isDetailOpen ? 'Detayı Gizle ▴' : 'Teknik & KDV Detayı ▾'}
+                      </button>
+                    </div>
+
+                    <div
+                      onClick={() => handleVehicleQuote(vehicle)}
                       style={{
-                        border: 'none',
-                        background: 'transparent',
-                        color: isDetailOpen ? '#38bdf8' : '#94a3b8',
-                        fontSize: '0.69rem',
+                        fontSize: '0.68rem',
+                        color: '#86efac',
                         fontWeight: 800,
                         cursor: 'pointer',
-                        padding: 0
+                        lineHeight: 1.3
                       }}
                     >
-                      {isDetailOpen ? 'Detayı Gizle ▴' : 'Teknik & KDV Detayı ▾'}
-                    </button>
+                      🔥 Peşin, takaslı veya referanslı alıma özel ekstra bayi iskontosu (son dip fiyat) için yeşil tuşa dokunun 👇
+                    </div>
                   </div>
                 )}
 
@@ -1766,17 +1882,17 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       onClick={() => {
                         if (onTrackFootprint) {
                           onTrackFootprint(
-                            'Kart İçi Taksit Planı WhatsApp Talebi',
+                            '🔥 Kart İçi Taksit & Son Dip Fiyat Soruldu',
                             vehicle.model,
                             `Peşinat: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL | Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay x ${monthlyPaymentEst.toLocaleString('tr-TR')} TL)`
                           );
                         }
                         const msg =
-                          `Merhaba ${salesRep?.name || 'Can Bey'}, *${friendlyInfo.title}* (${vehicle.model}) aracı için:\n` +
+                          `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, *${friendlyInfo.title}* (${vehicle.model}) aracı için:\n` +
                           `• Araç Bedeli: ${fullPriceForLoan.toLocaleString('tr-TR')} TL\n` +
                           `• Peşinat / Takasım: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL\n` +
                           `• Kalan Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay ~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)\n` +
-                          `ödeme planıyla detaylı bilgi almak istiyorum.`;
+                          `Bu ödeme planında bana özel yapabileceğiniz son dip fiyat / ekstra bayi iskontosu nedir?`;
                         if (onDirectWhatsApp) {
                           onDirectWhatsApp(msg);
                         } else {
@@ -1794,7 +1910,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         cursor: 'pointer'
                       }}
                     >
-                      💬 Bu Planı WhatsApp'tan Sor
+                      💬 Son Dip Fiyat & Taksiti Sor
                     </button>
                   </div>
                 </div>
@@ -1808,6 +1924,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     onClick={() => {
                       const nextId = isInlineCalcOpen ? null : vehicle.id;
                       setActiveInlineCalcId(nextId);
+                      setShowSmartNudge(true);
                       if (nextId && onTrackFootprint) {
                         onTrackFootprint('Taksit & Takas Hesapla Açıldı', vehicle.model, friendlyInfo.title);
                       }
@@ -1847,7 +1964,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     border: 'none',
                     borderRadius: '10px',
                     padding: isMobileView ? '11px 8px' : '10px 10px',
-                    fontSize: isMobileView ? '0.78rem' : '0.76rem',
+                    fontSize: isMobileView ? '0.76rem' : '0.75rem',
                     fontWeight: 900,
                     cursor: 'pointer',
                     display: 'flex',
@@ -1859,7 +1976,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                   }}
                 >
                   <FiMessageSquare size={14} style={{ flexShrink: 0 }} />
-                  {vehicle.isCustomPrice ? 'Özel Proje Fiyatı Al' : 'WhatsApp’tan Sor'}
+                  {vehicle.isCustomPrice ? 'Özel Dip Fiyatı Sor' : 'Son Oluru / Dip Fiyatı Sor'}
                 </button>
               </div>
             </div>
@@ -1870,6 +1987,84 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       {filteredVehicles.length === 0 && (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
           Aradığınız kriterlere uygun araç bulunamadı. Lütfen filtreleri sıfırlayın.
+        </div>
+      )}
+
+      {/* 👋 12. SANİYEDE ALTTAN ÇIKAN AKILLI CAN MURAT ÖZEL TEKLİF ÇUBUĞU */}
+      {showSmartNudge && !dismissedSmartNudge && (
+        <div style={{
+          position: 'fixed',
+          bottom: isMobileView ? '10px' : '16px',
+          left: isMobileView ? '10px' : '50%',
+          right: isMobileView ? '10px' : 'auto',
+          transform: isMobileView ? 'none' : 'translateX(-50%)',
+          width: isMobileView ? 'auto' : 'min(92vw, 680px)',
+          background: 'linear-gradient(135deg, #064e3b 0%, #0f172a 100%)',
+          border: '2px solid #22c55e',
+          borderRadius: '14px',
+          padding: isMobileView ? '10px 12px' : '12px 16px',
+          boxShadow: '0 14px 36px rgba(0, 0, 0, 0.65)',
+          zIndex: 995,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
+          flexWrap: isMobileView ? 'wrap' : 'nowrap'
+        }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <div style={{ fontSize: '0.73rem', fontWeight: 900, color: '#4ade80' }}>
+              👋 Can Murat — IVECO ERC Samsun (0544 622 59 31)
+            </div>
+            <div style={{ fontSize: isMobileView ? '0.75rem' : '0.8rem', color: '#f8fafc', fontWeight: 700, marginTop: '2px', lineHeight: 1.3 }}>
+              İncelediğiniz araçta liste fiyatının altında <strong>ekstra bayi iskontosu</strong> veya <strong>takas desteği</strong> tanımlayabilirim.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: isMobileView ? '100%' : 'auto', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={() => {
+                const activeVeh = filteredVehicles.find(v => v.id === activeInlineCalcId) || filteredVehicles[0] || IVECO_PRICING_CATALOG[0];
+                if (activeVeh) handleVehicleQuote(activeVeh);
+              }}
+              style={{
+                flex: isMobileView ? 1 : 'initial',
+                background: '#22c55e',
+                color: '#052e16',
+                border: 'none',
+                borderRadius: '9px',
+                padding: '9px 14px',
+                fontSize: '0.77rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <FiMessageSquare size={14} /> 💬 Son Oluru / Dip Fiyatı Sor
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDismissedSmartNudge(true)}
+              title="Kapat"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#cbd5e1',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 10px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 

@@ -607,8 +607,128 @@ export const REGIONAL_PROSPECTS_DIRECTORY = [
   },
 
   // ============================================================================
-  // 3. SEBZE-MEYVE HALİ KOMİSYONCULARI, SOĞUK HAVA DEPOLARI & GIDA/YEM/SÜT DAĞITIM
+  // 3. SEBZE-MEYVE HALİ KOMİSYONCULARI, MARKET ZİNCİRLERİ, GROSS & GIDA DAĞITIM
   // ============================================================================
+  {
+    id: 'mkt_1',
+    category: 'hal_gida_soguk',
+    subGroup: 'Samsun & Karadeniz Zincir Marketler Derneği',
+    name: 'Karadeniz PERDER (Yerel Zincir Marketler Derneği)',
+    contact: 'Oktay Akyüzlü (Başkan)',
+    city: 'Samsun / İlkadım',
+    phone: '0532 386 99 49',
+    email: 'bulenteperder@gmail.com',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily Panelvan (12-16m³) & Daily 7 Ton Market Dağıtım'
+  },
+  {
+    id: 'mkt_2',
+    category: 'hal_gida_soguk',
+    subGroup: 'Gross & Toptan Market Zinciri',
+    name: 'DevGross Toptan Market (Canik / Samsun)',
+    contact: 'Satın Alma & Lojistik Yönetimi',
+    city: 'Samsun / Canik',
+    phone: '0362 238 62 38',
+    email: 'info@devgross.com.tr',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily 3.5T Frigo/Kutu & Daily 7 Ton Kamyon'
+  },
+  {
+    id: 'mkt_3',
+    category: 'hal_gida_soguk',
+    subGroup: 'Yerel AVM & Market Zinciri',
+    name: 'Çelikpark AVM & Marketler Grubu (Atakum & Bafra)',
+    contact: 'Genel Merkez Yönetimi',
+    city: 'Samsun / Atakum',
+    phone: '0362 438 00 61',
+    email: 'iletisim@celikparkgrup.com',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily Panelvan & 3.5T Kamyonet'
+  },
+  {
+    id: 'mkt_4',
+    category: 'hal_gida_soguk',
+    subGroup: 'Yerel Market Zinciri',
+    name: 'Bahar AVM / Bahar Marketler Zinciri (Samsun)',
+    contact: 'Merkez Satın Alma & Sevkiyat',
+    city: 'Samsun / İlkadım & Atakum',
+    phone: '0362 439 15 25',
+    email: 'info@baharavm.com.tr',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily Panelvan & 7 Ton Şube Dağıtım Kamyonu'
+  },
+  {
+    id: 'mkt_5',
+    category: 'hal_gida_soguk',
+    subGroup: 'Mağazacılık & Market Zinciri',
+    name: 'Samsun Çarşı Mağazacılık A.Ş.',
+    contact: 'Lojistik / Satın Alma',
+    city: 'Samsun / İlkadım',
+    phone: '0362 432 02 07',
+    email: 'info@samsuncarsi.com.tr',
+    groups: ['daily35_van', 'daily35_chassis'],
+    model: 'Daily Panelvan & 3.5 Ton Kamyonet'
+  },
+  {
+    id: 'mkt_6',
+    category: 'hal_gida_soguk',
+    subGroup: 'Toptan Gıda & Market Dağıtım',
+    name: 'Üstün Gıda Toptan & Market Dağıtım (Gıda Borsası)',
+    contact: 'İşletme Sahibi',
+    city: 'Samsun / İlkadım',
+    phone: '0542 435 76 16',
+    email: '',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily 3.5T Çift Teker & 7 Ton Kamyon'
+  },
+  {
+    id: 'mkt_7',
+    category: 'hal_gida_soguk',
+    subGroup: 'Toptan Gıda & Market Dağıtım',
+    name: 'Atakum Gıda Toptan & Market Lojistik (Gıda Borsası)',
+    contact: 'İşletme Sahibi',
+    city: 'Samsun / İlkadım',
+    phone: '0546 435 61 05',
+    email: 'atakumgida@hotmail.com',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily Panelvan & 3.5T Kamyonet'
+  },
+  {
+    id: 'mkt_8',
+    category: 'hal_gida_soguk',
+    subGroup: 'Market & Bakkal Toptan Dağıtım',
+    name: 'Düzenli İhtiyaç Maddeleri & Gıda Dağıtım Ltd.',
+    contact: 'Filo / Satın Alma',
+    city: 'Samsun / İlkadım',
+    phone: '0362 440 55 02',
+    email: 'ntb@duzenligida.com',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily 3.5T & 7 Ton Dağıtım Kamyonu'
+  },
+  {
+    id: 'mkt_9',
+    category: 'hal_gida_soguk',
+    subGroup: 'Market & Bakkal Toptan Dağıtım',
+    name: 'Eynesil Gıda Dağıtım & Pazarlama (Gıda Borsası)',
+    contact: 'Sevkiyat Yönetimi',
+    city: 'Samsun / İlkadım',
+    phone: '0362 435 51 94',
+    email: 'info@eynesilgida.com.tr',
+    groups: ['daily35_van', 'daily35_chassis', 'daily70'],
+    model: 'Daily Panelvan & 7 Ton Kamyon'
+  },
+  {
+    id: 'mkt_10',
+    category: 'hal_gida_soguk',
+    subGroup: 'Zincir Market Bakliyat & Gıda Tedarik',
+    name: 'Akyüz Gıda Toptan Dağıtım (Tekkeköy)',
+    contact: 'Lojistik / Satın Alma',
+    city: 'Samsun / Tekkeköy',
+    phone: '0362 256 05 20',
+    email: 'info@akyuzgida.com.tr',
+    groups: ['daily35_chassis', 'daily70', 'eurocargo'],
+    model: 'Daily 7 Ton & Eurocargo Dağıtım Kamyonu'
+  },
   {
     id: 'hal_1',
     category: 'hal_gida_soguk',
