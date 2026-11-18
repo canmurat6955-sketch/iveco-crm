@@ -759,7 +759,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         { icon: '🚐', name: '3.5 Ton Kamyonet', sub: 'B Ehliyet • Çift Teker', hot: stepLocalT < 0.55 },
         { icon: '📦', name: 'Kapalı Panelvan', sub: '12 - 16 m³ Hacim', hot: false },
         { icon: '🚛', name: '7 Ton Kamyon', sub: '4.8 Ton Net Yük', hot: stepLocalT >= 0.55 },
-        { icon: '🏭', name: '10–18 Ton Kamyon', sub: 'Eurocargo Serisi', hot: false },
+        { icon: '🏭', name: 'Eurocargo', sub: '10–18 Ton • 14–20 Palet', hot: false },
         { icon: '🛣️', name: 'S-Way Çekici (Tır)', sub: '490 & 530 BG', hot: false },
         { icon: '🏗️', name: 'Mikser & Hafriyat', sub: '12 Teker T-Way', hot: false }
       ];

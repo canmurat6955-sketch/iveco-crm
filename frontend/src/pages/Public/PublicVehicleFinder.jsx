@@ -3177,9 +3177,9 @@ IVECO ERC Samsun Otomotiv
           {
             id: 'eurocargo',
             groupCode: 'eurocargo',
-            title: 'Büyük Kamyon (10–18 Ton)',
-            subtitle: 'C Ehliyet • Eurocargo',
-            desc: '6.5 Tondan 16 Tona kadar ağır yük taşıyan 6 teker ve 10 teker kamyonlar',
+            title: 'Eurocargo',
+            subtitle: 'C Ehliyet • 10–18 Ton • 14–20 Palet',
+            desc: '6.5 Tondan 16 Tona kadar ağır yük taşıyan 6 teker ve 10 teker Eurocargo kamyonlar',
             image: '/vehicles/eurocargo-100-120.jpg',
             defaultKey: 'truck_150e',
             options: [

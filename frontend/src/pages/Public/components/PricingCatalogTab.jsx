@@ -40,9 +40,9 @@ const CATEGORIES = [
   },
   {
     id: 'eurocargo',
-    title: '10–18 Ton Kamyon',
-    licenseBadge: 'Eurocargo • 14–20 Palet',
-    label: 'Büyük Kamyon (Eurocargo)',
+    title: 'Eurocargo',
+    licenseBadge: '10–18 Ton • 14–20 Palet',
+    label: 'Eurocargo (10–18 Ton Kamyon)',
     shortLabel: 'Eurocargo',
     image: '/vehicles/eurocargo-100-120.jpg'
   },
@@ -278,6 +278,11 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
   const [selectedSectorFilter, setSelectedSectorFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [onlyDoubleWheels, setOnlyDoubleWheels] = useState(false);
+  // 🛻 3.5 Ton Kamyonet (daily35_chassis) Çoktan Seçmeli 3 Adımlı Seçici State'leri
+  const [kamyonetWheelType, setKamyonetWheelType] = useState(null); // 'cift_teker' | 'tek_teker' | 'cift_kabin' | null
+  const [kamyonetChassisLen, setKamyonetChassisLen] = useState(null); // '3450' | '3750' | '4100' | null
+  const [kamyonetGearType, setKamyonetGearType] = useState(null); // 'manuel' | 'otomatik' | 'both' | null
+  const [showAllKamyonetList, setShowAllKamyonetList] = useState(false);
   const [activeInlineCalcId, setActiveInlineCalcId] = useState(null);
   const [showInlinePhotoUpload, setShowInlinePhotoUpload] = useState(false);
   const [showTradeInBox, setShowTradeInBox] = useState(false);
@@ -478,6 +483,27 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       if (!searchQuery.trim()) {
         if (selectedCategory === 'daily35_chassis') {
           if (v.segment !== 'Daily 35' || v.category.includes('Panelvan')) return false;
+          // 🛻 Çoktan Seçmeli 3 Adımlı Kamyonet Seçici aktifse (Tümünü Listele açık değilse):
+          if (!showAllKamyonetList) {
+            if (!kamyonetWheelType) return false;
+            const isDoubleCab = v.category.toLowerCase().includes('çift kabin') || v.id.includes('-dc-');
+            const isDoubleWheel = !isDoubleCab && (v.category.toLowerCase().includes('çift teker') || v.model.toLowerCase().includes('35 c'));
+            const isSingleWheel = !isDoubleCab && !isDoubleWheel;
+
+            if (kamyonetWheelType === 'cift_kabin') {
+              return isDoubleCab;
+            }
+            if (kamyonetWheelType === 'cift_teker' && !isDoubleWheel) return false;
+            if (kamyonetWheelType === 'tek_teker' && !isSingleWheel) return false;
+
+            if (!kamyonetChassisLen) return false;
+            if (String(v.wheelbase) !== String(kamyonetChassisLen)) return false;
+
+            if (!kamyonetGearType) return false;
+            const isAuto = (v.transmission || '').toLowerCase().includes('otomatik') || (v.transmission || '').toLowerCase().includes('hi-matic') || v.id.includes('himatic');
+            if (kamyonetGearType === 'manuel' && isAuto) return false;
+            if (kamyonetGearType === 'otomatik' && !isAuto) return false;
+          }
         } else if (selectedCategory === 'daily35_van') {
           if (v.segment !== 'Daily 35' || !v.category.includes('Panelvan')) return false;
         } else if (selectedCategory === 'daily70') {
@@ -514,7 +540,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
 
       return true;
     });
-  }, [hasGroupRestriction, allowedGroups, selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels]);
+  }, [hasGroupRestriction, allowedGroups, selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels, showAllKamyonetList, kamyonetWheelType, kamyonetChassisLen, kamyonetGearType]);
 
   const tradeInCatalogModels = useMemo(() => {
     return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && (v.campaignPrice || v.cashPrice || v.eurPrice));
@@ -1444,6 +1470,398 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         </div>
       )}
 
+      {/* 🛻 3.5 TON KAMYONET GRUBU — ADIM ADIM ÇOKTAN SEÇMELİ SİHİRBAZ */}
+      {selectedCategory === 'daily35_chassis' && !searchQuery.trim() && (
+        <div style={{
+          background: 'linear-gradient(160deg, rgba(15, 23, 42, 0.96) 0%, rgba(23, 37, 84, 0.94) 100%)',
+          border: '2px solid rgba(56, 189, 248, 0.55)',
+          borderRadius: '14px',
+          padding: isMobileView ? '12px' : '15px 18px',
+          marginBottom: '14px',
+          boxShadow: '0 8px 24px rgba(2, 132, 199, 0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <div style={{ fontSize: isMobileView ? '0.84rem' : '0.95rem', fontWeight: 900, color: '#fde047' }}>
+                🛻 3.5 Ton Kamyonet — 3 Adımda Aracınızı Seçin
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
+                Önce teker tipini, sonra şasi boyunu, en son vites tipini seçin; aradığınız aracın net fiyatı ve taksiti anında açılsın.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {(kamyonetWheelType || kamyonetChassisLen || kamyonetGearType) && !showAllKamyonetList && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKamyonetWheelType(null);
+                    setKamyonetChassisLen(null);
+                    setKamyonetGearType(null);
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#e2e8f0',
+                    borderRadius: '7px',
+                    padding: '5px 9px',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ↺ Seçimi Sıfırla
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowAllKamyonetList(prev => !prev)}
+                style={{
+                  background: showAllKamyonetList ? 'rgba(16, 185, 129, 0.25)' : 'rgba(15, 23, 42, 0.85)',
+                  border: showAllKamyonetList ? '1.5px solid #10b981' : '1px solid rgba(148, 163, 184, 0.35)',
+                  color: showAllKamyonetList ? '#4ade80' : '#93c5fd',
+                  borderRadius: '7px',
+                  padding: '5px 10px',
+                  fontSize: '0.69rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                {showAllKamyonetList ? '🎯 Adım Adım Seçime Dön' : '📋 Tümünü Listele (10 Model)'}
+              </button>
+            </div>
+          </div>
+
+          {!showAllKamyonetList && (
+            <>
+              {/* 1. ADIM: TEKER / KABİN TİPİ */}
+              <div>
+                <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#38bdf8', marginBottom: '6px' }}>
+                  1. ADIM — Teker / Kabin Tipi Seçin:
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobileView ? '1fr' : 'repeat(3, 1fr)',
+                  gap: '8px'
+                }}>
+                  {[
+                    {
+                      id: 'cift_teker',
+                      icon: '💪',
+                      title: '35C Çift Teker Kamyonet',
+                      sub: '3.0 Büyük Motor (160 BG) • Ağır Yük Şasisi',
+                      badge: 'En Çok Tercih Edilen'
+                    },
+                    {
+                      id: 'tek_teker',
+                      icon: '🛞',
+                      title: '35S Tek Teker Kamyonet',
+                      sub: '2.3 Ekonomik Motor (156 BG) • Şehir İçi Dağıtım',
+                      badge: '190.000 TL Nakit İndirimli'
+                    },
+                    {
+                      id: 'cift_kabin',
+                      icon: '👷',
+                      title: 'Çift Kabin (6+1 Kişilik)',
+                      sub: 'Ekip + Yük Taşıma (3.0m Kasa • 8 İleri Otomatik)',
+                      badge: 'Ekip Aracı'
+                    }
+                  ].map(opt => {
+                    const active = kamyonetWheelType === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setKamyonetWheelType(opt.id);
+                          if (opt.id === 'cift_kabin') {
+                            setKamyonetChassisLen('3450');
+                            setKamyonetGearType('otomatik');
+                            if (onTrackFootprint) {
+                              onTrackFootprint('Kamyonet Seçimi Yapıldı', 'IVECO DAILY 35 S 16 H A 8 DC 3450', 'Çift Kabin 6+1 Otomatik');
+                            }
+                            setTimeout(() => {
+                              const el = document.getElementById('kamyonet-result-anchor');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 80);
+                          } else {
+                            setKamyonetChassisLen(null);
+                            setKamyonetGearType(null);
+                          }
+                        }}
+                        style={{
+                          padding: isMobileView ? '10px 12px' : '11px 12px',
+                          borderRadius: '10px',
+                          border: active ? '2px solid #4ade80' : '1px solid rgba(148, 163, 184, 0.3)',
+                          background: active
+                            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                            : 'rgba(15, 23, 42, 0.82)',
+                          color: '#ffffff',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '3px',
+                          boxShadow: active ? '0 4px 14px rgba(16, 185, 129, 0.25)' : 'none'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '0.84rem', fontWeight: 900, color: active ? '#4ade80' : '#f8fafc' }}>
+                            {opt.icon} {opt.title}
+                          </span>
+                          <span style={{
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            padding: '2px 6px',
+                            borderRadius: '999px',
+                            background: active ? '#22c55e' : 'rgba(56, 189, 248, 0.18)',
+                            color: active ? '#052e16' : '#7dd3fc'
+                          }}>
+                            {active ? '✓ Seçildi' : opt.badge}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600 }}>
+                          {opt.sub}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. ADIM: KISA / ORTA / UZUN ŞASİ SEÇİMİ */}
+              {kamyonetWheelType && kamyonetWheelType !== 'cift_kabin' && (
+                <div style={{
+                  paddingTop: '10px',
+                  borderTop: '1px dashed rgba(56, 189, 248, 0.35)'
+                }}>
+                  <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#fde047', marginBottom: '6px' }}>
+                    2. ADIM — Şasi Boyu (Kasa Uzunluğu) Seçin:
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobileView ? '1fr' : 'repeat(3, 1fr)',
+                    gap: '8px'
+                  }}>
+                    {[
+                      {
+                        len: '3450',
+                        title: '📏 Kısa Şasi',
+                        kasa: '3.5 – 3.8 Metre Kasa Uygun',
+                        sub: '3450 mm Dingil Mesafesi • Şehir İçi Manevra'
+                      },
+                      {
+                        len: '3750',
+                        title: '📐 Orta Şasi',
+                        kasa: '4.1 – 4.3 Metre Kasa Uygun',
+                        sub: '3750 mm Dingil Mesafesi • Standart 8 Palet'
+                      },
+                      {
+                        len: '4100',
+                        title: '🚛 Uzun Şasi',
+                        kasa: '4.5 – 4.8 Metre Kasa Uygun',
+                        sub: kamyonetWheelType === 'tek_teker'
+                          ? '4100 mm Uzun Şasi (35C Çift Teker Modelinde Mevcut)'
+                          : '4100 mm Dingil Mesafesi • Maksimum Hacim (-190.000 TL Nakit İndirimli)'
+                      }
+                    ].map(sOpt => {
+                      const active = kamyonetChassisLen === sOpt.len;
+                      return (
+                        <button
+                          key={sOpt.len}
+                          type="button"
+                          onClick={() => {
+                            if (kamyonetWheelType === 'tek_teker' && sOpt.len === '4100') {
+                              setKamyonetWheelType('cift_teker');
+                              setKamyonetChassisLen('4100');
+                              setKamyonetGearType(null);
+                              toast.success('4.5–4.8m Uzun Şasi 35C Çift Teker modelimizde üretilmektedir; 35C Uzun Şasi seçildi ✓');
+                              return;
+                            }
+                            setKamyonetChassisLen(sOpt.len);
+                            if (kamyonetWheelType === 'tek_teker' && sOpt.len === '3750') {
+                              // Tek teker orta şasi sadece Manuel olarak mevcuttur
+                              setKamyonetGearType('manuel');
+                              if (onTrackFootprint) {
+                                onTrackFootprint('Kamyonet Seçimi Yapıldı', 'IVECO DAILY 35 S 16 CC 3750 H 2.3', 'Tek Teker Orta Şasi Manuel');
+                              }
+                              setTimeout(() => {
+                                const el = document.getElementById('kamyonet-result-anchor');
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                              }, 80);
+                            } else {
+                              setKamyonetGearType(null);
+                            }
+                          }}
+                          style={{
+                            padding: isMobileView ? '10px 12px' : '11px 12px',
+                            borderRadius: '10px',
+                            border: active ? '2px solid #fde047' : '1px solid rgba(148, 163, 184, 0.3)',
+                            background: active
+                              ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                              : 'rgba(15, 23, 42, 0.82)',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
+                            boxShadow: active ? '0 4px 14px rgba(245, 158, 11, 0.25)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 900, color: active ? '#fde047' : '#ffffff' }}>
+                              {sOpt.title}
+                            </span>
+                            {active && (
+                              <span style={{ fontSize: '0.63rem', background: '#fde047', color: '#0f172a', padding: '1px 6px', borderRadius: '999px', fontWeight: 900 }}>
+                                ✓ Seçildi
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: '#86efac', fontWeight: 800 }}>
+                            {sOpt.kasa}
+                          </div>
+                          <div style={{ fontSize: '0.67rem', color: '#94a3b8', fontWeight: 600 }}>
+                            {sOpt.sub}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. ADIM (SON SEÇİM): VİTES TİPİ (MANUEL / OTOMATİK) */}
+              {kamyonetWheelType && kamyonetWheelType !== 'cift_kabin' && kamyonetChassisLen && (
+                <div style={{
+                  paddingTop: '10px',
+                  borderTop: '1px dashed rgba(56, 189, 248, 0.35)'
+                }}>
+                  <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#4ade80', marginBottom: '6px' }}>
+                    3. ADIM (SON SEÇİM) — Vites Tipini Seçin:
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobileView ? '1fr' : 'repeat(3, 1fr)',
+                    gap: '8px'
+                  }}>
+                    {[
+                      {
+                        id: 'manuel',
+                        icon: '⚙️',
+                        title: 'Manuel Vites',
+                        sub: '6 İleri Manuel Şanzıman'
+                      },
+                      {
+                        id: 'otomatik',
+                        icon: '⚡',
+                        title: 'Otomatik Vites (Hi-Matic)',
+                        sub: kamyonetWheelType === 'tek_teker' && kamyonetChassisLen === '3750'
+                          ? '8 İleri Otomatik (35C Çift Teker Orta Şaside Mevcut)'
+                          : '8 İleri Tam Otomatik Şanzıman'
+                      },
+                      {
+                        id: 'both',
+                        icon: '🔄',
+                        title: 'İkisini Yan Yana Karşılaştır',
+                        sub: 'Manuel ve Otomatik Fiyatını Birlikte Gör'
+                      }
+                    ].map(gOpt => {
+                      const active = kamyonetGearType === gOpt.id;
+                      return (
+                        <button
+                          key={gOpt.id}
+                          type="button"
+                          onClick={() => {
+                            if (kamyonetWheelType === 'tek_teker' && kamyonetChassisLen === '3750' && gOpt.id === 'otomatik') {
+                              setKamyonetWheelType('cift_teker');
+                              setKamyonetChassisLen('3750');
+                              setKamyonetGearType('otomatik');
+                              toast.success('Orta Şasi Otomatik vites 35C Çift Teker modelimizde mevcuttur; otomatik seçildi ✓');
+                            } else {
+                              setKamyonetGearType(gOpt.id);
+                            }
+                            if (onTrackFootprint) {
+                              onTrackFootprint(
+                                'Kamyonet Son Seçimi Yapıldı',
+                                `${kamyonetWheelType === 'cift_teker' ? '35C Çift Teker' : '35S Tek Teker'} ${kamyonetChassisLen}mm`,
+                                gOpt.title
+                              );
+                            }
+                            setTimeout(() => {
+                              const el = document.getElementById('kamyonet-result-anchor');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 80);
+                          }}
+                          style={{
+                            padding: isMobileView ? '10px 12px' : '11px 12px',
+                            borderRadius: '10px',
+                            border: active ? '2px solid #22c55e' : '1px solid rgba(148, 163, 184, 0.3)',
+                            background: active
+                              ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                              : 'rgba(15, 23, 42, 0.82)',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
+                            boxShadow: active ? '0 4px 14px rgba(34, 197, 94, 0.25)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 900, color: active ? '#4ade80' : '#ffffff' }}>
+                              {gOpt.icon} {gOpt.title}
+                            </span>
+                            {active && (
+                              <span style={{ fontSize: '0.63rem', background: '#22c55e', color: '#052e16', padding: '1px 6px', borderRadius: '999px', fontWeight: 900 }}>
+                                ✓ Seçildi
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.69rem', color: '#cbd5e1', fontWeight: 600 }}>
+                            {gOpt.sub}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <div id="kamyonet-result-anchor" style={{ scrollMarginTop: '12px' }} />
+
+      {/* Seçilen Kamyonet Başlığı */}
+      {selectedCategory === 'daily35_chassis' && !searchQuery.trim() && !showAllKamyonetList && filteredVehicles.length > 0 && (
+        <div style={{
+          marginBottom: '10px',
+          padding: '8px 12px',
+          borderRadius: '10px',
+          background: 'rgba(16, 185, 129, 0.16)',
+          border: '1px solid rgba(16, 185, 129, 0.45)',
+          color: '#86efac',
+          fontSize: '0.78rem',
+          fontWeight: 900,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '6px'
+        }}>
+          <span>✅ Seçiminize Uygun Kamyonet Modeli Aşağıda Hazır:</span>
+          <span style={{ fontSize: '0.7rem', color: '#fde047' }}>
+            👇 Taksit hesaplayabilir veya Can Murat’a son dip fiyatı sorabilirsiniz
+          </span>
+        </div>
+      )}
+
       {/* Vehicle Grid — ÖNCE SONUÇ, MÜŞTERİ İSTERSE DETAY */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '14px' }}>
         {filteredVehicles.map(vehicle => {
@@ -2343,7 +2761,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         })}
       </div>
 
-      {filteredVehicles.length === 0 && (
+      {filteredVehicles.length === 0 && !(selectedCategory === 'daily35_chassis' && !searchQuery.trim() && !showAllKamyonetList) && (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
           Aradığınız kriterlere uygun araç bulunamadı. Lütfen filtreleri sıfırlayın.
         </div>
