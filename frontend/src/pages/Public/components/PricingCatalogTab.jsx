@@ -130,27 +130,27 @@ const FRIENDLY_VEHICLE_TITLES = {
     subtitle: 'En Büyük 18 m³ Hacim • Çift Teker • 8 İleri Otomatik • B Ehliyet'
   },
   'daily-70c16-3750-klima': {
-    title: 'Daily 7 Ton Kamyon — Orta Şasi (Manuel)',
+    title: 'Daily 7 Ton Kamyon — Kısa Şasi (Manuel)',
     subtitle: '4.1 – 4.3 Metre Kasa • ~4.8 Ton Yük • Klimalı • C Ehliyet'
   },
   'daily-70c16-3750-himatic-klima': {
-    title: 'Daily 7 Ton Kamyon — Orta Şasi (Otomatik)',
+    title: 'Daily 7 Ton Kamyon — Kısa Şasi (Otomatik)',
     subtitle: '4.1 – 4.3 Metre Kasa • ~4.8 Ton Yük • 8 İleri Otomatik'
   },
   'daily-70c16-4350-klima': {
-    title: 'Daily 7 Ton Kamyon — Uzun Şasi (Manuel)',
+    title: 'Daily 7 Ton Kamyon — Orta Şasi (Manuel)',
     subtitle: '5.1 – 5.3 Metre Kasa (10 Palet) • ~4.8 Ton Yük • Klimalı'
   },
   'daily-70c16-4350-himatic-klima': {
-    title: 'Daily 7 Ton Kamyon — Uzun Şasi (Otomatik)',
+    title: 'Daily 7 Ton Kamyon — Orta Şasi (Otomatik)',
     subtitle: '5.1 – 5.3 Metre Kasa (10 Palet) • 8 İleri Otomatik • Klimalı'
   },
   'daily-70c16-4750-klima': {
-    title: 'Daily 7 Ton Kamyon — Ekstra Uzun Şasi (Manuel)',
+    title: 'Daily 7 Ton Kamyon — Uzun Şasi (Manuel)',
     subtitle: '5.6 – 5.9 Metre Kasa (12 Palet) • ~4.7 Ton Yük • Klimalı'
   },
   'daily-70c16-4750-himatic-klima': {
-    title: 'Daily 7 Ton Kamyon — Ekstra Uzun Şasi (Otomatik)',
+    title: 'Daily 7 Ton Kamyon — Uzun Şasi (Otomatik)',
     subtitle: '5.6 – 5.9 Metre Kasa (12 Palet) • 8 İleri Otomatik • Klimalı'
   },
   'daily-70c18-van-4100-klima': {
@@ -283,6 +283,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
   const [kamyonetChassisLen, setKamyonetChassisLen] = useState(null); // '3450' | '3750' | '4100' | null
   const [kamyonetGearType, setKamyonetGearType] = useState(null); // 'manuel' | 'otomatik' | 'both' | null
   const [showAllKamyonetList, setShowAllKamyonetList] = useState(false);
+  // 🚛 7 Ton Daily Kamyon (daily70) Çoktan Seçmeli (Kısa / Orta / Uzun Şasi) State'leri
+  const [daily70ChassisLen, setDaily70ChassisLen] = useState(null); // '3750' | '4350' | '4750' | 'van' | null
+  const [daily70GearType, setDaily70GearType] = useState(null); // 'manuel' | 'otomatik' | 'both' | null
+  const [showAllDaily70List, setShowAllDaily70List] = useState(false);
   const [activeInlineCalcId, setActiveInlineCalcId] = useState(null);
   const [showInlinePhotoUpload, setShowInlinePhotoUpload] = useState(false);
   const [showTradeInBox, setShowTradeInBox] = useState(false);
@@ -508,6 +512,22 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           if (v.segment !== 'Daily 35' || !v.category.includes('Panelvan')) return false;
         } else if (selectedCategory === 'daily70') {
           if (v.segment !== 'Daily 70 C' && v.segment !== 'Daily 70' && !v.segment.includes('70') && !v.segment.includes('72')) return false;
+          // 🚛 Çoktan Seçmeli Daily 7 Ton Kamyon (Kısa / Orta / Uzun Şasi) Seçici aktifse:
+          if (!showAllDaily70List) {
+            if (!daily70ChassisLen) return false;
+            const is70Van = v.category.toLowerCase().includes('panelvan') || v.id.includes('-van-');
+            if (daily70ChassisLen === 'van') {
+              if (!is70Van) return false;
+            } else {
+              if (is70Van) return false;
+              if (String(v.wheelbase) !== String(daily70ChassisLen)) return false;
+            }
+
+            if (!daily70GearType) return false;
+            const isAuto70 = (v.transmission || '').toLowerCase().includes('otomatik') || (v.transmission || '').toLowerCase().includes('hi-matic') || v.id.includes('himatic') || v.id.includes('-a8-');
+            if (daily70GearType === 'manuel' && isAuto70) return false;
+            if (daily70GearType === 'otomatik' && !isAuto70) return false;
+          }
         } else if (selectedCategory === 'eurocargo') {
           if (v.segment !== 'Eurocargo') return false;
         } else if (selectedCategory === 'sway') {
@@ -540,7 +560,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
 
       return true;
     });
-  }, [hasGroupRestriction, allowedGroups, selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels, showAllKamyonetList, kamyonetWheelType, kamyonetChassisLen, kamyonetGearType]);
+  }, [hasGroupRestriction, allowedGroups, selectedSectorFilter, selectedCategory, searchQuery, onlyDoubleWheels, showAllKamyonetList, kamyonetWheelType, kamyonetChassisLen, kamyonetGearType, showAllDaily70List, daily70ChassisLen, daily70GearType]);
 
   const tradeInCatalogModels = useMemo(() => {
     return IVECO_PRICING_CATALOG.filter(v => !v.isCustomPrice && (v.campaignPrice || v.cashPrice || v.eurPrice));
@@ -1836,10 +1856,260 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         </div>
       )}
 
+      {/* 🚛 7 TON DAILY KAMYON (70C) GRUBU — KISA / ORTA / UZUN ŞASİ ÇOKTAN SEÇMELİ SİHİRBAZ */}
+      {selectedCategory === 'daily70' && !searchQuery.trim() && (
+        <div style={{
+          background: 'linear-gradient(160deg, rgba(15, 23, 42, 0.96) 0%, rgba(23, 37, 84, 0.94) 100%)',
+          border: '2px solid rgba(56, 189, 248, 0.55)',
+          borderRadius: '14px',
+          padding: isMobileView ? '12px' : '15px 18px',
+          marginBottom: '14px',
+          boxShadow: '0 8px 24px rgba(2, 132, 199, 0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <div style={{ fontSize: isMobileView ? '0.84rem' : '0.95rem', fontWeight: 900, color: '#fde047' }}>
+                🚛 Daily 7 Ton Kamyon (70C) — Şasi Boyu ve Vites Seçin
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '2px' }}>
+                Önce Kısa / Orta / Uzun şasi boyunu (veya 19.6 m³ Panelvanı), ardından vites tipini seçin; aradığınız aracın net fiyatı ve taksiti anında açılsın.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              {(daily70ChassisLen || daily70GearType) && !showAllDaily70List && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDaily70ChassisLen(null);
+                    setDaily70GearType(null);
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#e2e8f0',
+                    borderRadius: '7px',
+                    padding: '5px 9px',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ↺ Seçimi Sıfırla
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowAllDaily70List(prev => !prev)}
+                style={{
+                  background: showAllDaily70List ? 'rgba(16, 185, 129, 0.25)' : 'rgba(15, 23, 42, 0.85)',
+                  border: showAllDaily70List ? '1.5px solid #10b981' : '1px solid rgba(148, 163, 184, 0.35)',
+                  color: showAllDaily70List ? '#4ade80' : '#93c5fd',
+                  borderRadius: '7px',
+                  padding: '5px 10px',
+                  fontSize: '0.69rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                {showAllDaily70List ? '🎯 Adım Adım Seçime Dön' : '📋 Tümünü Listele (8 Model)'}
+              </button>
+            </div>
+          </div>
+
+          {!showAllDaily70List && (
+            <>
+              {/* 1. ADIM: KISA / ORTA / UZUN ŞASİ (VEYA DEV PANELVAN) SEÇİMİ */}
+              <div>
+                <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#38bdf8', marginBottom: '6px' }}>
+                  1. ADIM — Şasi Boyu (Kısa / Orta / Uzun) Seçin:
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobileView ? '1fr' : 'repeat(4, 1fr)',
+                  gap: '8px'
+                }}>
+                  {[
+                    {
+                      len: '3750',
+                      title: '📏 Kısa Şasi',
+                      kasa: '4.1 – 4.3 Metre Kasa Uygun',
+                      sub: '3750 mm Dingil • ~4.8 Ton Yük • Klimalı',
+                      badge: 'Manevra & Oto Kurtarma'
+                    },
+                    {
+                      len: '4350',
+                      title: '📐 Orta Şasi',
+                      kasa: '5.1 – 5.3 Metre Kasa (10 Palet)',
+                      sub: '4350 mm Dingil • ~4.8 Ton Yük • Klimalı',
+                      badge: 'En Çok Tercih Edilen'
+                    },
+                    {
+                      len: '4750',
+                      title: '🚛 Uzun Şasi',
+                      kasa: '5.6 – 5.9 Metre Kasa (12 Palet)',
+                      sub: '4750 mm Dingil • ~4.7 Ton Yük • Klimalı',
+                      badge: '-260.000 TL Nakit İndirimli'
+                    },
+                    {
+                      len: 'van',
+                      title: '🚐 7 Ton Dev Panelvan',
+                      kasa: '19.6 m³ Kapalı Sac Gövde',
+                      sub: '5.12m İç Uzunluk • 180 BG Büyük Motor',
+                      badge: '19.6 m³ Hazır Van'
+                    }
+                  ].map(sOpt => {
+                    const active = daily70ChassisLen === sOpt.len;
+                    return (
+                      <button
+                        key={sOpt.len}
+                        type="button"
+                        onClick={() => {
+                          setDaily70ChassisLen(sOpt.len);
+                          setDaily70GearType(null);
+                        }}
+                        style={{
+                          padding: isMobileView ? '10px 12px' : '11px 12px',
+                          borderRadius: '10px',
+                          border: active ? '2px solid #fde047' : '1px solid rgba(148, 163, 184, 0.3)',
+                          background: active
+                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                            : 'rgba(15, 23, 42, 0.82)',
+                          color: '#ffffff',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '3px',
+                          boxShadow: active ? '0 4px 14px rgba(245, 158, 11, 0.25)' : 'none'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ fontSize: '0.83rem', fontWeight: 900, color: active ? '#fde047' : '#ffffff' }}>
+                            {sOpt.title}
+                          </span>
+                          <span style={{
+                            fontSize: '0.6rem',
+                            fontWeight: 800,
+                            padding: '2px 6px',
+                            borderRadius: '999px',
+                            background: active ? '#fde047' : 'rgba(56, 189, 248, 0.18)',
+                            color: active ? '#0f172a' : '#7dd3fc'
+                          }}>
+                            {active ? '✓ Seçildi' : sOpt.badge}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.73rem', color: '#86efac', fontWeight: 800 }}>
+                          {sOpt.kasa}
+                        </div>
+                        <div style={{ fontSize: '0.67rem', color: '#94a3b8', fontWeight: 600 }}>
+                          {sOpt.sub}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. ADIM (SON SEÇİM): VİTES TİPİ (MANUEL / OTOMATİK) */}
+              {daily70ChassisLen && (
+                <div style={{
+                  paddingTop: '10px',
+                  borderTop: '1px dashed rgba(56, 189, 248, 0.35)'
+                }}>
+                  <div style={{ fontSize: '0.76rem', fontWeight: 900, color: '#4ade80', marginBottom: '6px' }}>
+                    2. ADIM (SON SEÇİM) — Vites Tipini Seçin:
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobileView ? '1fr' : 'repeat(3, 1fr)',
+                    gap: '8px'
+                  }}>
+                    {[
+                      {
+                        id: 'manuel',
+                        icon: '⚙️',
+                        title: 'Manuel Vites',
+                        sub: '6 İleri Manuel Şanzıman (Klimalı)'
+                      },
+                      {
+                        id: 'otomatik',
+                        icon: '⚡',
+                        title: 'Otomatik Vites (Hi-Matic)',
+                        sub: '8 İleri Tam Otomatik Şanzıman (Klimalı)'
+                      },
+                      {
+                        id: 'both',
+                        icon: '🔄',
+                        title: 'İkisini Yan Yana Karşılaştır',
+                        sub: 'Manuel ve Otomatik Fiyatını Birlikte Gör'
+                      }
+                    ].map(gOpt => {
+                      const active = daily70GearType === gOpt.id;
+                      return (
+                        <button
+                          key={gOpt.id}
+                          type="button"
+                          onClick={() => {
+                            setDaily70GearType(gOpt.id);
+                            if (onTrackFootprint) {
+                              onTrackFootprint(
+                                'Daily 70C Kamyon Seçimi Yapıldı',
+                                `Daily 70C ${daily70ChassisLen === '3750' ? 'Kısa Şasi (3750)' : daily70ChassisLen === '4350' ? 'Orta Şasi (4350)' : daily70ChassisLen === '4750' ? 'Uzun Şasi (4750)' : 'Dev Panelvan (19.6m3)'}`,
+                                gOpt.title
+                              );
+                            }
+                            setTimeout(() => {
+                              const el = document.getElementById('kamyonet-result-anchor');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 80);
+                          }}
+                          style={{
+                            padding: isMobileView ? '10px 12px' : '11px 12px',
+                            borderRadius: '10px',
+                            border: active ? '2px solid #22c55e' : '1px solid rgba(148, 163, 184, 0.3)',
+                            background: active
+                              ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.28) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                              : 'rgba(15, 23, 42, 0.82)',
+                            color: '#ffffff',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '2px',
+                            boxShadow: active ? '0 4px 14px rgba(34, 197, 94, 0.25)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 900, color: active ? '#4ade80' : '#ffffff' }}>
+                              {gOpt.icon} {gOpt.title}
+                            </span>
+                            {active && (
+                              <span style={{ fontSize: '0.63rem', background: '#22c55e', color: '#052e16', padding: '1px 6px', borderRadius: '999px', fontWeight: 900 }}>
+                                ✓ Seçildi
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: '0.69rem', color: '#cbd5e1', fontWeight: 600 }}>
+                            {gOpt.sub}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       <div id="kamyonet-result-anchor" style={{ scrollMarginTop: '12px' }} />
 
-      {/* Seçilen Kamyonet Başlığı */}
-      {selectedCategory === 'daily35_chassis' && !searchQuery.trim() && !showAllKamyonetList && filteredVehicles.length > 0 && (
+      {/* Seçilen Kamyonet / Daily 70C Kamyon Başlığı */}
+      {((selectedCategory === 'daily35_chassis' && !showAllKamyonetList) || (selectedCategory === 'daily70' && !showAllDaily70List)) && !searchQuery.trim() && filteredVehicles.length > 0 && (
         <div style={{
           marginBottom: '10px',
           padding: '8px 12px',
@@ -1855,7 +2125,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           flexWrap: 'wrap',
           gap: '6px'
         }}>
-          <span>✅ Seçiminize Uygun Kamyonet Modeli Aşağıda Hazır:</span>
+          <span>✅ Seçiminize Uygun {selectedCategory === 'daily70' ? 'Daily 7 Ton Kamyon' : 'Kamyonet'} Modeli Aşağıda Hazır:</span>
           <span style={{ fontSize: '0.7rem', color: '#fde047' }}>
             👇 Taksit hesaplayabilir veya Can Murat’a son dip fiyatı sorabilirsiniz
           </span>
@@ -2761,7 +3031,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         })}
       </div>
 
-      {filteredVehicles.length === 0 && !(selectedCategory === 'daily35_chassis' && !searchQuery.trim() && !showAllKamyonetList) && (
+      {filteredVehicles.length === 0 && !(!searchQuery.trim() && ((selectedCategory === 'daily35_chassis' && !showAllKamyonetList) || (selectedCategory === 'daily70' && !showAllDaily70List))) && (
         <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
           Aradığınız kriterlere uygun araç bulunamadı. Lütfen filtreleri sıfırlayın.
         </div>
