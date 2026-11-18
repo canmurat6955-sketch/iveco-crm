@@ -44,11 +44,12 @@ const SOURCE_META = {
   vip_portal_footprint: { label: 'WhatsApp Özel Müşteri Linki', short: '👑 Kişiye Özel Link', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.35)' },
   wa_durum: { label: 'WhatsApp Durum Paylaşımı', short: '📲 WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
   whatsapp_durum: { label: 'WhatsApp Durum Paylaşımı', short: '📲 WhatsApp Durum', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.35)' },
-  wa_durum_kilavuz: { label: 'WA Durum (Kılavuz Videosu)', short: '📲 WA Durum (Kılavuz)', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_durum_kilavuz: { label: 'WA Durum (Çoktan Seçmeli Kılavuz)', short: '📲 WA Durum (Kılavuz)', color: '#4ade80', bg: 'rgba(34, 197, 94, 0.16)', border: 'rgba(34, 197, 94, 0.35)' },
+  wa_durum_coktan: { label: 'WA Durum (3 Adımlı Kamyonet & 7T Seçici)', short: '📲 WA Durum (Çoktan Seçmeli)', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.16)', border: 'rgba(56, 189, 248, 0.35)' },
   wa_durum_takas: { label: 'WA Durum (Takas & Kredi)', short: '📲 WA Durum (Takas)', color: '#fb923c', bg: 'rgba(249, 115, 22, 0.16)', border: 'rgba(249, 115, 22, 0.35)' },
   wa_durum_odemesiz: { label: 'WA Durum (3-6 Ay Ödemesiz)', short: '📲 WA Durum (Ödemesiz)', color: '#60a5fa', bg: 'rgba(59, 130, 246, 0.16)', border: 'rgba(59, 130, 246, 0.35)' },
   wa_durum_kdv: { label: 'WA Durum (%20 KDV & İndirim)', short: '📲 WA Durum (KDV)', color: '#34d399', bg: 'rgba(16, 185, 129, 0.16)', border: 'rgba(16, 185, 129, 0.35)' },
-  wa_durum_kantar: { label: 'WA Durum (35C vs 70C Kantar)', short: '📲 WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
+  wa_durum_kantar: { label: 'WA Durum (3.5T / 7T / Eurocargo)', short: '📲 WA Durum (35C/70C)', color: '#fbbf24', bg: 'rgba(245, 158, 11, 0.16)', border: 'rgba(245, 158, 11, 0.35)' },
   wa_grup: { label: 'WhatsApp Nakliye / Esnaf Grubu', short: '👥 WhatsApp Grubu', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.15)', border: 'rgba(45, 212, 191, 0.35)' },
   fb_grup: { label: 'Facebook Kamyoncu / Nakliye Grubu', short: '📘 Facebook Grubu', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
   facebook: { label: 'Facebook Paylaşım Linki', short: '📘 Facebook', color: '#3b82f6', bg: 'rgba(24, 119, 242, 0.18)', border: 'rgba(59, 130, 246, 0.45)' },
@@ -133,6 +134,7 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   if (combined.includes('linkedin')) {
     return SOURCE_META.linkedin;
   }
+  if (combined.includes('wa_durum_coktan')) return SOURCE_META.wa_durum_coktan;
   if (combined.includes('wa_durum_takas')) return SOURCE_META.wa_durum_takas;
   if (combined.includes('wa_durum_odemesiz')) return SOURCE_META.wa_durum_odemesiz;
   if (combined.includes('wa_durum_kdv')) return SOURCE_META.wa_durum_kdv;

@@ -22,7 +22,21 @@ const FPS = 30;
 const CANVAS_W = 1080;
 const CANVAS_H = 1920;
 
-// ── 5 AKILCI WHATSAPP DURUM VİDEO SENARYOSU ─────────────────────────────────
+const SYSTEM_IMAGE_URLS = {
+  daily35_sasi: '/vehicles/daily-35s-sasi.jpg',
+  daily_van: '/vehicles/daily-panelvan.jpg',
+  daily70: '/vehicles/daily-35c-72c.jpg',
+  eurocargo: '/vehicles/eurocargo-100-120.jpg',
+  eurocargo_big: '/vehicles/eurocargo-150-160.jpg',
+  sway: '/vehicles/sway-cekici.jpg',
+  tway: '/vehicles/tway-damper.jpg',
+  ustyapi_35: '/ustyapi/daily35-1.jpg',
+  ustyapi_72: '/ustyapi/daily72-1.jpg',
+  ustyapi_ec: '/ustyapi/eurocargo-1.jpg',
+  logo_iveco: '/logo-iveco-white.png'
+};
+
+// ── 8 AKILCI & GERÇEK ARAÇ GÖRSELLİ WHATSAPP DURUM VİDEO SENARYOSU ──────────
 // ANDROID WHATSAPP DURUM KURALI:
 // Android'de açıklama + link toplamı ~180 karakteri aşarsa veya yıldız (*), madde imi ve çoklu paragraf
 // kullanılırsa üstteki resimli önizleme kartı kaybolur ve video altında "...devamını oku" çıkıp link gizlenir.
@@ -30,46 +44,46 @@ const CANVAS_H = 1920;
 const VIDEO_SCENARIOS = [
   {
     id: 'kilavuz',
-    dayLabel: '1. Senaryo • Yeni Sade Ekran Kılavuzu',
-    shortTitle: '📲 10 Sn Yeni Ekran Kılavuzu',
+    dayLabel: '1. Senaryo • Yeni Çoktan Seçmeli Ekran Kılavuzu',
+    shortTitle: '📲 3 Adımda Aracını Seç & Taksit Hesapla',
     refCode: 'wa_durum_kilavuz',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — 2026 Fiyat & Taksit Ekranı',
+    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Çoktan Seçmeli 2026 Fiyat & Taksit',
     onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz',
     caption:
-      `📲 Araç grubunu seçip aynı kart içinde 2026 IVECO peşin fiyat ve taksitinizi hesaplayın 👇\n\n` +
+      `📲 3 adımda aracınızı seçip aynı kart içinde 2026 IVECO fiyat ve taksitinizi hesaplayın 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz`,
     steps: [
       {
-        badge: 'ADIM 1 / 4 • 6 ARAÇ GRUBUNDAN BİRİNE DOKUNUN',
-        title: '1. İlgilendiğiniz Araç Grubunu Seçin & Fiyatı Görün',
+        badge: 'ADIM 1 / 4 • RESİMLİ 6 ARAÇ GRUBUNDAN BİRİNE DOKUNUN',
+        title: '1. Üstten Araç Grubunu Seçin & Çoktan Seçmeli Başlasın',
         subtitle: '3.5T Kamyonet, Panelvan, 7T Kamyon, Eurocargo, S-Way Çekici veya T-Way Mikser/Hafriyat.',
-        voiceover: 'Üstteki altı araç grubundan işinize uygun olanı tek dokunuşla seçin.',
+        voiceover: 'Üstten araç grubunu seçip çoktan seçmeli adımlarla modelinizi belirleyin.',
         audioUrl: '/audio/wa-scenarios/kilavuz_1.mp3',
         accent: '#10b981',
         accentBg: 'rgba(16, 185, 129, 0.22)'
       },
       {
-        badge: 'ADIM 2 / 4 • KART İÇİ "TAKSİT & TAKAS HESAPLA"',
-        title: "2. '💳 Taksit & Takas Hesapla' Tuşuna Dokunun",
-        subtitle: 'Başka sayfaya zıplamadan, aynı kartın içinde peşinatınızı ve 12-24-36 ay vadeyi seçin.',
-        voiceover: 'Kartın içindeki taksit ve takas hesaplayıcıyla aylık ödemenizi görün.',
+        badge: 'ADIM 2 / 4 • TEK/ÇİFT TEKER → KISA/ORTA/UZUN ŞASİ → VİTES',
+        title: '2. Teker Tipini, Şasi Boyunu ve Vitesi Seçin',
+        subtitle: '10 kart arasında kaybolmadan: 1. Çift/Tek Teker → 2. Kısa/Orta/Uzun Şasi → 3. Manuel/Otomatik!',
+        voiceover: 'Teker tipini, kısa orta uzun şasi boyunu ve vitesinizi tek dokunuşla seçin.',
         audioUrl: '/audio/wa-scenarios/kilavuz_2.mp3',
-        accent: '#3b82f6',
-        accentBg: 'rgba(59, 130, 246, 0.22)'
-      },
-      {
-        badge: 'ADIM 3 / 4 • %20 KDV VERGİ İNDİRİMİ & 2 NET BUTON',
-        title: "3. %20 KDV İndirimini Görün & WhatsApp'tan Sorun",
-        subtitle: 'Her araçta sadece 2 net tuş var: Taksit & Takas Hesapla veya WhatsApp’tan Can Murat’a Sor!',
-        voiceover: 'Yüzde yirmi KDV vergi avantajınızı görüp WhatsApp’tan bize ulaşın.',
-        audioUrl: '/audio/wa-scenarios/kilavuz_3.mp3',
         accent: '#f59e0b',
         accentBg: 'rgba(245, 158, 11, 0.22)'
       },
       {
+        badge: 'ADIM 3 / 4 • KART İÇİ TAKSİT HESAPLA & SON DİP FİYATI SOR',
+        title: "3. Kart İçinden Taksit Hesaplayın veya Dip Fiyatı Sorun",
+        subtitle: 'TL veya İhracatçı Euro Kredisi taksitini görün, yeşil tuşla Can Murat’a son oluru sorun!',
+        voiceover: 'Kartın içinden taksit hesaplayın veya yeşil tuşla son dip fiyatı sorun.',
+        audioUrl: '/audio/wa-scenarios/kilavuz_3.mp3',
+        accent: '#3b82f6',
+        accentBg: 'rgba(59, 130, 246, 0.22)'
+      },
+      {
         badge: 'ADIM 4 / 4 • ŞİMDİ KENDİ TELEFONUNUZDA DENEYİN',
         title: 'Aşağıdaki Linke Dokunun, Hesabınızı Canlı Yapın!',
-        subtitle: 'Karmaşık menü yok, form yok! Linke tıklayıp 10 saniyede aracınızı ve taksitinizi görün.',
+        subtitle: 'Karmaşık liste yok! Linke tıklayıp 3 adımda aracınızı, taksitinizi ve dip fiyatı görün.',
         voiceover: 'Aşağıdaki linke dokunun, kendi hesabınızı on saniyede canlı yapın!',
         audioUrl: '/audio/wa-scenarios/kilavuz_4.mp3',
         accent: '#22c55e',
@@ -78,8 +92,57 @@ const VIDEO_SCENARIOS = [
     ]
   },
   {
+    id: 'coktan_secmeli',
+    dayLabel: '2. Senaryo • Kamyonet & 7T Kamyon Çoktan Seçmeli',
+    shortTitle: '🛻 Tek/Çift Teker • Kısa/Orta/Uzun Şasi Seçici',
+    refCode: 'wa_durum_coktan',
+    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — 3 Adımlı Kamyonet & 70C Kamyon Seçici',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_coktan',
+    caption:
+      `🛻 Tek/Çift teker ve Kısa/Orta/Uzun şasiyi 3 adımda seçip 2026 IVECO fiyatını görün 👇\n\n` +
+      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_coktan`,
+    steps: [
+      {
+        badge: 'ÇOKTAN SEÇMELİ 1 / 4 • 3.5T KAMYONET & 7T KAMYON',
+        title: 'Uzun Listelerde Arama Yok: 3 Adımda Aracınız Hazır!',
+        subtitle: 'Hem 3.5 Ton Kamyonette hem 7 Ton Daily 70C Kamyonda adım adım çoktan seçmeli sistem.',
+        voiceover: 'Kamyonet ve yedi ton kamyonda karışıklık bitti, adım adım aracınızı seçin.',
+        audioUrl: '/audio/wa-scenarios/coktan_secmeli_1.mp3',
+        accent: '#38bdf8',
+        accentBg: 'rgba(56, 189, 248, 0.22)'
+      },
+      {
+        badge: 'ÇOKTAN SEÇMELİ 2 / 4 • TEKER TİPİ & ŞASİ BOYU SEÇİMİ',
+        title: '1. Çift/Tek Teker → 2. Kısa / Orta / Uzun Şasi',
+        subtitle: '35C Çift Teker (3.0 Motor) veya 35S Tek Teker; 3.5m Kısa, 4.3m Orta, 4.8m ve 5.9m Uzun Şasi!',
+        voiceover: 'Önce çift teker veya tek tekeri, ardından kısa, orta, uzun şasiyi seçin.',
+        audioUrl: '/audio/wa-scenarios/coktan_secmeli_2.mp3',
+        accent: '#f59e0b',
+        accentBg: 'rgba(245, 158, 11, 0.22)'
+      },
+      {
+        badge: 'ÇOKTAN SEÇMELİ 3 / 4 • SON SEÇİM: MANUEL / OTOMATİK',
+        title: '3. Manuel veya 8 İleri Otomatik Seçin, Kart Açılsın!',
+        subtitle: 'Sadece seçtiğiniz aracın net peşin fiyatı, %20 KDV mahsubu ve taksit hesaplayıcısı açılır.',
+        voiceover: 'Son adımda manuel veya otomatik vitesi seçip net fiyatı anında görün.',
+        audioUrl: '/audio/wa-scenarios/coktan_secmeli_3.mp3',
+        accent: '#10b981',
+        accentBg: 'rgba(16, 185, 129, 0.22)'
+      },
+      {
+        badge: 'ÇOKTAN SEÇMELİ 4 / 4 • HEMEN DENEYİN',
+        title: 'Aşağıdaki Linke Tıklayın, 3 Adımda İveco’nuzu Seçin!',
+        subtitle: 'İster 3.5 Ton Kamyonet ister 7 Ton Kamyon; kendi şasi boyunuzu seçip dip fiyat isteyin.',
+        voiceover: 'Aşağıdaki linke tıklayın, üç adımda size en uygun İveco’yu bulun!',
+        audioUrl: '/audio/wa-scenarios/coktan_secmeli_4.mp3',
+        accent: '#22c55e',
+        accentBg: 'rgba(34, 197, 94, 0.25)'
+      }
+    ]
+  },
+  {
     id: 'takas',
-    dayLabel: '2. Senaryo • Kart İçi Takas + Kredi',
+    dayLabel: '3. Senaryo • Kart İçi Takas + Kredi & 4 Resim',
     shortTitle: '🔄 Eski Aracı Takasa Ver, Üstünü Kredile',
     refCode: 'wa_durum_takas',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Kart İçi Takas & Taksit Hesaplayıcı',
@@ -128,8 +191,8 @@ const VIDEO_SCENARIOS = [
   },
   {
     id: 'odemesiz',
-    dayLabel: '3. Senaryo • 3-6 Ay Ödemesiz & %0 Faiz',
-    shortTitle: '⏳ Şimdi Al, 3-6 Ay Sonra Öde',
+    dayLabel: '4. Senaryo • 3-6 Ay Ödemesiz & %0 Faiz',
+    shortTitle: '⏳ Şimdi Al, 6 Ay Sonra Öde',
     refCode: 'wa_durum_odemesiz',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Resmi Banka Kredi Oranları Tablosu',
     onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_odemesiz',
@@ -177,7 +240,7 @@ const VIDEO_SCENARIOS = [
   },
   {
     id: 'kdv',
-    dayLabel: '4. Senaryo • %20 KDV & Nakit İndirimi',
+    dayLabel: '5. Senaryo • %20 KDV & Nakit İndirimi',
     shortTitle: '🧾 %20 KDV Avantajı & 325 Bin TL Nakit İndirimi',
     refCode: 'wa_durum_kdv',
     urlBar: '🔒 iveco-fiyat-listesi.vercel.app — %20 KDV Kalkanı & Peşin İndirimler',
@@ -225,20 +288,118 @@ const VIDEO_SCENARIOS = [
     ]
   },
   {
+    id: 'ihracat_euro',
+    dayLabel: '6. Senaryo • İhracatçıya Özel Euro (€) Kredisi',
+    shortTitle: '💶 İhracatçı Euro (€) Kredisi • %0 Kâr Payı',
+    refCode: 'ihracat_euro',
+    urlBar: '🔒 iveco-fiyat-listesi.vercel.app/?loan=eur — İhracatçı Euro Kredisi',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?loan=eur&ref=ihracat_euro',
+    caption:
+      `🇪🇺 İhracatçı firmalarımıza özel %0 kâr paylı & 6 ay ödemesiz Euro (€) kredisi taksit tablosu 👇\n\n` +
+      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?loan=eur&ref=ihracat_euro`,
+    steps: [
+      {
+        badge: 'İHRACATÇI 1 / 4 • 32 SAYILI KARAR EURO (€) FİNANSMANI',
+        title: 'İhracatçı & Döviz Gelirli Firmalara Euro (€) Kredisi!',
+        subtitle: 'Yüksek TL faiz maliyetine girmeden tüm 2026 IVECO modellerinde Euro bazlı ticari kredi.',
+        voiceover: 'İhracatçı ve döviz gelirli firmalarımıza özel Euro kredisi fırsatı başladı.',
+        audioUrl: '/audio/wa-scenarios/ihracat_euro_1.mp3',
+        accent: '#3b82f6',
+        accentBg: 'rgba(59, 130, 246, 0.24)'
+      },
+      {
+        badge: 'İHRACATÇI 2 / 4 • KART İÇİNDE EURO (€) TAKSİT HESABI',
+        title: "Kart İçinde '💶 İhracatçı Euro (€) Kredisi' Sekmesi!",
+        subtitle: '€15.000 - €75.000 peşinat ve 12-24-36-48 ay Euro taksitlerini aynı kart içinde görün.',
+        voiceover: 'Kart içindeki hesaplayıcıdan Euro kredisini seçip aylık taksitinizi görün.',
+        audioUrl: '/audio/wa-scenarios/ihracat_euro_2.mp3',
+        accent: '#f59e0b',
+        accentBg: 'rgba(245, 158, 11, 0.22)'
+      },
+      {
+        badge: 'İHRACATÇI 3 / 4 • KUVEYT TÜRK %0 KÂR PAYI & 6 AY ÖDEMESİZ',
+        title: 'Kuveyt Türk %0 Kâr Payı • Garanti BBVA • BNP Paribas',
+        subtitle: 'S-Way Çekici, Eurocargo, T-Way ve Daily serisinde 6 ay ödemesiz veya 60 aya varan Euro vade.',
+        voiceover: "Kuveyt Türk'te sıfır kâr payı veya altı ay ödemesiz Euro finansmanı kullanın.",
+        audioUrl: '/audio/wa-scenarios/ihracat_euro_3.mp3',
+        accent: '#10b981',
+        accentBg: 'rgba(16, 185, 129, 0.22)'
+      },
+      {
+        badge: 'İHRACATÇI 4 / 4 • EURO KREDİ EKRANINI AÇIN',
+        title: 'Aşağıdaki Linkten Euro (€) Taksitinizi Canlı Görün!',
+        subtitle: 'Linke dokunduğunuzda Euro (€) kredi hesaplayıcısı otomatik açık olarak gelir.',
+        voiceover: 'İhracatçıya özel Euro taksit tablosu için aşağıdaki linke dokunun!',
+        audioUrl: '/audio/wa-scenarios/ihracat_euro_4.mp3',
+        accent: '#22c55e',
+        accentBg: 'rgba(34, 197, 94, 0.25)'
+      }
+    ]
+  },
+  {
+    id: 'santiye_tway',
+    dayLabel: '7. Senaryo • 12 Teker T-Way Mikser, Damper & S-Way',
+    shortTitle: '🏗️ 12 Teker Mikser 5.75M • Hafriyat 5.85M TL',
+    refCode: 'beton_agrega',
+    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Beton Santrali, Hafriyat & Çekici Serisi',
+    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega',
+    caption:
+      `🏗️ 12 Teker T-Way Mikser (5.75M TL) & Hafriyat (5.85M TL) -325 Bin TL nakit indirimi tablosu 👇\n\n` +
+      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega`,
+    steps: [
+      {
+        badge: 'ŞANTİYE 1 / 4 • HAZIR BETON, MADEN & HAFRİYAT SERİSİ',
+        title: '12 Teker (8x4) T-Way & S-Way Çekici Özel Vitrini!',
+        subtitle: 'Beton santralleri, taş ocakları ve hafriyat filoları için 10mm çelik şasili ağır hizmet serisi.',
+        voiceover: 'Hazır beton, hafriyat ve ağır nakliye filolarına özel şantiye serisi.',
+        audioUrl: '/audio/wa-scenarios/santiye_tway_1.mp3',
+        accent: '#f59e0b',
+        accentBg: 'rgba(245, 158, 11, 0.24)'
+      },
+      {
+        badge: 'ŞANTİYE 2 / 4 • 325.000 TL NAKİT ALIM İNDİRİMİ',
+        title: '12 Teker Mikser 5.750.000 TL • Hafriyat 5.850.000 TL!',
+        subtitle: '6.075.000 TL / 6.175.000 TL liste fiyatı yerine tam 325.000 TL nakit indirimiyle hemen teslim.',
+        voiceover: 'On iki teker mikser ve hafriyat damperinde üç yüz yirmi beş bin lira nakit indirimi.',
+        audioUrl: '/audio/wa-scenarios/santiye_tway_2.mp3',
+        accent: '#10b981',
+        accentBg: 'rgba(16, 185, 129, 0.22)'
+      },
+      {
+        badge: 'ŞANTİYE 3 / 4 • ~975.000 TL %20 KDV & S-WAY ÇEKİCİ',
+        title: 'S-Way 500/580 BG Çekici & ~975 Bin TL KDV Kalkanı!',
+        subtitle: 'Üstyapıyı beklemeden şasi faturanızı hemen kesip ~975.000 TL KDV’yi verginizden düşün.',
+        voiceover: 'S-Way çekici ve T-Way serisinde yüzde yirmi KDV kalkanıyla vergiden düşün.',
+        audioUrl: '/audio/wa-scenarios/santiye_tway_3.mp3',
+        accent: '#3b82f6',
+        accentBg: 'rgba(59, 130, 246, 0.22)'
+      },
+      {
+        badge: 'ŞANTİYE 4 / 4 • ŞANTİYE ÖZEL LİNKİNİ AÇIN',
+        title: 'Aşağıdaki Linkten T-Way & S-Way Fiyatlarını İnceleyin!',
+        subtitle: 'Yeşil "Son Oluru / Dip Fiyatı Sor" tuşuyla şantiyenize özel filo iskontosunu öğrenin.',
+        voiceover: 'Şantiye ve çekici özel fiyat ekranımız için aşağıdaki linke tıklayın!',
+        audioUrl: '/audio/wa-scenarios/santiye_tway_4.mp3',
+        accent: '#22c55e',
+        accentBg: 'rgba(34, 197, 94, 0.25)'
+      }
+    ]
+  },
+  {
     id: 'kantar',
-    dayLabel: '5. Senaryo • 3.5T / 7T / 12 Teker Mikser & Damper',
-    shortTitle: '⚖️ 3.5T, 7T Kamyon ve 12 Teker T-Way Fiyatları',
+    dayLabel: '8. Senaryo • 3.5T / 7T Kamyon / Eurocargo Kıyaslama',
+    shortTitle: '⚖️ 3.5T, 7T Kamyon, Eurocargo & T-Way Fiyatları',
     refCode: 'wa_durum_kantar',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Halk Diliyle Sade Araç & Fiyat Kataloğu',
+    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Gerçek Görselli Araç & Fiyat Kataloğu',
     onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar',
     caption:
-      `⚖️ 3.5T Kamyonet, 7T Kamyon ve 12 Teker Mikser/Hafriyat net peşin fiyatlarını karşılaştırın 👇\n\n` +
+      `⚖️ 3.5T Kamyonet, 7T Kamyon, Eurocargo ve T-Way net peşin fiyatlarını karşılaştırın 👇\n\n` +
       `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar`,
     steps: [
       {
         badge: 'ARAÇ GRUBU 1 / 4 • B EHLİYET 3.5 TON KAMYONET & VAN',
         title: 'Daily 3.5 Ton Tek/Çift Teker & Kapalı Panelvan',
-        subtitle: 'Halk diliyle net kasa ölçüleri: Kısa, Orta ve Uzun Şasi (1.905.000 TL’den başlayan peşin).',
+        subtitle: 'Çoktan seçmeli Kısa, Orta ve Uzun Şasi (1.905.000 TL’den başlayan peşin fiyatlarla).',
         voiceover: 'B ehliyetle kullanılan takograf muafiyetli üç buçuk ton kamyonet mi?',
         audioUrl: '/audio/wa-scenarios/kantar_1.mp3',
         accent: '#3b82f6',
@@ -246,8 +407,8 @@ const VIDEO_SCENARIOS = [
       },
       {
         badge: 'ARAÇ GRUBU 2 / 4 • 7 TON DAILY 70C & EUROCARGO',
-        title: 'Daily 7 Ton Kamyon: 4.8 Ton Yük & 260 Bin İndirim!',
-        subtitle: '10-12 Euro Palet kapasiteli uzun şasi; 260.000 TL nakit indirimiyle 2.420.000 TL net peşin.',
+        title: 'Daily 7 Ton Kamyon (Kısa/Orta/Uzun) & Eurocargo!',
+        subtitle: '7 Ton Kamyonda 260.000 TL nakit indirimi (2.390.000 TL’den başlayan fiyat) ve Eurocargo serisi.',
         voiceover: 'Beş tona yakın yük taşıyan indirimli yedi ton kamyon mu?',
         audioUrl: '/audio/wa-scenarios/kantar_2.mp3',
         accent: '#f59e0b',
@@ -303,6 +464,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
   const audioBufferCacheRef = useRef({});
   const activePreviewSourceRef = useRef(null);
   const lastSpokenStepRef = useRef(-1);
+  const loadedImagesRef = useRef({});
 
   const [scenarioIdx, setScenarioIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -316,15 +478,246 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
   const currentScenario = VIDEO_SCENARIOS[scenarioIdx] || VIDEO_SCENARIOS[0];
 
+  // Sistemdeki gerçek araç ve üstyapı görsellerini Canvas için belleğe yükle
+  useEffect(() => {
+    Object.entries(SYSTEM_IMAGE_URLS).forEach(([key, url]) => {
+      if (loadedImagesRef.current[key]) return;
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        loadedImagesRef.current[key] = img;
+      };
+      img.src = url;
+    });
+  }, []);
+
+  // Yuvarlatılmış beyaz/vitrin çerçeve içinde gerçek araç fotoğrafı çizen yardımcı
+  const drawVehiclePhotoBox = (ctx, imgKey, x, y, w, h, radius = 14, borderColor = '#38bdf8', mode = 'contain', bg = '#ffffff') => {
+    ctx.save();
+    drawRoundedRect(ctx, x, y, w, h, radius);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    if (borderColor) {
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = borderColor;
+      ctx.stroke();
+    }
+    ctx.clip();
+
+    const img = loadedImagesRef.current[imgKey];
+    if (img && img.complete && img.naturalWidth > 0) {
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+      const pad = mode === 'contain' ? 6 : 0;
+      const availW = w - pad * 2;
+      const availH = h - pad * 2;
+      const scale = mode === 'cover'
+        ? Math.max(availW / iw, availH / ih)
+        : Math.min(availW / iw, availH / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
+    } else {
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('IVECO 2026', x + w / 2, y + h / 2 + 7);
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+  };
+
+  // Ortak: Gerçek sistemdeki 6 Resimli Araç Grubu Seçici Gridini Çizer
+  const drawSixPhotoCategoryGrid = (ctx, contentX, topY, contentW, activeIdx = 0) => {
+    drawRoundedRect(ctx, contentX, topY, contentW, 325, 22);
+    ctx.fillStyle = '#111d35';
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+    ctx.stroke();
+
+    ctx.fillStyle = '#fde047';
+    ctx.font = '900 22px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('👇 HANGİ ARAÇ GRUBUNA BAKIYORSUNUZ? (GERÇEK GÖRSELLİ SEÇİCİ)', contentX + 22, topY + 38);
+
+    const cats = [
+      { key: 'daily35_sasi', title: '3.5 Ton Kamyonet', sub: 'B Ehliyet • Tek/Çift Teker' },
+      { key: 'daily_van', title: 'Kapalı Panelvan', sub: 'B Ehliyet • 12-18 m³' },
+      { key: 'daily70', title: '7 Ton Kamyon', sub: 'Daily 70C • Kısa/Orta/Uzun' },
+      { key: 'eurocargo', title: 'Eurocargo', sub: '10–18 Ton • 14–20 Palet' },
+      { key: 'sway', title: 'S-Way Çekici (Tır)', sub: '500–580 BG • Uzun Yol' },
+      { key: 'tway', title: 'Mikser & Hafriyat', sub: 'T-Way • 12 & 10 Teker' }
+    ];
+
+    cats.forEach((c, idx) => {
+      const col = idx % 3;
+      const row = Math.floor(idx / 3);
+      const bx = contentX + 20 + col * 288;
+      const by = topY + 54 + row * 128;
+      const isHot = idx === activeIdx;
+
+      drawRoundedRect(ctx, bx, by, 276, 116, 16);
+      ctx.fillStyle = isHot ? 'rgba(2, 132, 199, 0.36)' : '#0b1324';
+      ctx.fill();
+      ctx.lineWidth = isHot ? 3.5 : 1.5;
+      ctx.strokeStyle = isHot ? '#fde047' : 'rgba(148, 163, 184, 0.28)';
+      ctx.stroke();
+
+      // Sol tarafında gerçek araç fotoğrafı
+      drawVehiclePhotoBox(ctx, c.key, bx + 10, by + 14, 88, 62, 10, isHot ? '#fde047' : '#38bdf8', 'contain');
+
+      ctx.fillStyle = isHot ? '#fde047' : '#ffffff';
+      ctx.font = '900 19px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(c.title, bx + 106, by + 38);
+
+      ctx.fillStyle = isHot ? '#e0f2fe' : '#93c5fd';
+      ctx.font = '700 15px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(c.sub, bx + 106, by + 64);
+
+      if (isHot) {
+        drawRoundedRect(ctx, bx + 106, by + 76, 110, 26, 8);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#052e16';
+        ctx.font = '900 14px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('✓ SEÇİLDİ', bx + 124, by + 94);
+      }
+    });
+  };
+
+  // Ortak: Çoktan Seçmeli 3 Adımlı Sihirbaz Kutusu Çizer (Tek/Çift Teker -> Kısa/Orta/Uzun Şasi -> Manuel/Otomatik)
+  const drawMultipleChoiceWizardBox = (ctx, contentX, topY, contentW, mode = 'kamyonet35', stepLocalT = 0.5) => {
+    drawRoundedRect(ctx, contentX, topY, contentW, 470, 24);
+    const grad = ctx.createLinearGradient(0, topY, 0, topY + 470);
+    grad.addColorStop(0, '#132342');
+    grad.addColorStop(1, '#0c172e');
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#38bdf8';
+    ctx.stroke();
+
+    ctx.fillStyle = '#fde047';
+    ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText(
+      mode === 'daily70'
+        ? '🚛 DAILY 7 TON KAMYON (70C) — ÇOKTAN SEÇMELİ ŞASİ & VİTES SEÇİCİ'
+        : '🛻 3.5 TON KAMYONET — 3 ADIMDA ÇOKTAN SEÇMELİ ARAÇ SİHİRBAZI',
+      contentX + 24,
+      topY + 42
+    );
+
+    // 1. ADIM: TEKER / KABİN SEÇİMİ
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = '900 19px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('1. ADIM — Teker / Model Tipi Seçin:', contentX + 24, topY + 78);
+
+    const step1Opts = mode === 'daily70'
+      ? [
+          { title: '💪 70C Çift Teker Kamyon', sub: '4.8 Ton Yük • 3.0 Motor', active: true },
+          { title: '🚐 70C Dev Panelvan (19.6 m³)', sub: '5.12m İç Boy • 180 BG', active: false },
+          { title: '❄️ Klimalı & C-Profil Şasi', sub: '-260.000 TL Nakit İndirimli', active: false }
+        ]
+      : [
+          { title: '💪 35C Çift Teker', sub: '3.0 Büyük Motor (160 BG)', active: stepLocalT < 0.7 },
+          { title: '🛞 35S Tek Teker', sub: '2.3 Motor • -190B İndirim', active: stepLocalT >= 0.7 },
+          { title: '👷 Çift Kabin (6+1)', sub: 'Ekip + 3.0m Açık Kasa', active: false }
+        ];
+
+    step1Opts.forEach((o, i) => {
+      const ox = contentX + 24 + i * 284;
+      const oy = topY + 90;
+      drawRoundedRect(ctx, ox, oy, 272, 82, 14);
+      ctx.fillStyle = o.active ? 'rgba(16, 185, 129, 0.28)' : '#091122';
+      ctx.fill();
+      ctx.lineWidth = o.active ? 3 : 1.5;
+      ctx.strokeStyle = o.active ? '#4ade80' : '#334155';
+      ctx.stroke();
+
+      ctx.fillStyle = o.active ? '#4ade80' : '#ffffff';
+      ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.title, ox + 16, oy + 34);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '600 16px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.sub, ox + 16, oy + 62);
+    });
+
+    // 2. ADIM: KISA / ORTA / UZUN ŞASİ SEÇİMİ
+    ctx.fillStyle = '#fde047';
+    ctx.font = '900 19px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('2. ADIM — Şasi Boyu (Kısa / Orta / Uzun) Seçin:', contentX + 24, topY + 206);
+
+    const step2Opts = mode === 'daily70'
+      ? [
+          { title: '📏 Kısa Şasi (3750)', kasa: '4.1 – 4.3m Kasa Uygun', active: false },
+          { title: '📐 Orta Şasi (4350)', kasa: '5.1 – 5.3m Kasa (10 Palet)', active: stepLocalT < 0.5 },
+          { title: '🚛 Uzun Şasi (4750)', kasa: '5.6 – 5.9m Kasa (12 Palet)', active: stepLocalT >= 0.5 }
+        ]
+      : [
+          { title: '📏 Kısa Şasi (3450)', kasa: '3.5 – 3.8 Metre Kasa', active: false },
+          { title: '📐 Orta Şasi (3750)', kasa: '4.1 – 4.3 Metre Kasa', active: stepLocalT < 0.55 },
+          { title: '🚛 Uzun Şasi (4100)', kasa: '4.5 – 4.8 Metre Kasa', active: stepLocalT >= 0.55 }
+        ];
+
+    step2Opts.forEach((o, i) => {
+      const ox = contentX + 24 + i * 284;
+      const oy = topY + 218;
+      drawRoundedRect(ctx, ox, oy, 272, 86, 14);
+      ctx.fillStyle = o.active ? 'rgba(245, 158, 11, 0.28)' : '#091122';
+      ctx.fill();
+      ctx.lineWidth = o.active ? 3 : 1.5;
+      ctx.strokeStyle = o.active ? '#fde047' : '#334155';
+      ctx.stroke();
+
+      ctx.fillStyle = o.active ? '#fde047' : '#ffffff';
+      ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.title, ox + 16, oy + 34);
+      ctx.fillStyle = '#86efac';
+      ctx.font = '800 16px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.kasa, ox + 16, oy + 64);
+    });
+
+    // 3. ADIM: SON SEÇİM (MANUEL / OTOMATİK VİTES)
+    ctx.fillStyle = '#4ade80';
+    ctx.font = '900 19px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('3. ADIM (SON SEÇİM) — Vites Tipini Seçin:', contentX + 24, topY + 338);
+
+    const step3Opts = [
+      { title: '⚙️ Manuel Vites', sub: '6 İleri Manuel Şanzıman', active: stepLocalT < 0.45 },
+      { title: '⚡ Otomatik (Hi-Matic)', sub: '8 İleri Tam Otomatik', active: stepLocalT >= 0.45 },
+      { title: '🔄 İkisini Karşılaştır', sub: 'Manuel & Otomatik Yan Yana', active: false }
+    ];
+
+    step3Opts.forEach((o, i) => {
+      const ox = contentX + 24 + i * 284;
+      const oy = topY + 350;
+      drawRoundedRect(ctx, ox, oy, 272, 92, 14);
+      ctx.fillStyle = o.active ? 'rgba(34, 197, 94, 0.28)' : '#091122';
+      ctx.fill();
+      ctx.lineWidth = o.active ? 3 : 1.5;
+      ctx.strokeStyle = o.active ? '#22c55e' : '#334155';
+      ctx.stroke();
+
+      ctx.fillStyle = o.active ? '#4ade80' : '#ffffff';
+      ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.title, ox + 16, oy + 36);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '600 16px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(o.sub, ox + 16, oy + 66);
+    });
+  };
+
   // Senaryo bazlı özel telefon içi ekran çizici
   const renderPhoneScreenContent = (ctx, scId, stepIdx, stepLocalT, phoneX, phoneY, phoneW) => {
     const contentX = phoneX + 34;
     const contentW = phoneW - 68;
 
-    // 4. Adım tüm senaryolarda o senaryoya özel "Şimdi Linke Dokunun" final ekranıdır
+    // 4. Adım tüm senaryolarda gerçek araç görsel vitrinli "Şimdi Linke Dokunun" final ekranıdır
     if (stepIdx === 3) {
-      drawRoundedRect(ctx, contentX, phoneY + 115, contentW, 1080, 30);
-      const ctaGrad = ctx.createLinearGradient(0, phoneY + 115, 0, phoneY + 1195);
+      drawRoundedRect(ctx, contentX, phoneY + 108, contentW, 1110, 30);
+      const ctaGrad = ctx.createLinearGradient(0, phoneY + 108, 0, phoneY + 1218);
       ctaGrad.addColorStop(0, '#0f291e');
       ctaGrad.addColorStop(1, '#091526');
       ctx.fillStyle = ctaGrad;
@@ -333,23 +726,36 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.strokeStyle = '#22c55e';
       ctx.stroke();
 
+      // Üstte 4 Gerçek Araç Fotoğraflı Mini Vitrin Şeridi
+      const showcaseKeys = ['daily35_sasi', 'daily70', 'eurocargo_big', 'tway'];
+      showcaseKeys.forEach((k, idx) => {
+        drawVehiclePhotoBox(ctx, k, contentX + 36 + idx * 208, phoneY + 132, 194, 110, 14, '#4ade80', 'cover');
+      });
+
       ctx.textAlign = 'center';
       ctx.fillStyle = '#4ade80';
-      ctx.font = '900 30px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText(`🚀 ${currentScenario.dayLabel.toUpperCase()}`, CANVAS_W / 2, phoneY + 195);
+      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(`🚀 ${currentScenario.dayLabel.toUpperCase()}`, CANVAS_W / 2, phoneY + 282);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 44px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('2026 IVECO BASİT FİYAT LİSTESİ', CANVAS_W / 2, phoneY + 268);
-      ctx.fillText('& KART İÇİ TAKSİT HESAPLAYICI', CANVAS_W / 2, phoneY + 325);
+      ctx.font = '900 38px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('2026 IVECO ÇOKTAN SEÇMELİ KATALOG', CANVAS_W / 2, phoneY + 332);
+      ctx.fillText('& KART İÇİ TAKSİT / EURO KREDİ EKRANI', CANVAS_W / 2, phoneY + 378);
 
       const scenarioBullets = {
         kilavuz: [
-          '✅  Üstteki 6 büyük kutudan aracınızın grubunu seçin',
-          '✅  Halk dilinde sade başlıklar & net peşin/liste fiyatları',
-          '✅  Karttaki "💳 Taksit & Takas Hesapla" tuşuna dokunun',
+          '✅  Resimli 6 araç grubundan işinize uygun olanı seçin',
+          '✅  Çoktan Seçmeli: Tek/Çift Teker → Kısa/Orta/Uzun Şasi → Vites',
+          '✅  Karttaki "💳 Taksit & Takas Hesapla" (TL & Euro Kredi) açın',
           '✅  Sayfa değişmeden aynı kart içinde taksitinizi görün',
-          '✅  "💬 WhatsApp’tan Sor" ile Can Murat’a tek tuşla ulaşın'
+          '✅  "💬 Son Oluru / Dip Fiyatı Sor" ile Can Murat’a ulaşın'
+        ],
+        coktan_secmeli: [
+          '🛻  1. Adım: 35C Çift Teker, 35S Tek Teker veya Çift Kabin seçin',
+          '📏  2. Adım: Kısa (3.5m), Orta (4.3m) veya Uzun Şasi (4.8m / 5.9m)',
+          '⚙️  3. Adım: Manuel veya 8 İleri Otomatik (Hi-Matic) seçin',
+          '🚛  Daily 7 Ton Kamyonda da Kısa / Orta / Uzun çoktan seçmeli!',
+          '💬  Seçtiğiniz aracın kartından son dip fiyatı tek tuşla sorun'
         ],
         takas: [
           '🔄  Kart içindeki "💳 Taksit & Takas Hesapla" kutusunu açın',
@@ -368,77 +774,480 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         kdv: [
           '🧾  Her araçta %20 İndirilebilir KDV Vergi Kalkanı',
           '💵  Daily 7 Ton’da 260 Bin, 12 Teker T-Way’de 325 Bin TL İndirim',
-          '💳  Kart içinden peşinatsız veya takaslı taksit hesabı',
-          '💬  "WhatsApp’tan Sor" ile muhasebeniz için proforma isteyin',
+          '⚡  Üstyapıyı beklemeden hemen ŞASİ faturası kesim avantajı',
+          '📤  "Muhasebeye Gönder" ile KDV tablosunu müşavirinize atın',
           '📈  Devlete vergi yerine şirketinizin filosuna sıfır araç alın'
         ],
+        ihracat_euro: [
+          '🇪🇺  32 Sayılı Karar kapsamında İhracatçıya Özel Euro (€) Kredisi',
+          '💶  Kart içinde "🇹🇷 TL Kredi | 💶 İhracatçı Euro Kredisi" sekmesi',
+          '🔥  Kuveyt Türk %0 Kâr Payı veya 6 Ay Ödemesiz Euro Kredisi',
+          '🏦  Garanti BBVA & BNP Paribas 12 - 24 - 36 - 48 Ay Euro Taksit',
+          '💬  Euro ödeme planınızla birlikte özel filo dip fiyatını sorun'
+        ],
+        santiye_tway: [
+          '🏗️  T-Way 12 Teker (8x4) Mikser: 5.750.000 TL (-325.000 TL İndirim)',
+          '🪨  T-Way 12 Teker (8x4) Hafriyat: 5.850.000 TL (-325.000 TL İndirim)',
+          '🛣️  S-Way 500 / 580 BG Çekici: €123.000’dan başlayan Euro fiyatı',
+          '🧾  Şantiye grubunda araç başı ~975.000 TL %20 KDV mahsubu',
+          '💬  Şantiyenize özel toplu alım ve son dip fiyatı hemen sorun'
+        ],
         kantar: [
-          '🚐  Daily 3.5 Ton: B Ehliyet • Takograf Muafiyetli • 2.390.000 TL',
-          '🚛  Daily 7 Ton Kamyon: 4.8 Ton Yük • 12 Palet • 2.420.000 TL',
-          '🏗️  T-Way 12 Teker (8x4) Mikser: 5.750.000 TL Nakit Fırsatı',
-          '🪨  T-Way 12 Teker (8x4) Hafriyat Damperi: 5.850.000 TL Nakit',
-          '💳  Her araç kartının içinde tek tuşla taksit & takas hesabı'
+          '🚐  Daily 3.5 Ton: Çoktan Seçmeli Kısa/Orta/Uzun • 1.905.000 TL’den',
+          '🚛  Daily 7 Ton Kamyon: Kısa/Orta/Uzun • 2.390.000 TL’den (-260B)',
+          '🚚  Eurocargo (10–18 Ton • 14–20 Palet): 3.330.000 TL’den başlayan',
+          '🏗️  T-Way 12 Teker Mikser & Hafriyat: 5.750.000 TL Nakit Fırsatı',
+          '💳  Her araç kartının içinde tek tuşla TL & Euro taksit hesabı'
         ]
       };
 
       const bullets = scenarioBullets[scId] || scenarioBullets.kilavuz;
       ctx.textAlign = 'left';
       bullets.forEach((b, idx) => {
-        const by = phoneY + 395 + idx * 86;
-        drawRoundedRect(ctx, contentX + 44, by, contentW - 88, 68, 16);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+        const by = phoneY + 415 + idx * 82;
+        drawRoundedRect(ctx, contentX + 38, by, contentW - 76, 66, 15);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
         ctx.fill();
         ctx.fillStyle = '#e2e8f0';
-        ctx.font = '700 25px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(b, contentX + 72, by + 44);
+        ctx.font = '700 23px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(b, contentX + 60, by + 42);
       });
 
-      const bounceY = Math.sin(stepLocalT * Math.PI * 6) * 14;
-      drawRoundedRect(ctx, contentX + 44, phoneY + 875 + bounceY, contentW - 88, 175, 26);
+      const bounceY = Math.sin(stepLocalT * Math.PI * 6) * 12;
+      drawRoundedRect(ctx, contentX + 40, phoneY + 860 + bounceY, contentW - 80, 175, 26);
       ctx.fillStyle = '#22c55e';
       ctx.fill();
 
       ctx.textAlign = 'center';
       ctx.fillStyle = '#052e16';
-      ctx.font = '900 36px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('👇 HEMEN AŞAĞIDAKİ LİNKE DOKUNUN!', CANVAS_W / 2, phoneY + 945 + bounceY);
+      ctx.font = '900 35px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('👇 HEMEN AŞAĞIDAKİ LİNKE DOKUNUN!', CANVAS_W / 2, phoneY + 928 + bounceY);
 
-      ctx.font = '800 26px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('iveco-fiyat-listesi.vercel.app', CANVAS_W / 2, phoneY + 1005 + bounceY);
+      ctx.font = '800 25px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('iveco-fiyat-listesi.vercel.app', CANVAS_W / 2, phoneY + 986 + bounceY);
 
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '700 24px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('Satış Sorumlusu Can Murat • 0544 622 59 31 | IVECO ERC Samsun', CANVAS_W / 2, phoneY + 1135);
+      ctx.fillStyle = '#fde047';
+      ctx.font = '800 24px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('Satış Sorumlusu Can Murat • 0544 622 59 31 | IVECO ERC Samsun', CANVAS_W / 2, phoneY + 1145);
       ctx.textAlign = 'left';
       return;
     }
 
-    // ── SENARYO 2 (TAKAS + KREDİ) ÖZEL SAHNELERİ ─────────────────────────────
+    // ── SENARYO 2 (ÇOKTAN SEÇMELİ KAMYONET & 7T KAMYON SİHİRBAZI) ÖZEL SAHNELERİ ──
+    if (scId === 'coktan_secmeli') {
+      if (stepIdx === 0) {
+        drawSixPhotoCategoryGrid(ctx, contentX, phoneY + 102, contentW, stepLocalT < 0.5 ? 0 : 2);
+        drawMultipleChoiceWizardBox(ctx, contentX, phoneY + 448, contentW, stepLocalT < 0.5 ? 'kamyonet35' : 'daily70', stepLocalT);
+
+        drawRoundedRect(ctx, contentX + 36, phoneY + 1120, contentW - 72, 100, 20);
+        ctx.fillStyle = '#f59e0b';
+        ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('👆 Kamyonet ve 7 Ton Kamyonda 3 Adımlı Çoktan Seçmeli Sistem!', CANVAS_W / 2, phoneY + 1180);
+        ctx.textAlign = 'left';
+        return;
+      }
+
+      if (stepIdx === 1 || stepIdx === 2) {
+        const is70Mode = stepIdx === 2 && stepLocalT >= 0.5;
+        drawMultipleChoiceWizardBox(ctx, contentX, phoneY + 102, contentW, is70Mode ? 'daily70' : 'kamyonet35', stepLocalT);
+
+        // Seçim Sonucu Açılan Gerçek Fotoğraflı Araç Kartı
+        const cardY = phoneY + 592;
+        drawRoundedRect(ctx, contentX, cardY, contentW, 505, 24);
+        ctx.fillStyle = '#162544';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#22c55e';
+        ctx.stroke();
+
+        drawRoundedRect(ctx, contentX + 24, cardY + 20, contentW - 48, 44, 10);
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.22)';
+        ctx.fill();
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('✅ SEÇİMİNİZE UYGUN ARAÇ KARTI ANINDA AÇILDI:', contentX + 40, cardY + 49);
+
+        // Sağ üstte gerçek araç fotoğrafı
+        drawVehiclePhotoBox(ctx, is70Mode ? 'daily70' : 'daily35_sasi', contentX + contentW - 235, cardY + 78, 210, 136, 16, '#38bdf8', 'contain');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 30px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(
+          is70Mode
+            ? 'Daily 7 Ton Kamyon — Uzun Şasi (Otomatik)'
+            : 'Daily 3.5 Ton Çift Teker — Uzun Şasi (Otomatik)',
+          contentX + 26,
+          cardY + 115
+        );
+
+        ctx.fillStyle = '#86efac';
+        ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(
+          is70Mode
+            ? '5.6 – 5.9 Metre Kasa (12 Palet) • ~4.7 Ton Yük • 8 İleri Otomatik'
+            : '4.5 – 4.8 Metre Kasa • 3.0 Büyük Motor (160 BG) • B Ehliyet',
+          contentX + 26,
+          cardY + 152
+        );
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 17px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(
+          is70Mode
+            ? 'Fabrika Kodu: IVECO DAILY 70 C 16 H A 8 CC 4750 Hi-Matic Klimalı'
+            : 'Fabrika Kodu: IVECO DAILY 35 C 16 H 3.0 A 8 CC 4100 Hi-Matic',
+          contentX + 26,
+          cardY + 186
+        );
+
+        // Net Fiyat Kutusu
+        drawRoundedRect(ctx, contentX + 24, cardY + 225, contentW - 48, 148, 16);
+        ctx.fillStyle = '#0b1324';
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(74, 222, 128, 0.45)';
+        ctx.stroke();
+
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('NAKİT / PEŞİN FİYATI (-190B / -260B NAKİT İNDİRİMLİ):', contentX + 44, cardY + 262);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '700 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(is70Mode ? 'Liste / Kredili: 2.800.000 TL' : 'Liste / Kredili: 2.490.000 TL', contentX + 44, cardY + 296);
+
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '900 42px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(is70Mode ? '2.540.000 TL' : '2.300.000 TL', contentX + contentW - 44, cardY + 288);
+        ctx.textAlign = 'left';
+
+        ctx.fillStyle = '#fcd34d';
+        ctx.font = '800 19px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(
+          is70Mode
+            ? '🧾 Vergiden Düşülen %20 KDV: ~423.333 TL   |   🔥 Yeşil Tuşla Son Dip Fiyatı Sorun'
+            : '🧾 Vergiden Düşülen %20 KDV: ~383.333 TL   |   🔥 Yeşil Tuşla Son Dip Fiyatı Sorun',
+          contentX + 44,
+          cardY + 346
+        );
+
+        // 2 Net Ana Buton
+        drawRoundedRect(ctx, contentX + 24, cardY + 392, 410, 88, 16);
+        ctx.fillStyle = '#0284c7';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 229, cardY + 445);
+
+        drawRoundedRect(ctx, contentX + 452, cardY + 392, 424, 88, 16);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor', contentX + 664, cardY + 445);
+        ctx.textAlign = 'left';
+
+        drawRoundedRect(ctx, contentX + 36, phoneY + 1120, contentW - 72, 100, 20);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#052e16';
+        ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('👆 3 Adımda Seçin, Taksiti Görün & Son Dip Fiyatı Sorun!', CANVAS_W / 2, phoneY + 1180);
+        ctx.textAlign = 'left';
+        return;
+      }
+    }
+
+    // ── SENARYO 6 (İHRACATÇI EURO € KREDİSİ) ÖZEL SAHNELERİ ──────────────────
+    if (scId === 'ihracat_euro') {
+      // Üstte İhracatçı Euro Kredisi Aktif Bandı + Gerçek S-Way & Eurocargo Fotoğrafı
+      drawRoundedRect(ctx, contentX, phoneY + 104, contentW, 135, 20);
+      ctx.fillStyle = 'rgba(30, 58, 138, 0.75)';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#60a5fa';
+      ctx.stroke();
+
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('🇪🇺 32 SAYILI KARAR • İHRACATÇI & DÖVİZ GELİRLİ FİRMALARA ÖZEL EURO (€) KREDİSİ', contentX + 24, phoneY + 144);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('Kuveyt Türk %0 Kâr Payı / 6 Ay Ödemesiz • Garanti BBVA • BNP Paribas', contentX + 24, phoneY + 186);
+      ctx.fillStyle = '#fde047';
+      ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('S-Way Çekici, Eurocargo, T-Way ve Daily serisinde kart içi canlı Euro (€) taksit hesabı!', contentX + 24, phoneY + 218);
+
+      // Araç Kartı + Açık Euro Hesaplayıcı
+      const cardY = phoneY + 258;
+      drawRoundedRect(ctx, contentX, cardY, contentW, 835, 26);
+      ctx.fillStyle = '#15233e';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#60a5fa';
+      ctx.stroke();
+
+      const isSway = stepIdx !== 1;
+      drawVehiclePhotoBox(ctx, isSway ? 'sway' : 'eurocargo_big', contentX + contentW - 235, cardY + 22, 210, 128, 16, '#60a5fa', 'cover');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 30px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(isSway ? 'S-Way 500 / 580 BG Çekici (Full Plus)' : 'Eurocargo 15–16 Ton Kamyon (18 Palet)', contentX + 26, cardY + 62);
+      ctx.fillStyle = '#86efac';
+      ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(isSway ? 'NET EURO FİYATI: €123.000 (+KDV)' : 'İhracatçı Euro Karşılığı: ~€98.500', contentX + 26, cardY + 102);
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('🇪🇺 İhracatçı Euro Kredisi: 12 - 24 - 36 - 48 Ay Euro Taksit', contentX + 26, cardY + 136);
+
+      // Kart İçi Hesaplayıcı Kutusu (TL | EUR Sekmeli)
+      const calcY = cardY + 168;
+      drawRoundedRect(ctx, contentX + 22, calcY, contentW - 44, 642, 20);
+      ctx.fillStyle = '#0b1324';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#60a5fa';
+      ctx.stroke();
+
+      // TL | EUR Sekme Seçici
+      drawRoundedRect(ctx, contentX + 44, calcY + 20, 380, 56, 12);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '800 21px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🇹🇷 TL Ticari Kredi', contentX + 234, calcY + 56);
+
+      drawRoundedRect(ctx, contentX + 440, calcY + 20, 416, 56, 12);
+      ctx.fillStyle = '#2563eb';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#fde047';
+      ctx.stroke();
+      ctx.fillStyle = '#fef08a';
+      ctx.font = '900 22px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('💶 İhracatçı Euro (€) Kredisi', contentX + 648, calcY + 56);
+      ctx.textAlign = 'left';
+
+      // 1. Euro Peşinat Seçimi
+      ctx.fillStyle = '#fde68a';
+      ctx.font = '800 21px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('1. Euro (€) Peşinat veya Takas Değeriniz:', contentX + 44, calcY + 114);
+
+      const eurPresets = ['Peşinatsız', '€15.000', '€30.000', '€50.000', '€75.000'];
+      eurPresets.forEach((p, i) => {
+        const px = contentX + 44 + i * 164;
+        const py = calcY + 128;
+        const sel = i === 2; // €30.000
+        drawRoundedRect(ctx, px, py, 152, 52, 10);
+        ctx.fillStyle = sel ? '#f59e0b' : '#1e293b';
+        ctx.fill();
+        ctx.fillStyle = sel ? '#0f172a' : '#e2e8f0';
+        ctx.font = '900 19px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p, px + 76, py + 33);
+      });
+      ctx.textAlign = 'left';
+
+      // 2. Euro Vade Seçimi
+      ctx.fillStyle = '#93c5fd';
+      ctx.font = '800 21px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('2. Euro (€) Kredi Vadesi Seçin (32 Sayılı Karar):', contentX + 44, calcY + 220);
+
+      const eurTerms = ['12 Ay (%0 Kâr Payı)', '24 Ay Euro', '36 Ay Euro', '48 Ay Euro'];
+      const activeEurIdx = stepIdx === 2 ? 0 : 2;
+      eurTerms.forEach((t, i) => {
+        const tx = contentX + 44 + i * 206;
+        const ty = calcY + 234;
+        const sel = i === activeEurIdx;
+        drawRoundedRect(ctx, tx, ty, 194, 56, 12);
+        ctx.fillStyle = sel ? '#2563eb' : '#1e293b';
+        ctx.fill();
+        ctx.lineWidth = sel ? 2.5 : 1;
+        ctx.strokeStyle = sel ? '#93c5fd' : '#334155';
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 18px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(t, tx + 97, ty + 35);
+      });
+      ctx.textAlign = 'left';
+
+      // Euro Sonuç Kutusu
+      drawRoundedRect(ctx, contentX + 44, calcY + 314, contentW - 88, 200, 18);
+      ctx.fillStyle = 'rgba(30, 58, 138, 0.42)';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#60a5fa';
+      ctx.stroke();
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '700 22px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('Araç Bedeli: €123.000   |   Peşinat / Takas: -€30.000   |   Kalan Kredi: €93.000', contentX + 66, calcY + 358);
+
+      ctx.fillStyle = '#4ade80';
+      ctx.font = '900 42px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText(
+        activeEurIdx === 0
+          ? '12 Ay Euro Taksit (%0 Kâr Payı!): ~€7.750 / Ay'
+          : '36 Ay Euro Taksit: ~€2.840 / Ay',
+        contentX + 66,
+        calcY + 422
+      );
+
+      ctx.fillStyle = '#fde047';
+      ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('🇪🇺 Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & BNP Paribas Euro Finansmanı', contentX + 66, calcY + 476);
+
+      // Yeşil Gönder Butonu
+      drawRoundedRect(ctx, contentX + 44, calcY + 534, contentW - 88, 86, 16);
+      ctx.fillStyle = '#22c55e';
+      ctx.fill();
+      ctx.fillStyle = '#052e16';
+      ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('💬 Euro Kredi & Son Dip Fiyatı Can Murat’a Sor', CANVAS_W / 2, calcY + 588);
+      ctx.textAlign = 'left';
+
+      drawRoundedRect(ctx, contentX + 36, phoneY + 1120, contentW - 72, 100, 20);
+      ctx.fillStyle = '#2563eb';
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('👆 İhracatçıya Özel Euro (€) Taksitini Kart İçinde Canlı Hesaplayın!', CANVAS_W / 2, phoneY + 1180);
+      ctx.textAlign = 'left';
+      return;
+    }
+
+    // ── SENARYO 7 (12 TEKER T-WAY MİKSER & HAFRİYAT + S-WAY ÇEKİCİ) SAHNELERİ ─
+    if (scId === 'santiye_tway') {
+      const heavyCards = [
+        {
+          img: 'tway',
+          badge: '🏗️ 12 TEKER (8x4) BETON MİKSERİ ŞASİSİ (460 BG)',
+          title: 'T-Way AD410T46 8x4 — 10–12 m³ Mikser Şasisi',
+          sub: 'Kampanyalı Liste: 6.075.000 TL   |   Nakit İndirimi: -325.000 TL!',
+          price: 'Nakit / Peşin: 5.750.000 TL   (🧾 %20 KDV: ~958.333 TL)',
+          color: '#fde047',
+          border: stepIdx === 0 ? '#fde047' : 'rgba(245, 158, 11, 0.45)'
+        },
+        {
+          img: 'tway',
+          badge: '🪨 12 TEKER (8x4) AĞIR HAFRİYAT & KAYA DAMPERİ (540 BG)',
+          title: 'T-Way AD410T54 8x4 — 22–24 m³ Kaya Damperi',
+          sub: 'Kampanyalı Liste: 6.175.000 TL   |   Nakit İndirimi: -325.000 TL!',
+          price: 'Nakit / Peşin: 5.850.000 TL   (🧾 %20 KDV: ~975.000 TL)',
+          color: '#4ade80',
+          border: stepIdx === 1 ? '#4ade80' : 'rgba(16, 185, 129, 0.45)'
+        },
+        {
+          img: 'sway',
+          badge: '🛣️ S-WAY 500 / 580 BG UZUN YOL & LOWBED ÇEKİCİ',
+          title: 'IVECO S-Way 500 & 580 BG Çekici (Full Plus / Diamond)',
+          sub: 'Retarderli • 12 İleri Otomatik • TL veya İhracatçı Euro (€) Kredili',
+          price: 'Net Euro Fiyatı: €123.000 (+KDV)   |   Euro Kredi Taksitli',
+          color: '#60a5fa',
+          border: stepIdx === 2 ? '#60a5fa' : 'rgba(59, 130, 246, 0.45)'
+        }
+      ];
+
+      heavyCards.forEach((c, idx) => {
+        const cy = phoneY + 104 + idx * 332;
+        drawRoundedRect(ctx, contentX, cy, contentW, 312, 22);
+        ctx.fillStyle = '#132038';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = c.border;
+        ctx.stroke();
+
+        // Sağ üstte gerçek T-Way / S-Way fotoğrafı
+        drawVehiclePhotoBox(ctx, c.img, contentX + contentW - 210, cy + 18, 188, 118, 14, c.color, 'cover');
+
+        ctx.fillStyle = c.color;
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.badge, contentX + 24, cy + 42);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.title, contentX + 24, cy + 84);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '700 19px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.sub, contentX + 24, cy + 122);
+
+        drawRoundedRect(ctx, contentX + 24, cy + 148, contentW - 48, 72, 14);
+        ctx.fillStyle = '#0b1324';
+        ctx.fill();
+        ctx.fillStyle = c.color;
+        ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.price, contentX + 42, cy + 194);
+
+        // 2 Ana Buton
+        drawRoundedRect(ctx, contentX + 24, cy + 236, 412, 56, 12);
+        ctx.fillStyle = '#0284c7';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 230, cy + 271);
+
+        drawRoundedRect(ctx, contentX + 452, cy + 236, 424, 56, 12);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor', contentX + 664, cy + 271);
+        ctx.textAlign = 'left';
+      });
+
+      drawRoundedRect(ctx, contentX + 36, phoneY + 1120, contentW - 72, 100, 20);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('👆 Şantiye & Beton Filolarına Özel Son Dip Fiyatı Hemen Sorun!', CANVAS_W / 2, phoneY + 1180);
+      ctx.textAlign = 'left';
+      return;
+    }
+
+    // ── SENARYO 3 (TAKAS + KREDİ) ÖZEL SAHNELERİ ─────────────────────────────
     if (scId === 'takas') {
       if (stepIdx === 0 || stepIdx === 1) {
         const slideProgress = stepIdx === 0
           ? easeInOutQuad(Math.min(1, Math.max(0, (stepLocalT - 0.1) / 0.65)))
           : 1;
         const tradeInVal = Math.round((1000000 + slideProgress * 500000) / 50000) * 50000; // 1.0M -> 1.5M TL
-        const zeroVehiclePrice = 2390000; // Daily 3.5 Ton Çift Teker
+        const zeroVehiclePrice = 2390000;
         const diffLoan = zeroVehiclePrice - tradeInVal;
 
-        drawRoundedRect(ctx, contentX, phoneY + 110, contentW, 355, 24);
+        drawRoundedRect(ctx, contentX, phoneY + 106, contentW, 365, 24);
         ctx.fillStyle = '#162238';
         ctx.fill();
         ctx.lineWidth = 3;
         ctx.strokeStyle = '#3b82f6';
         ctx.stroke();
 
+        // Sağ üstte gerçek araç fotoğrafı
+        drawVehiclePhotoBox(ctx, 'daily70', contentX + contentW - 195, phoneY + 120, 172, 95, 12, '#38bdf8', 'contain');
+
         ctx.fillStyle = '#93c5fd';
-        ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText('💳 KART İÇİ TAKSİT & TAKAS HESAPLAYICI (AYNI KARTTA AÇILIR)', contentX + 30, phoneY + 160);
+        ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('💳 KART İÇİ TAKSİT & TAKAS HESAPLAYICI', contentX + 30, phoneY + 152);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('Daily 7 Ton / 3.5 Ton Çift Teker Şasi', contentX + 30, phoneY + 190);
 
         // Hızlı Peşinat / Takas Butonları
         const quickBtns = ['Peşinatsız', '500 Bin', '1 Milyon', '1.5 Milyon', '2 Milyon'];
         quickBtns.forEach((qb, idx) => {
           const qx = contentX + 30 + idx * 168;
-          const qy = phoneY + 185;
+          const qy = phoneY + 228;
           const isSelected = (slideProgress < 0.5 && idx === 2) || (slideProgress >= 0.5 && idx === 3);
           drawRoundedRect(ctx, qx, qy, 158, 54, 12);
           ctx.fillStyle = isSelected ? '#2563eb' : '#0f172a';
@@ -453,15 +1262,15 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         });
         ctx.textAlign = 'left';
 
-        drawRoundedRect(ctx, contentX + 30, phoneY + 258, contentW - 60, 82, 16);
+        drawRoundedRect(ctx, contentX + 30, phoneY + 298, contentW - 60, 74, 16);
         ctx.fillStyle = '#0f172a';
         ctx.fill();
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '700 24px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText('Seçilen Takas / Peşinat Tutarı:', contentX + 55, phoneY + 308);
+        ctx.font = '700 23px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('Seçilen Takas / Peşinat Tutarı:', contentX + 55, phoneY + 344);
         ctx.fillStyle = '#4ade80';
-        ctx.font = '900 36px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(`${tradeInVal.toLocaleString('tr-TR')} TL`, contentX + 500, phoneY + 310);
+        ctx.font = '900 34px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(`${tradeInVal.toLocaleString('tr-TR')} TL`, contentX + 500, phoneY + 346);
 
         // Alt Fark Hesabı Tablosu
         drawRoundedRect(ctx, contentX, phoneY + 495, contentW, 560, 26);
@@ -476,7 +1285,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         ctx.fillText('📊 KART İÇİNDE CANLI FARK & TAKSİT HESABI', contentX + 34, phoneY + 558);
 
         const rows = [
-          { label: 'Daily 3.5 Ton Çift Teker (Nakit Fiyatı):', val: '2.390.000 TL', color: '#ffffff' },
+          { label: 'Sıfır 2026 IVECO (Nakit İndirimli):', val: '2.390.000 TL', color: '#ffffff' },
           { label: 'Mevcut Aracınızın Takas Peşinatı (-):', val: `-${tradeInVal.toLocaleString('tr-TR')} TL`, color: '#fbbf24' },
           { label: 'Üste Kredilendirilecek Net Fark:', val: `${diffLoan.toLocaleString('tr-TR')} TL`, color: '#4ade80' }
         ];
@@ -513,7 +1322,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       }
 
       if (stepIdx === 2) {
-        // 4 Resimle Takas Ekspertiz Ekranı
+        // 4 Resimle Takas Ekspertiz Ekranı (Gerçek Araç Görselli)
         drawRoundedRect(ctx, contentX, phoneY + 115, contentW, 950, 28);
         ctx.fillStyle = '#132038';
         ctx.fill();
@@ -521,13 +1330,15 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         ctx.strokeStyle = '#3b82f6';
         ctx.stroke();
 
+        drawVehiclePhotoBox(ctx, 'ustyapi_35', contentX + contentW - 205, phoneY + 135, 175, 110, 14, '#10b981', 'cover');
+
         ctx.fillStyle = '#60a5fa';
-        ctx.font = '900 28px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText('📸 WHATSAPP’TAN 4 RESİMLE YERİNDEN TAKAS EKSPERTİZİ', contentX + 36, phoneY + 175);
+        ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('📸 WHATSAPP’TAN 4 RESİMLE TAKAS EKSPERTİZİ', contentX + 36, phoneY + 175);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = '800 34px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText('Sanayiye Gitmeden Telefonunuzdan Fiyat Alın!', contentX + 36, phoneY + 230);
+        ctx.font = '800 31px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('Sanayiye Gitmeden 15 Dk’da Fiyat Alın!', contentX + 36, phoneY + 225);
 
         const photoSlots = [
           { icon: '🚛', title: '1. Dışarıdan Görünüm', desc: 'Aracın dış kasa/şasi resmi' },
@@ -569,9 +1380,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         ctx.fillStyle = '#22c55e';
         ctx.fill();
         ctx.fillStyle = '#052e16';
-        ctx.font = '900 32px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.font = '900 31px "Segoe UI", Inter, Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('💬 WhatsApp’tan Sor — Takas & Kredi Teklifi Al', CANVAS_W / 2, phoneY + 898);
+        ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor — Takas Teklifi Al', CANVAS_W / 2, phoneY + 898);
         ctx.textAlign = 'left';
 
         ctx.font = '66px "Segoe UI Emoji", Arial';
@@ -580,7 +1391,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       }
     }
 
-    // ── SENARYO 3 (3-6 AY ÖDEMESİZ & 5 BANKA) ÖZEL SAHNELERİ ──────────────────
+    // ── SENARYO 4 (3-6 AY ÖDEMESİZ & 5 BANKA) ÖZEL SAHNELERİ ──────────────────
     if (scId === 'odemesiz') {
       if (stepIdx === 0 || stepIdx === 1) {
         drawRoundedRect(ctx, contentX, phoneY + 110, contentW, 960, 26);
@@ -590,13 +1401,15 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         ctx.strokeStyle = '#f59e0b';
         ctx.stroke();
 
+        drawVehiclePhotoBox(ctx, 'daily35_sasi', contentX + contentW - 210, phoneY + 130, 180, 112, 14, '#f59e0b', 'contain');
+
         ctx.fillStyle = '#fbbf24';
-        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
         ctx.fillText('🏛️ KUVEYT TÜRK & 5 BANKA TİCARİ KREDİ TABLOSU', contentX + 34, phoneY + 172);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 36px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText('Kart İçinden Taksit & 3-6 Ay Ödemesiz Seçenekler', contentX + 34, phoneY + 230);
+        ctx.font = '900 32px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('3-6 Ay Ödemesiz & %0 Faizli Seçenekler', contentX + 34, phoneY + 224);
 
         const graceBoxes = [
           {
@@ -607,9 +1420,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
             border: '#10b981'
           },
           {
-            title: '🔥 6 AY ÖDEMESİZ DÖNEM SEÇENEĞİ',
-            sub: 'Aracınızı hemen teslim alın, ilk 6 ay boyunca taksit ödemeyin!',
-            detail: '1.000.000 TL - 5.000.000 TL Arası Kredi • %2,85 - %2,91 Oran • 12-36 Ay Vade',
+            title: '🔥 6 AY ÖDEMESİZ DÖNEM (TL & EURO KREDİ)',
+            sub: 'Aracınızı bugün teslim alın, ilk 6 ay boyunca taksit ödemeyin!',
+            detail: '1.000.000 TL - 5.000.000 TL veya İhracatçı Euro (€) Kredisi • 12-36 Ay Vade',
             color: '#fbbf24',
             border: '#f59e0b'
           },
@@ -656,26 +1469,29 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       }
     }
 
-    // ── SENARYO 5 (3.5T, 7T & 12 TEKER T-WAY MİKSER/HAFRİYAT) ÖZEL SAHNELERİ ──
+    // ── SENARYO 8 (3.5T, 7T, EUROCARGO & 12 TEKER T-WAY) GERÇEK RESİMLİ SAHNELER ──
     if (scId === 'kantar') {
       const cards = [
         {
-          badge: '🚐 1. GRUP: B EHLİYET & TAKOGRAF MUAFİYETLİ',
-          title: 'Daily 3.5 Ton Çift Teker — Orta Şasi',
-          sub: 'Kampanyalı: 2.500.000 TL  |  Nakit İndirimi: -110.000 TL',
-          price: 'Net Peşin: 2.390.000 TL  (KDV: ~398 Bin TL)',
+          img: 'daily35_sasi',
+          badge: '🚐 1. GRUP: B EHLİYET & ÇOKTAN SEÇMELİ ŞASİ',
+          title: 'Daily 3.5 Ton Tek/Çift Teker (Kısa / Orta / Uzun)',
+          sub: 'Tek Teker Peşin: 1.905.000 TL  |  Çift Teker: 2.035.000 TL',
+          price: '190.000 TL Nakit İndirimi + %20 KDV Avantajı',
           border: stepIdx === 0 ? '#3b82f6' : 'rgba(59, 130, 246, 0.4)',
           color: '#60a5fa'
         },
         {
-          badge: '🚛 2. GRUP: 4.8 TON NET YÜK & 10-12 EURO PALET',
-          title: 'Daily 7 Ton Kamyon — Uzun Şasi (Manuel/Otomatik)',
-          sub: 'Kampanyalı: 2.680.000 TL  |  Nakit İndirimi: -260.000 TL!',
-          price: 'Net Peşin: 2.420.000 TL  (KDV: ~403 Bin TL)',
+          img: 'daily70',
+          badge: '🚛 2. GRUP: 7 TON KAMYON (KISA/ORTA/UZUN) & EUROCARGO',
+          title: 'Daily 7 Ton Kamyon (70C) & Eurocargo (10–18 Ton)',
+          sub: '70C Kısa/Orta/Uzun Peşin: 2.390.000 TL (-260.000 TL İndirim!)',
+          price: 'Eurocargo 10–18 Ton: 3.330.000 TL’den Başlayan Peşin',
           border: stepIdx === 1 ? '#f59e0b' : 'rgba(245, 158, 11, 0.4)',
           color: '#fbbf24'
         },
         {
+          img: 'tway',
           badge: '🏗️ 3. GRUP: 12 TEKER (8x4) MİKSER & KAYA DAMPERİ',
           title: 'T-Way 12 Teker (8x4) Beton Mikseri & Hafriyat',
           sub: 'Mikser Liste: 6.075.000 TL  |  Nakit İndirimi: -325.000 TL!',
@@ -686,47 +1502,50 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ];
 
       cards.forEach((c, idx) => {
-        const cy = phoneY + 108 + idx * 325;
-        drawRoundedRect(ctx, contentX, cy, contentW, 302, 22);
+        const cy = phoneY + 106 + idx * 328;
+        drawRoundedRect(ctx, contentX, cy, contentW, 306, 22);
         ctx.fillStyle = '#132038';
         ctx.fill();
         ctx.lineWidth = 3;
         ctx.strokeStyle = c.border;
         ctx.stroke();
 
+        // Sağ üstte gerçek araç fotoğrafı
+        drawVehiclePhotoBox(ctx, c.img, contentX + contentW - 205, cy + 16, 182, 116, 14, c.color, 'contain');
+
         ctx.fillStyle = c.color;
-        ctx.font = '900 22px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(c.badge, contentX + 28, cy + 46);
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.badge, contentX + 26, cy + 44);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 31px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(c.title, contentX + 28, cy + 94);
+        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.title, contentX + 26, cy + 88);
 
         ctx.fillStyle = '#cbd5e1';
-        ctx.font = '600 21px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(c.sub, contentX + 28, cy + 135);
+        ctx.font = '700 19px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.sub, contentX + 26, cy + 124);
 
-        drawRoundedRect(ctx, contentX + 28, cy + 154, contentW - 56, 68, 14);
+        drawRoundedRect(ctx, contentX + 26, cy + 148, contentW - 52, 68, 14);
         ctx.fillStyle = '#0f172a';
         ctx.fill();
         ctx.fillStyle = c.color;
-        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(c.price, contentX + 48, cy + 198);
+        ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText(c.price, contentX + 44, cy + 191);
 
-        // 2 Sade Buton (Taksit & Takas Hesapla | WhatsApp'tan Sor)
-        drawRoundedRect(ctx, contentX + 28, cy + 234, 410, 52, 12);
+        // 2 Sade Buton (Taksit & Takas Hesapla | Son Oluru / Dip Fiyatı Sor)
+        drawRoundedRect(ctx, contentX + 26, cy + 234, 410, 54, 12);
         ctx.fillStyle = '#2563eb';
         ctx.fill();
         ctx.fillStyle = '#ffffff';
         ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 233, cy + 267);
+        ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 231, cy + 268);
 
-        drawRoundedRect(ctx, contentX + 454, cy + 234, 410, 52, 12);
+        drawRoundedRect(ctx, contentX + 454, cy + 234, 412, 54, 12);
         ctx.fillStyle = '#16a34a';
         ctx.fill();
         ctx.fillStyle = '#ffffff';
-        ctx.fillText('💬 WhatsApp’tan Sor', contentX + 659, cy + 267);
+        ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor', contentX + 660, cy + 268);
         ctx.textAlign = 'left';
       });
 
@@ -741,151 +1560,95 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       return;
     }
 
-    // ── SENARYO 1 (GENEL KILAVUZ - YENİ BASİT SİSTEM) SAHNELERİ ──────────────
+    // ── SENARYO 1 (GENEL KILAVUZ - YENİ ÇOKTAN SEÇMELİ & GÖRSELLİ SİSTEM) ────
     if (stepIdx === 0 && scId !== 'kdv') {
-      // Üstte 6 Araç Grubu Seçici Kutular (2 Satır x 3 Sütun)
-      drawRoundedRect(ctx, contentX, phoneY + 105, contentW, 355, 24);
-      ctx.fillStyle = '#132038';
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#10b981';
-      ctx.stroke();
+      // Üstte Gerçek Fotoğraflı 6 Araç Grubu Seçici Kutular
+      const activeGroupIdx = stepLocalT < 0.5 ? 0 : 2;
+      drawSixPhotoCategoryGrid(ctx, contentX, phoneY + 102, contentW, activeGroupIdx);
 
-      ctx.fillStyle = '#34d399';
-      ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('👇 1. ADIM: İLGİLENDİĞİNİZ ARAÇ GRUBUNA DOKUNUN', contentX + 28, phoneY + 150);
-
-      const groupBoxes = [
-        { icon: '🚐', name: '3.5 Ton Kamyonet', sub: 'B Ehliyet • Çift Teker', hot: stepLocalT < 0.55 },
-        { icon: '📦', name: 'Kapalı Panelvan', sub: '12 - 16 m³ Hacim', hot: false },
-        { icon: '🚛', name: '7 Ton Kamyon', sub: '4.8 Ton Net Yük', hot: stepLocalT >= 0.55 },
-        { icon: '🏭', name: 'Eurocargo', sub: '10–18 Ton • 14–20 Palet', hot: false },
-        { icon: '🛣️', name: 'S-Way Çekici (Tır)', sub: '490 & 530 BG', hot: false },
-        { icon: '🏗️', name: 'Mikser & Hafriyat', sub: '12 Teker T-Way', hot: false }
-      ];
-
-      groupBoxes.forEach((gb, idx) => {
-        const col = idx % 3;
-        const row = Math.floor(idx / 3);
-        const gx = contentX + 24 + col * 286;
-        const gy = phoneY + 172 + row * 132;
-
-        drawRoundedRect(ctx, gx, gy, 272, 118, 16);
-        ctx.fillStyle = gb.hot ? 'rgba(16, 185, 129, 0.22)' : '#0f172a';
-        ctx.fill();
-        ctx.lineWidth = gb.hot ? 3 : 1.5;
-        ctx.strokeStyle = gb.hot ? '#10b981' : '#334155';
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '800 22px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(`${gb.icon} ${gb.name}`, gx + 16, gy + 50);
-
-        ctx.fillStyle = gb.hot ? '#6ee7b7' : '#94a3b8';
-        ctx.font = '600 18px "Segoe UI", Inter, Arial, sans-serif';
-        ctx.fillText(gb.sub, gx + 16, gy + 88);
-      });
-
-      // Altta Halk Dilinde Sade Araç Kartı + 2 Net Tuş
-      const cardY = phoneY + 485;
-      drawRoundedRect(ctx, contentX, cardY, contentW, 575, 26);
-      ctx.fillStyle = '#162238';
-      ctx.fill();
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.55)';
-      ctx.stroke();
-
-      ctx.fillStyle = '#60a5fa';
-      ctx.font = '800 22px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🪪 B EHLİYET • 🚫 TAKOGRAF MUAFİYETLİ • 🛞 ÇİFT TEKER', contentX + 30, cardY + 48);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 34px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('Daily 3.5 Ton Çift Teker — Orta Şasi (Otomatik)', contentX + 30, cardY + 100);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 21px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('Anlaşılır halk dilinde başlık • Karmaşık fabrika kodları gizlendi', contentX + 30, cardY + 138);
-
-      // 2 Büyük Fiyat Kutusu (Nakit İndirimli & Kredili Liste)
-      drawRoundedRect(ctx, contentX + 30, cardY + 165, 405, 145, 18);
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.14)';
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#10b981';
-      ctx.stroke();
-      ctx.fillStyle = '#6ee7b7';
-      ctx.font = '700 21px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('💵 Nakit İndirimli Net Fiyat:', contentX + 52, cardY + 208);
-      ctx.fillStyle = '#4ade80';
-      ctx.font = '900 38px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('2.390.000 TL', contentX + 52, cardY + 265);
-      ctx.fillStyle = '#a7f3d0';
-      ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🔥 110.000 TL Nakit İndirimi Dahil', contentX + 52, cardY + 295);
-
-      drawRoundedRect(ctx, contentX + 455, cardY + 165, 405, 145, 18);
-      ctx.fillStyle = '#0f172a';
-      ctx.fill();
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = '#334155';
-      ctx.stroke();
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '700 21px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🏦 Kredili / Kampanyalı Liste:', contentX + 478, cardY + 208);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 38px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('2.500.000 TL', contentX + 478, cardY + 265);
-      ctx.fillStyle = '#fbbf24';
-      ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🧾 %20 KDV Avantajı: ~398.333 TL', contentX + 478, cardY + 295);
-
-      // Yeni Sade 2 Buton Düzeni
-      drawRoundedRect(ctx, contentX + 30, cardY + 340, contentW - 60, 46, 12);
-      ctx.fillStyle = 'rgba(245, 158, 11, 0.14)';
-      ctx.fill();
-      ctx.fillStyle = '#fbbf24';
-      ctx.font = '800 21px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('✨ YENİ SADE TASARIM: Her araç kartında sadece 2 net işlem tuşu!', contentX + 50, cardY + 370);
-
-      drawRoundedRect(ctx, contentX + 30, cardY + 408, 405, 105, 20);
-      ctx.fillStyle = '#2563eb';
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#93c5fd';
-      ctx.stroke();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 232, cardY + 468);
-
-      drawRoundedRect(ctx, contentX + 455, cardY + 408, 405, 105, 20);
-      ctx.fillStyle = '#16a34a';
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 26px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('💬 WhatsApp’tan Sor', contentX + 657, cardY + 468);
-      ctx.textAlign = 'left';
+      // Altta Çoktan Seçmeli Sihirbaz Başlangıcı + Gerçek Araç Kartı Önizlemesi
+      drawMultipleChoiceWizardBox(ctx, contentX, phoneY + 446, contentW, activeGroupIdx === 0 ? 'kamyonet35' : 'daily70', stepLocalT);
 
       // Parmak İkonu
-      const fingerTargetX = stepLocalT < 0.55 ? contentX + 140 : contentX + 700;
-      const fingerTargetY = stepLocalT < 0.55 ? phoneY + 265 : phoneY + 265;
-      ctx.font = '62px "Segoe UI Emoji", Arial';
-      ctx.fillText('👆', fingerTargetX, fingerTargetY);
+      const fingerTargetX = stepLocalT < 0.5 ? contentX + 140 : contentX + 700;
+      ctx.font = '60px "Segoe UI Emoji", Arial';
+      ctx.fillText('👆', fingerTargetX, phoneY + 255);
 
       drawRoundedRect(ctx, contentX + 40, phoneY + 1110, contentW - 80, 110, 22);
       ctx.fillStyle = '#f59e0b';
       ctx.fill();
       ctx.fillStyle = '#0f172a';
-      ctx.font = '900 28px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('👆 Üstten araç grubunu seçin, sade fiyat kartlarını hemen görün!', CANVAS_W / 2, phoneY + 1176);
+      ctx.fillText('👆 Üstten resimli araç grubunu seçin, 3 adımda aracınızı bulun!', CANVAS_W / 2, phoneY + 1176);
       ctx.textAlign = 'left';
       return;
     }
 
     if (stepIdx === 1 && scId !== 'kdv') {
-      // 2. Adım: Kart İçinde Açılan Taksit & Takas Hesaplayıcı
+      if (scId === 'kilavuz') {
+        // Kılavuz 2. Adım: Çoktan Seçmeli Sihirbaz + Altta Açılan Araç Kartı
+        drawMultipleChoiceWizardBox(ctx, contentX, phoneY + 104, contentW, 'kamyonet35', stepLocalT);
+
+        const cardY = phoneY + 594;
+        drawRoundedRect(ctx, contentX, cardY, contentW, 495, 24);
+        ctx.fillStyle = '#162544';
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#38bdf8';
+        ctx.stroke();
+
+        drawVehiclePhotoBox(ctx, 'daily35_sasi', contentX + contentW - 225, cardY + 24, 200, 130, 16, '#38bdf8', 'contain');
+
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('✅ 3 ADIMDA SEÇİLEN KAMYONET:', contentX + 26, cardY + 50);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 30px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('Daily 3.5 Ton Çift Teker — Orta Şasi (Otomatik)', contentX + 26, cardY + 95);
+
+        ctx.fillStyle = '#86efac';
+        ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('4.1 – 4.3 Metre Kasa • 3.0 Büyük Motor • 8 İleri Otomatik', contentX + 26, cardY + 132);
+
+        drawRoundedRect(ctx, contentX + 24, cardY + 172, contentW - 48, 138, 16);
+        ctx.fillStyle = '#0b1324';
+        ctx.fill();
+        ctx.fillStyle = '#4ade80';
+        ctx.font = '900 38px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('Net Fiyat: 2.170.000 TL  (🧾 KDV: ~361.667 TL)', contentX + 44, cardY + 235);
+        ctx.fillStyle = '#fde047';
+        ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.fillText('🔥 Peşin, takaslı veya referanslı alıma özel son dip fiyatı yeşil tuşla sorun 👇', contentX + 44, cardY + 284);
+
+        drawRoundedRect(ctx, contentX + 24, cardY + 340, 412, 92, 16);
+        ctx.fillStyle = '#0284c7';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 230, cardY + 396);
+
+        drawRoundedRect(ctx, contentX + 452, cardY + 340, 424, 92, 16);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor', contentX + 664, cardY + 396);
+        ctx.textAlign = 'left';
+
+        drawRoundedRect(ctx, contentX + 40, phoneY + 1110, contentW - 80, 110, 22);
+        ctx.fillStyle = '#2563eb';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('👆 Teker tipini, şasi boyunu ve vitesi seçin; kartınız anında açılsın!', CANVAS_W / 2, phoneY + 1176);
+        ctx.textAlign = 'left';
+        return;
+      }
+
+      // Diğer Senaryolar 2. Adım: Kart İçinde Açılan Taksit & Takas Hesaplayıcı (TL + İhracatçı Euro Sekmeli)
       drawRoundedRect(ctx, contentX, phoneY + 108, contentW, 965, 26);
       ctx.fillStyle = '#162238';
       ctx.fill();
@@ -893,70 +1656,68 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.strokeStyle = '#3b82f6';
       ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 31px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🚐 Daily 3.5 Ton Çift Teker — Orta Şasi', contentX + 30, phoneY + 160);
+      drawVehiclePhotoBox(ctx, 'daily35_sasi', contentX + contentW - 190, phoneY + 122, 164, 96, 12, '#38bdf8', 'contain');
 
-      // 2 Ana Tuş (Mavi Tuş Aktif: Taksit Paneli Açık)
-      drawRoundedRect(ctx, contentX + 30, phoneY + 185, 410, 74, 16);
-      ctx.fillStyle = '#2563eb';
-      ctx.fill();
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#93c5fd';
-      ctx.stroke();
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('💳 Taksit & Takas Kapat ▲', contentX + 235, phoneY + 231);
-
-      drawRoundedRect(ctx, contentX + 455, phoneY + 185, 405, 74, 16);
-      ctx.fillStyle = '#16a34a';
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('💬 WhatsApp’tan Sor', contentX + 657, phoneY + 231);
-      ctx.textAlign = 'left';
+      ctx.font = '900 29px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('🚐 Daily 3.5 Ton Çift Teker — Orta Şasi', contentX + 30, phoneY + 162);
 
       // Kart İçi Açılır Hesaplama Kutusu
-      const boxY = phoneY + 282;
-      drawRoundedRect(ctx, contentX + 26, boxY, contentW - 52, 760, 22);
+      const boxY = phoneY + 234;
+      drawRoundedRect(ctx, contentX + 26, boxY, contentW - 52, 810, 22);
       ctx.fillStyle = '#0f172a';
       ctx.fill();
       ctx.lineWidth = 2.5;
       ctx.strokeStyle = '#3b82f6';
       ctx.stroke();
 
+      // TL | Euro Sekmesi
+      drawRoundedRect(ctx, contentX + 52, boxY + 22, 375, 52, 10);
+      ctx.fillStyle = '#0284c7';
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🇹🇷 TL Ticari Kredi', contentX + 239, boxY + 55);
+
+      drawRoundedRect(ctx, contentX + 440, boxY + 22, 412, 52, 10);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.fillText('💶 İhracatçı Euro (€) Kredisi', contentX + 646, boxY + 55);
+      ctx.textAlign = 'left';
+
       ctx.fillStyle = '#93c5fd';
-      ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('1️⃣ PEŞİNAT VEYA TAKAS ARACINIZIN DEĞERİNİ SEÇİN:', contentX + 52, boxY + 50);
+      ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('1️⃣ PEŞİNAT VEYA TAKAS ARACINIZIN DEĞERİNİ SEÇİN:', contentX + 52, boxY + 114);
 
       const dpOptions = ['Peşinatsız (0 TL)', '500 Bin TL', '1 Milyon TL', '1.5 Milyon TL'];
       const activeDpIdx = stepLocalT < 0.45 ? 2 : 3;
       dpOptions.forEach((opt, idx) => {
         const ox = contentX + 52 + idx * 198;
-        const oy = boxY + 72;
+        const oy = boxY + 132;
         const isSel = idx === activeDpIdx;
-        drawRoundedRect(ctx, ox, oy, 186, 62, 14);
+        drawRoundedRect(ctx, ox, oy, 186, 60, 14);
         ctx.fillStyle = isSel ? '#10b981' : '#1e293b';
         ctx.fill();
         ctx.fillStyle = isSel ? '#052e16' : '#e2e8f0';
         ctx.font = '900 20px "Segoe UI", Inter, Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(opt, ox + 93, oy + 39);
+        ctx.fillText(opt, ox + 93, oy + 38);
       });
       ctx.textAlign = 'left';
 
       ctx.fillStyle = '#93c5fd';
-      ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('2️⃣ KAÇ AY VADE İSTERSİNİZ?', contentX + 52, boxY + 190);
+      ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('2️⃣ KAÇ AY VADE İSTERSİNİZ?', contentX + 52, boxY + 240);
 
       const termOptions = ['12 Ay Vade', '24 Ay Vade', '36 Ay Vade'];
       const activeTermIdx = stepLocalT < 0.5 ? 1 : 2;
       termOptions.forEach((tOpt, idx) => {
         const tx = contentX + 52 + idx * 265;
-        const ty = boxY + 212;
+        const ty = boxY + 258;
         const isSel = idx === activeTermIdx;
-        drawRoundedRect(ctx, tx, ty, 248, 64, 14);
+        drawRoundedRect(ctx, tx, ty, 248, 62, 14);
         ctx.fillStyle = isSel ? '#2563eb' : '#1e293b';
         ctx.fill();
         ctx.lineWidth = isSel ? 2.5 : 1;
@@ -965,11 +1726,11 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
         ctx.fillStyle = '#ffffff';
         ctx.font = '900 23px "Segoe UI", Inter, Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(tOpt, tx + 124, ty + 41);
+        ctx.fillText(tOpt, tx + 124, ty + 40);
       });
       ctx.textAlign = 'left';
 
-      // Canlı Sonuç Özeti (Kalan Kredi & Aylık Taksit)
+      // Canlı Sonuç Özeti
       const dpVal = activeDpIdx === 2 ? 1000000 : 1500000;
       const remLoan = 2390000 - dpVal;
       const months = activeTermIdx === 1 ? 24 : 36;
@@ -977,7 +1738,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       const factor = Math.pow(1 + rate, months);
       const monthlyPayment = Math.round((remLoan * rate * factor) / (factor - 1));
 
-      drawRoundedRect(ctx, contentX + 52, boxY + 305, contentW - 104, 195, 18);
+      drawRoundedRect(ctx, contentX + 52, boxY + 345, contentW - 104, 195, 18);
       ctx.fillStyle = 'rgba(16, 185, 129, 0.14)';
       ctx.fill();
       ctx.lineWidth = 2.5;
@@ -986,30 +1747,24 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
       ctx.fillStyle = '#cbd5e1';
       ctx.font = '700 23px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText(`Peşinat Sonrası Kalan Kredi: ${remLoan.toLocaleString('tr-TR')} TL  (${months} Ay)`, contentX + 78, boxY + 355);
+      ctx.fillText(`Peşinat Sonrası Kalan Kredi: ${remLoan.toLocaleString('tr-TR')} TL  (${months} Ay)`, contentX + 78, boxY + 392);
 
       ctx.fillStyle = '#4ade80';
       ctx.font = '900 44px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText(`Aylık Taksit: ~${monthlyPayment.toLocaleString('tr-TR')} TL`, contentX + 78, boxY + 422);
+      ctx.fillText(`Aylık Taksit: ~${monthlyPayment.toLocaleString('tr-TR')} TL`, contentX + 78, boxY + 458);
 
       ctx.fillStyle = '#fbbf24';
-      ctx.font = '800 21px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🔥 1M TL 6 Ay %0 Faiz veya Kuveyt Türk 3-6 Ay Ödemesiz Seçenekli!', contentX + 78, boxY + 472);
+      ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('🔥 1M TL %0 Faiz, Kuveyt Türk 6 Ay Ödemesiz veya İhracatçı Euro Kredisi!', contentX + 78, boxY + 508);
 
       // Kart İçi Yeşil WhatsApp Gönder Butonu
-      drawRoundedRect(ctx, contentX + 52, boxY + 530, contentW - 104, 96, 18);
+      drawRoundedRect(ctx, contentX + 52, boxY + 565, contentW - 104, 96, 18);
       ctx.fillStyle = '#22c55e';
       ctx.fill();
       ctx.fillStyle = '#052e16';
       ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('💬 Bu Hesabı WhatsApp’tan Can Murat’a Gönder', CANVAS_W / 2, boxY + 588);
-      ctx.textAlign = 'left';
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 20px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Başka sayfaya gitmeden aynı kartın içinde anında hesaplanır!', CANVAS_W / 2, boxY + 675);
+      ctx.fillText('💬 Son Dip Fiyat & Taksiti Can Murat’a Sor', CANVAS_W / 2, boxY + 623);
       ctx.textAlign = 'left';
 
       drawRoundedRect(ctx, contentX + 40, phoneY + 1110, contentW - 80, 110, 22);
@@ -1023,37 +1778,42 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       return;
     }
 
-    // 3. Adım / KDV ve Muhasebe Sahnesi (Yeni 2 Butonlu Sade Tasarım + 12 Teker & 7 Ton İndirimi)
-    drawRoundedRect(ctx, contentX, phoneY + 115, contentW, 940, 28);
+    // 3. Adım / KDV ve Muhasebe Sahnesi (Gerçek Araç Görselli + 2 Butonlu Sade Tasarım)
+    drawRoundedRect(ctx, contentX, phoneY + 110, contentW, 955, 28);
     ctx.fillStyle = '#132038';
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#f59e0b';
     ctx.stroke();
 
+    drawVehiclePhotoBox(ctx, 'daily70', contentX + contentW - 225, phoneY + 132, 198, 124, 16, '#f59e0b', 'contain');
+
     ctx.fillStyle = '#fbbf24';
-    ctx.font = '800 24px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('⚖️ NAKİT İNDİRİMİ + %20 İNDİRİLEBİLİR KDV VERGİ KALKANI', contentX + 34, phoneY + 170);
+    ctx.font = '800 22px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('⚖️ NAKİT İNDİRİMİ + %20 İNDİRİLEBİLİR KDV VERGİ KALKANI', contentX + 34, phoneY + 164);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '900 35px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('Daily 7 Ton Kamyon — Uzun Şasi (4.8 Ton Yük)', contentX + 34, phoneY + 225);
+    ctx.font = '900 31px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('Daily 7 Ton Kamyon — Uzun Şasi', contentX + 34, phoneY + 214);
+    ctx.fillStyle = '#86efac';
+    ctx.font = '800 20px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('5.6 – 5.9 Metre Kasa (12 Palet) • 4.7 Ton Yük • Klimalı', contentX + 34, phoneY + 248);
 
-    drawRoundedRect(ctx, contentX + 34, phoneY + 255, contentW - 68, 155, 20);
+    drawRoundedRect(ctx, contentX + 34, phoneY + 275, contentW - 68, 150, 20);
     ctx.fillStyle = '#0f172a';
     ctx.fill();
 
     ctx.fillStyle = '#94a3b8';
     ctx.font = '600 23px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('Kredili Liste: 2.680.000 TL   |   Nakit İndirimi: -260.000 TL', contentX + 55, phoneY + 305);
+    ctx.fillText('Kredili Liste: 2.680.000 TL   |   Nakit İndirimi: -260.000 TL', contentX + 55, phoneY + 322);
 
     ctx.fillStyle = '#4ade80';
     ctx.font = '900 38px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('Net Peşin Fiyat: 2.420.000 TL (KDV Dahil)', contentX + 55, phoneY + 362);
+    ctx.fillText('Net Peşin Fiyat: 2.420.000 TL (KDV Dahil)', contentX + 55, phoneY + 375);
 
     ctx.fillStyle = '#cbd5e1';
     ctx.font = '700 20px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('🏗️ T-Way 12 Teker Mikser: 5.750.000 TL Nakit (-325.000 TL İndirim!)', contentX + 55, phoneY + 396);
+    ctx.fillText('🏗️ T-Way 12 Teker Mikser: 5.750.000 TL Nakit (-325.000 TL İndirim!)', contentX + 55, phoneY + 408);
 
     const pulseScale = 1 + Math.sin(stepLocalT * Math.PI * 4) * 0.015;
     ctx.save();
@@ -1082,28 +1842,28 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ctx.restore();
 
     // Yeni 2 Butonlu Sade Kart Altı
-    drawRoundedRect(ctx, contentX + 34, phoneY + 660, 405, 105, 20);
+    drawRoundedRect(ctx, contentX + 34, phoneY + 655, 405, 105, 20);
     ctx.fillStyle = '#2563eb';
     ctx.fill();
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = '#93c5fd';
     ctx.stroke();
     ctx.fillStyle = '#ffffff';
-    ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 236, phoneY + 722);
+    ctx.fillText('💳 Taksit & Takas Hesapla', contentX + 236, phoneY + 717);
 
-    drawRoundedRect(ctx, contentX + 465, phoneY + 660, 405, 105, 20);
+    drawRoundedRect(ctx, contentX + 465, phoneY + 655, 405, 105, 20);
     ctx.fillStyle = '#16a34a';
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#86efac';
     ctx.stroke();
     ctx.fillStyle = '#ffffff';
-    ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('💬 WhatsApp’tan Sor', contentX + 667, phoneY + 722);
+    ctx.font = '900 24px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.fillText('💬 Son Oluru / Dip Fiyatı Sor', contentX + 667, phoneY + 717);
 
-    drawRoundedRect(ctx, contentX + 34, phoneY + 795, contentW - 68, 98, 18);
+    drawRoundedRect(ctx, contentX + 34, phoneY + 790, contentW - 68, 98, 18);
     ctx.fillStyle = '#0f172a';
     ctx.fill();
     ctx.lineWidth = 2;
@@ -1111,10 +1871,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ctx.stroke();
     ctx.fillStyle = '#fbbf24';
     ctx.font = '800 24px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('📞 Satış Sorumlusu Can Murat — 0544 622 59 31', CANVAS_W / 2, phoneY + 840);
+    ctx.fillText('📞 Satış Sorumlusu Can Murat — 0544 622 59 31', CANVAS_W / 2, phoneY + 835);
     ctx.fillStyle = '#cbd5e1';
     ctx.font = '600 20px "Segoe UI", Inter, Arial, sans-serif';
-    ctx.fillText('Tek tuşla resmi proforma veya kredi tablosunu WhatsApp’tan isteyin', CANVAS_W / 2, phoneY + 874);
+    ctx.fillText('Peşin, kredili veya takaslı alımda size özel son dip fiyatı hemen sorun', CANVAS_W / 2, phoneY + 869);
     ctx.textAlign = 'left';
 
     ctx.font = '68px "Segoe UI Emoji", Arial';
@@ -1124,9 +1884,9 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
     ctx.fillStyle = '#10b981';
     ctx.fill();
     ctx.fillStyle = '#052e16';
-    ctx.font = '900 28px "Segoe UI", Inter, Arial, sans-serif';
+    ctx.font = '900 27px "Segoe UI", Inter, Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText("👆 '💬 WhatsApp’tan Sor' tuşuyla tek tıkla Can Murat’a bağlanın!", CANVAS_W / 2, phoneY + 1176);
+    ctx.fillText("👆 '💬 Son Oluru / Dip Fiyatı Sor' tuşuyla Can Murat’a bağlanın!", CANVAS_W / 2, phoneY + 1176);
     ctx.textAlign = 'left';
   };
 
@@ -1290,7 +2050,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
 
   const loadStepAudioBuffer = async (audioUrl) => {
     if (!audioUrl) return null;
-    const cacheKey = `${audioUrl}?v=ahmet_male_v4`;
+    const cacheKey = `${audioUrl}?v=ahmet_male_v5`;
     if (audioBufferCacheRef.current[cacheKey]) {
       return audioBufferCacheRef.current[cacheKey];
     }
@@ -1720,10 +2480,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.18rem', fontWeight: 800 }}>
-                🎬 5 Akılcı Senaryolu & Tok Erkek Spiker Sesli WhatsApp Durum Stüdyosu
+                🎬 8 Akılcı Senaryolu, Gerçek Araç Görselli & Tok Erkek Spiker Sesli WhatsApp Durum Stüdyosu
               </h2>
               <p style={{ margin: 0, fontSize: '0.79rem', color: 'var(--text-secondary)' }}>
-                Gerçek Türkçe Erkek Spiker Sesi (Microsoft Ahmet Neural), hafif kurumsal fon müziği ve Android uyumlu takip linki
+                Çoktan seçmeli yeni ekran görselleri, gerçek IVECO araç fotoğrafları, Ahmet AI erkek spiker sesi ve takip linki
               </p>
             </div>
           </div>
@@ -1743,10 +2503,10 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* ── 5 AKILCI SENARYO SEÇİCİ SEKMELER ─────────────────────────────── */}
+        {/* ── 8 AKILCI SENARYO SEÇİCİ SEKMELER ─────────────────────────────── */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(195px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '8px',
           marginBottom: '16px',
           background: 'var(--bg-secondary)',
