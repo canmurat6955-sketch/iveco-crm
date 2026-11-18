@@ -304,6 +304,17 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
   const [taxModalVehicleId, setTaxModalVehicleId] = useState('daily-35c16-3750-30');
   const [customTaxInvoiceTl, setCustomTaxInvoiceTl] = useState(0);
   const [taxEntityRate, setTaxEntityRate] = useState(0.25); // 0.25 (%25 Kurumlar) | 0.35 (%35 Gelir Vergisi)
+  const isExporterUrl = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    const loanParam = (params.get('loan') || params.get('kredi') || params.get('currency') || '').toLowerCase();
+    const ref = (params.get('ref') || '').toLowerCase();
+    return loanParam === 'eur' || loanParam === 'euro' || ref.includes('ihracat') || ref.includes('euro');
+  }, []);
+
+  const [inlineCalcCurrency, setInlineCalcCurrency] = useState(() => isExporterUrl ? 'EUR' : 'TRY');
+  const [eurTradeInValue, setEurTradeInValue] = useState(0);
+  const [eurLoanTerm, setEurLoanTerm] = useState(36);
   const [showSmartNudge, setShowSmartNudge] = useState(false);
   const [dismissedSmartNudge, setDismissedSmartNudge] = useState(false);
 
@@ -311,8 +322,16 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
     if (typeof window === 'undefined') return null;
     const params = new URLSearchParams(window.location.search);
     const ref = (params.get('ref') || '').toLowerCase();
+    const loanParam = (params.get('loan') || params.get('kredi') || '').toLowerCase();
     const company = params.get('company') || params.get('firma') || params.get('kisi') || '';
 
+    if (loanParam === 'eur' || loanParam === 'euro' || ref.includes('ihracat') || ref.includes('euro')) {
+      return {
+        badge: '🇪🇺 İHRACATÇI & DÖVİZ GELİRLİ FİRMALARA ÖZEL EURO (€) KREDİSİ AKTİF',
+        title: `${company ? `${company} — ` : ''}Euro (€) Bazlı Ticari Kredi & Özel Filo İskontosu Tanımlandı!`,
+        desc: '32 Sayılı Karar kapsamında ihracatçı ve döviz gelirli firmalarımıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) taksitlerini her araç kartındaki "Taksit & Takas Hesapla" tuşuyla Euro bazında hesaplayabilirsiniz.'
+      };
+    }
     if (ref.includes('kasaci') || ref.includes('karoser') || ref.includes('servis')) {
       return {
         badge: '🎟️ ÜSTYAPICI & KASACI REFERANS İNDİRİMİ AKTİF',
@@ -337,7 +356,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
     return {
       badge: '🤫 IVECO SAMSUN ÖZEL BAYİ İSKONTOSU & TAKAS DESTEĞİ',
       title: `${company ? `${company} — ` : ''}Liste Fiyatının Altındaki "Özel Dip Fiyatı" Öğrenin!`,
-      desc: 'Ekrandaki rakamlar standart kampanya fiyatlarıdır. Peşin, kredili veya takaslı alımda size özel ekstra bayi indirimini karttaki yeşil "Son Oluru / Dip Fiyatı Sor" tuşuyla anında öğrenin.'
+      desc: 'Ekrandaki rakamlar standart kampanya fiyatlarıdır. Peşin, kredili (TL veya İhracatçı Euro Kredisi) veya takaslı alımda size özel ekstra bayi indirimini karttaki yeşil "Son Oluru / Dip Fiyatı Sor" tuşuyla anında öğrenin.'
     };
   }, []);
 
@@ -1444,6 +1463,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             ? Math.round(((partnerPricing ? partnerPricing.finalEur : (vehicle.eurPrice || vehicle.cashPrice || 123000)) * tcmbEurRate) * 1.20)
             : (partnerPricing && !partnerPricing.isEur ? partnerPricing.finalCampaign : (vehicle.campaignPrice || vehicle.cashPrice || 0));
 
+          const fullPriceEurForLoan = vehicle.currency === 'EUR'
+            ? Math.round(partnerPricing ? partnerPricing.finalEur : (vehicle.eurPrice || vehicle.cashPrice || 123000))
+            : (fullPriceForLoan > 0 && tcmbEurRate > 0 ? Math.round(fullPriceForLoan / tcmbEurRate) : 0);
+
           const remainingAfterTradeIn = (!vehicle.isCustomPrice && fullPriceForLoan > 0)
             ? Math.max(0, fullPriceForLoan - (Number(tradeInValue) || 0))
             : 0;
@@ -1455,6 +1478,19 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             : isZeroInterestEligible
               ? Math.round(remainingAfterTradeIn / 12)
               : Math.round((remainingAfterTradeIn * monthlyRate * Math.pow(1 + monthlyRate, activeTerm)) / (Math.pow(1 + monthlyRate, activeTerm) - 1));
+
+          // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk %0 / Garanti BBVA / BNP Paribas)
+          const remainingEurAfterTradeIn = (!vehicle.isCustomPrice && fullPriceEurForLoan > 0)
+            ? Math.max(0, fullPriceEurForLoan - (Number(eurTradeInValue) || 0))
+            : 0;
+          const activeEurTerm = Number(eurLoanTerm) || 36;
+          const isZeroEurEligible = remainingEurAfterTradeIn > 0 && activeEurTerm === 12;
+          const monthlyEurRate = activeEurTerm === 12 ? 0 : activeEurTerm === 24 ? 0.0045 : activeEurTerm === 36 ? 0.0052 : 0.0058;
+          const monthlyEurPaymentEst = remainingEurAfterTradeIn <= 0
+            ? 0
+            : isZeroEurEligible
+              ? Math.round(remainingEurAfterTradeIn / 12)
+              : Math.round((remainingEurAfterTradeIn * monthlyEurRate * Math.pow(1 + monthlyEurRate, activeEurTerm)) / (Math.pow(1 + monthlyEurRate, activeEurTerm) - 1));
 
           return (
             <div
@@ -1687,6 +1723,20 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       </button>
                     </div>
 
+                    {(isExporterUrl || vehicle.currency === 'EUR') && fullPriceEurForLoan > 0 && (
+                      <div style={{
+                        fontSize: '0.69rem',
+                        color: '#93c5fd',
+                        fontWeight: 800,
+                        background: 'rgba(30, 58, 138, 0.35)',
+                        border: '1px solid rgba(96, 165, 250, 0.35)',
+                        borderRadius: '6px',
+                        padding: '3px 7px'
+                      }}>
+                        🇪🇺 İhracatçı Euro Kredisi: ~€{fullPriceEurForLoan.toLocaleString('tr-TR')} (36 Ay ~€{monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay • Kuveyt Türk %0 Kâr Payı Seçeneği)
+                      </div>
+                    )}
+
                     <div
                       onClick={() => handleVehicleQuote(vehicle)}
                       style={{
@@ -1786,11 +1836,11 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                 )}
               </div>
 
-              {/* 💳 KART İÇİ ANINDA TAKSİT & TAKAS HESAPLAYICI (Başka Sayfaya Zıplatmaz!) */}
+              {/* 💳 KART İÇİ ANINDA TAKSİT & TAKAS HESAPLAYICI (TL + İHRACATÇI EURO KREDİSİ DESTEKLİ!) */}
               {isInlineCalcOpen && !vehicle.isCustomPrice && (
                 <div style={{
-                  background: 'rgba(15, 23, 42, 0.95)',
-                  border: '1.5px solid #38bdf8',
+                  background: 'rgba(15, 23, 42, 0.96)',
+                  border: inlineCalcCurrency === 'EUR' ? '1.5px solid #60a5fa' : '1.5px solid #38bdf8',
                   borderRadius: '11px',
                   padding: '10px 11px',
                   marginBottom: '10px',
@@ -1799,8 +1849,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                   gap: '8px'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#38bdf8' }}>
-                      💳 {lockedBank ? `${lockedBank.shortName} Kredi` : 'Taksit & Takas'} Hesaplayıcı
+                    <span style={{ fontSize: '0.74rem', fontWeight: 900, color: inlineCalcCurrency === 'EUR' ? '#93c5fd' : '#38bdf8' }}>
+                      {inlineCalcCurrency === 'EUR'
+                        ? '🇪🇺 İhracatçı Euro (€) Kredi & Takas Hesaplayıcı'
+                        : `💳 ${lockedBank ? `${lockedBank.shortName} Kredi` : 'Taksit & Takas'} Hesaplayıcı`}
                     </span>
                     <button
                       type="button"
@@ -1820,174 +1872,403 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     </button>
                   </div>
 
-                  {/* Peşinat / Takas Seçimi */}
-                  <div>
-                    <div style={{ fontSize: '0.7rem', color: '#fde68a', fontWeight: 800, marginBottom: '4px' }}>
-                      1. Peşinatınız veya Takas Aracınızın Değeri:
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
-                      {[0, 500000, 1000000, 1500000, 2000000, 3000000].map(preset => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setTradeInValue(preset)}
-                          style={{
-                            padding: '4px 7px',
-                            borderRadius: '6px',
-                            fontSize: '0.67rem',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            background: Number(tradeInValue) === preset ? '#f59e0b' : 'rgba(255,255,255,0.08)',
-                            color: Number(tradeInValue) === preset ? '#0f172a' : '#e2e8f0',
-                            border: Number(tradeInValue) === preset ? '1px solid #fde047' : '1px solid rgba(255,255,255,0.15)'
-                          }}
-                        >
-                          {preset === 0 ? 'Peşinatsız' : `${(preset / 1000000).toLocaleString('tr-TR')} Milyon`}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="number"
-                      step={50000}
-                      min={0}
-                      value={tradeInValue}
-                      onChange={(e) => setTradeInValue(Math.max(0, Number(e.target.value) || 0))}
-                      placeholder="Peşinat veya takas tutarı yazın (TL)"
-                      style={{
-                        width: '100%',
-                        padding: '7px 10px',
-                        background: 'rgba(2, 6, 23, 0.9)',
-                        border: '1px solid rgba(245, 158, 11, 0.45)',
-                        borderRadius: '7px',
-                        color: '#fde047',
-                        fontSize: '0.82rem',
-                        fontWeight: 900
-                      }}
-                    />
-                  </div>
-
-                  {/* Vade Seçimi */}
-                  <div>
-                    <div style={{ fontSize: '0.7rem', color: '#7dd3fc', fontWeight: 800, marginBottom: '4px' }}>
-                      2. Kaç Ay Taksit Olsun?
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px' }}>
-                      {[12, 24, 36].map(t => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setTradeInTerm(t)}
-                          style={{
-                            padding: '6px',
-                            borderRadius: '7px',
-                            fontSize: '0.74rem',
-                            fontWeight: 900,
-                            cursor: 'pointer',
-                            background: activeTerm === t ? '#0284c7' : 'rgba(255,255,255,0.07)',
-                            color: '#fff',
-                            border: activeTerm === t ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)'
-                          }}
-                        >
-                          {t} Ay
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Sonuç Özeti */}
+                  {/* 🇹🇷 TL KREDİ | 💶 İHRACATÇI EURO (€) KREDİSİ SEÇİCİ */}
                   <div style={{
-                    background: 'rgba(16, 185, 129, 0.14)',
-                    border: '1px solid rgba(16, 185, 129, 0.45)',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1.15fr',
+                    gap: '5px',
+                    background: 'rgba(2, 6, 23, 0.85)',
+                    padding: '4px',
                     borderRadius: '8px',
-                    padding: '8px 10px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '3px'
+                    border: '1px solid rgba(255,255,255,0.1)'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#cbd5e1' }}>
-                      <span>Araç Bedeli:</span>
-                      <strong>{fullPriceForLoan.toLocaleString('tr-TR')} TL</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#fde68a' }}>
-                      <span>Peşinat / Takas:</span>
-                      <strong>-{(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', color: '#7dd3fc', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3px' }}>
-                      <span>Kalan Kredi Tutarı:</span>
-                      <strong>{remainingAfterTradeIn.toLocaleString('tr-TR')} TL</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#6ee7b7' }}>
-                        {activeTerm} Ay Aylık Taksit {isZeroInterestEligible ? '(%0 Faiz!)' : ''}:
-                      </span>
-                      <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#4ade80' }}>
-                        {remainingAfterTradeIn > 0 ? `~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay` : 'Kredi Yok'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Hesaplayıcı İçi Hızlı Gönderim Butonları */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedTradeInVehicleId(vehicle.id);
-                        setTradeInTargetModel(friendlyInfo.title);
-                        setShowTradeInBox(true);
-                        setTimeout(() => {
-                          const el = document.getElementById('tradein-loan-calc-box');
-                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 80);
-                      }}
+                      onClick={() => setInlineCalcCurrency('TRY')}
                       style={{
-                        padding: '8px 6px',
-                        borderRadius: '7px',
-                        background: 'rgba(245, 158, 11, 0.2)',
-                        border: '1px solid rgba(245, 158, 11, 0.5)',
-                        color: '#fde68a',
-                        fontSize: '0.69rem',
-                        fontWeight: 800,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      📸 Takas Resmi Yükle
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onTrackFootprint) {
-                          onTrackFootprint(
-                            '🔥 Kart İçi Taksit & Son Dip Fiyat Soruldu',
-                            vehicle.model,
-                            `Peşinat: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL | Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay x ${monthlyPaymentEst.toLocaleString('tr-TR')} TL)`
-                          );
-                        }
-                        const msg =
-                          `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, *${friendlyInfo.title}* (${vehicle.model}) aracı için:\n` +
-                          `• Araç Bedeli: ${fullPriceForLoan.toLocaleString('tr-TR')} TL\n` +
-                          `• Peşinat / Takasım: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL\n` +
-                          `• Kalan Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay ~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)\n` +
-                          `Bu ödeme planında bana özel yapabileceğiniz son dip fiyat / ekstra bayi iskontosu nedir?`;
-                        if (onDirectWhatsApp) {
-                          onDirectWhatsApp(msg);
-                        } else {
-                          openWhatsAppChat(salesRep?.phoneWhatsapp || '905446225931', msg);
-                        }
-                      }}
-                      style={{
-                        padding: '8px 6px',
-                        borderRadius: '7px',
-                        background: '#22c55e',
-                        border: 'none',
-                        color: '#052e16',
+                        padding: '6px 6px',
+                        borderRadius: '6px',
+                        border: inlineCalcCurrency === 'TRY' ? '1.5px solid #38bdf8' : 'none',
+                        background: inlineCalcCurrency === 'TRY' ? 'rgba(2, 132, 199, 0.35)' : 'transparent',
+                        color: inlineCalcCurrency === 'TRY' ? '#ffffff' : '#94a3b8',
                         fontSize: '0.69rem',
                         fontWeight: 900,
                         cursor: 'pointer'
                       }}
                     >
-                      💬 Son Dip Fiyat & Taksiti Sor
+                      🇹🇷 TL Ticari Kredi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInlineCalcCurrency('EUR')}
+                      style={{
+                        padding: '6px 6px',
+                        borderRadius: '6px',
+                        border: inlineCalcCurrency === 'EUR' ? '1.5px solid #60a5fa' : 'none',
+                        background: inlineCalcCurrency === 'EUR'
+                          ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.5) 0%, rgba(30, 58, 138, 0.85) 100%)'
+                          : 'transparent',
+                        color: inlineCalcCurrency === 'EUR' ? '#fef08a' : '#94a3b8',
+                        fontSize: '0.69rem',
+                        fontWeight: 900,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      💶 İhracatçı Euro (€) Kredisi
                     </button>
                   </div>
+
+                  {inlineCalcCurrency === 'EUR' ? (
+                    <>
+                      {/* Euro Peşinat / Takas Seçimi */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#fde68a', fontWeight: 800, marginBottom: '4px' }}>
+                          1. Euro (€) Peşinat veya Takas Değeriniz:
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+                          {[0, 15000, 30000, 50000, 75000].map(preset => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setEurTradeInValue(preset)}
+                              style={{
+                                padding: '4px 7px',
+                                borderRadius: '6px',
+                                fontSize: '0.67rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                background: Number(eurTradeInValue) === preset ? '#f59e0b' : 'rgba(255,255,255,0.08)',
+                                color: Number(eurTradeInValue) === preset ? '#0f172a' : '#e2e8f0',
+                                border: Number(eurTradeInValue) === preset ? '1px solid #fde047' : '1px solid rgba(255,255,255,0.15)'
+                              }}
+                            >
+                              {preset === 0 ? 'Peşinatsız' : `€${preset.toLocaleString('tr-TR')}`}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          type="number"
+                          step={5000}
+                          min={0}
+                          value={eurTradeInValue}
+                          onChange={(e) => setEurTradeInValue(Math.max(0, Number(e.target.value) || 0))}
+                          placeholder="Peşinat veya takas tutarı yazın (€)"
+                          style={{
+                            width: '100%',
+                            padding: '7px 10px',
+                            background: 'rgba(2, 6, 23, 0.9)',
+                            border: '1px solid rgba(96, 165, 250, 0.45)',
+                            borderRadius: '7px',
+                            color: '#fde047',
+                            fontSize: '0.82rem',
+                            fontWeight: 900
+                          }}
+                        />
+                      </div>
+
+                      {/* Euro Vade Seçimi */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#93c5fd', fontWeight: 800, marginBottom: '4px' }}>
+                          2. Euro (€) Kredi Vadesi Seçin (32 Sayılı Karar):
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+                          {[
+                            { t: 12, label: '12 Ay (%0)' },
+                            { t: 24, label: '24 Ay' },
+                            { t: 36, label: '36 Ay' },
+                            { t: 48, label: '48 Ay' }
+                          ].map(item => (
+                            <button
+                              key={item.t}
+                              type="button"
+                              onClick={() => setEurLoanTerm(item.t)}
+                              style={{
+                                padding: '6px 4px',
+                                borderRadius: '7px',
+                                fontSize: '0.69rem',
+                                fontWeight: 900,
+                                cursor: 'pointer',
+                                background: activeEurTerm === item.t ? '#2563eb' : 'rgba(255,255,255,0.07)',
+                                color: '#fff',
+                                border: activeEurTerm === item.t ? '1.5px solid #93c5fd' : '1px solid rgba(255,255,255,0.15)'
+                              }}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Euro Sonuç Özeti */}
+                      <div style={{
+                        background: 'rgba(30, 58, 138, 0.35)',
+                        border: '1px solid rgba(96, 165, 250, 0.48)',
+                        borderRadius: '8px',
+                        padding: '8px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#cbd5e1' }}>
+                          <span>Araç Euro Karşılığı:</span>
+                          <strong>~€{fullPriceEurForLoan.toLocaleString('tr-TR')}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#fde68a' }}>
+                          <span>Peşinat / Takas:</span>
+                          <strong>-€{(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', color: '#93c5fd', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3px' }}>
+                          <span>Kalan Euro Kredi:</span>
+                          <strong>€{remainingEurAfterTradeIn.toLocaleString('tr-TR')}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.74rem', fontWeight: 900, color: '#93c5fd' }}>
+                            {activeEurTerm} Ay Euro Taksit {isZeroEurEligible ? '(%0 Kâr Payı!)' : ''}:
+                          </span>
+                          <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#4ade80' }}>
+                            {remainingEurAfterTradeIn > 0 ? `~€${monthlyEurPaymentEst.toLocaleString('tr-TR')} / Ay` : 'Kredi Yok'}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.64rem', color: '#bfdbfe', marginTop: '2px', lineHeight: 1.25 }}>
+                          🇪🇺 İhracatçı & döviz gelirli firmalara özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & BNP Paribas Euro finansmanı.
+                        </div>
+                      </div>
+
+                      {/* Euro Hesaplayıcı İçi Hızlı Gönderim Butonları */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTradeInVehicleId(vehicle.id);
+                            setTradeInTargetModel(friendlyInfo.title);
+                            setShowTradeInBox(true);
+                            setTimeout(() => {
+                              const el = document.getElementById('tradein-loan-calc-box');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 80);
+                          }}
+                          style={{
+                            padding: '8px 6px',
+                            borderRadius: '7px',
+                            background: 'rgba(245, 158, 11, 0.2)',
+                            border: '1px solid rgba(245, 158, 11, 0.5)',
+                            color: '#fde68a',
+                            fontSize: '0.69rem',
+                            fontWeight: 800,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📸 Takas Resmi Yükle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onTrackFootprint) {
+                              onTrackFootprint(
+                                '💶 Kart İçi İhracatçı Euro Kredisi & Dip Fiyat Soruldu',
+                                vehicle.model,
+                                `Euro Peşinat: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')} | Euro Kredi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${activeEurTerm} Ay x ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay)`
+                              );
+                            }
+                            const msg =
+                              `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, ihracatçı firmamız için *${friendlyInfo.title}* (${vehicle.model}) aracıyla ilgileniyoruz:\n` +
+                              `• Araç Euro Karşılığı: ~€${fullPriceEurForLoan.toLocaleString('tr-TR')} (${fullPriceForLoan.toLocaleString('tr-TR')} TL)\n` +
+                              `• Peşinat / Takasımız: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')}\n` +
+                              `• İhracatçı Euro Kredisi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${activeEurTerm} Ay ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay)\n` +
+                              `İhracatçı Euro kredisi (Kuveyt Türk / Garanti BBVA / BNP Paribas) ve firmanıza özel son dip fiyat teklifinizi paylaşabilir misiniz?`;
+                            if (onDirectWhatsApp) {
+                              onDirectWhatsApp(msg);
+                            } else {
+                              openWhatsAppChat(salesRep?.phoneWhatsapp || '905446225931', msg);
+                            }
+                          }}
+                          style={{
+                            padding: '8px 6px',
+                            borderRadius: '7px',
+                            background: '#22c55e',
+                            border: 'none',
+                            color: '#052e16',
+                            fontSize: '0.69rem',
+                            fontWeight: 900,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          💬 Euro Kredi & Dip Fiyatı Sor
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* TL Peşinat / Takas Seçimi */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#fde68a', fontWeight: 800, marginBottom: '4px' }}>
+                          1. Peşinatınız veya Takas Aracınızın Değeri:
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+                          {[0, 500000, 1000000, 1500000, 2000000, 3000000].map(preset => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setTradeInValue(preset)}
+                              style={{
+                                padding: '4px 7px',
+                                borderRadius: '6px',
+                                fontSize: '0.67rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                background: Number(tradeInValue) === preset ? '#f59e0b' : 'rgba(255,255,255,0.08)',
+                                color: Number(tradeInValue) === preset ? '#0f172a' : '#e2e8f0',
+                                border: Number(tradeInValue) === preset ? '1px solid #fde047' : '1px solid rgba(255,255,255,0.15)'
+                              }}
+                            >
+                              {preset === 0 ? 'Peşinatsız' : `${(preset / 1000000).toLocaleString('tr-TR')} Milyon`}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          type="number"
+                          step={50000}
+                          min={0}
+                          value={tradeInValue}
+                          onChange={(e) => setTradeInValue(Math.max(0, Number(e.target.value) || 0))}
+                          placeholder="Peşinat veya takas tutarı yazın (TL)"
+                          style={{
+                            width: '100%',
+                            padding: '7px 10px',
+                            background: 'rgba(2, 6, 23, 0.9)',
+                            border: '1px solid rgba(245, 158, 11, 0.45)',
+                            borderRadius: '7px',
+                            color: '#fde047',
+                            fontSize: '0.82rem',
+                            fontWeight: 900
+                          }}
+                        />
+                      </div>
+
+                      {/* TL Vade Seçimi */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#7dd3fc', fontWeight: 800, marginBottom: '4px' }}>
+                          2. Kaç Ay Taksit Olsun?
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px' }}>
+                          {[12, 24, 36].map(t => (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => setTradeInTerm(t)}
+                              style={{
+                                padding: '6px',
+                                borderRadius: '7px',
+                                fontSize: '0.74rem',
+                                fontWeight: 900,
+                                cursor: 'pointer',
+                                background: activeTerm === t ? '#0284c7' : 'rgba(255,255,255,0.07)',
+                                color: '#fff',
+                                border: activeTerm === t ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)'
+                              }}
+                            >
+                              {t} Ay
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* TL Sonuç Özeti */}
+                      <div style={{
+                        background: 'rgba(16, 185, 129, 0.14)',
+                        border: '1px solid rgba(16, 185, 129, 0.45)',
+                        borderRadius: '8px',
+                        padding: '8px 10px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#cbd5e1' }}>
+                          <span>Araç Bedeli:</span>
+                          <strong>{fullPriceForLoan.toLocaleString('tr-TR')} TL</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.71rem', color: '#fde68a' }}>
+                          <span>Peşinat / Takas:</span>
+                          <strong>-{(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', color: '#7dd3fc', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3px' }}>
+                          <span>Kalan Kredi Tutarı:</span>
+                          <strong>{remainingAfterTradeIn.toLocaleString('tr-TR')} TL</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#6ee7b7' }}>
+                            {activeTerm} Ay Aylık Taksit {isZeroInterestEligible ? '(%0 Faiz!)' : ''}:
+                          </span>
+                          <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#4ade80' }}>
+                            {remainingAfterTradeIn > 0 ? `~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay` : 'Kredi Yok'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* TL Hesaplayıcı İçi Hızlı Gönderim Butonları */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTradeInVehicleId(vehicle.id);
+                            setTradeInTargetModel(friendlyInfo.title);
+                            setShowTradeInBox(true);
+                            setTimeout(() => {
+                              const el = document.getElementById('tradein-loan-calc-box');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 80);
+                          }}
+                          style={{
+                            padding: '8px 6px',
+                            borderRadius: '7px',
+                            background: 'rgba(245, 158, 11, 0.2)',
+                            border: '1px solid rgba(245, 158, 11, 0.5)',
+                            color: '#fde68a',
+                            fontSize: '0.69rem',
+                            fontWeight: 800,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📸 Takas Resmi Yükle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (onTrackFootprint) {
+                              onTrackFootprint(
+                                '🔥 Kart İçi Taksit & Son Dip Fiyat Soruldu',
+                                vehicle.model,
+                                `Peşinat: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL | Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay x ${monthlyPaymentEst.toLocaleString('tr-TR')} TL)`
+                              );
+                            }
+                            const msg =
+                              `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, *${friendlyInfo.title}* (${vehicle.model}) aracı için:\n` +
+                              `• Araç Bedeli: ${fullPriceForLoan.toLocaleString('tr-TR')} TL\n` +
+                              `• Peşinat / Takasım: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL\n` +
+                              `• Kalan Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay ~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)\n` +
+                              `Bu ödeme planında bana özel yapabileceğiniz son dip fiyat / ekstra bayi iskontosu nedir?`;
+                            if (onDirectWhatsApp) {
+                              onDirectWhatsApp(msg);
+                            } else {
+                              openWhatsAppChat(salesRep?.phoneWhatsapp || '905446225931', msg);
+                            }
+                          }}
+                          style={{
+                            padding: '8px 6px',
+                            borderRadius: '7px',
+                            background: '#22c55e',
+                            border: 'none',
+                            color: '#052e16',
+                            fontSize: '0.69rem',
+                            fontWeight: 900,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          💬 Son Dip Fiyat & Taksiti Sor
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -1999,6 +2280,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     onClick={() => {
                       const nextId = isInlineCalcOpen ? null : vehicle.id;
                       setActiveInlineCalcId(nextId);
+                      if (nextId && (isExporterUrl || vehicle.currency === 'EUR')) {
+                        setInlineCalcCurrency('EUR');
+                      }
                       setShowSmartNudge(true);
                       if (nextId && onTrackFootprint) {
                         onTrackFootprint('Taksit & Takas Hesapla Açıldı', vehicle.model, friendlyInfo.title);

@@ -155,6 +155,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [vipSelectedCustomer, setVipSelectedCustomer] = useState(null);
   const [vipCompanyName, setVipCompanyName] = useState('');
   const [vipPhone, setVipPhone] = useState('');
+  const [enableExporterEurLoan, setEnableExporterEurLoan] = useState(false);
   const [enableChannelDiscount, setEnableChannelDiscount] = useState(false);
   const [channelDiscountType, setChannelDiscountType] = useState('amount'); // 'amount' | 'percent'
   const [channelDiscountValue, setChannelDiscountValue] = useState(50000);
@@ -179,7 +180,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const [taxRadarLoading, setTaxRadarLoading] = useState(false);
   const [taxRadarSearch, setTaxRadarSearch] = useState('');
   const [taxRadarFilter, setTaxRadarFilter] = useState('unsent'); // 'all' | 'unsent' | 'crm' | 'radar'
-  const [taxRadarTemplate, setTaxRadarTemplate] = useState('esnaf_kdv'); // 'esnaf_kdv' | 'kurumsal_vergi' | 'smmm_muhasebe'
+  const [taxRadarTemplate, setTaxRadarTemplate] = useState('esnaf_kdv'); // 'esnaf_kdv' | 'kurumsal_vergi' | 'smmm_muhasebe' | 'ihracat_euro'
   const [sentTaxPhones, setSentTaxPhones] = useState(() => {
     try {
       const raw = window.localStorage.getItem(TAX_OUTREACH_SENT_KEY);
@@ -233,11 +234,15 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   const channelGeneratedLink = useMemo(() => {
     const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
     const params = new URLSearchParams();
+    const isEurLoanActive = enableExporterEurLoan || hookStyle === 'exporter_eur' || (selectedChannelId === 'mail_kurumsal' && mailTemplate === 'ihracat_euro');
 
     if (selectedChannelId === 'banka_kanal') {
       params.set('bank', selectedBankObj.id);
       if (bankOpenTab === 'krediler') {
         params.set('tab', 'krediler');
+      }
+      if (isEurLoanActive) {
+        params.set('loan', 'eur');
       }
       if (vipCompanyName.trim()) {
         params.set('bbranch', vipCompanyName.trim());
@@ -279,6 +284,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     } else if (channelSector && channelSector !== 'all') {
       params.set('sector', channelSector);
     }
+    if (isEurLoanActive) {
+      params.set('loan', 'eur');
+    }
     if (enableChannelDiscount && Number(channelDiscountValue) > 0) {
       const label = vipCompanyName.trim()
         ? `${vipCompanyName.trim()} Özel İndirimi`
@@ -303,6 +311,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     vipPhone,
     channelSector,
     selectedVehicleGroups,
+    enableExporterEurLoan,
+    hookStyle,
+    mailTemplate,
     enableChannelDiscount,
     channelDiscountValue,
     channelDiscountType,
@@ -314,6 +325,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     const discNote = enableChannelDiscount && Number(channelDiscountValue) > 0
       ? (channelDiscountType === 'percent' ? ` (%${channelDiscountValue} Özel İskonto)` : ` (-${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim)`)
       : '';
+    if (mailTemplate === 'ihracat_euro' || enableExporterEurLoan) {
+      return `${compPrefix}2026 IVECO İhracatçı Euro (€) Kredisi (%0 Kâr Payı / 6 Ay Ödemesiz) & Filo Teklifi${discNote}`;
+    }
     if (mailTemplate === 'beton_santiye' || (selectedVehicleGroups.includes('tway') && selectedVehicleGroups.length <= 3)) {
       return `${compPrefix}2026 IVECO 12 Teker Beton Mikseri, Ağır Hafriyat Damperi & Çekici Özel Fiyat Teklifi${discNote}`;
     }
@@ -324,11 +338,12 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       return `${compPrefix}Filo Yenileme, Takas Değerleme & 1.000.000 TL %0 Faizli 2026 IVECO Teklifi${discNote}`;
     }
     return `${compPrefix}2026 Model IVECO Ticari Araç Fiyat Listesi, Filo İskontosu & Kredi Simülasyonu${discNote}`;
-  }, [vipCompanyName, mailTemplate, selectedVehicleGroups, enableChannelDiscount, channelDiscountValue, channelDiscountType]);
+  }, [vipCompanyName, mailTemplate, selectedVehicleGroups, enableExporterEurLoan, enableChannelDiscount, channelDiscountValue, channelDiscountType]);
 
   // Sekme 1 için üretilen Hazır Paylaşım Mesajı
   const channelGeneratedMessage = useMemo(() => {
     const link = channelGeneratedLink;
+    const isEurLoanActive = enableExporterEurLoan || hookStyle === 'exporter_eur' || (selectedChannelId === 'mail_kurumsal' && mailTemplate === 'ihracat_euro');
     const discountShortNote = enableChannelDiscount && Number(channelDiscountValue) > 0
       ? (channelDiscountType === 'percent'
           ? ` (%${channelDiscountValue} özel iskonto tanımlı)`
@@ -339,6 +354,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           ? `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *%${channelDiscountValue} Özel İskonto* fiyatlardan otomatik düşülmüştür!\n`
           : `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *Araç Başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim* fiyatlardan otomatik düşülmüştür!\n`)
       : '';
+    const eurBonusLine = isEurLoanActive
+      ? `💶 *İhracatçı Euro (€) Kredisi Avantajı:* 32 Sayılı Karar kapsamında ihracatçı firmalarımıza özel *Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) Kredi* taksitlerini ekranınızda doğrudan Euro bazında hesaplayabilirsiniz!\n`
+      : '';
 
     // 📧 KURUMSAL E-POSTA / MAİL ŞABLONLARI (Düz Metin, Resmi Hitap, İmza Bloğu ve Özel Link)
     if (selectedChannelId === 'mail_kurumsal') {
@@ -347,6 +365,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         ? (channelDiscountType === 'percent'
             ? `\n• FİRMANIZA ÖZEL TANIMLI İSKONTO: Aşağıdaki bağlantıda tüm 2026 model araçlarımızda firmanıza özel %${channelDiscountValue} kurumsal filo iskontosu fiyatlardan otomatik olarak düşülmüştür.\n`
             : `\n• FİRMANIZA ÖZEL TANIMLI İNDİRİM: Aşağıdaki bağlantıda tüm 2026 model araçlarımızda firmanıza özel araç başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL kurumsal indirim fiyatlardan otomatik olarak düşülmüştür.\n`)
+        : '';
+      const plainEurBonusLine = isEurLoanActive
+        ? `\n• İHRACATÇI EURO (€) KREDİSİ AVANTAJI (32 Sayılı Karar): İhracatçı / döviz gelirli firmanıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) kredi taksitlerini bağlantıdaki her araç kartı içinde doğrudan Euro bazında simüle edebilirsiniz.\n`
         : '';
 
       const groupLabels = selectedVehicleGroups.length > 0
@@ -360,11 +381,26 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `IVECO ERC Samsun Otomotiv Yetkili Bayii\n` +
         `GSM / WhatsApp: 0544 622 59 31`;
 
+      if (mailTemplate === 'ihracat_euro') {
+        return (
+          `${targetCompany}\n\n` +
+          `İhracat ve uluslararası lojistik operasyonlarınız kapsamında; 32 Sayılı Karar uyarınca döviz gelirli firmalarımıza özel hazırladığımız "2026 Model IVECO İhracatçı Euro (€) Kredisi, %20 KDV Kalkanı & Filo Teklifimizi" bilgilerinize sunarız:\n` +
+          plainDiscountLine +
+          `\n1. İhracatçıya Özel Euro (€) Finansmanı: Yüksek TL kredi maliyetlerine girmeden; Kuveyt Türk (%0 Kâr Payı veya 6 Ay Ödemesiz Dönem), Garanti BBVA ve BNP Paribas anlaşmalı Euro (€) kredi paketlerimizle 12 aydan 60 aya varan Euro bazlı taksit imkanı sunuyoruz.\n` +
+          `2. Kapsanan Araç Grupları: ${groupLabels} (S-Way Çekici, Eurocargo, Daily 70C ve 3.5T serisi dahil tüm ticari modellerimiz).\n` +
+          `3. %20 KDV Mahsubu & Tam Amortisman: Fatura içindeki %20 KDV'nin tamamı doğrudan mahsup edilir ve kıst amortisman sınırı olmaksızın 1. yıl %20 tam amortisman gider yazılır. Üstyapıyı beklemeden hemen şasi faturası kesebilmekteyiz.\n\n` +
+          `Firmanıza özel Euro (€) kredi taksit hesaplayıcısı açık olarak hazırlanan dijital katalog bağlantımız:\n\n` +
+          `${link}\n` +
+          signatureBlock
+        );
+      }
+
       if (mailTemplate === 'beton_santiye') {
         return (
           `${targetCompany}\n\n` +
           `2026 yılı hazır beton, inşaat, maden ve şantiye yatırımlarınız kapsamında; IVECO ERC Samsun Otomotiv olarak hazırladığımız güncel 12 Teker (8x4) T-Way, S-Way Çekici ve Daily şasi fiyatlarımızı bilgilerinize sunarız:\n` +
           plainDiscountLine +
+          plainEurBonusLine +
           `\n• 12 Teker (8x4) T-Way AD410T46 (460 BG) Beton Mikseri Şasisi:\n` +
           `  - Kampanyalı Liste Fiyatı: 6.075.000 TL (KDV Dahil)\n` +
           `  - Nakit / Peşin Alım Özel Fiyatı: 5.750.000 TL (-325.000 TL Nakit İndirimi)\n` +
@@ -383,10 +419,11 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${targetCompany}\n\n` +
           `Vergi ve nakit akışı planlaması döneminde yüksek KDV veya Kurumlar/Gelir Vergisi ödemek yerine ticari araç filonuzu yenileyebilmeniz adına hazırladığımız "2026 IVECO %20 KDV Mahsubu, Tam Amortisman & Kampanya Tablomuzu" bilgilerinize sunarız:\n` +
           plainDiscountLine +
+          plainEurBonusLine +
           `\n1. %20 İndirilecek KDV Kalkanı: Ticari şasi, panelvan, kamyon ve çekici faturalarımızdaki %20 KDV'nin tamamı tek seferde ödenecek KDV'nizden mahsup edilir.\n` +
           `2. Kıst Amortisman Muafiyeti: Binek araçların aksine ticari araçlarımızda kıst amortisman kısıtlaması yoktur; yılın hangi ayında fatura kesilirse kesilsin 1. yıl %20 tam amortisman doğrudan gider yazılır.\n` +
           `3. Üstyapıyı Beklemeden Hemen Şasi Faturası: Kasa, frigo, damper veya mikser imalat sırasını beklemeden ŞASİ faturanızı hemen keserek vergi avantajını anında kullanmanızı sağlıyoruz.\n` +
-          `4. Finansman Desteği: 1.000.000 TL 12 Ay %0 Faiz (Aylık 83.333 TL) veya anlaşmalı banka ticari kredi paketleri.\n\n` +
+          `4. Finansman Desteği: 1.000.000 TL 12 Ay %0 Faiz (Aylık 83.333 TL), İhracatçı Euro (€) Kredisi veya anlaşmalı banka ticari kredi paketleri.\n\n` +
           `Mali müşaviriniz ve finans departmanınızla birlikte model bazlı KDV matrahlarını ve aylık ödeme tablosunu aşağıdaki canlı bağlantımızdan inceleyebilirsiniz:\n\n` +
           `${link}\n` +
           signatureBlock
@@ -398,7 +435,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${targetCompany}\n\n` +
           `Filonuzda bulunan mevcut ticari araçlarınızı değerinde takasa vererek 2026 model sıfır kilometre IVECO (${groupLabels}) araçlarla yenileyebilmeniz için hazırladığımız dijital hesaplama ekranımızı bilgilerinize sunarız:\n` +
           plainDiscountLine +
-          `\n• Canlı Takas + Kredi Simülasyonu: Mevcut aracınızın tahmini takas bedelini peşinata sayarak, kalan tutar için 1.000.000 TL 12 Ay %0 Faiz ve anlaşmalı banka ticari kredi taksitlerini anında hesaplayabilirsiniz.\n` +
+          plainEurBonusLine +
+          `\n• Canlı Takas + Kredi Simülasyonu: Mevcut aracınızın tahmini takas bedelini peşinata sayarak, kalan tutar için 1.000.000 TL 12 Ay %0 Faiz, İhracatçı Euro (€) Kredisi ve anlaşmalı banka ticari kredi taksitlerini anında hesaplayabilirsiniz.\n` +
           `• 4 Fotoğrafla 15 Dakikada Takas Ön Değerleme: Aracınızı bayimize getirmeden ekran üzerinden 4 fotoğraf (dıştan, içten, KM ve ruhsat) yükleyerek 15 dakika içinde resmi takas ön teklifimizi alabilirsiniz.\n` +
           `• 24 Saat Ücretsiz Şasi & Fiyat Blokajı: Yönetim ve muhasebe onay süreciniz boyunca seçtiğiniz aracı 24 saat ücretsiz olarak firmanız adına opsiyonlayabilirsiniz.\n\n` +
           `Firmanıza özel hazırlanan dijital katalog ve takas/kredi simülasyon bağlantısı:\n\n` +
@@ -412,8 +450,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `${targetCompany}\n\n` +
         `2026 yılı ticari araç ve filo yatırımlarınız kapsamında; IVECO ERC Samsun Otomotiv olarak firmanız için hazırladığımız güncel dijital fiyat listemizi, %20 KDV vergi kalkanı & amortisman tablomuzu ve ticari kredi simülasyon bağlantımızı bilgilerinize sunarız:\n` +
         plainDiscountLine +
+        plainEurBonusLine +
         `\n• Kapsanan Araç Grupları: ${groupLabels}\n` +
-        `• Canlı Finansman & Takas Hesaplayıcı: 1.000.000 TL 12 Ay %0 Faiz kampanyamız ve anlaşmalı banka ticari kredi oranlarıyla aylık ödeme planınızı ekran üzerinden anında oluşturabilirsiniz.\n` +
+        `• Canlı Finansman & Takas Hesaplayıcı: 1.000.000 TL 12 Ay %0 Faiz kampanyamız, İhracatçı Euro (€) Kredisi ve anlaşmalı banka ticari kredi oranlarıyla aylık ödeme planınızı ekran üzerinden anında oluşturabilirsiniz.\n` +
         `• %20 KDV & Tam Amortisman Tablosu: Üstyapı imalatını beklemeden hemen şasi faturası kesim imkanı, %20 KDV mahsubu ve 1. yıl tam amortisman dökümünü tek tıkla muhasebe biriminize aktarabilirsiniz.\n` +
         `• Resmi Proforma & 24 Saat Fiyat Blokajı: İlgilendiğiniz modeller için aynı gün resmi banka proforması oluşturabilir veya fiyatı 24 saat ücretsiz sabitleyebilirsiniz.\n\n` +
         `Firmanıza özel hazırlanan canlı katalog ve hesaplama bağlantısı:\n\n` +
@@ -434,6 +473,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${bankerGreeting} merhabalar, kolay gelsin. 🙏\n\n` +
           `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
           `Şubenizde ticari araç (kamyonet, panelvan, kamyon veya çekici) yatırımı ya da yıl sonu KDV/vergi mahsubu için kredi limiti kullanan müşterileriniz olduğunda, *sadece ${selectedBankObj.name} ${rateTermLabel} oranlarının* ve 2026 IVECO proforma fiyatlarımızın yer aldığı *${selectedBankObj.shortName} Özel Dijital Ekranımızı* aşağıya bıraktım${discountShortNote}.\n\n` +
+          eurBonusLine +
           `Müşterinizle doğrudan paylaşabilirsiniz; ekranda yalnızca *${selectedBankObj.name}* paketleri görünür ve şasi proformasını aynı gün hazırlarız 👇\n\n` +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
           `${link}`
@@ -444,6 +484,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
         `Portföyünüzde ticari araç alımı, filo yenileme veya yıl sonu vergi/KDV planlaması yapan müşterileriniz için *yalnızca ${selectedBankObj.name} ${rateTermLabel} oranlarının ve vade paketlerinin* yer aldığı özel hesaplama bağlantımızı bilgilerinize sunarım${discountShortNote}:\n\n` +
         discountLine +
+        eurBonusLine +
         `${selectedBankObj.icon} *Sadece ${selectedBankObj.name} Oranları:* Bu bağlantıda diğer bankalar yer almaz; yalnızca *${selectedBankObj.name}* ticari finansman paketleri ve taksit tablosu açılır.\n` +
         `⚡ *Aynı Gün Proforma & Şasi Faturası:* Kredi/finansman onayı çıkan müşterilerinize üstyapıyı beklemeden *aynı gün resmi şasi proforması ve faturası* kesiyoruz.\n` +
         `🧾 *%20 KDV & Tam Amortisman Tablosu:* Müşteriniz araç kartından %20 KDV mahsubu ve 1. yıl tam amortisman hesabını tek tuşla görebilir.\n\n` +
@@ -454,9 +495,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     }
 
     // WHATSAPP DURUM (STATUS) ÖZEL KURALI:
-    // Android WhatsApp Durum'da metin ~180 karakteri aşarsa veya linkin altında/başında metin-emoji olursa
-    // üstteki beyaz resimli link kartı gizlenir. Bu yüzden Durum metinleri kısa tutulur ve link en son satırda tek başına yer alır:
     if (selectedChannelId === 'wa_durum') {
+      if (hookStyle === 'exporter_eur' || enableExporterEurLoan) {
+        return (
+          `🇪🇺 İhracatçı firmalarımıza özel Kuveyt Türk %0 Kâr Payı & 6 Ay Ödemesiz Euro (€) Kredisiyle 2026 IVECO taksitinizi hesaplayın${discountShortNote} 👇\n\n` +
+          `${link}`
+        );
+      }
       if (hookStyle === 'tradein_hook') {
         return (
           `🔄 Aracınızı takasa verince 2026 IVECO ayda kaç TL'ye gelir? 1M TL %0 Faizle hemen hesaplayın${discountShortNote} 👇\n\n` +
@@ -481,13 +526,30 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       );
     }
 
+    // 💶 İHRACATÇI EURO (€) KREDİSİ ÖZEL KANCASI
+    if (hookStyle === 'exporter_eur') {
+      const prefix = vipCompanyName.trim() ? `Sayın *${vipCompanyName.trim()}* Yönetimi, ` : '';
+      return (
+        `${prefix}merhabalar, hayırlı işler ve bol ihracatlar dilerim. 🙏\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `İhracatçı ve döviz gelirli firmalarımızın yüksek TL faiz maliyetine girmeden *32 Sayılı Karar kapsamında Euro (€) Kredisiyle* ticari araç alabilmesi için hazırladığımız *İhracatçı Özel Euro (€) Finansman & Fiyat Ekranımızı* aşağıya bıraktım${discountShortNote}:\n\n` +
+        discountLine +
+        `🇪🇺 *Kuveyt Türk %0 Kâr Payı & 6 Ay Ödemesiz Euro Kredisi:* Aracınızı bugün teslim alın, ilk Euro taksitini 6 ay sonra ödeyin veya 12 Ay %0 kâr payı avantajından yararlanın.\n` +
+        `💶 *Garanti BBVA & BNP Paribas 12-60 Ay Euro Paketleri:* S-Way Çekici, Eurocargo, T-Way ve Daily serisi tüm araçlarımızda kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
+        `🧾 *%20 KDV Mahsubu & Hemen Şasi Faturası:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV ve tam amortisman avantajını kullanabilirsiniz 👇\n\n` +
+        `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+        `${link}`
+      );
+    }
+
     // 1. SIKMAYAN 2 CÜMLELİK MERAK KANCASI (REKLAM KOKMAYAN / EN YÜKSEK TIKLAMA)
     if (hookStyle === 'curiosity_short') {
       if (selectedChannelId === 'wa_ozel' || selectedChannelId === 'wa_musteri') {
         const prefix = vipCompanyName.trim() ? `*${vipCompanyName.trim()}* — ` : '';
         return (
           `${prefix}Abi selamlar, hayırlı işler dilerim. 🙏\n\n` +
-          `Seni hiç telefonla bölmeyeyim dedim; beni aramana bile gerek kalmadan elindeki aracın takasını düşüp kalan kredi taksitini ve 2026 şasi fiyatlarını kendi başına görebileceğin bir hesap makinesi hazırladım${discountShortNote}. Lazım oldukça elinin altında bulunsun 👇\n\n` +
+          `Seni hiç telefonla bölmeyeyim dedim; beni aramana bile gerek kalmadan elindeki aracın takasını düşüp kalan kredi taksitini${isEurLoanActive ? ' (veya İhracatçı Euro € kredisini)' : ''} ve 2026 şasi fiyatlarını kendi başına görebileceğin bir hesap makinesi hazırladım${discountShortNote}. Lazım oldukça elinin altında bulunsun 👇\n\n` +
+          eurBonusLine +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
           `${link}`
         );
@@ -495,7 +557,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       if (selectedChannelId === 'wa_grup') {
         return (
           `Cümleten hayırlı işler, kazasız belasız seferler abilerim. 🙏\n\n` +
-          `Grubu reklamla meşgul etmek için değil, işinize yarayacak canlı bir hesap cetveli bırakmak için yazıyorum: Kimseyi aramadan hangi ehliyetle hangi tonaj taşınır, elinizdeki aracın takasını düşünce ayda kaç TL taksit çıkar 10 saniyede kendiniz bakabilirsiniz${discountShortNote} 👇\n\n` +
+          `Grubu reklamla meşgul etmek için değil, işinize yarayacak canlı bir hesap cetveli bırakmak için yazıyorum: Kimseyi aramadan hangi ehliyetle hangi tonaj taşınır, elinizdeki aracın takasını düşünce ayda kaç TL (veya ihracatçıya kaç €) taksit çıkar 10 saniyede kendiniz bakabilirsiniz${discountShortNote} 👇\n\n` +
+          eurBonusLine +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
           `${link}`
         );
@@ -504,7 +567,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         const groupPrefix = vipCompanyName.trim() ? `📘 ${vipCompanyName.trim()} ailesine ` : 'Gruptaki tüm kamyoncu, nakliyeci ve esnaf abilerime/kardeşlerime ';
         return (
           `${groupPrefix}hayırlı işler, kazasız belasız seferler dilerim! 🚛🙏\n\n` +
-          `Kimseyi aramadan 10 saniyede elinizdeki aracın takas değerini düşüp, 2026 model sıfır IVECO şasi (Daily 3.5T, Daily 7T, Eurocargo, S-Way) için 1.000.000 TL %0 Faizle ayda kaç TL taksit çıkacağını ve 24 farklı gerçek üstyapı örneğini kendi ekranınızda görebileceğiniz canlı hesap cetvelimizi bıraktım${discountShortNote} 👇\n\n` +
+          `Kimseyi aramadan 10 saniyede elinizdeki aracın takas değerini düşüp, 2026 model sıfır IVECO şasi (Daily 3.5T, Daily 7T, Eurocargo, S-Way) için 1.000.000 TL %0 Faizle (veya ihracatçıya özel Euro € kredisiyle) ayda kaç taksit çıkacağını ve 24 farklı gerçek üstyapı örneğini kendi ekranınızda görebileceğiniz canlı hesap cetvelimizi bıraktım${discountShortNote} 👇\n\n` +
           `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun)\n\n` +
           `${link}`
         );
@@ -517,7 +580,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         );
       }
       return (
-        `Ticari araç yatırımlarında telefon trafiğine girmeden; tonaj/kasa uyumu, %20 KDV vergi kalkanı ve takas + kredi nakit akışını 30 saniyede kendi ekranınızda simüle edebileceğiniz dijital hesaplama aracımız${discountShortNote} 👇\n\n` +
+        `Ticari araç yatırımlarında telefon trafiğine girmeden; tonaj/kasa uyumu, %20 KDV vergi kalkanı, İhracatçı Euro (€) kredisi ve takas + kredi nakit akışını 30 saniyede kendi ekranınızda simüle edebileceğiniz dijital hesaplama aracımız${discountShortNote} 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
         `${link}`
       );
@@ -527,7 +590,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     if (hookStyle === 'tradein_hook') {
       return (
         `🔄 *"Elimdeki aracı takasa versem ne kadar sayarlar, üstüne ayda kaç TL öderim?"* diye merak edenler için canlı ekran açtık!${discountShortNote}\n\n` +
-        `İster araç kartındaki *"💳 Taksit & Takas Hesapla"* tuşundan aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle* kalan taksitinizi görün, isterseniz *"💬 Son Oluru / Dip Fiyatı Sor"* tuşuyla 15 dakikada takas ön fiyatınızı cebinize gönderelim 👇\n\n` +
+        eurBonusLine +
+        `İster araç kartındaki *"💳 Taksit & Takas Hesapla"* tuşundan aracınızın takas değerini düşüp *1.000.000 TL %0 Faizle (veya İhracatçı Euro € Kredisiyle)* kalan taksitinizi görün, isterseniz *"💬 Son Oluru / Dip Fiyatı Sor"* tuşuyla 15 dakikada takas ön fiyatınızı cebinize gönderelim 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
       );
@@ -543,7 +607,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `🧾 *1. %20 İndirilecek KDV:* Ticari şasi/panelvan/çekici faturasındaki *%20 KDV (~308.000 TL - 1.150.000 TL)* tek seferde ödenecek KDV'den mahsup edilir.\n` +
           `📉 *2. Kıst Amortisman Yok:* Binek araçların aksine ticari araçlarımızda kıst amortisman sınırı yoktur; yılın son ayında kesilen faturada bile *1. yıl %20 tam amortisman* gider yazılır.\n` +
           `⚡ *3. Üstyapıyı Beklemeden Hemen Şasi Faturası:* Kasa/frigo imalatını beklemeden *ŞASİ faturasını hemen kesiyoruz*; mükellefiniz 2026 vergi avantajını kaçırmadan üstyapısını yaptırabiliyor.\n` +
-          `💳 *4. Kampanya Özeti:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)*\n\n` +
+          `💳 *4. Kampanya Özeti:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* ve ihracatçı mükelleflere özel *Euro (€) Kredisi*\n\n` +
           `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n` +
           `👇 *Canlı KDV & Kampanya Tablosunu incelemek veya mükellefinizle paylaşmak için tıklayın:*\n\n` +
           `${link}`
@@ -554,7 +618,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `2026 model IVECO şasi, panelvan ve çekici alımlarında:\n` +
         `✅ Fatura içindeki *%20 KDV'nin tamamını* doğrudan ödenecek KDV'nizden düşebilir,\n` +
         `✅ Binek araçtaki kıst amortisman cezasına takılmadan *1. yıl %20 tam amortisman* gider yazabilir,\n` +
-        `✅ Kasa/üstyapı sırasını beklemeden *ŞASİ faturanızı hemen kestirip* *1.000.000 TL 12 Ay %0 Faiz* avantajından yararlanabilirsiniz${discountShortNote}!\n\n` +
+        `✅ Kasa/üstyapı sırasını beklemeden *ŞASİ faturanızı hemen kestirip* *1.000.000 TL 12 Ay %0 Faiz* (veya ihracatçıya özel Euro € kredisi) avantajından yararlanabilirsiniz${discountShortNote}!\n\n` +
+        eurBonusLine +
         `📊 Her araç kartındaki *"Teknik & KDV Detayı"* bölümünden kendi faturanızı hesaplayıp mali müşavirinize tek tuşla gönderebilirsiniz 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
@@ -567,7 +632,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
         `2026 model IVECO Daily (B ve C Ehliyet), Eurocargo, S-Way ve T-Way güncel fiyat listemizi, anlaşmalı banka kredi oranlarımızı ve takas hesaplama ekranımızı aşağıdaki bağlantıdan inceleyebilirsiniz:\n\n` +
         discountLine +
-        `✅ *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya vadeli banka oranlarıyla aylık taksitinizi anında görün,\n` +
+        eurBonusLine +
+        `✅ *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz, İhracatçı Euro (€) Kredisi veya vadeli banka oranlarıyla aylık taksitinizi anında görün,\n` +
         `🧾 *%20 KDV & Kampanya Tablosu:* Model bazlı indirilecek KDV ve tam yıl amortisman tablosunu tek tıkla muhasebecinize iletin,\n` +
         `📸 *4 Resimle 15 Dk'da Takas:* Mevcut aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyip 15 dakikada takas ön fiyatı alın 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
@@ -582,6 +648,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${vipCompanyName.trim() ? `*${vipCompanyName.trim()}* — ` : ''}Abi merhaba, hayırlı işler, bol kazançlar dilerim. 🙏\n\n` +
           `IVECO ERC Samsun'da *Satış Sorumlusu Can Murat* olarak senin için özel bir canlı katalog ve hesaplama bağlantısı hazırladım. Artık 2026 şasi fiyatlarına bakmak veya takas/kredi hesabı yapmak için beni aramana bile gerek yok:\n\n` +
           discountLine +
+          eurBonusLine +
           `🔄 Elindeki aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* ile kalan taksitini 10 saniyede kendin hesaplayabilirsin,\n` +
           `🧾 Yıl sonu *%20 KDV İndirimi + Tam Amortisman* tablosunu tek tuşla muhasebecine gönderebilirsin,\n` +
           `📸 Mevcut aracının *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takasla fiyat alabilirsin 👇\n\n` +
@@ -595,6 +662,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
           `2026 yılı filo yenileme ve ticari araç yatırımlarınız kapsamında firmanıza özel hazırladığım dijital katalog, %20 KDV vergi kalkanı & tam yıl amortisman özeti (üstyapıyı beklemeden şasi faturası kesim imkanı) ve ticari kredi simülasyon bağlantınızı bilgilerinize sunarım:\n\n` +
           discountLine +
+          eurBonusLine +
           `*Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
           `${link}`
         );
@@ -604,6 +672,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
         `Firmanız için hazırladığım 2026 model IVECO şasi fiyat listesini, %20 KDV + kampanya tablosunu, takas + %0 faizli kredi hesaplayıcısını ve 4 resimle (1 dıştan, 1 içten, KM ve ruhsat) 15 dakikada takas ön değerleme ekranımızı aşağıdaki size özel bağlantıdan inceleyebilirsiniz 👇\n\n` +
         discountLine +
+        eurBonusLine +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +
         `${link}`
       );
@@ -614,8 +683,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🚛 *Gruptaki tüm nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, kazasız belasız seferler dilerim!*\n\n` +
         `IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz *2026 Canlı Fiyat, KDV Tablosu, Takas & Kredi Ekranımızı* açtık:\n\n` +
         discountLine +
+        eurBonusLine +
         `✅ *Ehliyet & Tonaja Göre Seçim:* Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici (CE Ehliyet) ve T-Way Damper/Mikser,\n` +
-        `🔄 *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz veya anlaşmalı banka oranlarıyla aylık taksitinizi anında görün,\n` +
+        `🔄 *Canlı Takas + Kredi Hesabı:* Elinizdeki aracın takas değerini düşüp 1M TL %0 Faiz, İhracatçı Euro (€) Kredisi veya anlaşmalı banka oranlarıyla aylık taksitinizi anında görün,\n` +
         `🧾 *Yıl Sonu %20 KDV & Şasi Faturası Avantajı:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV'yi verginizden düşün,\n` +
         `📸 *4 Resimle 15 Dk'da Takas:* Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
         `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31*\n` +
@@ -630,10 +700,11 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🚛 Gruptaki tüm kamyoncu, nakliyeci, lojistikçi ve esnaf abilerime/kardeşlerime hayırlı işler, bol kazançlar dilerim!\n\n` +
         `${groupTitle}IVECO ERC Samsun Otomotiv olarak kimseyi telefon trafiğiyle yormadan 10 saniyede kendi hesabınızı yapabileceğiniz 2026 Canlı Şasi Fiyat, KDV Tablosu, Takas & Kredi Ekranımızı açtık:\n\n` +
         discountLine +
+        eurBonusLine +
         `✅ Ehliyet & Tonaja Göre Şasi Seçimi: Daily 3.5 Ton (B Ehliyet), Daily 7 Ton (C1/C Ehliyet), Eurocargo (C Ehliyet), S-Way Çekici ve T-Way,\n` +
         `🏗️ 24 Gerçek Üstyapı Örneği Galerisi: Şasi üzerine tente, kapalı kasa, frigo, damper, vinç ve oto kurtarıcı uygulama örnekleri,\n` +
         `🧾 %20 KDV & Tam Amortisman Tablosu: Üstyapıyı beklemeden şasi faturası kesip %20 KDV'yi vergiden düşme hesabı,\n` +
-        `🔄 Canlı Takas + Kredi Hesabı: Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz veya banka oranlarıyla aylık taksitinizi anında görün,\n` +
+        `🔄 Canlı Takas + Kredi Hesabı: Elinizdeki aracın takas değerini düşüp 1.000.000 TL 12 Ay %0 Faiz, İhracatçı Euro (€) Kredisi veya banka oranlarıyla aylık taksitinizi anında görün,\n` +
         `📸 4 Resimle 15 Dk'da Takas: Aracınızın 1 dıştan, 1 içten, KM ve ruhsat resmini yükleyin, 15 dakikada takasla net fiyatınızı çıkaralım!\n\n` +
         `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n` +
         `👇 Hemen incelemek ve kendi hesabınızı yapmak için tıklayın:\n\n` +
@@ -645,8 +716,9 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       return (
         `"Elimdeki aracı takasa versem 2026 sıfır IVECO bana ayda kaç TL'ye gelir?" diye düşünmeyin, 10 saniyede kendiniz hesaplayın! 🚛📊\n\n` +
         discountLine +
+        eurBonusLine +
         `Yeni Dijital Showroom ekranımızda neler var?\n` +
-        `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz),\n` +
+        `✅ Canlı Takas + Kredi Hesaplayıcı (1.000.000 TL 12 Ay %0 Faiz & İhracatçı Euro Kredisi),\n` +
         `🧾 Yıl Sonu %20 KDV & Mali Müşavir Kampanya Tablosu,\n` +
         `📸 4 Resimle (1 Dıştan, 1 İçten, KM, Ruhsat) 15 Dakikada Takas Ekspertizi,\n` +
         `🔒 Muhasebecinizle görüşene kadar Fiyatı 24 Saat Ücretsiz Opsiyonlama,\n` +
@@ -661,9 +733,10 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     return (
       `Ticari araç ve filo yatırımlarında telefon trafiğine girmeden, 30 saniyede şeffaf fizibilite çıkarabileceğiniz "IVECO ERC Dijital Showroom & Finansman Merkezi" yayında. 🚛📈\n\n` +
       discountLine +
+      eurBonusLine +
       `Platform üzerinden doğrudan:\n` +
       `1️⃣ Tonaj, üstyapı ve ehliyet sınıfına göre 2026 Daily (3.5T - 7T), Eurocargo, S-Way Çekici ve T-Way şasi eşleştirmesi,\n` +
-      `2️⃣ Takas peşinatı + %0 faizli TL ve EUR ticari kredi nakit akış simülasyonu,\n` +
+      `2️⃣ Takas peşinatı + %0 faizli TL ve İhracatçı Euro (€) ticari kredi nakit akış simülasyonu,\n` +
       `3️⃣ Mali müşavirinize tek tıkla iletebileceğiniz %20 KDV Vergi Kalkanı, Kıst Amortisman Muafiyeti & Üstyapıyı Beklemeden Hemen Şasi Faturası Özeti,\n` +
       `4️⃣ 4 fotoğrafla (dıştan, içten, KM, ruhsat) 15 dakikada takas değerleme ve 24 saatlik ücretsiz şasi/fiyat blokajı oluşturabilirsiniz 👇\n\n` +
       `📞 Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv\n\n` +
@@ -679,6 +752,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     channelGeneratedLink,
     vipCompanyName,
     vipTone,
+    enableExporterEurLoan,
     enableChannelDiscount,
     channelDiscountType,
     channelDiscountValue
@@ -802,7 +876,10 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     if (Array.isArray(target.groups) && target.groups.length > 0) {
       params.set('groups', target.groups.join(','));
     }
-    params.set('ref', target.category === 'smmm_odalar' ? 'smmm_kanal' : 'yilsonu_kdv_tarama');
+    if (taxRadarTemplate === 'ihracat_euro') {
+      params.set('loan', 'eur');
+    }
+    params.set('ref', target.category === 'smmm_odalar' ? 'smmm_kanal' : taxRadarTemplate === 'ihracat_euro' ? 'ihracat_euro' : 'yilsonu_kdv_tarama');
     return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
   };
 
@@ -811,6 +888,19 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     const hasRealName = target.name && !target.name.includes('Ziyaretçisi') && !target.name.includes('Kayıtlı Müşteri');
     const titlePrefix = hasRealName ? `*${target.name}* — ` : '';
     const modelNote = target.model && target.model !== 'Genel Fiyat Listesi' ? `*${target.model}* ve ` : '';
+
+    if (taxRadarTemplate === 'ihracat_euro') {
+      return (
+        `${titlePrefix}Merhabalar, hayırlı işler ve bol ihracatlar dilerim. 🙏\n\n` +
+        `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
+        `İhracatçı ve döviz gelirli firmalarımızın yüksek TL faiz maliyetine girmeden *32 Sayılı Karar kapsamında Euro (€) Kredisiyle* ticari araç alabilmesi için firmanıza özel hazırladığımız *İhracatçı Euro (€) Finansman & %20 KDV Ekranımızı* bilgilerinize sunarım:\n\n` +
+        `🇪🇺 *Kuveyt Türk %0 Kâr Payı & 6 Ay Ödemesiz Euro Kredisi:* Aracınızı bugün teslim alın, ilk Euro taksitini 6 ay sonra ödeyin veya 12 Ay %0 kâr payı avantajından yararlanın.\n` +
+        `💶 *Garanti BBVA & BNP Paribas 12-60 Ay Euro Paketleri:* ${modelNote}tüm 2026 modellerimizde kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
+        `🧾 *%20 KDV & Hemen Şasi Faturası:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV ve tam amortisman avantajını kullanabilirsiniz 👇\n\n` +
+        `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
+        `${link}`
+      );
+    }
 
     if (target.category === 'beton_hafriyat') {
       return (
@@ -840,7 +930,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `🧾 *%20 İndirilecek KDV:* Ticari şasi/çekici faturasındaki %20 KDV'nin tamamı tek seferde ödenecek KDV'den mahsup edilir.\n` +
         `📉 *Kıst Amortisman Yok:* Binek araçların aksine ticari araçlarımızda kıst amortisman sınırı yoktur; *1. yıl %20 tam amortisman* doğrudan gider yazılır.\n` +
         `⚡ *Üstyapıyı Beklemeden Hemen Şasi Faturası:* Kasa/frigo imalatının bitmesini beklemeden *ŞASİ faturanızı hemen kesiyoruz*; vergi avantajını bu yıl kullanıp üstyapıyı dilediğiniz zaman yaptırabilirsiniz.\n` +
-        `💳 *Finansman:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)*\n\n` +
+        `💳 *Finansman:* *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya İhracatçı Euro (€) Kredisi\n\n` +
         `👇 *Firmanıza özel canlı KDV & Kampanya Tablosunu incelemek ve mali müşavirinize iletmek için tıklayın:*\n\n` +
         `${link}`
       );
@@ -1644,6 +1734,29 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                     </div>
                   </div>
 
+                  {/* 💶 İhracatçı Müşteri: Euro (€) Kredisi Seçeneğini Öne Çıkar */}
+                  <div style={{
+                    padding: '8px 10px',
+                    borderRadius: '9px',
+                    background: enableExporterEurLoan ? 'rgba(37, 99, 235, 0.22)' : 'rgba(2, 6, 23, 0.6)',
+                    border: enableExporterEurLoan ? '1.5px solid #60a5fa' : '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', fontSize: '0.73rem', fontWeight: 900, color: enableExporterEurLoan ? '#93c5fd' : '#cbd5e1' }}>
+                      <span>🇪🇺 İhracatçı Müşteri: Euro (€) Kredisi Seçeneğini Öne Çıkar (?loan=eur)</span>
+                      <input
+                        type="checkbox"
+                        checked={enableExporterEurLoan}
+                        onChange={(e) => setEnableExporterEurLoan(e.target.checked)}
+                        style={{ accentColor: '#3b82f6', width: '16px', height: '16px', cursor: 'pointer' }}
+                      />
+                    </label>
+                    {enableExporterEurLoan && (
+                      <div style={{ fontSize: '0.67rem', color: '#bfdbfe', marginTop: '4px', lineHeight: 1.3 }}>
+                        ✓ Müşteri linki açtığında Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & BNP Paribas <strong>Euro (€) Kredi Hesaplayıcısı</strong> otomatik seçili gelir ve mesaja Euro kredisi bilgisi eklenir.
+                      </div>
+                    )}
+                  </div>
+
                   {/* Bu Linke Özel İndirim / Oran Aç-Kapat */}
                   <div style={{
                     padding: '8px 10px',
@@ -1787,9 +1900,10 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#d8b4fe', marginBottom: '5px' }}>
                         📧 Hazır Kurumsal E-Posta Şablonu & Konusu Seç:
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: '6px' }}>
                         {[
                           { id: 'kurumsal_filo', label: '🏢 Kurumsal Satın Alma & Filo' },
+                          { id: 'ihracat_euro', label: '💶 İhracatçı Euro (€) Kredisi & Filo' },
                           { id: 'beton_santiye', label: '🏗️ Beton Santrali & Hafriyat (12 Teker)' },
                           { id: 'kdv_muhasebe', label: '🧾 Muhasebe / %20 KDV & Amortisman' },
                           { id: 'takas_yenileme', label: '🔄 Filo Yenileme, Takas & %0 Faiz' }
@@ -1866,9 +1980,10 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                     <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fbbf24', marginBottom: '5px' }}>
                       🎯 Müşteriyi Sıkmadan Tıklatan Mesaj Kancası Seç:
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: '6px' }}>
                       {[
                         { id: 'curiosity_short', label: '⚡ 2 Cümle Merak (Sıfır Reklam)' },
+                        { id: 'exporter_eur', label: '💶 İhracatçı Euro (€) Kredisi' },
                         { id: 'tradein_hook', label: '🔄 "Aracım Kaç Para Eder?" Kancası' },
                         { id: 'tax_hook', label: '🧾 "%20 KDV Vergi Kalkanı" Kancası' },
                         { id: 'detailed', label: '📋 Detaylı Tanıtım Metni' }
@@ -2573,12 +2688,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                 {/* Mesaj Şablonu Seçici */}
                 <div>
                   <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fde047', marginBottom: '5px' }}>
-                    1. Gönderilecek Yıl Sonu KDV & Şasi Faturası Şablonunu Seç:
+                    1. Gönderilecek Yıl Sonu KDV, İhracatçı Euro Kredisi & Şasi Faturası Şablonunu Seç:
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '6px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '6px' }}>
                     {[
                       { id: 'esnaf_kdv', label: '🤝 Samimi Esnaf (%20 KDV + Hemen Şasi Faturası + 1M %0 Faiz)' },
                       { id: 'kurumsal_vergi', label: '🏢 Kurumsal Filo (%20 KDV + Kıst Amortisman Yok + Kredi)' },
+                      { id: 'ihracat_euro', label: '💶 İhracatçı Euro (€) Kredisi (%0 Kâr Payı / 6 Ay Ödemesiz + %20 KDV)' },
                       { id: 'smmm_muhasebe', label: '👨‍💼 Muhasebe / Mali Müşavir KDV & Kampanya Tablosu Özeti' }
                     ].map(tpl => {
                       const active = taxRadarTemplate === tpl.id;

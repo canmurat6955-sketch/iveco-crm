@@ -62,6 +62,7 @@ const SOURCE_META = {
   insaat_kereste: { label: 'Kereste, Demir & İnşaat Malzemesi Linki', short: '🪵 Kereste & İnşaat', color: '#f97316', bg: 'rgba(249, 115, 22, 0.18)', border: 'rgba(249, 115, 22, 0.45)' },
   mobilya_nakliyat: { label: 'Evden Eve Nakliyat & Mobilya Linki', short: '🛋️ Mobilya & Nakliyat', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.18)', border: 'rgba(56, 189, 248, 0.45)' },
   catering_dagitim: { label: 'Yemek Fabrikası (Catering) & Dağıtım Linki', short: '🍱 Catering & Dağıtım', color: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.18)', border: 'rgba(45, 212, 191, 0.45)' },
+  ihracat_euro: { label: 'İhracatçı Euro (€) Kredili Özel Link', short: '💶 İhracatçı Euro Kredisi', color: '#60a5fa', bg: 'rgba(37, 99, 235, 0.22)', border: 'rgba(96, 165, 250, 0.5)' },
   yilsonu_kdv_tarama: { label: 'Yıl Sonu %20 KDV & Şasi Faturası Taraması', short: '🧾 Yıl Sonu KDV Taraması', color: '#fde047', bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.45)' },
   wa_muhasebe_paylasim: { label: 'Müşterinin Mali Müşavirine Gönderdiği KDV Özeti', short: '📤 Muhasebeciye İletilen KDV', color: '#34d399', bg: 'rgba(16, 185, 129, 0.18)', border: 'rgba(16, 185, 129, 0.45)' },
   instagram: { label: 'Instagram Biyografi / Hikaye / Reels', short: '📸 Instagram', color: '#f472b6', bg: 'rgba(236, 72, 153, 0.16)', border: 'rgba(236, 72, 153, 0.4)' },
@@ -79,6 +80,9 @@ function getSourceMeta(source, notesOrCampaign = '', pageUrl = '') {
   const combined = `${source || ''} ${notesOrCampaign || ''} ${pageUrl || ''}`.toLowerCase();
   if (source === 'proforma_link' || combined.includes('/p/')) {
     return SOURCE_META.proforma_link;
+  }
+  if (combined.includes('loan=eur') || combined.includes('ihracat_euro') || combined.includes('ihracatçı euro')) {
+    return SOURCE_META.ihracat_euro;
   }
   if (combined.includes('mail_kurumsal') || combined.includes('ref=mail') || combined.includes('e-posta ziyaretçisi')) {
     return SOURCE_META.mail_kurumsal;
@@ -230,6 +234,13 @@ function describeClickedLink(signal) {
       linkTitle: camp || 'Resmi Proforma Teklifi',
       linkSub: shortPath || '/p/teklif',
       isPartner: false
+    };
+  }
+  if (lowerUrl.includes('loan=eur') || lowerUrl.includes('ihracat_euro')) {
+    return {
+      linkTitle: companyInUrl ? `💶 İhracatçı Euro Kredisi (${companyInUrl})` : '💶 İhracatçı Euro (€) Kredisi Özel Linki',
+      linkSub: groupsLabel ? `Euro Kredisi • ${groupsLabel}` : '/fiyat-listesi?loan=eur',
+      isPartner: true
     };
   }
   if (bankInUrl) {

@@ -849,7 +849,11 @@ export default function PublicVehicleFinder() {
   const [selectedCampaignId, setSelectedCampaignId] = useState(null);
 
   // İhracatçı Euro Kredisi State'leri (S-Way, T-Way ve Uluslararası Nakliye İçin)
-  const [loanCurrencyMode, setLoanCurrencyMode] = useState('TRY');
+  const [loanCurrencyMode, setLoanCurrencyMode] = useState(() => {
+    const loanParam = (searchParams.get('loan') || searchParams.get('kredi') || searchParams.get('currency') || '').toLowerCase();
+    const rCode = (searchParams.get('ref') || '').toLowerCase();
+    return (loanParam === 'eur' || loanParam === 'euro' || rCode.includes('ihracat') || rCode.includes('euro')) ? 'EUR' : 'TRY';
+  });
   const [selectedEurBankId, setSelectedEurBankId] = useState(
     lockedBank?.hasEurCampaigns ? lockedBank.id : 'kuveyt_turk'
   );

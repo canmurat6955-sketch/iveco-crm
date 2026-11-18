@@ -11,8 +11,18 @@ import { FiDollarSign, FiCheckCircle, FiShield, FiPercent, FiMessageSquare, FiGl
 // Not: Kaynaksız "hızlı kredi paketi" örnekleri kaldırıldı; yalnızca resmi banka tablolarındaki kampanyalar gösterilir.
 
 export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank = null }) {
-  // Para Birimi Modu: 'TRY' veya 'EUR'
-  const [currencyMode, setCurrencyMode] = useState('TRY');
+  // Para Birimi Modu: 'TRY' veya 'EUR' (?loan=eur veya ihracat_euro linklerinde otomatik EUR açılır)
+  const [currencyMode, setCurrencyMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      const loan = (p.get('loan') || p.get('kredi') || p.get('currency') || '').toLowerCase();
+      const ref = (p.get('ref') || '').toLowerCase();
+      if (loan === 'eur' || loan === 'euro' || ref.includes('ihracat') || ref.includes('euro')) {
+        return 'EUR';
+      }
+    }
+    return 'TRY';
+  });
 
   // TL Kredi State'leri
   const [selectedBankId, setSelectedBankId] = useState(lockedBank?.id || 'teb_cetelem');
