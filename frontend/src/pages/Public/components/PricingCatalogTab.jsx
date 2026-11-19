@@ -322,8 +322,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
   }, []);
 
   const [inlineCalcCurrency, setInlineCalcCurrency] = useState(() => isExporterUrl ? 'EUR' : 'TRY');
+  const [inlineGraceMonths, setInlineGraceMonths] = useState(0); // 0 = Hemen Eşit Taksit | 6 = 6 Ay Ödemesiz (Kuveyt Türk / Albaraka)
   const [eurTradeInValue, setEurTradeInValue] = useState(0);
   const [eurLoanTerm, setEurLoanTerm] = useState(36);
+  const [inlineEurGraceMonths, setInlineEurGraceMonths] = useState(0); // 0 = Hemen Eşit Taksit | 6 = 6 Ay Ödemesiz Euro Kredisi
   const [showSmartNudge, setShowSmartNudge] = useState(false);
   const [dismissedSmartNudge, setDismissedSmartNudge] = useState(false);
 
@@ -589,19 +591,44 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
     const safeTradeVal = Math.max(0, Number(tradeInValue) || 0);
     const remainingPrincipal = Math.max(0, vehiclePrice - safeTradeVal);
     const term = Number(tradeInTerm) || 24;
+    const isHeavy = selectedTradeVehicle?.segment === 'S-Way' || selectedTradeVehicle?.segment === 'T-Way';
+    const zeroCap = isHeavy ? 2000000 : 1200000;
 
     let monthlyPayment = 0;
     let isZeroInterest = false;
+    let appliedRatePct = 0;
+    let rateExplain = '';
+
     if (remainingPrincipal === 0) {
       monthlyPayment = 0;
-    } else if (!isEur && remainingPrincipal <= 1000000 && term === 12) {
-      // 1.000.000 TL'ye kadar 12 Ay %0 Faiz avantajı (Hafif Ticari)
-      monthlyPayment = Math.round(remainingPrincipal / 12);
+    } else if (inlineGraceMonths === 6) {
+      // ⏳ 6 Ay Ödemesiz + Eşit Taksit (Kuveyt Türk & Albaraka Kasım 2026 Resmi Oranları: İlk 6 ay 0 TL, sonra taksit)
+      appliedRatePct = remainingPrincipal <= 1000000 ? 2.15 : remainingPrincipal <= 1500000 ? 2.24 : 2.67;
+      const r = appliedRatePct / 100;
+      const graceCompounded = remainingPrincipal * Math.pow(1 + r * 0.45, 2); // 6 ay erteleme kâr payı farkı (resmi tabloyla birebir uyumlu: 1M 24 ay -> ~61.825 TL)
+      const factor = Math.pow(1 + r, term);
+      monthlyPayment = Math.round((graceCompounded * r * factor) / (factor - 1));
+      rateExplain = `İlk 6 Ay 0 TL Ödeme • 7. Aydan İtibaren %${appliedRatePct.toFixed(2)} Oranla ${term} Taksit`;
+    } else if (!isEur && remainingPrincipal <= zeroCap && (term === 6 || term === 9 || term === 12)) {
+      monthlyPayment = Math.round(remainingPrincipal / term);
       isZeroInterest = true;
+      appliedRatePct = 0;
+      rateExplain = '%0 Faiz / Kâr Payı (IVECO Sübvansiyonlu Resmi Kampanya)';
     } else {
-      const r = 0.0329; // Ortalama anlaşmalı ticari kredi oranı
+      // IVECO Kasım 2026 Resmi Banka Tablosu Kademeli Sübvansiyon Oranları (Kuveyt Türk / Albaraka / Garanti / TEB)
+      if (term <= 12) {
+        appliedRatePct = remainingPrincipal <= 1000000 ? 0.75 : remainingPrincipal <= 1500000 ? 1.18 : 1.74;
+      } else if (term <= 24) {
+        appliedRatePct = remainingPrincipal <= 1000000 ? 1.30 : remainingPrincipal <= 1500000 ? 1.94 : remainingPrincipal <= 2000000 ? 2.24 : 2.54;
+      } else if (term <= 36) {
+        appliedRatePct = remainingPrincipal <= 2000000 ? 2.67 : 2.73;
+      } else {
+        appliedRatePct = 2.89;
+      }
+      const r = appliedRatePct / 100;
       const factor = Math.pow(1 + r, term);
       monthlyPayment = Math.round((remainingPrincipal * r * factor) / (factor - 1));
+      rateExplain = `%${appliedRatePct.toFixed(2)} IVECO Sübvansiyonlu Banka Oranı`;
     }
 
     return {
@@ -610,9 +637,12 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       remainingPrincipal,
       term,
       monthlyPayment,
-      isZeroInterest
+      isZeroInterest,
+      appliedRatePct,
+      rateExplain,
+      graceMonths: inlineGraceMonths
     };
-  }, [selectedTradeVehicle, tradeInValue, tradeInTerm, tcmbEurRate, partnerProtocol]);
+  }, [selectedTradeVehicle, tradeInValue, tradeInTerm, inlineGraceMonths, tcmbEurRate, partnerProtocol]);
 
   const handleVehicleQuote = (vehicle) => {
     const partnerPricing = partnerProtocol
@@ -948,9 +978,31 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#7dd3fc', marginBottom: '5px' }}>
-                  4. Kalan Tutar İçin Kredi Vadesi:
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px', gap: '6px', flexWrap: 'wrap' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#7dd3fc' }}>
+                    4. Kredi Vadesi & Erteleme Seçimi:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextGrace = inlineGraceMonths === 6 ? 0 : 6;
+                      setInlineGraceMonths(nextGrace);
+                      if (nextGrace === 6 && tradeInTerm < 24) setTradeInTerm(24);
+                    }}
+                    style={{
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.67rem',
+                      fontWeight: 900,
+                      cursor: 'pointer',
+                      background: inlineGraceMonths === 6 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255,255,255,0.08)',
+                      color: inlineGraceMonths === 6 ? '#fde047' : '#cbd5e1',
+                      border: inlineGraceMonths === 6 ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.18)'
+                    }}
+                  >
+                    {inlineGraceMonths === 6 ? '⏳ 6 Ay Ertelemeli (İlk 6 Ay 0 TL) ✓' : '⏳ 6 Ay Erteleme Ekle'}
+                  </button>
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                   {[12, 24, 36].map(t => (
                     <button
@@ -960,7 +1012,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       style={{
                         padding: '9px 6px',
                         borderRadius: '8px',
-                        fontSize: '0.78rem',
+                        fontSize: '0.76rem',
                         fontWeight: 800,
                         cursor: 'pointer',
                         background: tradeInTerm === t ? 'linear-gradient(135deg, #0284c7, #004B93)' : 'rgba(15, 28, 50, 0.9)',
@@ -968,7 +1020,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         border: tradeInTerm === t ? '1.5px solid #38bdf8' : '1px solid rgba(148,163,184,0.3)'
                       }}
                     >
-                      {t} Ay
+                      {inlineGraceMonths === 6 ? `6+${t} Ay` : `${t} Ay`}
                     </button>
                   ))}
                 </div>
@@ -1110,7 +1162,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                   padding: isMobileView ? '5px 8px' : '6px 12px'
                 }}>
                   <div style={{ fontSize: '0.63rem', color: '#6ee7b7', fontWeight: 800 }}>
-                    {tradeInCalc.term} AY TAKSİT {tradeInCalc.isZeroInterest ? '(%0 FAİZ!)' : ''}
+                    {tradeInCalc.graceMonths === 6 ? `6 AY ERTELEME + ${tradeInCalc.term} TAKSİT` : `${tradeInCalc.term} AY TAKSİT`} {tradeInCalc.isZeroInterest ? '(%0 FAİZ!)' : `(%${tradeInCalc.appliedRatePct.toFixed(2)})`}
                   </div>
                   <div style={{ fontSize: isMobileView ? '0.9rem' : '1.02rem', fontWeight: 900, color: '#34d399' }}>
                     {tradeInCalc.remainingPrincipal > 0 ? `~${tradeInCalc.monthlyPayment.toLocaleString('tr-TR')} TL/Ay` : 'Kredi Yok'}
@@ -2159,26 +2211,88 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             ? Math.max(0, fullPriceForLoan - (Number(tradeInValue) || 0))
             : 0;
           const activeTerm = Number(tradeInTerm) || 12;
-          const isZeroInterestEligible = !vehicle.isCustomPrice && vehicle.currency !== 'EUR' && remainingAfterTradeIn > 0 && remainingAfterTradeIn <= 1000000 && activeTerm === 12;
-          const monthlyRate = lockedBank?.baseRate ? (lockedBank.baseRate / 100) : 0.0329;
+          const isHeavyVeh = vehicle.segment === 'S-Way' || vehicle.segment === 'T-Way';
+          const zeroCapTl = isHeavyVeh ? 2000000 : 1200000;
+          const isZeroInterestEligible =
+            !vehicle.isCustomPrice &&
+            vehicle.currency !== 'EUR' &&
+            inlineGraceMonths === 0 &&
+            remainingAfterTradeIn > 0 &&
+            remainingAfterTradeIn <= zeroCapTl &&
+            (activeTerm === 6 || activeTerm === 9 || activeTerm === 12);
+
+          // IVECO Kasım 2026 Resmi Banka Kampanya Tablosu Kademeli Sübvansiyonlu Oranlar
+          let appliedTlRatePct = 0;
+          if (remainingAfterTradeIn > 0) {
+            if (inlineGraceMonths === 6) {
+              // ⏳ 6 Ay Ödemesiz + Eşit Taksit (Kuveyt Türk & Albaraka Resmi Oranları)
+              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 2.15 : remainingAfterTradeIn <= 1500000 ? 2.24 : 2.67;
+            } else if (isZeroInterestEligible) {
+              appliedTlRatePct = 0;
+            } else if (lockedBank?.baseRate) {
+              appliedTlRatePct = Number(lockedBank.baseRate);
+            } else if (activeTerm <= 12) {
+              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 0.75 : remainingAfterTradeIn <= 1500000 ? 1.18 : 1.74;
+            } else if (activeTerm <= 24) {
+              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 1.30 : remainingAfterTradeIn <= 1500000 ? 1.94 : remainingAfterTradeIn <= 2000000 ? 2.24 : 2.54;
+            } else if (activeTerm <= 36) {
+              appliedTlRatePct = remainingAfterTradeIn <= 2000000 ? 2.67 : 2.73;
+            } else {
+              appliedTlRatePct = 2.89;
+            }
+          }
+
+          const monthlyRate = appliedTlRatePct / 100;
+          const effectiveTlPrincipalForCalc =
+            inlineGraceMonths === 6 && remainingAfterTradeIn > 0
+              ? remainingAfterTradeIn * Math.pow(1 + monthlyRate * 0.45, 2) // 6 ay ödemesiz dönem kâr payı farkı (1M 24 ay -> ~61.825 TL/Ay resmi tabloyla birebir)
+              : remainingAfterTradeIn;
+
           const monthlyPaymentEst = remainingAfterTradeIn <= 0
             ? 0
             : isZeroInterestEligible
-              ? Math.round(remainingAfterTradeIn / 12)
-              : Math.round((remainingAfterTradeIn * monthlyRate * Math.pow(1 + monthlyRate, activeTerm)) / (Math.pow(1 + monthlyRate, activeTerm) - 1));
+              ? Math.round(remainingAfterTradeIn / activeTerm)
+              : Math.round((effectiveTlPrincipalForCalc * monthlyRate * Math.pow(1 + monthlyRate, activeTerm)) / (Math.pow(1 + monthlyRate, activeTerm) - 1));
+          const totalTlRepaymentEst = monthlyPaymentEst * activeTerm;
 
-          // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk %0 / Garanti BBVA / BNP Paribas)
+          // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk %0 & 6 Ay Ödemesiz / Garanti BBVA / BNP Paribas)
           const remainingEurAfterTradeIn = (!vehicle.isCustomPrice && fullPriceEurForLoan > 0)
             ? Math.max(0, fullPriceEurForLoan - (Number(eurTradeInValue) || 0))
             : 0;
           const activeEurTerm = Number(eurLoanTerm) || 36;
-          const isZeroEurEligible = remainingEurAfterTradeIn > 0 && activeEurTerm === 12;
-          const monthlyEurRate = activeEurTerm === 12 ? 0 : activeEurTerm === 24 ? 0.0045 : activeEurTerm === 36 ? 0.0052 : 0.0058;
+          const isZeroEurEligible =
+            remainingEurAfterTradeIn > 0 &&
+            inlineEurGraceMonths === 0 &&
+            ((activeEurTerm <= 12 && remainingEurAfterTradeIn <= 120000) || (activeEurTerm <= 24 && remainingEurAfterTradeIn <= 80000));
+
+          let appliedEurRatePct = 0;
+          if (remainingEurAfterTradeIn > 0) {
+            if (inlineEurGraceMonths === 6) {
+              // ⏳ Kuveyt Türk & Garanti BBVA 6 Ay Ödemesiz Euro Kredisi Resmi Oranları (%0.20 - %0.35)
+              appliedEurRatePct = activeEurTerm <= 18 ? 0.22 : activeEurTerm <= 24 ? 0.27 : 0.33;
+            } else if (isZeroEurEligible) {
+              appliedEurRatePct = 0;
+            } else if (activeEurTerm <= 12) {
+              appliedEurRatePct = 0.06;
+            } else if (activeEurTerm <= 24) {
+              appliedEurRatePct = 0.17;
+            } else if (activeEurTerm <= 36) {
+              appliedEurRatePct = 0.31;
+            } else {
+              appliedEurRatePct = 0.38;
+            }
+          }
+          const monthlyEurRate = appliedEurRatePct / 100;
+          const effectiveEurPrincipalForCalc =
+            inlineEurGraceMonths === 6 && remainingEurAfterTradeIn > 0
+              ? remainingEurAfterTradeIn * (1 + monthlyEurRate * 6)
+              : remainingEurAfterTradeIn;
           const monthlyEurPaymentEst = remainingEurAfterTradeIn <= 0
             ? 0
-            : isZeroEurEligible
-              ? Math.round(remainingEurAfterTradeIn / 12)
-              : Math.round((remainingEurAfterTradeIn * monthlyEurRate * Math.pow(1 + monthlyEurRate, activeEurTerm)) / (Math.pow(1 + monthlyEurRate, activeEurTerm) - 1));
+            : appliedEurRatePct === 0
+              ? Math.round(remainingEurAfterTradeIn / activeEurTerm)
+              : Math.round((effectiveEurPrincipalForCalc * monthlyEurRate * Math.pow(1 + monthlyEurRate, activeEurTerm)) / (Math.pow(1 + monthlyEurRate, activeEurTerm) - 1));
+          const totalEurRepaymentEst = monthlyEurPaymentEst * activeEurTerm;
 
           return (
             <div
@@ -2524,7 +2638,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                 )}
               </div>
 
-              {/* 💳 KART İÇİ ANINDA TAKSİT & TAKAS HESAPLAYICI (TL + İHRACATÇI EURO KREDİSİ DESTEKLİ!) */}
+              {/* 💳 KART İÇİ ANINDA TAKSİT & TAKAS HESAPLAYICI (TL + İHRACATÇI EURO KREDİSİ + 6 AY ERTELEME DESTEKLİ!) */}
               {isInlineCalcOpen && !vehicle.isCustomPrice && (
                 <div style={{
                   background: 'rgba(15, 23, 42, 0.96)',
@@ -2654,18 +2768,70 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         />
                       </div>
 
+                      {/* Euro Ödeme Başlangıcı: Hemen Taksit vs 6 Ay Erteleme */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 800, marginBottom: '4px' }}>
+                          2. Ödeme Başlangıcı (Kuveyt Türk / Garanti BBVA):
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: '5px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setInlineEurGraceMonths(0)}
+                            style={{
+                              padding: '6px 6px',
+                              borderRadius: '7px',
+                              fontSize: '0.67rem',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              background: inlineEurGraceMonths === 0 ? 'rgba(37, 99, 235, 0.35)' : 'rgba(255,255,255,0.06)',
+                              color: inlineEurGraceMonths === 0 ? '#ffffff' : '#94a3b8',
+                              border: inlineEurGraceMonths === 0 ? '1.5px solid #60a5fa' : '1px solid rgba(255,255,255,0.12)'
+                            }}
+                          >
+                            ⚡ Hemen Eşit Taksit (12-24 Ay %0)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setInlineEurGraceMonths(6);
+                              if (activeEurTerm < 18) setEurLoanTerm(24);
+                            }}
+                            style={{
+                              padding: '6px 6px',
+                              borderRadius: '7px',
+                              fontSize: '0.67rem',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              background: inlineEurGraceMonths === 6 ? 'rgba(245, 158, 11, 0.28)' : 'rgba(255,255,255,0.06)',
+                              color: inlineEurGraceMonths === 6 ? '#fde047' : '#94a3b8',
+                              border: inlineEurGraceMonths === 6 ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.12)'
+                            }}
+                          >
+                            ⏳ 6 Ay Erteleme (İlk 6 Ay 0 €)
+                          </button>
+                        </div>
+                      </div>
+
                       {/* Euro Vade Seçimi */}
                       <div>
                         <div style={{ fontSize: '0.7rem', color: '#93c5fd', fontWeight: 800, marginBottom: '4px' }}>
-                          2. Euro (€) Kredi Vadesi Seçin (32 Sayılı Karar):
+                          3. Euro (€) Taksit Sayısı Seçin:
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
-                          {[
-                            { t: 12, label: '12 Ay (%0)' },
-                            { t: 24, label: '24 Ay' },
-                            { t: 36, label: '36 Ay' },
-                            { t: 48, label: '48 Ay' }
-                          ].map(item => (
+                          {(inlineEurGraceMonths === 6
+                            ? [
+                                { t: 18, label: '6+18 Ay' },
+                                { t: 24, label: '6+24 Ay' },
+                                { t: 36, label: '6+36 Ay' },
+                                { t: 48, label: '6+48 Ay' }
+                              ]
+                            : [
+                                { t: 12, label: '12 Ay (%0)' },
+                                { t: 24, label: remainingEurAfterTradeIn <= 80000 ? '24 Ay (%0)' : '24 Ay' },
+                                { t: 36, label: '36 Ay' },
+                                { t: 48, label: '48 Ay' }
+                              ]
+                          ).map(item => (
                             <button
                               key={item.t}
                               type="button"
@@ -2673,7 +2839,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                               style={{
                                 padding: '6px 4px',
                                 borderRadius: '7px',
-                                fontSize: '0.69rem',
+                                fontSize: '0.68rem',
                                 fontWeight: 900,
                                 cursor: 'pointer',
                                 background: activeEurTerm === item.t ? '#2563eb' : 'rgba(255,255,255,0.07)',
@@ -2706,20 +2872,43 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                           <strong>-€{(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.73rem', color: '#93c5fd', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3px' }}>
-                          <span>Kalan Euro Kredi:</span>
+                          <span>Kullandırılacak Euro Kredi:</span>
                           <strong>€{remainingEurAfterTradeIn.toLocaleString('tr-TR')}</strong>
                         </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#bfdbfe' }}>
+                          <span>Uygulanan Aylık Oran:</span>
+                          <strong style={{ color: appliedEurRatePct === 0 ? '#4ade80' : '#fde047' }}>
+                            {appliedEurRatePct === 0 ? '%0 Kâr Payı / Faiz' : `Aylık %${appliedEurRatePct.toFixed(2)}`}
+                          </strong>
+                        </div>
+                        {inlineEurGraceMonths === 6 && remainingEurAfterTradeIn > 0 && (
+                          <div style={{
+                            background: 'rgba(245, 158, 11, 0.18)',
+                            border: '1px solid rgba(245, 158, 11, 0.45)',
+                            borderRadius: '6px',
+                            padding: '4px 7px',
+                            fontSize: '0.67rem',
+                            color: '#fde047',
+                            fontWeight: 800,
+                            marginTop: '2px'
+                          }}>
+                            ⏳ 1. – 6. Ay Arası: <strong>0 € Ödeme</strong> • 7. Aydan İtibaren {activeEurTerm} Eşit Taksit (Toplam {activeEurTerm + 6} Ay)
+                          </div>
+                        )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
                           <span style={{ fontSize: '0.74rem', fontWeight: 900, color: '#93c5fd' }}>
-                            {activeEurTerm} Ay Euro Taksit {isZeroEurEligible ? '(%0 Kâr Payı!)' : ''}:
+                            {inlineEurGraceMonths === 6 ? `7. Aydan İtibaren (${activeEurTerm} Ay):` : `${activeEurTerm} Ay Euro Taksit:`}
                           </span>
                           <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#4ade80' }}>
                             {remainingEurAfterTradeIn > 0 ? `~€${monthlyEurPaymentEst.toLocaleString('tr-TR')} / Ay` : 'Kredi Yok'}
                           </span>
                         </div>
-                        <div style={{ fontSize: '0.64rem', color: '#bfdbfe', marginTop: '2px', lineHeight: 1.25 }}>
-                          🇪🇺 İhracatçı & döviz gelirli firmalara özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & BNP Paribas Euro finansmanı.
-                        </div>
+                        {remainingEurAfterTradeIn > 0 && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.67rem', color: '#94a3b8' }}>
+                            <span>Toplam Geri Ödeme:</span>
+                            <strong>~€{totalEurRepaymentEst.toLocaleString('tr-TR')}</strong>
+                          </div>
+                        )}
                       </div>
 
                       {/* Euro Hesaplayıcı İçi Hızlı Gönderim Butonları */}
@@ -2751,18 +2940,19 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         <button
                           type="button"
                           onClick={() => {
+                            const graceLabel = inlineEurGraceMonths === 6 ? '6 Ay Ödemesiz + ' : '';
                             if (onTrackFootprint) {
                               onTrackFootprint(
                                 '💶 Kart İçi İhracatçı Euro Kredisi & Dip Fiyat Soruldu',
                                 vehicle.model,
-                                `Euro Peşinat: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')} | Euro Kredi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${activeEurTerm} Ay x ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay)`
+                                `Euro Peşinat: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')} | Euro Kredi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${graceLabel}${activeEurTerm} Ay x ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay)`
                               );
                             }
                             const msg =
                               `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, ihracatçı firmamız için *${friendlyInfo.title}* (${vehicle.model}) aracıyla ilgileniyoruz:\n` +
                               `• Araç Euro Karşılığı: ~€${fullPriceEurForLoan.toLocaleString('tr-TR')} (${fullPriceForLoan.toLocaleString('tr-TR')} TL)\n` +
                               `• Peşinat / Takasımız: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')}\n` +
-                              `• İhracatçı Euro Kredisi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${activeEurTerm} Ay ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay)\n` +
+                              `• İhracatçı Euro Kredisi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${graceLabel}${activeEurTerm} Ay ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay • Oran: %${appliedEurRatePct.toFixed(2)})\n` +
                               `İhracatçı Euro kredisi (Kuveyt Türk / Garanti BBVA / BNP Paribas) ve firmanıza özel son dip fiyat teklifinizi paylaşabilir misiniz?`;
                             if (onDirectWhatsApp) {
                               onDirectWhatsApp(msg);
@@ -2833,29 +3023,84 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         />
                       </div>
 
+                      {/* ⏳ 2. ADIM: Ödeme Başlangıcı (Hemen Taksit vs 6 Ay Ödemesiz / Ertelemeli) */}
+                      <div>
+                        <div style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 800, marginBottom: '4px' }}>
+                          2. İlk Taksit Ne Zaman Başlasın?
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: '5px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setInlineGraceMonths(0)}
+                            style={{
+                              padding: '6px 6px',
+                              borderRadius: '7px',
+                              fontSize: '0.68rem',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              background: inlineGraceMonths === 0 ? 'rgba(2, 132, 199, 0.35)' : 'rgba(255,255,255,0.06)',
+                              color: inlineGraceMonths === 0 ? '#ffffff' : '#94a3b8',
+                              border: inlineGraceMonths === 0 ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.12)'
+                            }}
+                          >
+                            ⚡ Hemen Başlasın (%0 Faiz Avantajı)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setInlineGraceMonths(6);
+                              setTradeInTerm(24);
+                            }}
+                            style={{
+                              padding: '6px 6px',
+                              borderRadius: '7px',
+                              fontSize: '0.68rem',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              background: inlineGraceMonths === 6 ? 'rgba(245, 158, 11, 0.28)' : 'rgba(255,255,255,0.06)',
+                              color: inlineGraceMonths === 6 ? '#fde047' : '#94a3b8',
+                              border: inlineGraceMonths === 6 ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.12)'
+                            }}
+                          >
+                            ⏳ 6 Ay Erteleme (İlk 6 Ay 0 TL)
+                          </button>
+                        </div>
+                      </div>
+
                       {/* TL Vade Seçimi */}
                       <div>
                         <div style={{ fontSize: '0.7rem', color: '#7dd3fc', fontWeight: 800, marginBottom: '4px' }}>
-                          2. Kaç Ay Taksit Olsun?
+                          3. Kaç Ay Taksit Olsun?
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '5px' }}>
-                          {[12, 24, 36].map(t => (
+                        <div style={{ display: 'grid', gridTemplateColumns: inlineGraceMonths === 6 ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '5px' }}>
+                          {(inlineGraceMonths === 6
+                            ? [
+                                { t: 24, label: '6 Ay Erteleme + 24 Taksit' },
+                                { t: 36, label: '6 Ay Erteleme + 36 Taksit' }
+                              ]
+                            : [
+                                { t: 6, label: remainingAfterTradeIn <= zeroCapTl ? '6 Ay (%0)' : '6 Ay' },
+                                { t: 12, label: remainingAfterTradeIn <= zeroCapTl ? '12 Ay (%0)' : '12 Ay' },
+                                { t: 24, label: '24 Ay' },
+                                { t: 36, label: '36 Ay' }
+                              ]
+                          ).map(item => (
                             <button
-                              key={t}
+                              key={item.t}
                               type="button"
-                              onClick={() => setTradeInTerm(t)}
+                              onClick={() => setTradeInTerm(item.t)}
                               style={{
-                                padding: '6px',
+                                padding: '6px 4px',
                                 borderRadius: '7px',
-                                fontSize: '0.74rem',
+                                fontSize: '0.7rem',
                                 fontWeight: 900,
                                 cursor: 'pointer',
-                                background: activeTerm === t ? '#0284c7' : 'rgba(255,255,255,0.07)',
+                                background: activeTerm === item.t ? '#0284c7' : 'rgba(255,255,255,0.07)',
                                 color: '#fff',
-                                border: activeTerm === t ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)'
+                                border: activeTerm === item.t ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)'
                               }}
                             >
-                              {t} Ay
+                              {item.label}
                             </button>
                           ))}
                         </div>
@@ -2883,14 +3128,46 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                           <span>Kalan Kredi Tutarı:</span>
                           <strong>{remainingAfterTradeIn.toLocaleString('tr-TR')} TL</strong>
                         </div>
+                        {remainingAfterTradeIn > 0 && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.69rem', color: '#cbd5e1' }}>
+                            <span>IVECO Kampanya Oranı:</span>
+                            <strong style={{ color: isZeroInterestEligible ? '#4ade80' : '#fde047' }}>
+                              {isZeroInterestEligible
+                                ? '%0 Faiz / Kâr Payı (Sübvansiyonlu)'
+                                : `Aylık %${appliedTlRatePct.toFixed(2)} (Kuveyt Türk / Albaraka / Garanti / TEB)`}
+                            </strong>
+                          </div>
+                        )}
+                        {inlineGraceMonths === 6 && remainingAfterTradeIn > 0 && (
+                          <div style={{
+                            background: 'rgba(245, 158, 11, 0.18)',
+                            border: '1px solid rgba(245, 158, 11, 0.45)',
+                            borderRadius: '6px',
+                            padding: '4px 7px',
+                            fontSize: '0.67rem',
+                            color: '#fde047',
+                            fontWeight: 800,
+                            marginTop: '2px'
+                          }}>
+                            ⏳ 1. – 6. Ay Arası: <strong>0 TL Taksit</strong> (Aracı hemen teslim alıp çalıştırın, taksit 7. ayda başlasın • Toplam {activeTerm + 6} Ay)
+                          </div>
+                        )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#6ee7b7' }}>
-                            {activeTerm} Ay Aylık Taksit {isZeroInterestEligible ? '(%0 Faiz!)' : ''}:
+                          <span style={{ fontSize: '0.74rem', fontWeight: 900, color: '#6ee7b7' }}>
+                            {inlineGraceMonths === 6
+                              ? `7. Aydan İtibaren (${activeTerm} Taksit):`
+                              : `${activeTerm} Ay Aylık Taksit ${isZeroInterestEligible ? '(%0 Faiz!)' : ''}:`}
                           </span>
                           <span style={{ fontSize: '1.05rem', fontWeight: 900, color: '#4ade80' }}>
                             {remainingAfterTradeIn > 0 ? `~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay` : 'Kredi Yok'}
                           </span>
                         </div>
+                        {remainingAfterTradeIn > 0 && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.67rem', color: '#94a3b8' }}>
+                            <span>Toplam Geri Ödeme:</span>
+                            <strong>~{totalTlRepaymentEst.toLocaleString('tr-TR')} TL</strong>
+                          </div>
+                        )}
                       </div>
 
                       {/* TL Hesaplayıcı İçi Hızlı Gönderim Butonları */}
@@ -2922,18 +3199,19 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         <button
                           type="button"
                           onClick={() => {
+                            const gracePrefix = inlineGraceMonths === 6 ? '6 Ay Ödemesiz + ' : '';
                             if (onTrackFootprint) {
                               onTrackFootprint(
                                 '🔥 Kart İçi Taksit & Son Dip Fiyat Soruldu',
                                 vehicle.model,
-                                `Peşinat: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL | Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay x ${monthlyPaymentEst.toLocaleString('tr-TR')} TL)`
+                                `Peşinat: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL | Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${gracePrefix}${activeTerm} Ay x ${monthlyPaymentEst.toLocaleString('tr-TR')} TL)`
                               );
                             }
                             const msg =
                               `Merhaba ${salesRep?.name || 'Satış Sorumlusu Can Murat'}, *${friendlyInfo.title}* (${vehicle.model}) aracı için:\n` +
                               `• Araç Bedeli: ${fullPriceForLoan.toLocaleString('tr-TR')} TL\n` +
                               `• Peşinat / Takasım: ${(Number(tradeInValue) || 0).toLocaleString('tr-TR')} TL\n` +
-                              `• Kalan Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${activeTerm} Ay ~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay)\n` +
+                              `• Kalan Kredi: ${remainingAfterTradeIn.toLocaleString('tr-TR')} TL (${gracePrefix}${activeTerm} Ay ~${monthlyPaymentEst.toLocaleString('tr-TR')} TL/Ay • Oran: %${appliedTlRatePct.toFixed(2)})\n` +
                               `Bu ödeme planında bana özel yapabileceğiniz son dip fiyat / ekstra bayi iskontosu nedir?`;
                             if (onDirectWhatsApp) {
                               onDirectWhatsApp(msg);
