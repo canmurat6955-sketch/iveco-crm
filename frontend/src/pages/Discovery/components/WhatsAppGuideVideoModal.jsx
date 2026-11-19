@@ -47,11 +47,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '1. Senaryo • Yeni Çoktan Seçmeli Ekran Kılavuzu',
     shortTitle: '📲 3 Adımda Aracını Seç & Taksit Hesapla',
     refCode: 'wa_durum_kilavuz',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Çoktan Seçmeli 2026 Fiyat & Taksit',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz',
+    urlBar: '🔒 iveco-crm.onrender.com — Çoktan Seçmeli 2026 Fiyat & Taksit',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kilavuz',
     caption:
       `📲 3 adımda aracınızı seçip aynı kart içinde 2026 IVECO fiyat ve taksitinizi hesaplayın 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kilavuz`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kilavuz`,
     steps: [
       {
         badge: 'ADIM 1 / 4 • RESİMLİ 6 ARAÇ GRUBUNDAN BİRİNE DOKUNUN',
@@ -96,11 +96,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '2. Senaryo • Kamyonet & 7T Kamyon Çoktan Seçmeli',
     shortTitle: '🛻 Tek/Çift Teker • Kısa/Orta/Uzun Şasi Seçici',
     refCode: 'wa_durum_coktan',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — 3 Adımlı Kamyonet & 70C Kamyon Seçici',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_coktan',
+    urlBar: '🔒 iveco-crm.onrender.com — 3 Adımlı Kamyonet & 70C Kamyon Seçici',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_coktan',
     caption:
       `🛻 Tek/Çift teker ve Kısa/Orta/Uzun şasiyi 3 adımda seçip 2026 IVECO fiyatını görün 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_coktan`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_coktan`,
     steps: [
       {
         badge: 'ÇOKTAN SEÇMELİ 1 / 4 • 3.5T KAMYONET & 7T KAMYON',
@@ -145,11 +145,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '3. Senaryo • Kart İçi Takas + Kredi & 4 Resim',
     shortTitle: '🔄 Eski Aracı Takasa Ver, Üstünü Kredile',
     refCode: 'wa_durum_takas',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Kart İçi Takas & Taksit Hesaplayıcı',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_takas',
+    urlBar: '🔒 iveco-crm.onrender.com — Kart İçi Takas & Taksit Hesaplayıcı',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_takas',
     caption:
       `🔄 Aracınızı takasa verince sıfır IVECO ayda kaç TL'ye gelir? 1M TL %0 Faizle hesaplayın 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_takas`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_takas`,
     steps: [
       {
         badge: 'TAKAS ADIM 1 / 4 • KART İÇİNDE PEŞİNAT SEÇİN',
@@ -194,11 +194,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '4. Senaryo • 3-6 Ay Ödemesiz & %0 Faiz',
     shortTitle: '⏳ Şimdi Al, 6 Ay Sonra Öde',
     refCode: 'wa_durum_odemesiz',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Resmi Banka Kredi Oranları Tablosu',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_odemesiz',
+    urlBar: '🔒 iveco-crm.onrender.com — Resmi Banka Kredi Oranları Tablosu',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_odemesiz',
     caption:
       `⏳ Şimdi alın, ilk taksiti 3-6 ay sonra ödeyin: Anlaşmalı bankalarda %0 faizli kredi tablosu 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_odemesiz`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_odemesiz`,
     steps: [
       {
         badge: 'FİNANSMAN 1 / 4 • NAKİT AKIŞINIZI KORUYUN',
@@ -243,11 +243,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '5. Senaryo • %20 KDV & Nakit İndirimi',
     shortTitle: '🧾 %20 KDV Avantajı & 325 Bin TL Nakit İndirimi',
     refCode: 'wa_durum_kdv',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — %20 KDV Kalkanı & Peşin İndirimler',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kdv',
+    urlBar: '🔒 iveco-crm.onrender.com — %20 KDV Kalkanı & Peşin İndirimler',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kdv',
     caption:
       `🧾 Vergi ödemek yerine filoyu yenileyin: %20 KDV avantajı ve 325 Bin TL'ye varan nakit indirimi 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kdv`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kdv`,
     steps: [
       {
         badge: 'MUHASEBE 1 / 4 • YIL SONU %20 KDV VERGİ KALKANI',
@@ -292,11 +292,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '6. Senaryo • İhracatçıya Özel Euro (€) Kredisi',
     shortTitle: '💶 İhracatçı Euro (€) Kredisi • %0 Kâr Payı',
     refCode: 'ihracat_euro',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app/?loan=eur — İhracatçı Euro Kredisi',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?loan=eur&ref=ihracat_euro',
+    urlBar: '🔒 iveco-crm.onrender.com/?loan=eur — İhracatçı Euro Kredisi',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?loan=eur&ref=ihracat_euro',
     caption:
       `🇪🇺 İhracatçı firmalarımıza özel %0 kâr paylı & 6 ay ödemesiz Euro (€) kredisi taksit tablosu 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?loan=eur&ref=ihracat_euro`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?loan=eur&ref=ihracat_euro`,
     steps: [
       {
         badge: 'İHRACATÇI 1 / 4 • 32 SAYILI KARAR EURO (€) FİNANSMANI',
@@ -341,11 +341,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '7. Senaryo • 12 Teker T-Way Mikser, Damper & S-Way',
     shortTitle: '🏗️ 12 Teker Mikser 5.75M • Hafriyat 5.85M TL',
     refCode: 'beton_agrega',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Beton Santrali, Hafriyat & Çekici Serisi',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega',
+    urlBar: '🔒 iveco-crm.onrender.com — Beton Santrali, Hafriyat & Çekici Serisi',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega',
     caption:
       `🏗️ 12 Teker T-Way Mikser (5.75M TL) & Hafriyat (5.85M TL) -325 Bin TL nakit indirimi tablosu 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?groups=tway,sway,daily35_chassis&ref=beton_agrega`,
     steps: [
       {
         badge: 'ŞANTİYE 1 / 4 • HAZIR BETON, MADEN & HAFRİYAT SERİSİ',
@@ -390,11 +390,11 @@ const VIDEO_SCENARIOS = [
     dayLabel: '8. Senaryo • 3.5T / 7T Kamyon / Eurocargo Kıyaslama',
     shortTitle: '⚖️ 3.5T, 7T Kamyon, Eurocargo & T-Way Fiyatları',
     refCode: 'wa_durum_kantar',
-    urlBar: '🔒 iveco-fiyat-listesi.vercel.app — Gerçek Görselli Araç & Fiyat Kataloğu',
-    onlyLink: 'https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar',
+    urlBar: '🔒 iveco-crm.onrender.com — Gerçek Görselli Araç & Fiyat Kataloğu',
+    onlyLink: 'https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kantar',
     caption:
       `⚖️ 3.5T Kamyonet, 7T Kamyon, Eurocargo ve T-Way net peşin fiyatlarını karşılaştırın 👇\n\n` +
-      `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_durum_kantar`,
+      `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_durum_kantar`,
     steps: [
       {
         badge: 'ARAÇ GRUBU 1 / 4 • B EHLİYET 3.5 TON KAMYONET & VAN',
@@ -869,8 +869,8 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.font = '900 35px "Segoe UI", Inter, Arial, sans-serif';
       ctx.fillText('👇 HEMEN AŞAĞIDAKİ LİNKE DOKUNUN!', CANVAS_W / 2, phoneY + 928 + bounceY);
 
-      ctx.font = '800 25px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('iveco-fiyat-listesi.vercel.app', CANVAS_W / 2, phoneY + 986 + bounceY);
+      ctx.font = '800 24px "Segoe UI", Inter, Arial, sans-serif';
+      ctx.fillText('iveco-crm.onrender.com/fiyat-listesi', CANVAS_W / 2, phoneY + 986 + bounceY);
 
       ctx.fillStyle = '#fde047';
       ctx.font = '800 24px "Segoe UI", Inter, Arial, sans-serif';

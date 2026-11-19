@@ -109,9 +109,14 @@ def health_check():
     }
 
 
-# ── Derlenmiş arayüzü (frontend/dist) doğrudan backend'den sun ─────────
-# Böylece tek süreç yeterli olur; hash'li dosyalar 1 yıl önbelleğe alınır, index.html hiç alınmaz.
-FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+# ── Derlenmiş arayüzü (backend/static_dist veya frontend/dist) doğrudan backend'den sun ─────────
+# Render üzerinde Root Directory 'backend' olduğu için static_dist klasörü önceliklidir.
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIST = (
+    _BACKEND_DIR / "static_dist"
+    if (_BACKEND_DIR / "static_dist" / "index.html").exists()
+    else _BACKEND_DIR.parent / "frontend" / "dist"
+)
 
 if FRONTEND_DIST.exists():
     @app.middleware("http")

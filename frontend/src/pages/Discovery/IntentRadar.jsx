@@ -1124,7 +1124,7 @@ export default function IntentRadar() {
     const cleanPhone = signal.phone.replace(/\D/g, '');
     const last10 = cleanPhone.slice(-10);
     const model = (signal.realModelsList && signal.realModelsList[0]) || '2026 IVECO Ticari Şasi';
-    const baseOrigin = (getPublicOrigin() || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const baseOrigin = (getPublicOrigin() || 'https://iveco-crm.onrender.com').replace(/\/$/, '');
     const params = new URLSearchParams();
     if (signal.matched_customer_id) params.set('cid', String(signal.matched_customer_id));
     if (signal.company_name && !isGenericVisitorName(signal.company_name)) params.set('company', signal.company_name);

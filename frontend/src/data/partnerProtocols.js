@@ -262,7 +262,7 @@ export function calculatePartnerVehiclePricing(vehicle, partnerProtocol, tcmbEur
  * Dashboard veya Asistan üzerinden seçilen dernek ayarlarıyla paylaşılabilir takip linki üretir.
  */
 export function buildPartnerShareUrl(origin, config) {
-  const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+  const baseOrigin = (origin || 'https://iveco-crm.onrender.com').replace(/\/$/, '');
   const params = new URLSearchParams();
 
   const partnerId = (config.id || 'custom').toLowerCase();

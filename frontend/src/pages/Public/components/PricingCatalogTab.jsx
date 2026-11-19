@@ -722,7 +722,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       );
     }
     const bankQuery = lockedBank ? `&bank=${lockedBank.id}` : '';
-    const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_muhasebe_paylasim${bankQuery}`;
+    const shareUrl = `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_muhasebe_paylasim${bankQuery}`;
     const priceLine = vehicle.isCustomPrice
       ? `💰 *Fiyat:* Özel Şantiye / Proje Teklifi`
       : vehicle.currency === 'EUR'
@@ -3429,7 +3429,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             );
           }
           const bankQuery = lockedBank ? `&bank=${lockedBank.id}` : '';
-          const shareUrl = `https://iveco-fiyat-listesi.vercel.app/fiyat-listesi?ref=wa_smmm_tablo${bankQuery}`;
+          const shareUrl = `https://iveco-crm.onrender.com/fiyat-listesi?ref=wa_smmm_tablo${bankQuery}`;
           const msg =
             `👨‍💼 *2026 IVECO Yıl Sonu KDV, Tam Amortisman & Kampanya Tablosu (Mali Müşavir / Muhasebe Özeti)*\n\n` +
             `🚛 *Seçilen Araç:* ${selectedModalVeh?.model || 'IVECO 2026 Ticari Şasi'}\n` +

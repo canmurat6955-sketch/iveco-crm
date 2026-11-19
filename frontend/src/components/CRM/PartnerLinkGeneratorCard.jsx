@@ -232,7 +232,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
 
   // Sekme 1 için üretilen Link
   const channelGeneratedLink = useMemo(() => {
-    const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const baseOrigin = (origin || 'https://iveco-crm.onrender.com').replace(/\/$/, '');
     const params = new URLSearchParams();
     const isEurLoanActive = enableExporterEurLoan || hookStyle === 'exporter_eur' || (selectedChannelId === 'mail_kurumsal' && mailTemplate === 'ihracat_euro');
 
@@ -873,7 +873,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   }, [studioMode]);
 
   const buildTaxRadarCustomerLink = (target) => {
-    const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const baseOrigin = (origin || 'https://iveco-crm.onrender.com').replace(/\/$/, '');
     const params = new URLSearchParams();
     if (target.customerId) params.set('cid', String(target.customerId));
     if (target.name && !target.name.includes('Ziyaretçisi')) params.set('company', target.name);
@@ -974,7 +974,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   };
 
   const handleSendMailToTarget = (target) => {
-    const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const baseOrigin = (origin || 'https://iveco-crm.onrender.com').replace(/\/$/, '');
     const mailParams = new URLSearchParams();
     if (target.name && !target.name.includes('Ziyaretçisi')) mailParams.set('company', target.name);
     if (Array.isArray(target.groups) && target.groups.length > 0) {
