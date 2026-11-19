@@ -12,9 +12,29 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an unhandled error:', error, errorInfo);
+    const msg = String(error?.message || error || '').toLowerCase();
+    if (
+      msg.includes('dynamically imported module') ||
+      msg.includes('importing a module script failed') ||
+      msg.includes('loading chunk') ||
+      msg.includes('failed to fetch')
+    ) {
+      const key = 'iveco_eb_chunk_reload_ts';
+      const last = Number(window.sessionStorage.getItem(key) || 0);
+      if (Date.now() - last > 10000) {
+        window.sessionStorage.setItem(key, String(Date.now()));
+        if ('caches' in window) {
+          caches.keys().then((names) => names.forEach((n) => caches.delete(n))).catch(() => {});
+        }
+        window.location.reload();
+      }
+    }
   }
 
   handleReload = () => {
+    if ('caches' in window) {
+      caches.keys().then((names) => names.forEach((n) => caches.delete(n))).catch(() => {});
+    }
     window.location.reload();
   };
 

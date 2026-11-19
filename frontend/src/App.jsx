@@ -7,28 +7,50 @@ import Login from './pages/Login';
 import { WhatsAppProvider } from './contexts/WhatsAppContext';
 import { CallProvider } from './contexts/CallContext';
 
+// Yeni sürüm yayınlandığında müşterinin telefonunda eski JS paketi (chunk) önbellekte kaldıysa
+// hata ekranı göstermek yerine önbelleği temizleyip sayfayı otomatik yeniler:
+function lazyWithRetry(factory) {
+  return lazy(() =>
+    factory().catch((err) => {
+      if (typeof window !== 'undefined') {
+        const key = 'iveco_chunk_reload_ts';
+        const lastReload = Number(window.sessionStorage.getItem(key) || 0);
+        if (Date.now() - lastReload > 10000) {
+          window.sessionStorage.setItem(key, String(Date.now()));
+          if ('caches' in window) {
+            caches.keys().then((names) => names.forEach((n) => caches.delete(n))).catch(() => {});
+          }
+          window.location.reload();
+          return new Promise(() => {});
+        }
+      }
+      throw err;
+    })
+  );
+}
+
 // Sayfalar ihtiyaç anında yüklenir (code splitting): ilk açılışta tüm uygulama inmez.
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const CustomerList = lazy(() => import('./pages/CRM/CustomerList'));
-const CustomerDetail = lazy(() => import('./pages/CRM/CustomerDetail'));
-const ImportCustomers = lazy(() => import('./pages/CRM/ImportCustomers'));
-const CampaignList = lazy(() => import('./pages/Campaigns/CampaignList'));
-const SalesActivity = lazy(() => import('./pages/Sales/SalesActivity'));
-const Pipeline = lazy(() => import('./pages/Sales/Pipeline'));
-const NotificationCenter = lazy(() => import('./pages/Notifications/NotificationCenter'));
-const DiscoveryList = lazy(() => import('./pages/Discovery/DiscoveryList'));
-const IntentRadar = lazy(() => import('./pages/Discovery/IntentRadar'));
-const RoutePlanner = lazy(() => import('./pages/Sales/RoutePlanner'));
-const CardScanner = lazy(() => import('./pages/CRM/CardScanner'));
-const MapPage = lazy(() => import('./pages/CRM/Map'));
-const ProformaNew = lazy(() => import('./pages/CRM/ProformaNew'));
-const ProformaDetail = lazy(() => import('./pages/CRM/ProformaDetail'));
-const ProformaQuick = lazy(() => import('./pages/CRM/ProformaQuick'));
-const VehicleManagement = lazy(() => import('./pages/Vehicles/VehicleManagement'));
-const PersonalContacts = lazy(() => import('./pages/Contacts/PersonalContacts'));
-const Workbench = lazy(() => import('./pages/Workbench/Workbench'));
-const PublicProposalView = lazy(() => import('./pages/Public/PublicProposalView'));
-const PublicVehicleFinder = lazy(() => import('./pages/Public/PublicVehicleFinder'));
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const CustomerList = lazyWithRetry(() => import('./pages/CRM/CustomerList'));
+const CustomerDetail = lazyWithRetry(() => import('./pages/CRM/CustomerDetail'));
+const ImportCustomers = lazyWithRetry(() => import('./pages/CRM/ImportCustomers'));
+const CampaignList = lazyWithRetry(() => import('./pages/Campaigns/CampaignList'));
+const SalesActivity = lazyWithRetry(() => import('./pages/Sales/SalesActivity'));
+const Pipeline = lazyWithRetry(() => import('./pages/Sales/Pipeline'));
+const NotificationCenter = lazyWithRetry(() => import('./pages/Notifications/NotificationCenter'));
+const DiscoveryList = lazyWithRetry(() => import('./pages/Discovery/DiscoveryList'));
+const IntentRadar = lazyWithRetry(() => import('./pages/Discovery/IntentRadar'));
+const RoutePlanner = lazyWithRetry(() => import('./pages/Sales/RoutePlanner'));
+const CardScanner = lazyWithRetry(() => import('./pages/CRM/CardScanner'));
+const MapPage = lazyWithRetry(() => import('./pages/CRM/Map'));
+const ProformaNew = lazyWithRetry(() => import('./pages/CRM/ProformaNew'));
+const ProformaDetail = lazyWithRetry(() => import('./pages/CRM/ProformaDetail'));
+const ProformaQuick = lazyWithRetry(() => import('./pages/CRM/ProformaQuick'));
+const VehicleManagement = lazyWithRetry(() => import('./pages/Vehicles/VehicleManagement'));
+const PersonalContacts = lazyWithRetry(() => import('./pages/Contacts/PersonalContacts'));
+const Workbench = lazyWithRetry(() => import('./pages/Workbench/Workbench'));
+const PublicProposalView = lazyWithRetry(() => import('./pages/Public/PublicProposalView'));
+const PublicVehicleFinder = lazyWithRetry(() => import('./pages/Public/PublicVehicleFinder'));
 
 const PageLoader = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>

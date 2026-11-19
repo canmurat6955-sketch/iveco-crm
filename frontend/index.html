@@ -52,10 +52,32 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-            .catch(err => console.error('Service Worker registration failed:', err));
+            .then(reg => {
+              reg.update().catch(() => {});
+            })
+            .catch(() => {});
         });
       }
+      // WhatsApp / Instagram uygulama içi tarayıcılarda eski önbellek (chunk) yüzünden ekran yükleniyorda takılırsa
+      // otomatik olarak önbelleği temizleyip en güncel sürümü yükler:
+      setTimeout(function() {
+        var rootEl = document.getElementById('root');
+        if (rootEl && rootEl.innerText && rootEl.innerText.indexOf('Yükleniyor...') !== -1) {
+          var retried = sessionStorage.getItem('erc_auto_recover_v1');
+          if (!retried) {
+            sessionStorage.setItem('erc_auto_recover_v1', '1');
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                return Promise.all(names.map(function(n) { return caches.delete(n); }));
+              }).finally(function() {
+                window.location.reload();
+              });
+            } else {
+              window.location.reload();
+            }
+          }
+        }
+      }, 4500);
     </script>
   </body>
 </html>
