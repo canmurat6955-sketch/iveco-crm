@@ -998,9 +998,13 @@ class DiscoveryService:
         seen_ip_minute = set()
         for s in signals:
             ip_str = str(s.ip_address or "")
-            # 1. Facebook / Meta link önizleme botu IP'lerinden (`66.220.149.x` vb.) girilmiş sahte kayıtları otomatik sil
+            # 1. Facebook / Meta link önizleme botu IP'lerinden (`31.13.x.x`, `66.220.149.x` vb.) girilmiş sahte kayıtları otomatik sil
             if (
-                ip_str.startswith("66.220.14")
+                ip_str.startswith("31.13.")
+                or ip_str.startswith("157.240.")
+                or ip_str.startswith("185.60.21")
+                or ip_str.startswith("129.134.")
+                or ip_str.startswith("66.220.14")
                 or ip_str.startswith("66.220.15")
                 or ip_str.startswith("173.252.")
                 or ip_str.startswith("69.63.17")
@@ -1145,8 +1149,8 @@ class DiscoveryService:
 
         # Aynı IP'den son 10 dakika içinde oluşturulmuş aktif oturum kaydı varsa:
         # - Heartbeat ise sadece süreyi ve scroll derinliğini güncelle (yeni satır açma).
-        # - İlk açılış kaydı ("Linkine Tıkladı" / 5 sn) üzerine yeni bir araç/kredi incelemesi geldiyse
-        #   SADECE AYNI FİRMA VE AYNI KANAL İSE aynı satırı zenginleştir (Farklı müşterilerin kayıtlarını ASLA birbirine karıştırma!).
+        # - Aynı ziyaretçinin peş peşe yaptığı adımları (Araç Grubu Seçimi -> Şasi Boyu Seçimi -> Taksit & 6 Ay Erteleme Hesabı)
+        #   aynı oturum satırında birleştirip zenginleştir ki tabloda sadece "Giriş Yaptı" kalmasın!
         if data.ip_address:
             cutoff_naive = datetime.utcnow() - timedelta(minutes=10)
             recent_sig = (
@@ -1183,25 +1187,23 @@ class DiscoveryService:
                         "is_heartbeat_only": True,
                     }
 
-                # Eğer önceki kayıt aynı firma/ziyaretçiye aitse ve sadece "Linkine Tıkladı" / "Linki Açıldı" ise birleştir:
                 prev_q = str(recent_sig.search_query or "")
                 new_q = str(data.search_query or "")
-                is_prev_generic_open = (
-                    "Linkine Tıkladı" in prev_q
-                    or "Linki Açıldı" in prev_q
-                    or "Araç Seçiciyi Açtı" in prev_q
-                )
                 is_new_generic_open = (
                     "Linkine Tıkladı" in new_q
                     or "Linki Açıldı" in new_q
                     or "Araç Seçiciyi Açtı" in new_q
                 )
-                if is_same_visitor_session and (is_prev_generic_open or is_new_generic_open):
+                if is_same_visitor_session:
                     recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
                     recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
                     if not is_new_generic_open:
-                        recent_sig.search_query = data.search_query
-                        if data.target_model:
+                        if prev_q and new_q and new_q not in prev_q and "Linkine Tıkladı" not in prev_q and "Linki Açıldı" not in prev_q:
+                            combined_q = f"{prev_q} • {new_q}"
+                            recent_sig.search_query = combined_q[-480:]
+                        else:
+                            recent_sig.search_query = data.search_query
+                        if data.target_model and "Katalog" not in data.target_model and "Fiyat & Kredi Listesi" not in data.target_model:
                             recent_sig.target_model = data.target_model
                         if data.target_campaign:
                             recent_sig.target_campaign = data.target_campaign

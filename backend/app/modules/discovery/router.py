@@ -305,7 +305,11 @@ def record_intent_signal(
     )
     ip_str = str(data.ip_address or "")
     is_fb_crawler_ip = (
-        ip_str.startswith("66.220.14")
+        ip_str.startswith("31.13.")
+        or ip_str.startswith("157.240.")
+        or ip_str.startswith("185.60.21")
+        or ip_str.startswith("129.134.")
+        or ip_str.startswith("66.220.14")
         or ip_str.startswith("66.220.15")
         or ip_str.startswith("173.252.")
         or ip_str.startswith("69.63.17")

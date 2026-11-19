@@ -1661,6 +1661,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                           } else {
                             setKamyonetChassisLen(null);
                             setKamyonetGearType(null);
+                            if (onTrackFootprint) {
+                              onTrackFootprint('Kamyonet Seçimi Yapıldı', opt.title, opt.sub);
+                            }
                           }
                         }}
                         style={{
@@ -1749,6 +1752,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                               setKamyonetWheelType('cift_teker');
                               setKamyonetChassisLen('4100');
                               setKamyonetGearType(null);
+                              if (onTrackFootprint) {
+                                onTrackFootprint('Kamyonet Şasi Seçimi Yapıldı', '35C Çift Teker Uzun Şasi (4100mm)', sOpt.kasa);
+                              }
                               toast.success('4.5–4.8m Uzun Şasi 35C Çift Teker modelimizde üretilmektedir; 35C Uzun Şasi seçildi ✓');
                               return;
                             }
@@ -1765,6 +1771,13 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                               }, 80);
                             } else {
                               setKamyonetGearType(null);
+                              if (onTrackFootprint) {
+                                onTrackFootprint(
+                                  'Kamyonet Şasi Seçimi Yapıldı',
+                                  `${kamyonetWheelType === 'cift_teker' ? '35C Çift Teker' : '35S Tek Teker'} ${sOpt.title} (${sOpt.len}mm)`,
+                                  sOpt.kasa
+                                );
+                              }
                             }
                           }}
                           style={{
@@ -2021,6 +2034,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                         onClick={() => {
                           setDaily70ChassisLen(sOpt.len);
                           setDaily70GearType(null);
+                          if (onTrackFootprint) {
+                            onTrackFootprint('Daily 70C Kamyon Seçimi Yapıldı', `Daily 70C ${sOpt.title}`, sOpt.kasa);
+                          }
                         }}
                         style={{
                           padding: isMobileView ? '10px 12px' : '11px 12px',
@@ -2987,7 +3003,16 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                             <button
                               key={preset}
                               type="button"
-                              onClick={() => setTradeInValue(preset)}
+                              onClick={() => {
+                                setTradeInValue(preset);
+                                if (onTrackFootprint) {
+                                  onTrackFootprint(
+                                    'Kart İçi Peşinat Seçildi',
+                                    vehicle.model,
+                                    preset === 0 ? 'Peşinatsız Kredi Hesabı' : `Peşinat/Takas: ${(preset / 1000000).toLocaleString('tr-TR')} Milyon TL`
+                                  );
+                                }
+                              }}
                               style={{
                                 padding: '4px 7px',
                                 borderRadius: '6px',
@@ -3050,6 +3075,13 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                             onClick={() => {
                               setInlineGraceMonths(6);
                               setTradeInTerm(24);
+                              if (onTrackFootprint) {
+                                onTrackFootprint(
+                                  '⏳ Kart İçi 6 Ay Erteleme Seçildi',
+                                  vehicle.model,
+                                  `İlk 6 Ay 0 TL Taksit + 24 Ay Vade`
+                                );
+                              }
                             }}
                             style={{
                               padding: '6px 6px',
@@ -3088,7 +3120,16 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                             <button
                               key={item.t}
                               type="button"
-                              onClick={() => setTradeInTerm(item.t)}
+                              onClick={() => {
+                                setTradeInTerm(item.t);
+                                if (onTrackFootprint) {
+                                  onTrackFootprint(
+                                    'Kart İçi Vade Seçildi',
+                                    vehicle.model,
+                                    `${inlineGraceMonths === 6 ? '6 Ay Ertelemeli ' : ''}${item.t} Ay Vade`
+                                  );
+                                }
+                              }}
                               style={{
                                 padding: '6px 4px',
                                 borderRadius: '7px',

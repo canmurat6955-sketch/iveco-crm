@@ -444,8 +444,8 @@ function classifyVisitorSignals(events) {
 
     // 3. Net Türkçe Satış Aksiyonu Özeti
     const qLower = combinedText.toLowerCase();
-    if (qLower.includes('whatsapp tıklandı') || qLower.includes('whatsapp görüşme') || qLower.includes('direkt mesaj')) {
-      actionSummary.add('💬 WhatsApp Mesaj Butonuna Tıkladı');
+    if (qLower.includes('whatsapp tıklandı') || qLower.includes('whatsapp görüşme') || qLower.includes('direkt mesaj') || qLower.includes('dip fiyat soruldu')) {
+      actionSummary.add('💬 WhatsApp ile Son Dip Fiyat / Teklif Sordu');
     }
     if (qLower.includes('telefonla ara')) {
       actionSummary.add('📞 Telefonla Arama Butonuna Bastı');
@@ -458,14 +458,25 @@ function classifyVisitorSignals(events) {
     } else if (qLower.includes('takas + kredi') || qLower.includes('takas peşinat') || qLower.includes('4 resimle takas')) {
       actionSummary.add('🔄 Takas + Kredi Hesaplama Aracını Kullandı');
     }
+    if (qLower.includes('taksit & takas hesapla açıldı') || qLower.includes('kart içi taksit') || qLower.includes('kart içi peşinat') || qLower.includes('kart içi vade')) {
+      actionSummary.add('💳 Kart İçi Taksit & Peşinat Hesapladı');
+    }
+    if (qLower.includes('6 ay erteleme') || qLower.includes('6 ay ödemesiz')) {
+      actionSummary.add('⏳ 6 Ay Ertelemeli Kredi Planını Seçti');
+    }
+    if (qLower.includes('kamyonet seçimi') || qLower.includes('kamyonet son seçimi') || qLower.includes('kamyonet şasi') || qLower.includes('daily 70c kamyon seçimi')) {
+      actionSummary.add('🛻 Çoktan Seçmeli Teker / Şasi Boyu Seçti');
+    } else if (qLower.includes('araç grubu seçildi')) {
+      actionSummary.add('🚛 Araç Grubu Kartına Tıklayıp İnceledi');
+    }
     if (qLower.includes('peşinat/takas sürgüsü') || qLower.includes('peşinat/takas seçildi')) {
       actionSummary.add('💰 Canlı Peşinat / Takas Hesabı Yaptı');
     }
     if (qLower.includes('kredi planı inceleme') || qLower.includes('banka kredi & taksit')) {
       actionSummary.add('🏦 Kredi & Taksit Tablosunu İnceledi');
     }
-    if (qLower.includes('ortağa / muhasebeye')) {
-      actionSummary.add('📤 Araç Özetini Ortağına / Muhasebeye İletti');
+    if (qLower.includes('ortağa / muhasebeye') || qLower.includes('mali müşavire')) {
+      actionSummary.add('📤 Araç & KDV Özetini Muhasebeye / Ortağına İletti');
     }
     if (qLower.includes('filo iskonto') || qLower.includes('filo alımı')) {
       actionSummary.add('🏢 Çoklu Filo İskontosu İnceledi');
