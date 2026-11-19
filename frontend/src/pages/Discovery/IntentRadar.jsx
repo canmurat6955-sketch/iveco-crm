@@ -614,6 +614,55 @@ export default function IntentRadar() {
       if (dateRange === '7d') return t >= Date.now() - 7 * 86400000;
       if (dateRange === '30d') return t >= Date.now() - 30 * 86400000;
       return true;
+    }).map(s => {
+      // Kurumsal E-Posta (mail_kurumsal) linklerinde ziyaretçi bizzat numara girmediyse
+      // başka bir müşteriden / eski oturumdan kalan telefon ve CRM kaydı eşleşmesini kesin olarak temizle!
+      const pageLower = String(s.page_url || '').toLowerCase();
+      const compLower = String(s.company_name || '').toLowerCase();
+      const isMailSignal =
+        s.source === 'mail_kurumsal' ||
+        pageLower.includes('ref=mail_kurumsal') ||
+        compLower.includes('kurumsal e-posta') ||
+        compLower.includes('akçansa') ||
+        compLower.includes('akcansa') ||
+        compLower.includes('betonsa');
+      const visitorTypedPhone =
+        String(s.search_query || '').includes('Numarasını Tanımladı') ||
+        String(s.search_query || '').includes('Teklif');
+
+      if (isMailSignal && !visitorTypedPhone) {
+        return {
+          ...s,
+          phone: null,
+          matched_customer_id: null,
+          matched_customer_name: null,
+          status: s.status === 'converted' ? 'new' : s.status
+        };
+      }
+
+      // Eğer URL veya sinyaldeki firma adı ile eşleşen CRM müşterisi adı birbirinden tamamen farklıysa,
+      // yanlış müşteri telefonunu ve CRM eşleşmesini gizle
+      if (s.matched_customer_name && s.company_name) {
+        const cleanSigComp = cleanVisitorName(s.company_name).toLowerCase();
+        const cleanCrmComp = cleanVisitorName(s.matched_customer_name).toLowerCase();
+        if (
+          cleanSigComp &&
+          cleanCrmComp &&
+          !isGenericVisitorName(cleanSigComp) &&
+          !cleanSigComp.includes(cleanCrmComp) &&
+          !cleanCrmComp.includes(cleanSigComp)
+        ) {
+          return {
+            ...s,
+            phone: null,
+            matched_customer_id: null,
+            matched_customer_name: null,
+            status: 'new'
+          };
+        }
+      }
+
+      return s;
     });
   }, [signals, dateRange]);
 

@@ -908,16 +908,27 @@ export default function PublicVehicleFinder() {
     }
   }, []);
 
-  const [customerName, setCustomerName] = useState(nameParam || storedVisitorProfile.name || '');
+  // Eğer linkte özel bir firma adı (?company=...) varsa ve tarayıcı hafızasındaki firma ile uyuşmuyorsa,
+  // başka müşterinin eski telefon numarasının bu yeni firma linkine yapışmasını KESİN OLARAK engelle!
+  const isMailChannelLink = (refCode || '').toLowerCase().includes('mail');
+  const isStoredProfileMatchingCompany =
+    !companyParam ||
+    (storedVisitorProfile.company &&
+      storedVisitorProfile.company.trim().toLowerCase() === companyParam.trim().toLowerCase());
+  const safeInitialPhone = isMailChannelLink
+    ? ''
+    : (phoneParam || (isStoredProfileMatchingCompany ? (storedVisitorProfile.phone || '') : ''));
+
+  const [customerName, setCustomerName] = useState(nameParam || (isStoredProfileMatchingCompany ? (storedVisitorProfile.name || '') : ''));
   const [customerCompany, setCustomerCompany] = useState(companyParam || storedVisitorProfile.company || '');
-  const [customerPhone, setCustomerPhone] = useState(phoneParam || storedVisitorProfile.phone || '');
+  const [customerPhone, setCustomerPhone] = useState(safeInitialPhone);
   const [customerCity, setCustomerCity] = useState('Samsun');
   const [customerNotes, setCustomerNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [quickPhoneInput, setQuickPhoneInput] = useState(phoneParam || storedVisitorProfile.phone || '');
+  const [quickPhoneInput, setQuickPhoneInput] = useState(safeInitialPhone);
   const [quickNameInput, setQuickNameInput] = useState(companyParam || nameParam || storedVisitorProfile.company || storedVisitorProfile.name || '');
-  const [quickPhoneUnlocked, setQuickPhoneUnlocked] = useState(Boolean(phoneParam || storedVisitorProfile.phone));
+  const [quickPhoneUnlocked, setQuickPhoneUnlocked] = useState(Boolean(safeInitialPhone));
 
   // Aktif İnceleme Süresi Sayacı: Sekme arka planda (uykuda) kaldığında sayacı durdurur,
   // böylece akşamdan açık kalan sekmelerde "1106 dk" gibi gerçek dışı süreler oluşmaz.

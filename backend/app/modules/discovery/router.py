@@ -323,13 +323,27 @@ def record_intent_signal(
     try:
         from app.modules.crm.models import Customer
 
-        if data.matched_customer_id and (not data.phone or not data.company_name):
+        is_mail_sig = (
+            data.source == "mail_kurumsal"
+            or "ref=mail_kurumsal" in str(data.page_url or "").lower()
+        )
+        if data.matched_customer_id and not is_mail_sig and (not data.phone or not data.company_name):
             cust = db.query(Customer).filter(Customer.id == data.matched_customer_id).first()
             if cust:
-                if not data.phone and cust.phone:
-                    data.phone = cust.phone
-                if (not data.company_name or "Ziyaretçisi" in data.company_name) and cust.company_name:
-                    data.company_name = cust.company_name
+                sig_comp = (data.company_name or "").strip().lower()
+                crm_comp = (cust.company_name or "").strip().lower()
+                is_matching_company = (
+                    not sig_comp
+                    or "ziyaretçi" in sig_comp
+                    or (crm_comp and (crm_comp in sig_comp or sig_comp in crm_comp))
+                )
+                if is_matching_company:
+                    if not data.phone and cust.phone:
+                        data.phone = cust.phone
+                    if (not data.company_name or "Ziyaretçisi" in data.company_name) and cust.company_name:
+                        data.company_name = cust.company_name
+                else:
+                    data.matched_customer_id = None
     except Exception:
         pass
 

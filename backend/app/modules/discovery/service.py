@@ -1045,12 +1045,56 @@ class DiscoveryService:
                     s.company_name = matches[-1]
                     dirty = True
 
+            # 4b. Kurumsal E-Posta (mail_kurumsal) linklerinde:
+            # Aynı IP'deki başka bir oturumdan veya eski müşteri seçiminden yanlışlıkla yapışmış telefon/CRM eşleşmesini temizle
+            page_url_lower = str(s.page_url or "").lower()
+            comp_lower = str(s.company_name or "").lower()
+            is_mail_sig = (
+                s.source == "mail_kurumsal"
+                or "ref=mail_kurumsal" in page_url_lower
+                or "kurumsal e-posta" in comp_lower
+                or "akçansa" in comp_lower
+                or "akcansa" in comp_lower
+                or "betonsa" in comp_lower
+            )
+            visitor_typed_phone = bool(
+                s.search_query and ("Numarasını Tanımladı" in s.search_query or "Teklif" in s.search_query)
+            )
+            if is_mail_sig and not visitor_typed_phone:
+                if s.phone:
+                    s.phone = None
+                    dirty = True
+                if s.matched_customer_id:
+                    s.matched_customer_id = None
+                    if s.status == "converted":
+                        s.status = "new"
+                    dirty = True
+
+            # 4c. Eğer s.matched_customer_id varsa ama URL/sinyaldeki firma adı eşleşen CRM müşterisinin adıyla tamamen farklıysa,
+            # yanlış müşteri eşleşmesini kaldır ve hatalı telefon numarasını temizle
+            if s.matched_customer_id and s.customer and s.company_name:
+                raw_sig_comp = re.sub(r"\s*\([^)]*\)", "", s.company_name).strip().lower()
+                crm_comp = (s.customer.company_name or "").strip().lower()
+                if (
+                    raw_sig_comp
+                    and crm_comp
+                    and "ziyaretçi" not in raw_sig_comp
+                    and raw_sig_comp not in crm_comp
+                    and crm_comp not in raw_sig_comp
+                ):
+                    if s.phone == s.customer.phone:
+                        s.phone = None
+                    s.matched_customer_id = None
+                    if s.status == "converted":
+                        s.status = "new"
+                    dirty = True
+
             # 5. created_at tarihini her zaman UTC timezone-aware (+00:00) olarak döndür ki tarayıcı 3 saat geri ("3 saat önce") göstermesin!
             aware_created_at = s.created_at
             if aware_created_at is not None and aware_created_at.tzinfo is None:
                 aware_created_at = aware_created_at.replace(tzinfo=timezone.utc)
 
-            cust_name = s.customer.company_name if s.customer else None
+            cust_name = s.customer.company_name if (s.matched_customer_id and s.customer) else None
             results.append({
                 "id": s.id,
                 "source": s.source,
@@ -1085,9 +1129,24 @@ class DiscoveryService:
         """Yeni bir web arama niyeti / kampanya tıklama sinyali kaydeder veya mevcut oturumun süresini günceller."""
         is_heartbeat = bool(data.search_query and "[Süre Güncellemesi]" in data.search_query)
 
+        # Kurumsal E-Posta (mail_kurumsal) açılış sinyallerinde ziyaretçi kendisi numara yazmadıysa
+        # URL'den veya önceki oturumdan telefon / matched_customer_id taşınmasını engelle
+        page_url_lower = str(data.page_url or "").lower()
+        is_mail_open = (
+            data.source == "mail_kurumsal"
+            or "ref=mail_kurumsal" in page_url_lower
+        )
+        visitor_explicitly_identified = bool(
+            data.search_query and ("Numarasını Tanımladı" in data.search_query or "Teklif" in data.search_query)
+        )
+        if is_mail_open and not visitor_explicitly_identified:
+            data.phone = None
+            data.matched_customer_id = None
+
         # Aynı IP'den son 10 dakika içinde oluşturulmuş aktif oturum kaydı varsa:
         # - Heartbeat ise sadece süreyi ve scroll derinliğini güncelle (yeni satır açma).
-        # - İlk açılış kaydı ("Linkine Tıkladı" / 5 sn) üzerine yeni bir araç/kredi incelemesi geldiyse aynı satırı zenginleştir.
+        # - İlk açılış kaydı ("Linkine Tıkladı" / 5 sn) üzerine yeni bir araç/kredi incelemesi geldiyse
+        #   SADECE AYNI FİRMA VE AYNI KANAL İSE aynı satırı zenginleştir (Farklı müşterilerin kayıtlarını ASLA birbirine karıştırma!).
         if data.ip_address:
             cutoff_naive = datetime.utcnow() - timedelta(minutes=10)
             recent_sig = (
@@ -1100,7 +1159,20 @@ class DiscoveryService:
                 .first()
             )
             if recent_sig:
-                if is_heartbeat:
+                def _clean_comp(val: Optional[str]) -> str:
+                    if not val:
+                        return ""
+                    cleaned = re.sub(r"\s*\([^)]*\)", "", str(val)).strip().lower()
+                    return "" if "ziyaretçi" in cleaned else cleaned
+
+                prev_comp = _clean_comp(recent_sig.company_name)
+                new_comp = _clean_comp(data.company_name)
+                is_same_visitor_session = (
+                    (not prev_comp or not new_comp or prev_comp == new_comp)
+                    and (not data.source or not recent_sig.source or data.source == recent_sig.source or is_heartbeat)
+                )
+
+                if is_heartbeat and is_same_visitor_session:
                     recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
                     recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
                     self.db.commit()
@@ -1111,8 +1183,7 @@ class DiscoveryService:
                         "is_heartbeat_only": True,
                     }
 
-                # Eğer önceki kayıt son 3 dakika içindeyse ve sadece "Linkine Tıkladı" / "Linki Açıldı" ise,
-                # yeni gelen gerçek aksiyonu (veya mükerrer açılış sinyalini) aynı satır üzerinde birleştir:
+                # Eğer önceki kayıt aynı firma/ziyaretçiye aitse ve sadece "Linkine Tıkladı" / "Linki Açıldı" ise birleştir:
                 prev_q = str(recent_sig.search_query or "")
                 new_q = str(data.search_query or "")
                 is_prev_generic_open = (
@@ -1125,7 +1196,7 @@ class DiscoveryService:
                     or "Linki Açıldı" in new_q
                     or "Araç Seçiciyi Açtı" in new_q
                 )
-                if is_prev_generic_open or is_new_generic_open:
+                if is_same_visitor_session and (is_prev_generic_open or is_new_generic_open):
                     recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
                     recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
                     if not is_new_generic_open:
@@ -1136,7 +1207,7 @@ class DiscoveryService:
                             recent_sig.target_campaign = data.target_campaign
                         if data.notes:
                             recent_sig.notes = data.notes
-                    if data.phone and not recent_sig.phone:
+                    if data.phone and not recent_sig.phone and not is_mail_open:
                         recent_sig.phone = data.phone
                     if data.company_name and "Ziyaretçisi" not in data.company_name:
                         recent_sig.company_name = data.company_name

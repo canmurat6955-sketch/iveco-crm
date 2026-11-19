@@ -269,14 +269,19 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
       return `${baseOrigin}/fiyat-listesi?${params.toString()}`;
     }
 
-    if (vipSelectedCustomer?.id) {
+    const isSameSelectedCustomer =
+      vipSelectedCustomer?.id &&
+      vipCompanyName.trim() &&
+      vipCompanyName.trim().toLowerCase() === (vipSelectedCustomer.company_name || '').trim().toLowerCase();
+
+    if (isSameSelectedCustomer && selectedChannelId !== 'fb_grup' && selectedChannelId !== 'mail_kurumsal') {
       params.set('cid', String(vipSelectedCustomer.id));
     }
     if (vipCompanyName.trim()) {
       params.set('company', vipCompanyName.trim());
     }
     const cleanPhone = vipPhone.replace(/\D/g, '');
-    if (cleanPhone.length >= 10) {
+    if (cleanPhone.length >= 10 && selectedChannelId !== 'mail_kurumsal' && selectedChannelId !== 'fb_grup') {
       params.set('phone', cleanPhone);
     }
     if (selectedVehicleGroups.length > 0) {
@@ -969,7 +974,17 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
   };
 
   const handleSendMailToTarget = (target) => {
-    const link = buildTaxRadarCustomerLink(target).replace('ref=yilsonu_kdv_tarama', 'ref=mail_kurumsal');
+    const baseOrigin = (origin || 'https://iveco-crm.vercel.app').replace(/\/$/, '');
+    const mailParams = new URLSearchParams();
+    if (target.name && !target.name.includes('Ziyaretçisi')) mailParams.set('company', target.name);
+    if (Array.isArray(target.groups) && target.groups.length > 0) {
+      mailParams.set('groups', target.groups.join(','));
+    }
+    if (taxRadarTemplate === 'ihracat_euro') {
+      mailParams.set('loan', 'eur');
+    }
+    mailParams.set('ref', 'mail_kurumsal');
+    const link = `${baseOrigin}/fiyat-listesi?${mailParams.toString()}`;
     const cleanBody = buildTaxRadarCustomerMessage(target).replace(/\*/g, '').replace(buildTaxRadarCustomerLink(target), link);
     const subject = `${target.name} — 2026 Model IVECO Özel Fiyat Listesi, %20 KDV Avantajı & Finansman Teklifi`;
     const mailtoUrl = `mailto:${encodeURIComponent(target.email || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(cleanBody)}`;
@@ -1272,7 +1287,13 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       <button
                         key={ch.id}
                         type="button"
-                        onClick={() => setSelectedChannelId(ch.id)}
+                        onClick={() => {
+                          setSelectedChannelId(ch.id);
+                          if (ch.id === 'mail_kurumsal' || ch.id === 'fb_grup') {
+                            setVipSelectedCustomer(null);
+                            setVipPhone('');
+                          }
+                        }}
                         style={{
                           padding: '10px 8px',
                           borderRadius: '10px',
@@ -1552,8 +1573,18 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       type="text"
                       value={vipCompanyName}
                       onChange={(e) => {
-                        setVipCompanyName(e.target.value);
-                        if (!e.target.value) setVipSelectedCustomer(null);
+                        const nextVal = e.target.value;
+                        setVipCompanyName(nextVal);
+                        if (
+                          !nextVal ||
+                          (vipSelectedCustomer &&
+                            nextVal.trim().toLowerCase() !== (vipSelectedCustomer.company_name || '').trim().toLowerCase())
+                        ) {
+                          setVipSelectedCustomer(null);
+                          if (selectedChannelId === 'mail_kurumsal' || vipSelectedCustomer) {
+                            setVipPhone('');
+                          }
+                        }
                       }}
                       placeholder={
                         selectedChannelId === 'fb_grup'
