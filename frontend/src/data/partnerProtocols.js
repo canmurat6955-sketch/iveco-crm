@@ -172,17 +172,45 @@ export function resolvePartnerFromSearchParams(searchParams) {
     : (matchedPreset?.discountValue ?? 50000);
 
   const shortName = customShort || matchedPreset?.shortName || customName || partnerCode.toUpperCase();
-  const fullName = customName || matchedPreset?.fullName || shortName;
+  const shortLower = shortName.toLocaleLowerCase('tr-TR');
+  const customFullLower = customName.toLocaleLowerCase('tr-TR');
+  const stalePresetKeywords = ['arıcılar', 'aricilar', 'simder', 'şoförler', 'ziraat odası', 'gıda toptancıları', 'samsun tso', 'smmm'];
+  const isStaleCustomName = Boolean(
+    customShort &&
+    customName &&
+    stalePresetKeywords.some(kw => customFullLower.includes(kw) && !shortLower.includes(kw))
+  );
+
+  const isTransportCoop =
+    shortLower.includes('taşıyıcı') ||
+    shortLower.includes('tasiyici') ||
+    shortLower.includes('nakliye') ||
+    shortLower.includes('kooperatif') ||
+    shortLower.includes('lojistik') ||
+    shortLower.includes('şoför');
+
+  const fullName = isStaleCustomName
+    ? shortName
+    : (customName || matchedPreset?.fullName || shortName);
   const logoUrl = matchedPreset?.logoUrl || (lowerCode.includes('simder') ? '/partners/simder-logo.png' : '');
-  const icon = iconParam || matchedPreset?.icon || '🏛️';
-  const defaultSector = sectorParam || matchedPreset?.defaultSector || 'all';
+  const rawIcon = iconParam || matchedPreset?.icon || '🏛️';
+  const icon = (isStaleCustomName || (rawIcon === '🐝' && !shortLower.includes('arı') && !shortLower.includes('ari')))
+    ? (isTransportCoop ? '🚛' : '🏛️')
+    : rawIcon;
+  const rawSector = sectorParam || matchedPreset?.defaultSector || 'all';
+  const defaultSector = (isStaleCustomName || (rawSector === 'tarim_yem' && isTransportCoop))
+    ? 'nakliye_lojistik'
+    : rawSector;
   const badgeColor = matchedPreset?.badgeColor || '#10b981';
 
   const discountLabel = discountType === 'percent'
     ? `%${parsedDisc} Özel Üye İskontosu`
     : `Araç Başı ${parsedDisc.toLocaleString('tr-TR')} ₺ Üye İndirimi`;
 
-  const extraPerk = noteParam || matchedPreset?.extraPerk || `${shortName} Üyelerine Özel ${discountLabel} + 1M TL %0 Faiz Avantajı`;
+  const generatedExtraPerk = `${shortName} Üyelerine Özel ${discountLabel} + 1M TL %0 Faiz Avantajı`;
+  const extraPerk = (isStaleCustomName || (noteParam && noteParam.includes('50.000') && parsedDisc !== 50000))
+    ? generatedExtraPerk
+    : (noteParam || matchedPreset?.extraPerk || generatedExtraPerk);
 
   return {
     id: matchedPreset?.id || lowerCode || 'custom_partner',
@@ -327,12 +355,20 @@ export function buildPartnerAnnouncementText(origin, config) {
     );
   }
 
+  const rawShort = (config.shortName || 'Özel Protokol').trim();
+  const rawFull = (config.fullName || rawShort).trim();
+  const shortLower = rawShort.toLocaleLowerCase('tr-TR');
+  const fullLower = rawFull.toLocaleLowerCase('tr-TR');
+  const staleKeywords = ['arıcılar', 'aricilar', 'simder', 'şoförler', 'ziraat odası', 'gıda toptancıları', 'samsun tso', 'smmm'];
+  const isMismatchedFull = staleKeywords.some(kw => fullLower.includes(kw) && !shortLower.includes(kw));
+  const cleanTitle = (isMismatchedFull ? rawShort : rawFull).replace(/\s+Üyeleri$/i, '').trim();
+
   return (
-    `${config.icon || '🏛️'} *${config.fullName || config.shortName} Değerli Üyelerimize Özel IVECO 2026 Kampanyası!*\n\n` +
-    `IVECO ERC Samsun Otomotiv ile yapılan özel iş birliği kapsamında, tüm *${config.shortName}* üyelerimize 2026 model sıfır IVECO ticari araç alımlarında ${discText} tanımlanmıştır! 🚛🤝\n\n` +
-    `*${config.shortName} Üyelerine Özel Dijital Ekranımızda Neler Var?*\n` +
-    `✅ Tüm araçlarda *${config.shortName} Üye İndirimi düşülmüş* net protokol fiyatlarını ve *%20 İndirilecek KDV* tutarlarını anında görün,\n` +
-    `🔄 Elinizdeki mevcut aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya anlaşmalı banka oranlarıyla kalan taksitinizi 10 saniyede hesaplayın,\n` +
+    `${config.icon || '🚛'} *${cleanTitle} — Değerli Üyelerimize Özel IVECO 2026 Kampanyası!*\n\n` +
+    `IVECO ERC Samsun Otomotiv ile yapılan özel iş birliği kapsamında, tüm *${rawShort}* üyelerimize 2026 model sıfır IVECO ticari araç alımlarında ${discText} tanımlanmıştır! 🚛\n\n` +
+    `*${rawShort} Üyelerine Özel Dijital Ekranımızda Neler Var?*\n` +
+    `✅ Tüm araçlarda *${rawShort} Üye İndirimi düşülmüş* net protokol fiyatlarını ve *%20 İndirilecek KDV* tutarlarını anında görün,\n` +
+    `🔄 Elinizdeki mevcut aracın takas değerini düşüp *1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)* veya *6 Ay Ödemesiz* banka oranlarıyla kalan taksitinizi 10 saniyede hesaplayın,\n` +
     `📸 Takasa vereceğiniz aracın *4 resmini (1 dıştan, 1 içten, KM ve ruhsat)* yükleyip 15 dakikada takas ön fiyatı alın,\n` +
     `🔒 Beğendiğiniz şasiyi ve üye indirimini 24 saat ücretsiz adınıza opsiyonlayın 👇\n\n` +
     `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31 | IVECO ERC Samsun Otomotiv*\n\n` +

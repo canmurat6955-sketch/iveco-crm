@@ -1021,7 +1021,30 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     });
   }, [taxRadarTargets, sentTaxPhones, taxRadarFilter, taxRadarSearch]);
 
-  // --- SEKME 2 FONKSİYONLARI (DERNEK / ODA / SİMDER / ARICILAR BİRLİĞİ) ---
+  // --- SEKME 2 FONKSİYONLARI (DERNEK / ODA / KOOPERATİF / SMMM) ---
+  const inferPartnerMetaFromName = (rawName) => {
+    const lower = (rawName || '').toLocaleLowerCase('tr-TR');
+    if (lower.includes('taşıyıcı') || lower.includes('tasiyici') || lower.includes('nakliye') || lower.includes('şoför') || lower.includes('sofor') || lower.includes('lojistik') || lower.includes('kooperatif') || lower.includes('kamyon') || lower.includes('ambar')) {
+      return { icon: '🚛', sector: 'nakliye_lojistik' };
+    }
+    if (lower.includes('inşaat') || lower.includes('insaat') || lower.includes('müteahhit') || lower.includes('muteahhit') || lower.includes('simder') || lower.includes('beton') || lower.includes('hafriyat') || lower.includes('şantiye')) {
+      return { icon: '🏗️', sector: 'insaat_beton' };
+    }
+    if (lower.includes('gıda') || lower.includes('gida') || lower.includes('hal') || lower.includes('toptancı') || lower.includes('meyve') || lower.includes('sebze') || lower.includes('soğuk') || lower.includes('fırın') || lower.includes('market')) {
+      return { icon: '❄️', sector: 'gida_soguk' };
+    }
+    if (lower.includes('arıcı') || lower.includes('arici') || lower.includes('bal')) {
+      return { icon: '🐝', sector: 'tarim_yem' };
+    }
+    if (lower.includes('ziraat') || lower.includes('tarım') || lower.includes('tarim') || lower.includes('çiftçi') || lower.includes('yem') || lower.includes('süt') || lower.includes('hayvancılık')) {
+      return { icon: '🌾', sector: 'tarim_yem' };
+    }
+    if (lower.includes('smmm') || lower.includes('müşavir') || lower.includes('musavir') || lower.includes('muhasebe')) {
+      return { icon: '👨‍💼', sector: 'all' };
+    }
+    return { icon: '🏛️', sector: 'all' };
+  };
+
   const handleSelectPreset = (preset) => {
     setSelectedId(preset.id);
     setShortName(preset.shortName);
@@ -1034,30 +1057,65 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
     setExtraPerk(preset.extraPerk || '');
   };
 
-  const handleStartNewCustom = () => {
+  const handleShortNameChange = (newVal) => {
     setSelectedId('custom');
-    setShortName('Arıcılar Birliği');
-    setFullName('Samsun İli Arıcılar Birliği Üyeleri');
+    setShortName(newVal);
+    setFullName(newVal);
     setLogoUrl('');
-    setIcon('🐝');
-    setDiscountType('amount');
-    setDiscountValue(50000);
-    setDefaultSector('tarim_yem');
-    setExtraPerk('Birlik Üyelerine Özel Araç Başı 50.000 ₺ Protokol İndirimi + 1M TL %0 Faiz Avantajı');
-    toast.success('Yeni dernek/birlik şablonu açıldı — adını ve indirim tutarını aşağıdan dilediğin gibi değiştirebilirsin!');
+    const inferred = inferPartnerMetaFromName(newVal);
+    setIcon(inferred.icon);
+    setDefaultSector(inferred.sector);
   };
 
-  const currentConfig = useMemo(() => ({
-    id: selectedId,
-    shortName: shortName.trim() || 'Özel Protokol',
-    fullName: fullName.trim() || shortName.trim() || 'Kurumsal Üye Protokolü',
-    logoUrl,
-    icon: icon || '🏛️',
-    discountType,
-    discountValue: Number(discountValue) || 0,
-    defaultSector,
-    extraPerk: extraPerk.trim()
-  }), [selectedId, shortName, fullName, logoUrl, icon, discountType, discountValue, defaultSector, extraPerk]);
+  const handleStartNewCustom = () => {
+    setSelectedId('custom');
+    setShortName('');
+    setFullName('');
+    setLogoUrl('');
+    setIcon('🚛');
+    setDiscountType('amount');
+    setDiscountValue(40000);
+    setDefaultSector('nakliye_lojistik');
+    setExtraPerk('');
+    toast.success('Yeni dernek / kooperatif alanı temizlendi — kurum adını aşağıya yazabilirsin!');
+  };
+
+  const currentConfig = useMemo(() => {
+    const cleanShort = shortName.trim() || 'Özel Protokol';
+    const rawFull = fullName.trim();
+    const shortLower = cleanShort.toLocaleLowerCase('tr-TR');
+    const fullLower = rawFull.toLocaleLowerCase('tr-TR');
+
+    // Eğer kısa ad değiştirilmiş ama tam kurum başlığında eski preset'in ("Arıcılar Birliği", "SİMDER" vb.) adı kalmışsa otomatik kısa adı kullan!
+    const stalePresetKeywords = ['arıcılar', 'aricilar', 'simder', 'şoförler', 'ziraat odası', 'gıda toptancıları', 'samsun tso', 'smmm'];
+    const hasStaleFull = stalePresetKeywords.some(kw => fullLower.includes(kw) && !shortLower.includes(kw));
+    const effectiveFullName = (!rawFull || hasStaleFull) ? cleanShort : rawFull;
+
+    const inferred = inferPartnerMetaFromName(cleanShort);
+    const effectiveIcon = (icon === '🐝' && !shortLower.includes('arı') && !shortLower.includes('ari'))
+      ? inferred.icon
+      : (icon || inferred.icon || '🏛️');
+    const effectiveSector = (defaultSector === 'tarim_yem' && !shortLower.includes('arı') && !shortLower.includes('ziraat') && !shortLower.includes('tarım') && !shortLower.includes('yem'))
+      ? inferred.sector
+      : defaultSector;
+
+    const numDisc = Number(discountValue) || 0;
+    const dynamicPerk = discountType === 'percent'
+      ? `${cleanShort} Üyelerine Özel %${numDisc} Kurumsal Protokol İskontosu + 1M TL %0 Faiz Avantajı`
+      : `${cleanShort} Üyelerine Özel Araç Başı ${numDisc.toLocaleString('tr-TR')} ₺ Protokol İndirimi + 1M TL %0 Faiz Avantajı`;
+
+    return {
+      id: selectedId,
+      shortName: cleanShort,
+      fullName: effectiveFullName,
+      logoUrl,
+      icon: effectiveIcon,
+      discountType,
+      discountValue: numDisc,
+      defaultSector: effectiveSector,
+      extraPerk: dynamicPerk
+    };
+  }, [selectedId, shortName, fullName, logoUrl, icon, discountType, discountValue, defaultSector]);
 
   const generatedLink = useMemo(() => buildPartnerShareUrl(origin, currentConfig), [origin, currentConfig]);
   const generatedAnnouncement = useMemo(() => buildPartnerAnnouncementText(origin, currentConfig), [origin, currentConfig]);
@@ -2331,8 +2389,8 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                       <input
                         type="text"
                         value={shortName}
-                        onChange={(e) => setShortName(e.target.value)}
-                        placeholder="Örn: SİMDER veya Arıcılar Birliği"
+                        onChange={(e) => handleShortNameChange(e.target.value)}
+                        placeholder="Örn: S.S. Bafra 1 Nolu Motorlu Taşıyıcılar Kooperatifi"
                         style={{
                           flex: 1,
                           padding: '8px 10px',
