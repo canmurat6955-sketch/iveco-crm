@@ -1131,6 +1131,32 @@ class DiscoveryService:
 
     def create_intent_signal(self, data: WebIntentSignalCreate) -> dict:
         """Yeni bir web arama niyeti / kampanya tıklama sinyali kaydeder veya mevcut oturumun süresini günceller."""
+        # PostgreSQL VARCHAR sütun sınırlarını (source:50, target_model:100, target_campaign:200, page_url:500 vb.) aşmamak için güvenli kırpma:
+        if data.source:
+            data.source = str(data.source)[:50]
+        if data.search_query:
+            data.search_query = str(data.search_query)[:490]
+        if data.target_model:
+            data.target_model = str(data.target_model)[:100]
+        if data.target_campaign:
+            data.target_campaign = str(data.target_campaign)[:200]
+        if data.company_name:
+            data.company_name = str(data.company_name)[:490]
+        if data.city:
+            data.city = str(data.city)[:100]
+        if data.district:
+            data.district = str(data.district)[:100]
+        if data.phone:
+            data.phone = str(data.phone)[:50]
+        if data.ip_address:
+            data.ip_address = str(data.ip_address)[:100]
+        if data.page_url:
+            data.page_url = str(data.page_url)[:495]
+        if data.referrer:
+            data.referrer = str(data.referrer)[:495]
+        if data.intent_level:
+            data.intent_level = str(data.intent_level)[:30]
+
         is_heartbeat = bool(data.search_query and "[Süre Güncellemesi]" in data.search_query)
 
         # Kurumsal E-Posta (mail_kurumsal) açılış sinyallerinde ziyaretçi kendisi numara yazmadıysa
@@ -1198,6 +1224,7 @@ class DiscoveryService:
                     recent_sig.duration_seconds = max(recent_sig.duration_seconds or 0, data.duration_seconds or 0)
                     recent_sig.scroll_depth = max(recent_sig.scroll_depth or 0, data.scroll_depth or 0)
                     if not is_new_generic_open:
+                        recent_sig.created_at = datetime.now(timezone.utc)
                         if prev_q and new_q and new_q not in prev_q and "Linkine Tıkladı" not in prev_q and "Linki Açıldı" not in prev_q:
                             combined_q = f"{prev_q} • {new_q}"
                             recent_sig.search_query = combined_q[-480:]

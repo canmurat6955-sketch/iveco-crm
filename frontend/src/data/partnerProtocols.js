@@ -324,7 +324,9 @@ export function buildPartnerShareUrl(origin, config) {
     .toLowerCase()
     .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
     .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    .replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')
+    .slice(0, 36)
+    .replace(/_$/g, '');
 
   params.set('ref', `protokol_${slug || partnerId}`);
 

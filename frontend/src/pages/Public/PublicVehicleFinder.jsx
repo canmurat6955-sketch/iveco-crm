@@ -1559,15 +1559,15 @@ export default function PublicVehicleFinder() {
     const durationSeconds = Math.max(1, Math.min(activeSecondsRef.current || 1, 540));
 
     discoveryApi.recordIntentSignal({
-      source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
-      search_query: `[Canlı Ayak İzi - ${actionLabel}]`,
-      target_model: modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog',
-      target_campaign: campaignOverride || (isGroupRef && companyParam ? `Grup: ${companyParam}` : (sectorParam ? `Sektör: ${sectorParam}` : (socialSourceLabel || '2026 Fiyat & Kredi Portalı'))),
-      company_name: visitorLabel,
-      city: customerCity || 'Samsun',
-      phone: effectivePhone,
-      page_url: window.location.href,
-      referrer: document.referrer || (refCode || 'whatsapp_vip_link'),
+      source: String(customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint')).slice(0, 48),
+      search_query: `[Canlı Ayak İzi - ${actionLabel}]`.slice(0, 480),
+      target_model: String(modelOverride || matched?.modelTitle || 'IVECO 2026 Katalog').slice(0, 98),
+      target_campaign: String(campaignOverride || (isGroupRef && companyParam ? `Grup: ${companyParam}` : (sectorParam ? `Sektör: ${sectorParam}` : (socialSourceLabel || '2026 Fiyat & Kredi Portalı')))).slice(0, 195),
+      company_name: String(visitorLabel).slice(0, 480),
+      city: String(customerCity || 'Samsun').slice(0, 95),
+      phone: String(effectivePhone).slice(0, 48),
+      page_url: String(window.location.href).slice(0, 490),
+      referrer: String(document.referrer || (refCode || 'whatsapp_vip_link')).slice(0, 490),
       duration_seconds: durationSeconds,
       scroll_depth: 80,
       intent_score: (effectiveName || customerIdParam || effectivePhone) ? 95 : 90,
@@ -1645,10 +1645,10 @@ export default function PublicVehicleFinder() {
       const sec = Math.min(activeSecondsRef.current || 1, 540);
       if (sec < 8) return;
       discoveryApi.recordIntentSignal({
-        source: customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint'),
+        source: String(customerIdParam ? 'crm_existing_customer' : (refCode || 'vip_portal_footprint')).slice(0, 48),
         search_query: '[Süre Güncellemesi]',
-        target_model: selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi',
-        page_url: window.location.href,
+        target_model: String(selectedModelKey ? (matched?.modelTitle || selectedModelKey) : '2026 Fiyat & Kredi Listesi').slice(0, 98),
+        page_url: String(window.location.href).slice(0, 490),
         duration_seconds: sec,
         scroll_depth: 85,
         intent_score: 85,
@@ -1705,15 +1705,15 @@ export default function PublicVehicleFinder() {
         : `${currentBankMeta.name} (Resmi IVECO Kredi Kampanyası)`;
 
     const leadPayload = {
-      source: customerIdParam ? 'crm_existing_customer' : (refCode || 'whatsapp_link'),
-      search_query: `[Şasi & Kasa Seçici]: ${selectedSector} | ${payloadKg} kg | ${volumeM3} m3 | ${selectedBody}`,
-      target_model: matched.modelTitle,
-      target_campaign: campaignSummary,
-      company_name: customerCompany.trim() || customerName.trim() || 'WhatsApp Ziyaretçisi',
-      city: customerCity,
-      phone: customerPhone.trim(),
-      page_url: window.location.href,
-      referrer: document.referrer || 'whatsapp_chat',
+      source: String(customerIdParam ? 'crm_existing_customer' : (refCode || 'whatsapp_link')).slice(0, 48),
+      search_query: `[Şasi & Kasa Seçici]: ${selectedSector} | ${payloadKg} kg | ${volumeM3} m3 | ${selectedBody}`.slice(0, 480),
+      target_model: String(matched.modelTitle || '2026 IVECO Şasi').slice(0, 98),
+      target_campaign: String(campaignSummary || '').slice(0, 195),
+      company_name: String(customerCompany.trim() || customerName.trim() || 'WhatsApp Ziyaretçisi').slice(0, 480),
+      city: String(customerCity || 'Samsun').slice(0, 95),
+      phone: String(customerPhone.trim()).slice(0, 48),
+      page_url: String(window.location.href).slice(0, 490),
+      referrer: String(document.referrer || 'whatsapp_chat').slice(0, 490),
       duration_seconds: durationSeconds,
       scroll_depth: 100,
       intent_score: 99,
