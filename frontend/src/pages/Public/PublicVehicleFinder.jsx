@@ -124,9 +124,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 12M3 TEKNİK FÖY.pdf',
-    priceRange: '2.130.000 TL (Peşin) / 2.320.000 TL (Kampanyalı)',
-    campaignPriceText: '2.320.000 TL',
-    cashPriceText: '2.130.000 TL',
+    priceRange: '2.150.000 TL (Peşin) / 2.340.000 TL (Kampanyalı)',
+    campaignPriceText: '2.340.000 TL',
+    cashPriceText: '2.150.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -158,9 +158,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 16M3 TEKNİK FÖY.pdf',
-    priceRange: '2.160.000 TL (Peşin) / 2.350.000 TL (Kampanyalı)',
-    campaignPriceText: '2.350.000 TL',
-    cashPriceText: '2.160.000 TL',
+    priceRange: '2.180.000 TL (Peşin) / 2.370.000 TL (Kampanyalı)',
+    campaignPriceText: '2.370.000 TL',
+    cashPriceText: '2.180.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -192,9 +192,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY PANELVAN 18M3 ÇİFT TEKER TEKNİK FÖY.pdf',
-    priceRange: '2.320.000 TL (Peşin) / 2.510.000 TL (Kampanyalı)',
-    campaignPriceText: '2.510.000 TL',
-    cashPriceText: '2.320.000 TL',
+    priceRange: '2.340.000 TL (Peşin) / 2.530.000 TL (Kampanyalı)',
+    campaignPriceText: '2.530.000 TL',
+    cashPriceText: '2.340.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'panelvan'
@@ -228,9 +228,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '1.905.000 TL (Peşin) / 2.095.000 TL (Kampanyalı)',
-    campaignPriceText: '2.095.000 TL',
-    cashPriceText: '1.905.000 TL',
+    priceRange: '1.925.000 TL (Peşin) / 2.115.000 TL (Kampanyalı)',
+    campaignPriceText: '2.115.000 TL',
+    cashPriceText: '1.925.000 TL',
     cashDiscountText: '190.000 TL',
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
@@ -262,9 +262,9 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyonet-35s-35c.pdf',
     pdfName: 'DAILY KAMYONET TEKNİK FÖY .pdf',
-    priceRange: '2.065.000 TL (3750 Manuel) / 2.140.000 TL (3450 A8) / 2.170.000 TL (3750 A8)',
-    campaignPriceText: '2.170.000 TL (3750 A8) / 2.140.000 TL (3450 A8)',
-    cashPriceText: '2.065.000 TL (3750 Manuel) / 2.170.000 TL (3750 A8)',
+    priceRange: '2.085.000 TL (3750 Manuel) / 2.160.000 TL (3450 A8) / 2.190.000 TL (3750 A8)',
+    campaignPriceText: '2.190.000 TL (3750 A8) / 2.160.000 TL (3450 A8)',
+    cashPriceText: '2.085.000 TL (3750 Manuel) / 2.190.000 TL (3750 A8)',
     cashDiscountText: null,
     defaultLoan: 1000000,
     bodyType: 'kapali_kutu'
@@ -299,10 +299,10 @@ const VEHICLE_CATALOG = [
     },
     pdfUrl: '/specs/daily-kamyon-70c-72c.pdf',
     pdfName: 'DAILY KAMYON TEKNİK FÖY.pdf',
-    priceRange: '2.390.000 TL (Peşin) / 2.500.000 TL (Kampanyalı)',
-    campaignPriceText: '2.500.000 TL',
-    cashPriceText: '2.390.000 TL',
-    cashDiscountText: '110.000 TL',
+    priceRange: '2.390.000 TL (3750 Peşin) - 2.680.000 TL (4750 Peşin)',
+    campaignPriceText: '2.500.000 TL - 3.060.000 TL',
+    cashPriceText: '2.390.000 TL - 2.800.000 TL',
+    cashDiscountText: '110.000 TL - 260.000 TL',
     defaultLoan: 1500000,
     bodyType: 'frigo'
   },
@@ -1414,20 +1414,24 @@ export default function PublicVehicleFinder() {
     };
   }, [selectedModelKey, selectedCatalogOverride, payloadKg, volumeM3, customDims, bodyLengthCm, bodyWidthCm, bodyHeightCm, selectedBody, selectedSector]);
 
-  const visibleFinderBanks = useMemo(
-    () => (lockedBank ? BANK_LIST.filter(b => b.id === lockedBank.id) : BANK_LIST),
-    [lockedBank]
-  );
+  const visibleFinderBanks = useMemo(() => {
+    if (lockedBank) return BANK_LIST.filter(b => b.id === lockedBank.id);
+    return BANK_LIST.filter(b => {
+      if (b.id === 'diger_yok') return true;
+      return getCampaignsForVehicleAndBank(matched.series, b.id, 'all').campaigns.length > 0;
+    });
+  }, [lockedBank, matched.series]);
 
   const visibleFinderEurBanks = useMemo(
     () => (lockedBank ? EUR_PARTNER_BANKS.filter(b => b.id === lockedBank.id) : EUR_PARTNER_BANKS),
     [lockedBank]
   );
 
-  const activeFinderBankId = lockedBank?.id || selectedBankId;
+  const activeFinderBankId = lockedBank?.id
+    || (visibleFinderBanks.some(b => b.id === selectedBankId) ? selectedBankId : (visibleFinderBanks[0]?.id || 'teb_cetelem'));
   const activeFinderEurBankId = lockedBank?.hasEurCampaigns ? lockedBank.id : selectedEurBankId;
 
-  // Banka ve Kampanya Bilgisi (Ekim 2026 IVECO Resmi Banka Kampanyaları)
+  // Banka ve Kampanya Bilgisi (Kasım 2026 IVECO Resmi Banka Kampanyaları)
   const { category: vehicleCategory, effectiveBankId, campaigns: availableCampaigns } = useMemo(() => {
     return getCampaignsForVehicleAndBank(matched.series, activeFinderBankId, selectedTierId);
   }, [matched.series, activeFinderBankId, selectedTierId]);

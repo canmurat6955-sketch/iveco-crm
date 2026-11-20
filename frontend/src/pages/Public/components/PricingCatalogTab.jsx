@@ -340,7 +340,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       return {
         badge: '🇪🇺 İHRACATÇI & DÖVİZ GELİRLİ FİRMALARA ÖZEL EURO (€) KREDİSİ AKTİF',
         title: `${company ? `${company} — ` : ''}Euro (€) Bazlı Ticari Kredi & Özel Filo İskontosu Tanımlandı!`,
-        desc: '32 Sayılı Karar kapsamında ihracatçı ve döviz gelirli firmalarımıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) taksitlerini her araç kartındaki "Taksit & Takas Hesapla" tuşuyla Euro bazında hesaplayabilirsiniz.'
+        desc: '32 Sayılı Karar kapsamında ihracatçı ve döviz gelirli firmalarımıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Albaraka Türk, Garanti BBVA ve DenizBank Euro (€) taksitlerini her araç kartındaki "Taksit & Takas Hesapla" tuşuyla Euro bazında hesaplayabilirsiniz.'
       };
     }
     if (ref.includes('kasaci') || ref.includes('karoser') || ref.includes('servis')) {
@@ -1246,7 +1246,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             >
               <option value="Daily 35C16 Çift Teker Şasi">Model: Daily 35C16 Çift Teker Şasi</option>
               <option value="Daily 35S16 Panelvan (12 / 16 / 18 m³)">Model: Daily Panelvan (12 / 16 / 18 m³)</option>
-              <option value="Daily 72C18 (7 Ton Kamyon)">Model: Daily 72C18 (7 Ton Kamyon)</option>
+              <option value="Daily 70C16 / 72C16 (7 Ton Kamyon)">Model: Daily 70C16 / 72C16 (7 Ton Kamyon)</option>
               <option value="Eurocargo 100E / 150E / 160E">Model: Eurocargo Orta Ağır Kamyon</option>
               <option value="S-Way Çekici (500 / 530 / 580 HP)">Model: S-Way Çekici Filosu</option>
               <option value="T-Way 10 / 12 Teker Hafriyat">Model: T-Way Hafriyat & Mikser Filosu</option>
@@ -2228,40 +2228,57 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             : 0;
           const activeTerm = Number(tradeInTerm) || 12;
           const isHeavyVeh = vehicle.segment === 'S-Way' || vehicle.segment === 'T-Way';
-          const zeroCapTl = isHeavyVeh ? 2000000 : 1200000;
+          const isDaily70OrEc = vehicle.segment === 'Daily 70 C' || vehicle.segment === 'Eurocargo';
+          const zeroCapTl = isHeavyVeh
+            ? (activeTerm <= 6 ? 2000000 : activeTerm <= 9 ? 1580000 : 1250000)
+            : isDaily70OrEc
+              ? (activeTerm <= 6 ? 1500000 : activeTerm <= 9 ? 1250000 : 1000000)
+              : (activeTerm <= 6 ? 1000000 : 800000);
           const isZeroInterestEligible =
             !vehicle.isCustomPrice &&
             vehicle.currency !== 'EUR' &&
             inlineGraceMonths === 0 &&
             remainingAfterTradeIn > 0 &&
             remainingAfterTradeIn <= zeroCapTl &&
-            (activeTerm === 6 || activeTerm === 9 || activeTerm === 12);
+            (activeTerm === 6 || activeTerm === 8 || activeTerm === 9 || activeTerm === 12);
 
-          // IVECO Kasım 2026 Resmi Banka Kampanya Tablosu Kademeli Sübvansiyonlu Oranlar
+          // IVECO Kasım 2026 Resmi Banka Kampanya Tablosu Kademeli IVECO Katkılı Oranlar
           let appliedTlRatePct = 0;
           if (remainingAfterTradeIn > 0) {
             if (inlineGraceMonths === 6) {
-              // ⏳ 6 Ay Ödemesiz + Eşit Taksit (Kuveyt Türk & Albaraka Resmi Oranları)
-              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 2.15 : remainingAfterTradeIn <= 1500000 ? 2.24 : 2.67;
+              // ⏳ 6 Ay Ödemesiz + Eşit Taksit (Kuveyt Türk & Albaraka Kasım 2026 IVECO Katkılı Oranları)
+              if (isHeavyVeh) {
+                appliedTlRatePct = remainingAfterTradeIn <= 2500000 ? 2.48 : remainingAfterTradeIn <= 3500000 ? 2.59 : 2.83;
+              } else if (isDaily70OrEc) {
+                appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 1.76 : remainingAfterTradeIn <= 1500000 ? 2.24 : remainingAfterTradeIn <= 2000000 ? 2.47 : 2.70;
+              } else {
+                appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 2.36 : 2.76;
+              }
             } else if (isZeroInterestEligible) {
               appliedTlRatePct = 0;
             } else if (lockedBank?.baseRate) {
               appliedTlRatePct = Number(lockedBank.baseRate);
             } else if (activeTerm <= 12) {
-              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 0.75 : remainingAfterTradeIn <= 1500000 ? 1.18 : 1.74;
+              appliedTlRatePct = (isHeavyVeh || isDaily70OrEc)
+                ? (remainingAfterTradeIn <= 1250000 ? 0.70 : remainingAfterTradeIn <= 1500000 ? 1.18 : 1.76)
+                : (remainingAfterTradeIn <= 1000000 ? 0.98 : remainingAfterTradeIn <= 1500000 ? 1.80 : 2.38);
             } else if (activeTerm <= 24) {
-              appliedTlRatePct = remainingAfterTradeIn <= 1000000 ? 1.30 : remainingAfterTradeIn <= 1500000 ? 1.94 : remainingAfterTradeIn <= 2000000 ? 2.24 : 2.54;
+              appliedTlRatePct = (isHeavyVeh || isDaily70OrEc)
+                ? (remainingAfterTradeIn <= 1000000 ? 1.21 : remainingAfterTradeIn <= 1500000 ? 1.90 : remainingAfterTradeIn <= 2000000 ? 2.23 : 2.58)
+                : (remainingAfterTradeIn <= 800000 ? 1.83 : remainingAfterTradeIn <= 1000000 ? 2.11 : remainingAfterTradeIn <= 1500000 ? 2.43 : 2.67);
             } else if (activeTerm <= 36) {
-              appliedTlRatePct = remainingAfterTradeIn <= 2000000 ? 2.67 : 2.73;
+              appliedTlRatePct = (isHeavyVeh || isDaily70OrEc)
+                ? (remainingAfterTradeIn <= 2000000 ? 2.47 : 2.70)
+                : 2.76;
             } else {
-              appliedTlRatePct = 2.89;
+              appliedTlRatePct = 2.83;
             }
           }
 
           const monthlyRate = appliedTlRatePct / 100;
           const effectiveTlPrincipalForCalc =
             inlineGraceMonths === 6 && remainingAfterTradeIn > 0
-              ? remainingAfterTradeIn * Math.pow(1 + monthlyRate * 0.45, 2) // 6 ay ödemesiz dönem kâr payı farkı (1M 24 ay -> ~61.825 TL/Ay resmi tabloyla birebir)
+              ? remainingAfterTradeIn * Math.pow(1 + monthlyRate, 6) // 6 ay ödemesiz dönem kâr payı bileşimi (Kuveyt/Albaraka resmi tablo uyumlu)
               : remainingAfterTradeIn;
 
           const monthlyPaymentEst = remainingAfterTradeIn <= 0
@@ -2271,7 +2288,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
               : Math.round((effectiveTlPrincipalForCalc * monthlyRate * Math.pow(1 + monthlyRate, activeTerm)) / (Math.pow(1 + monthlyRate, activeTerm) - 1));
           const totalTlRepaymentEst = monthlyPaymentEst * activeTerm;
 
-          // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk %0 & 6 Ay Ödemesiz / Garanti BBVA / BNP Paribas)
+          // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk / Garanti BBVA / Albaraka / DenizBank)
           const remainingEurAfterTradeIn = (!vehicle.isCustomPrice && fullPriceEurForLoan > 0)
             ? Math.max(0, fullPriceEurForLoan - (Number(eurTradeInValue) || 0))
             : 0;
@@ -2279,21 +2296,21 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           const isZeroEurEligible =
             remainingEurAfterTradeIn > 0 &&
             inlineEurGraceMonths === 0 &&
-            ((activeEurTerm <= 12 && remainingEurAfterTradeIn <= 120000) || (activeEurTerm <= 24 && remainingEurAfterTradeIn <= 80000));
+            ((activeEurTerm <= 12 && remainingEurAfterTradeIn <= 110000) || (activeEurTerm <= 24 && remainingEurAfterTradeIn <= 60000));
 
           let appliedEurRatePct = 0;
           if (remainingEurAfterTradeIn > 0) {
             if (inlineEurGraceMonths === 6) {
-              // ⏳ Kuveyt Türk & Garanti BBVA 6 Ay Ödemesiz Euro Kredisi Resmi Oranları (%0.20 - %0.35)
-              appliedEurRatePct = activeEurTerm <= 18 ? 0.22 : activeEurTerm <= 24 ? 0.27 : 0.33;
+              // ⏳ Kuveyt Türk, Albaraka & Garanti BBVA 6 Ay Ödemesiz Euro Kredisi Resmi Oranları
+              appliedEurRatePct = activeEurTerm <= 24 ? 0.27 : 0.36;
             } else if (isZeroEurEligible) {
               appliedEurRatePct = 0;
             } else if (activeEurTerm <= 12) {
-              appliedEurRatePct = 0.06;
+              appliedEurRatePct = 0.05;
             } else if (activeEurTerm <= 24) {
               appliedEurRatePct = 0.17;
             } else if (activeEurTerm <= 36) {
-              appliedEurRatePct = 0.31;
+              appliedEurRatePct = 0.30;
             } else {
               appliedEurRatePct = 0.38;
             }
@@ -2969,7 +2986,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                               `• Araç Euro Karşılığı: ~€${fullPriceEurForLoan.toLocaleString('tr-TR')} (${fullPriceForLoan.toLocaleString('tr-TR')} TL)\n` +
                               `• Peşinat / Takasımız: €${(Number(eurTradeInValue) || 0).toLocaleString('tr-TR')}\n` +
                               `• İhracatçı Euro Kredisi: €${remainingEurAfterTradeIn.toLocaleString('tr-TR')} (${graceLabel}${activeEurTerm} Ay ~€${monthlyEurPaymentEst.toLocaleString('tr-TR')}/Ay • Oran: %${appliedEurRatePct.toFixed(2)})\n` +
-                              `İhracatçı Euro kredisi (Kuveyt Türk / Garanti BBVA / BNP Paribas) ve firmanıza özel son dip fiyat teklifinizi paylaşabilir misiniz?`;
+                              `İhracatçı Euro kredisi (Kuveyt Türk / Garanti BBVA / Albaraka Türk / DenizBank) ve firmanıza özel son dip fiyat teklifinizi paylaşabilir misiniz?`;
                             if (onDirectWhatsApp) {
                               onDirectWhatsApp(msg);
                             } else {
@@ -3451,15 +3468,25 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
         const totalFirstYearGainTl = kdvAmountTl + incomeTaxShieldTl;
 
         const bankTag = lockedBank ? `${lockedBank.shortName} • ` : '';
+        const getCatalogPrice = (id, fallback) => {
+          const item = tradeInCatalogModels.find(v => v.id === id);
+          if (!item) return fallback;
+          const pp = partnerProtocol ? calculatePartnerVehiclePricing(item, partnerProtocol, tcmbEurRate) : null;
+          return pp ? pp.finalCash : (item.cashPrice || item.campaignPrice || fallback);
+        };
         const summaryRows = [
-          { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: 1850000, campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
-          { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: 2050000, campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
-          { label: 'Daily 70C18 / 72C18 Şasi (7.2 Ton)', gross: 2490000, campaign: `${bankTag}1M TL %0 Faiz veya 6 Ay Ödemesiz Kredi` },
+          { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: getCatalogPrice('daily-35s16-3450-h', 1925000), campaign: `${bankTag}800.000 TL • 8 Ay %0 Faiz (100.000 ₺/Ay)` },
+          { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: getCatalogPrice('daily-35s16-van-3520l-h2', 2150000), campaign: `${bankTag}800.000 TL • 8 Ay %0 Faiz (100.000 ₺/Ay)` },
+          { label: 'Daily 70C16 / 72C16 Şasi (7.2 Ton)', gross: getCatalogPrice('daily-70c16-3750-klima', 2390000), campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
           { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Özel Ticari Kredisi` : 'Anlaşmalı Banka & Katılım Kredisi' },
           { label: 'T-Way 12 Teker Beton Mikseri (8x4)', gross: 5750000, campaign: `${bankTag}5.750.000 TL Nakit / 6.075.000 TL Liste` },
           { label: 'T-Way 12 Teker Hafriyat Damper (8x4)', gross: 5850000, campaign: `${bankTag}5.850.000 TL Nakit / 6.175.000 TL Liste` },
           { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Filo Finansmanı` : 'İhracatçı Euro & TL Filo Finansmanı' }
         ];
+
+        const activeLoanShareSummary = selectedModalVeh?.segment === 'Daily 35'
+          ? '800.000 TL 8 Ay %0 Faiz (100.000 TL/Ay)'
+          : '1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)';
 
         const handleShareFullTaxTable = () => {
           if (onTrackFootprint) {
@@ -3481,7 +3508,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             `🏦 *3. Kurumlar/Gelir Vergisi Kalkanı (%${Math.round(taxEntityRate * 100)}):* *~${incomeTaxShieldTl.toLocaleString('tr-TR')} TL*\n` +
             `✅ *1. Yıl Toplam KDV + Vergi Avantajı:* *~${totalFirstYearGainTl.toLocaleString('tr-TR')} TL*\n\n` +
             `⚡ *Kritik Yıl Sonu Avantajı:* Ticari şasi alımlarında binek araçtaki kıst amortisman ve gider kısıtlaması yoktur. Üstyapının (kasa/frigo/tente) bitmesini beklemeden *ŞASİ faturası hemen kesilip* 2026 vergisinden düşülebilir.\n` +
-            `💳 *Aktif Kredi Kampanyası:* ${lockedBank ? `${lockedBank.name} • ` : ''}1.000.000 TL 12 Ay %0 Faiz (83.333 TL/Ay)\n\n` +
+            `💳 *Aktif Kredi Kampanyası:* ${lockedBank ? `${lockedBank.name} • ` : ''}${activeLoanShareSummary}\n\n` +
             `📞 *Yetkili:* Satış Sorumlusu Can Murat — 0544 622 59 31 (IVECO ERC Samsun Otomotiv)\n` +
             `👇 *Canlı katalog ve tüm modellerin KDV tablosu:*\n${shareUrl}`;
           window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');

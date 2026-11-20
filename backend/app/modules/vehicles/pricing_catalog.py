@@ -1,6 +1,6 @@
 """
 IVECO 2026 Model Fiyat Matrisi ve Dinamik Fiyatlama Kataloğu.
-Eylül 2026 kuralları ile yapılandırılmıştır.
+Kasım 2026 kuralları ile güncellenmiştir.
 """
 from typing import List, Dict, Any, Optional
 
@@ -18,9 +18,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 1845000,
-        "campaign_price": 2095000,
+        "campaign_price": 2115000,
         "cash_discount": 190000,
-        "cash_price": 1905000,
+        "cash_price": 1925000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -37,9 +37,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 1955000,
-        "campaign_price": 2205000,
+        "campaign_price": 2225000,
         "cash_discount": 190000,
-        "cash_price": 2015000,
+        "cash_price": 2035000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -56,9 +56,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 1875000,
-        "campaign_price": 2125000,
+        "campaign_price": 2145000,
         "cash_discount": 190000,
-        "cash_price": 1935000,
+        "cash_price": 1955000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -75,9 +75,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2210000,
-        "campaign_price": 2460000,
+        "campaign_price": 2480000,
         "cash_discount": 190000,
-        "cash_price": 2270000,
+        "cash_price": 2290000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -94,9 +94,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 1975000,
-        "campaign_price": 2035000,
+        "campaign_price": 2055000,
         "cash_discount": 0,
-        "cash_price": 2035000,
+        "cash_price": 2055000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -113,9 +113,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2080000,
-        "campaign_price": 2140000,
+        "campaign_price": 2160000,
         "cash_discount": 0,
-        "cash_price": 2140000,
+        "cash_price": 2160000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -132,9 +132,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2005000,
-        "campaign_price": 2065000,
+        "campaign_price": 2085000,
         "cash_discount": 0,
-        "cash_price": 2065000,
+        "cash_price": 2085000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -151,9 +151,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2110000,
-        "campaign_price": 2170000,
+        "campaign_price": 2190000,
         "cash_discount": 0,
-        "cash_price": 2170000,
+        "cash_price": 2190000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -170,9 +170,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2135000,
-        "campaign_price": 2385000,
+        "campaign_price": 2405000,
         "cash_discount": 190000,
-        "cash_price": 2195000,
+        "cash_price": 2215000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -189,9 +189,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2240000,
-        "campaign_price": 2490000,
+        "campaign_price": 2510000,
         "cash_discount": 190000,
-        "cash_price": 2300000,
+        "cash_price": 2320000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -211,9 +211,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2070000,
-        "campaign_price": 2320000,
+        "campaign_price": 2340000,
         "cash_discount": 190000,
-        "cash_price": 2130000,
+        "cash_price": 2150000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -231,9 +231,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2100000,
-        "campaign_price": 2350000,
+        "campaign_price": 2370000,
         "cash_discount": 190000,
-        "cash_price": 2160000,
+        "cash_price": 2180000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -251,9 +251,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2240000,
-        "campaign_price": 2490000,
+        "campaign_price": 2510000,
         "cash_discount": 190000,
-        "cash_price": 2300000,
+        "cash_price": 2320000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -271,9 +271,9 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "tonnage": "3500 KG",
         "year": "2026",
         "dealer_cost": 2260000,
-        "campaign_price": 2510000,
+        "campaign_price": 2530000,
         "cash_discount": 190000,
-        "cash_price": 2320000,
+        "cash_price": 2340000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -291,7 +291,7 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 3750,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2420000,
+        "dealer_cost": 2289000,  # 2.400.000 resmi maliyet - 111.000 yeşil destek
         "campaign_price": 2500000,
         "cash_discount": 110000,
         "cash_price": 2390000,
@@ -310,7 +310,7 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 3750,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2550000,
+        "dealer_cost": 2419000,  # 2.530.000 resmi maliyet - 111.000 yeşil destek
         "campaign_price": 2630000,
         "cash_discount": 110000,
         "cash_price": 2520000,
@@ -329,7 +329,7 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 4350,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2490000,
+        "dealer_cost": 2359000,  # 2.470.000 resmi maliyet - 111.000 yeşil destek
         "campaign_price": 2570000,
         "cash_discount": 110000,
         "cash_price": 2460000,
@@ -348,7 +348,7 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 4350,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2610000,
+        "dealer_cost": 2479000,  # 2.590.000 resmi maliyet - 111.000 yeşil destek
         "campaign_price": 2690000,
         "cash_discount": 110000,
         "cash_price": 2580000,
@@ -367,10 +367,10 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 4750,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2610000,
-        "campaign_price": 2680000,
+        "dealer_cost": 2590000,  # Resmi baz maliyet (111.000 yeşil destekle net 2.479.000)
+        "campaign_price": 2940000,
         "cash_discount": 260000,
-        "cash_price": 2420000,
+        "cash_price": 2680000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -386,10 +386,10 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "wheelbase": 4750,
         "tonnage": "7000 KG / 7200 KG",
         "year": "2026",
-        "dealer_cost": 2730000,
-        "campaign_price": 2800000,
+        "dealer_cost": 2710000,  # Resmi baz maliyet (111.000 yeşil destekle net 2.599.000)
+        "campaign_price": 3060000,
         "cash_discount": 260000,
-        "cash_price": 2540000,
+        "cash_price": 2800000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -406,10 +406,10 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "body_volume": "19.6 m³",
         "tonnage": "7000 KG",
         "year": "2026",
-        "dealer_cost": 2600000,
-        "campaign_price": 2670000,
+        "dealer_cost": 2580000,  # Resmi maliyet (ek yeşil destek YOK)
+        "campaign_price": 2930000,
         "cash_discount": 260000,
-        "cash_price": 2410000,
+        "cash_price": 2670000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0
@@ -426,10 +426,10 @@ IVECO_PRICING_CATALOG: List[Dict[str, Any]] = [
         "body_volume": "19.6 m³",
         "tonnage": "7000 KG",
         "year": "2026",
-        "dealer_cost": 2720000,
-        "campaign_price": 2790000,
+        "dealer_cost": 2700000,  # Resmi maliyet (ek yeşil destek YOK)
+        "campaign_price": 3050000,
         "cash_discount": 260000,
-        "cash_price": 2530000,
+        "cash_price": 2790000,
         "currency": "TRY",
         "otv_rate": 4.0,
         "kdv_rate": 20.0

@@ -43,6 +43,12 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
   React.useEffect(() => {
     if (lockedBank?.id) {
       setSelectedBankId(lockedBank.id);
+      const hasLm = ['daily35', 'daily70', 'eurocargo'].some(
+        cat => getCampaignsForVehicleAndBank(cat, lockedBank.id).campaigns.length > 0
+      );
+      if (!hasLm && getCampaignsForVehicleAndBank('heavy', lockedBank.id).campaigns.length > 0) {
+        setSelectedVehicleCategory('heavy');
+      }
       if (lockedBank.hasEurCampaigns) {
         setSelectedEurBankId(lockedBank.id);
       } else {
@@ -51,17 +57,21 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
     }
   }, [lockedBank?.id, lockedBank?.hasEurCampaigns]);
 
-  const visibleBanks = useMemo(
-    () => (lockedBank ? BANK_LIST.filter(b => b.id === lockedBank.id) : BANK_LIST),
-    [lockedBank]
-  );
+  const visibleBanks = useMemo(() => {
+    if (lockedBank) return BANK_LIST.filter(b => b.id === lockedBank.id);
+    return BANK_LIST.filter(b => {
+      if (b.id === 'diger_yok') return true;
+      return getCampaignsForVehicleAndBank(selectedVehicleCategory, b.id).campaigns.length > 0;
+    });
+  }, [lockedBank, selectedVehicleCategory]);
 
   const visibleEurBanks = useMemo(
     () => (lockedBank ? EUR_PARTNER_BANKS.filter(b => b.id === lockedBank.id) : EUR_PARTNER_BANKS),
     [lockedBank]
   );
 
-  const effectiveBankId = lockedBank?.id || selectedBankId;
+  const effectiveBankId = lockedBank?.id
+    || (visibleBanks.some(b => b.id === selectedBankId) ? selectedBankId : (visibleBanks[0]?.id || 'teb_cetelem'));
   const effectiveEurBankId = lockedBank?.hasEurCampaigns ? lockedBank.id : selectedEurBankId;
 
   const activeBank = BANK_LIST.find(b => b.id === effectiveBankId) || visibleBanks[0] || BANK_LIST[0];
@@ -154,8 +164,8 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
             {lockedBank
               ? `${lockedBank.bankerName ? `Sayın ${lockedBank.bankerName} portföyüne özel hazırlanan bu ekranda ` : 'Bu özel banka bağlantısında '}yalnızca ${lockedBank.name} resmi ticari taşıt kredisi oranları ve vade seçenekleri listelenmektedir. Seçilen şasi için proforma fatura aynı gün kesilir.`
               : currencyMode === 'EUR'
-                ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA ve BNP Paribas resmi kampanya tablolarından Euro finansman: Kuveyt Türk\'te 24 aya kadar %0 kâr payı, 6 ay ödemesiz dönem ve 60 aya kadar eşit taksit seçenekleri.'
-                : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 800.000 TL - 1.500.000 TL arası %0 faiz; Daily için 2.000.000 TL, 72C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
+                ? '32 Sayılı Karar kapsamında döviz geliri olan ihracatçı ve uluslararası lojistik firmalarına Kuveyt Türk, Garanti BBVA, Albaraka Türk ve DenizBank resmi kampanya tablolarından Euro finansman: Kuveyt Türk\'te €50K-€60K\'da 24 aya kadar, €80K-€110K\'da 12 aya kadar %0 kâr payı, 6 ay ödemesiz dönem ve 60 aya kadar eşit taksit seçenekleri.'
+                : 'Vergi levhalı işletmelere ve KOBİ\'lere özel 800.000 TL - 2.180.000 TL arası %0 faiz; Daily 35 için 2.000.000 TL, Daily 70C & Eurocargo için 4.000.000 TL, S-Way & T-Way için 6.000.000 TL\'ye varan ticari krediler.'}
           </p>
         </div>
         <div style={{
@@ -259,7 +269,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
                 </>
               ) : (
                 <>
-                  Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€80.000 için 24 aya kadar, €90.000 - €110.000 için 12 aya kadar %0 kâr payı</strong> ve 6 ay ödemesiz dönem; Garanti BBVA ve BNP Paribas'ta ise <strong>60 aya kadar çok düşük faizli sabit Euro taksit</strong> imkanı vardır.
+                  Uluslararası taşımacılık (TIR/Lojistik), ihracat taahhüdü veya döviz geliri olan şirketler, Türk Parasını Koruma Kanunu (32 Sayılı Karar) uyarınca <strong>dövizle (Euro) borçlanma hakkına</strong> sahiptir. Örneğin Kuveyt Türk'te <strong>€50.000 - €60.000 için 24 aya kadar, €80.000 - €110.000 için 12 aya kadar %0 kâr payı</strong> ve 6 ay ödemesiz dönem; Garanti BBVA, Albaraka Türk ve DenizBank'ta ise <strong>60 aya kadar çok düşük faizli sabit Euro taksit</strong> imkanı vardır.
                 </>
               )}
             </div>
