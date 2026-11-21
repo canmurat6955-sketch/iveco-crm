@@ -351,7 +351,7 @@ export default function BodyStructureTab({ onSelectBody, onDirectWhatsApp, sales
           <div style={{ fontSize: '0.74rem', color: '#4ade80', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
             🚛 BU KASA İÇİN EN UYUMLU IVECO ŞASİLERİ
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '10px' }}>
             {activeBody.recommendedChassis.map((rc, idx) => (
               <div
                 key={idx}

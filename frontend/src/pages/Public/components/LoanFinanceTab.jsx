@@ -393,7 +393,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
                 Bu bankada seçili tipte Euro paketi yok. Diğer filtreleri deneyin veya satış temsilcimize danışın.
               </div>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '12px' }}>
               {eurPackages.map((preset) => {
                 const isSelected = activeEurPreset?.id === preset.id;
                 return (
@@ -670,11 +670,11 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
             {/* Real Bank Campaigns List from Excel */}
             {realCampaigns && realCampaigns.length > 0 && (
               <div style={{ marginBottom: '22px' }}>
-                <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 800, marginBottom: '8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 800, marginBottom: '8px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px' }}>
                   <span>📋 {activeBank.name} RESMİ KAMPANYA PAKETLERİ ({realCampaigns.length} SEÇENEK)</span>
                   <span style={{ fontSize: '0.68rem', color: '#cbd5e1', fontWeight: 600 }}>Tüm rakamlar resmi banka tablolarından alınmıştır</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 270px), 1fr))', gap: '10px' }}>
                   {realCampaigns.map((camp, idx) => {
                     const isZero = camp.rate === 0;
                     const isGrace = camp.gracePeriodMonths || camp.gracePeriod || (camp.title && camp.title.includes('Ödemesiz'));
@@ -794,7 +794,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
           Ticari Araç Alımında Şirketinizin Elde Ettiği Nakit & Vergi Avantajları
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '14px' }}>
           <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#38bdf8', marginBottom: '4px' }}>
               💰 1. %20 KDV'nin Tamamını İndirim Konusu Yapma

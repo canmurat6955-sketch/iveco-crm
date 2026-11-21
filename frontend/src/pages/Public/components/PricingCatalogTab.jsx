@@ -1496,11 +1496,11 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexWrap: isMobileView ? 'nowrap' : 'wrap',
+          flexWrap: 'wrap',
           gap: '8px',
           boxShadow: '0 4px 14px rgba(16, 185, 129, 0.14)'
         }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: '1 1 210px', minWidth: 0 }}>
             <div style={{ fontSize: isMobileView ? '0.65rem' : '0.68rem', fontWeight: 900, color: '#4ade80', letterSpacing: '0.2px' }}>
               {referralBannerInfo.badge}
             </div>
@@ -2201,7 +2201,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
       )}
 
       {/* Vehicle Grid — ÖNCE SONUÇ, MÜŞTERİ İSTERSE DETAY */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))', gap: isMobileView ? '12px' : '14px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? '1fr' : 'repeat(auto-fill, minmax(min(100%, 335px), 1fr))', gap: isMobileView ? '12px' : '14px' }}>
         {filteredVehicles.map(vehicle => {
           const sticker = getVehicleSticker(vehicle);
           const partnerPricing = partnerProtocol
@@ -2349,7 +2349,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                position: 'relative'
+                position: 'relative',
+                minWidth: 0,
+                overflow: 'hidden'
               }}
             >
               {/* Üst Rozetler */}
@@ -3326,15 +3328,17 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                       color: '#fff',
                       border: isInlineCalcOpen ? '1.5px solid #38bdf8' : 'none',
                       borderRadius: '10px',
-                      padding: isMobileView ? '11px 8px' : '10px 10px',
-                      fontSize: isMobileView ? '0.78rem' : '0.76rem',
+                      padding: isMobileView ? '10px 6px' : '10px 8px',
+                      fontSize: isMobileView ? '0.74rem' : '0.75rem',
                       fontWeight: 900,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '5px',
-                      whiteSpace: 'nowrap'
+                      gap: '4px',
+                      whiteSpace: 'normal',
+                      textAlign: 'center',
+                      lineHeight: 1.2
                     }}
                   >
                     💳 {isInlineCalcOpen ? 'Hesabı Kapat ▴' : 'Taksit & Takas Hesapla'}
@@ -3352,15 +3356,17 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
                     color: vehicle.isCustomPrice ? '#0f172a' : '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: isMobileView ? '11px 8px' : '10px 10px',
-                    fontSize: isMobileView ? '0.76rem' : '0.75rem',
+                    padding: isMobileView ? '10px 6px' : '10px 8px',
+                    fontSize: isMobileView ? '0.74rem' : '0.75rem',
                     fontWeight: 900,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '5px',
-                    whiteSpace: 'nowrap',
+                    gap: '4px',
+                    whiteSpace: 'normal',
+                    textAlign: 'center',
+                    lineHeight: 1.2,
                     boxShadow: '0 4px 12px rgba(34, 197, 94, 0.28)'
                   }}
                 >

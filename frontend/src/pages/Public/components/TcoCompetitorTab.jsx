@@ -779,7 +779,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
               flexWrap: 'wrap'
             }}>
               <div style={{ fontSize: '2rem' }}>💡</div>
-              <div style={{ flex: 1, minWidth: '280px' }}>
+              <div style={{ flex: 1, minWidth: 'min(100%, 280px)' }}>
                 <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#fbbf24', marginBottom: '3px' }}>
                   Filo Yöneticileri İçin 25.000 km Bakım, Çelik Zincir ve 3 Parça Tamponun Gerçek TCO Etkisi
                 </div>
