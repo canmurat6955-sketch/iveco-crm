@@ -360,7 +360,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           : `🎁 *Size Özel Tanımlanan İndirim:* Tüm 2026 modellerde *Araç Başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL Özel İndirim* fiyatlardan otomatik düşülmüştür!\n`)
       : '';
     const eurBonusLine = isEurLoanActive
-      ? `💶 *İhracatçı Euro (€) Kredisi Avantajı:* 32 Sayılı Karar kapsamında ihracatçı firmalarımıza özel *Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) Kredi* taksitlerini ekranınızda doğrudan Euro bazında hesaplayabilirsiniz!\n`
+      ? `💶 *İhracatçı Euro (€) Kredisi Avantajı:* 32 Sayılı Karar kapsamında ihracatçı firmalarımıza özel *Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve Albaraka Türk & DenizBank Euro (€) Kredi* taksitlerini ekranınızda doğrudan Euro bazında hesaplayabilirsiniz!\n`
       : '';
 
     // 📧 KURUMSAL E-POSTA / MAİL ŞABLONLARI (Düz Metin, Resmi Hitap, İmza Bloğu ve Özel Link)
@@ -372,7 +372,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
             : `\n• FİRMANIZA ÖZEL TANIMLI İNDİRİM: Aşağıdaki bağlantıda tüm 2026 model araçlarımızda firmanıza özel araç başı ${Number(channelDiscountValue).toLocaleString('tr-TR')} TL kurumsal indirim fiyatlardan otomatik olarak düşülmüştür.\n`)
         : '';
       const plainEurBonusLine = isEurLoanActive
-        ? `\n• İHRACATÇI EURO (€) KREDİSİ AVANTAJI (32 Sayılı Karar): İhracatçı / döviz gelirli firmanıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve BNP Paribas Euro (€) kredi taksitlerini bağlantıdaki her araç kartı içinde doğrudan Euro bazında simüle edebilirsiniz.\n`
+        ? `\n• İHRACATÇI EURO (€) KREDİSİ AVANTAJI (32 Sayılı Karar): İhracatçı / döviz gelirli firmanıza özel Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA ve Albaraka Türk & DenizBank Euro (€) kredi taksitlerini bağlantıdaki her araç kartı içinde doğrudan Euro bazında simüle edebilirsiniz.\n`
         : '';
 
       const groupLabels = selectedVehicleGroups.length > 0
@@ -391,7 +391,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
           `${targetCompany}\n\n` +
           `İhracat ve uluslararası lojistik operasyonlarınız kapsamında; 32 Sayılı Karar uyarınca döviz gelirli firmalarımıza özel hazırladığımız "2026 Model IVECO İhracatçı Euro (€) Kredisi, %20 KDV Kalkanı & Filo Teklifimizi" bilgilerinize sunarız:\n` +
           plainDiscountLine +
-          `\n1. İhracatçıya Özel Euro (€) Finansmanı: Yüksek TL kredi maliyetlerine girmeden; Kuveyt Türk (%0 Kâr Payı veya 6 Ay Ödemesiz Dönem), Garanti BBVA ve BNP Paribas anlaşmalı Euro (€) kredi paketlerimizle 12 aydan 60 aya varan Euro bazlı taksit imkanı sunuyoruz.\n` +
+          `\n1. İhracatçıya Özel Euro (€) Finansmanı: Yüksek TL kredi maliyetlerine girmeden; Kuveyt Türk (%0 Kâr Payı veya 6 Ay Ödemesiz Dönem), Garanti BBVA ve Albaraka Türk & DenizBank anlaşmalı Euro (€) kredi paketlerimizle 12 aydan 60 aya varan Euro bazlı taksit imkanı sunuyoruz.\n` +
           `2. Kapsanan Araç Grupları: ${groupLabels} (S-Way Çekici, Eurocargo, Daily 70C ve 3.5T serisi dahil tüm ticari modellerimiz).\n` +
           `3. %20 KDV Mahsubu & Tam Amortisman: Fatura içindeki %20 KDV'nin tamamı doğrudan mahsup edilir ve kıst amortisman sınırı olmaksızın 1. yıl %20 tam amortisman gider yazılır. Üstyapıyı beklemeden hemen şasi faturası kesebilmekteyiz.\n\n` +
           `Firmanıza özel Euro (€) kredi taksit hesaplayıcısı açık olarak hazırlanan dijital katalog bağlantımız:\n\n` +
@@ -540,7 +540,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `İhracatçı ve döviz gelirli firmalarımızın yüksek TL faiz maliyetine girmeden *32 Sayılı Karar kapsamında Euro (€) Kredisiyle* ticari araç alabilmesi için hazırladığımız *İhracatçı Özel Euro (€) Finansman & Fiyat Ekranımızı* aşağıya bıraktım${discountShortNote}:\n\n` +
         discountLine +
         `🇪🇺 *Kuveyt Türk %0 Kâr Payı & 6 Ay Ödemesiz Euro Kredisi:* Aracınızı bugün teslim alın, ilk Euro taksitini 6 ay sonra ödeyin veya 12 Ay %0 kâr payı avantajından yararlanın.\n` +
-        `💶 *Garanti BBVA & BNP Paribas 12-60 Ay Euro Paketleri:* S-Way Çekici, Eurocargo, T-Way ve Daily serisi tüm araçlarımızda kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
+        `💶 *Garanti BBVA & Albaraka Türk & DenizBank 12-60 Ay Euro Paketleri:* S-Way Çekici, Eurocargo, T-Way ve Daily serisi tüm araçlarımızda kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
         `🧾 *%20 KDV Mahsubu & Hemen Şasi Faturası:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV ve tam amortisman avantajını kullanabilirsiniz 👇\n\n` +
         `📞 *Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
@@ -900,7 +900,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
         `Ben IVECO ERC Samsun Otomotiv *Satış Sorumlusu Can Murat* (0544 622 59 31).\n\n` +
         `İhracatçı ve döviz gelirli firmalarımızın yüksek TL faiz maliyetine girmeden *32 Sayılı Karar kapsamında Euro (€) Kredisiyle* ticari araç alabilmesi için firmanıza özel hazırladığımız *İhracatçı Euro (€) Finansman & %20 KDV Ekranımızı* bilgilerinize sunarım:\n\n` +
         `🇪🇺 *Kuveyt Türk %0 Kâr Payı & 6 Ay Ödemesiz Euro Kredisi:* Aracınızı bugün teslim alın, ilk Euro taksitini 6 ay sonra ödeyin veya 12 Ay %0 kâr payı avantajından yararlanın.\n` +
-        `💶 *Garanti BBVA & BNP Paribas 12-60 Ay Euro Paketleri:* ${modelNote}tüm 2026 modellerimizde kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
+        `💶 *Garanti BBVA & Albaraka Türk & DenizBank 12-60 Ay Euro Paketleri:* ${modelNote}tüm 2026 modellerimizde kart içindeki *"Taksit & Takas Hesapla"* tuşuyla aylık Euro (€) taksitinizi anında görebilirsiniz.\n` +
         `🧾 *%20 KDV & Hemen Şasi Faturası:* Üstyapıyı beklemeden şasi faturanızı hemen kesip %20 KDV ve tam amortisman avantajını kullanabilirsiniz 👇\n\n` +
         `*Satış Sorumlusu Can Murat — 0544 622 59 31*\n\n` +
         `${link}`
@@ -1841,7 +1841,7 @@ export default function PartnerLinkGeneratorCard({ isMobile = false }) {
                     </label>
                     {enableExporterEurLoan && (
                       <div style={{ fontSize: '0.67rem', color: '#bfdbfe', marginTop: '4px', lineHeight: 1.3 }}>
-                        ✓ Müşteri linki açtığında Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & BNP Paribas <strong>Euro (€) Kredi Hesaplayıcısı</strong> otomatik seçili gelir ve mesaja Euro kredisi bilgisi eklenir.
+                        ✓ Müşteri linki açtığında Kuveyt Türk (%0 Kâr Payı / 6 Ay Ödemesiz), Garanti BBVA & Albaraka Türk & DenizBank <strong>Euro (€) Kredi Hesaplayıcısı</strong> otomatik seçili gelir ve mesaja Euro kredisi bilgisi eklenir.
                       </div>
                     )}
                   </div>

@@ -3129,10 +3129,23 @@ export const EUR_PARTNER_BANKS = [
 ];
 
 export function calculateEurLoan(principal, termMonths = 36, annualRatePct = 5.49) {
-  const p = Number(principal) || 0;
-  const n = Number(termMonths) || 12;
-  const annualRate = Number(annualRatePct) || 5.49;
-  if (p <= 0 || n <= 0) return { monthly: 0, total: 0, totalInterest: 0 };
+  const p = Number(principal);
+  const n = termMonths === '' || termMonths == null ? 12 : Number(termMonths);
+  const annualRate = annualRatePct === '' || annualRatePct == null ? 5.49 : Number(annualRatePct);
+  if (!Number.isFinite(p) || p <= 0 || !Number.isFinite(n) || n <= 0 || !Number.isFinite(annualRate) || annualRate < 0) {
+    return { monthly: 0, total: 0, totalInterest: 0 };
+  }
+  if (annualRate === 0) {
+    const monthly = Math.round(p / n);
+    return {
+      principal: p,
+      termMonths: n,
+      annualRatePct: 0,
+      monthly,
+      total: p,
+      totalInterest: 0
+    };
+  }
   const r = (annualRate / 100) / 12;
   const factor = Math.pow(1 + r, n);
   const monthly = Math.round(p * (r * factor) / (factor - 1));

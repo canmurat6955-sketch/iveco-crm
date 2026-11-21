@@ -24,71 +24,55 @@ class AuthService:
     def get_all_users(self):
         return self.db.query(User).all()
 
-    def _ensure_default_user(self, email: str, role: str, name: str) -> User:
-        """Helper to guarantee default user exists with working credentials."""
-        user = self.get_user_by_email(email)
-        if not user:
-            user = User(
-                email=email,
-                hashed_password=get_password_hash("barlas.1992"),
-                full_name=name,
-                role=role,
-                is_active=True,
-            )
-            self.db.add(user)
-            self.db.commit()
-            self.db.refresh(user)
-        else:
-            if not user.is_active or not verify_password("barlas.1992", user.hashed_password):
-                user.is_active = True
-                user.hashed_password = get_password_hash("barlas.1992")
-                self.db.commit()
-        return user
+    # Kısa kullanıcı adları (yalnızca e-posta eşlemesi; parola doğrulaması HER ZAMAN yapılır)
+    _ADMIN_ALIASES = {"admin", "admin@iveco-crm.local", "yonetici"}
+    _SALES_ALIASES = {"satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"}
+
+    @staticmethod
+    def _check_password(plain: str, hashed: str) -> bool:
+        """bcrypt doğrulaması. Giriş ekranı kodu küçük harfe çevirdiği için
+        hem girilen hâli hem küçük harf hâlini dener."""
+        if not plain or not hashed:
+            return False
+        for candidate in (plain, plain.lower()):
+            try:
+                if verify_password(candidate, hashed):
+                    return True
+            except Exception:
+                continue
+        return False
 
     def authenticate_user(self, email_or_identifier: str, password: str) -> Optional[User]:
+        """Yalnızca DB'deki bcrypt hash ile doğrulama.
+        Bilinmeyen kullanıcı → None (admin'e düşme YOK), kodda sabit parola YOK."""
         clean_id = (email_or_identifier or "").strip().lower()
         clean_pwd = (password or "").strip()
+        if not clean_id or not clean_pwd:
+            return None
 
-        # Check if identifier is an alias/passcode
-        is_admin_alias = clean_id in ["barlas.1992", "admin.barlas.1992", "admin", "admin@iveco-crm.local", "yonetici"]
-        is_sales_alias = clean_id in ["satis.barlas.1992", "satis", "satis@iveco-crm.local", "king", "iveco", "ivecocrm"]
-
-        user = None
-        if is_admin_alias:
-            user = self.get_user_by_email("admin@iveco-crm.local") or self._ensure_default_user("admin@iveco-crm.local", "admin", "Sistem Yöneticisi")
-        elif is_sales_alias:
-            user = self.get_user_by_email("satis@iveco-crm.local") or self._ensure_default_user("satis@iveco-crm.local", "sales_rep", "King Temsilcisi")
+        if clean_id in self._ADMIN_ALIASES:
+            user = self.get_user_by_email("admin@iveco-crm.local")
+        elif clean_id in self._SALES_ALIASES:
+            user = self.get_user_by_email("satis@iveco-crm.local")
         else:
-            user = self.get_user_by_email(email_or_identifier.strip())
-
-        # If user still not found, check if there's any active admin/user or fallback to admin
-        if not user:
-            user = self.db.query(User).filter(User.role == "admin", User.is_active == True).first()
-            if not user:
-                user = self._ensure_default_user("admin@iveco-crm.local", "admin", "Sistem Yöneticisi")
+            user = self.get_user_by_email((email_or_identifier or "").strip())
 
         if not user or not user.is_active:
             return None
-
-        # Master passcodes accepted for quick company mobile login (barlas.1992)
-        master_passwords = {"barlas.1992", "admin.barlas.1992", "admin123", "satis123"}
-        if clean_pwd.lower() in master_passwords or clean_id in master_passwords:
-            # Sync hash if needed
-            try:
-                if not verify_password("barlas.1992", user.hashed_password):
-                    user.hashed_password = get_password_hash("barlas.1992")
-                    self.db.commit()
-            except Exception:
-                pass
+        if self._check_password(clean_pwd, user.hashed_password):
             return user
+        return None
 
-        # Standard password verification
-        try:
-            if verify_password(clean_pwd, user.hashed_password):
+    def authenticate_passcode(self, code: str) -> Optional[User]:
+        """Mobil hızlı giriş: tek kod, varsayılan admin ve satış kullanıcılarının
+        kendi parolalarıyla (bcrypt) karşılaştırılır. Sabit/master kod yoktur."""
+        clean_code = (code or "").strip()
+        if not clean_code:
+            return None
+        for email in ("admin@iveco-crm.local", "satis@iveco-crm.local"):
+            user = self.get_user_by_email(email)
+            if user and user.is_active and self._check_password(clean_code, user.hashed_password):
                 return user
-        except Exception:
-            pass
-
         return None
 
     def create_user(self, user_data: UserCreate) -> User:

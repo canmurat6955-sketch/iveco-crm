@@ -1331,7 +1331,8 @@ class DiscoveryService:
                     customer = existing
                     if not customer.pipeline_stage:
                         customer.pipeline_stage = "lead"
-                    customer.pipeline_note = f"Araç Seçici İlgisi: {data.target_model}"
+                    if not customer.pipeline_note:
+                        customer.pipeline_note = f"Araç Seçici İlgisi: {data.target_model}"
                     self.db.add(customer)
 
                 ci = CustomerInteraction(

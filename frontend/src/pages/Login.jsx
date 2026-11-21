@@ -79,7 +79,7 @@ export default function Login() {
       }
 
       // 2. YOL: Klasik OAuth2 form girişi ile tek bir geri dönüş denemesi
-      const isAdmin = clean === 'barlas.1992' || clean.includes('admin') || clean === 'yonetici';
+      const isAdmin = clean.includes('admin') || clean === 'yonetici';
       const targetEmail = isAdmin ? 'admin@iveco-crm.local' : 'satis@iveco-crm.local';
 
       try {

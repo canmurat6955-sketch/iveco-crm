@@ -2276,6 +2276,8 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           }
 
           const monthlyRate = appliedTlRatePct / 100;
+          // Ticari taşıt kredilerinde faiz/kâr payı üzerinden %5 BSMV uygulanır (resmi banka tabloları ile tam uyum)
+          const effectiveMonthlyRate = inlineGraceMonths === 6 ? monthlyRate : monthlyRate * 1.05;
           const effectiveTlPrincipalForCalc =
             inlineGraceMonths === 6 && remainingAfterTradeIn > 0
               ? remainingAfterTradeIn * Math.pow(1 + monthlyRate, 6) // 6 ay ödemesiz dönem kâr payı bileşimi (Kuveyt/Albaraka resmi tablo uyumlu)
@@ -2285,8 +2287,12 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
             ? 0
             : isZeroInterestEligible
               ? Math.round(remainingAfterTradeIn / activeTerm)
-              : Math.round((effectiveTlPrincipalForCalc * monthlyRate * Math.pow(1 + monthlyRate, activeTerm)) / (Math.pow(1 + monthlyRate, activeTerm) - 1));
-          const totalTlRepaymentEst = monthlyPaymentEst * activeTerm;
+              : Math.round((effectiveTlPrincipalForCalc * effectiveMonthlyRate * Math.pow(1 + effectiveMonthlyRate, activeTerm)) / (Math.pow(1 + effectiveMonthlyRate, activeTerm) - 1));
+          const totalTlRepaymentEst = remainingAfterTradeIn <= 0
+            ? 0
+            : isZeroInterestEligible
+              ? remainingAfterTradeIn
+              : monthlyPaymentEst * activeTerm;
 
           // 💶 İhracatçı Euro (€) Kredisi Hesaplamaları (32 Sayılı Karar - Kuveyt Türk / Garanti BBVA / Albaraka / DenizBank)
           const remainingEurAfterTradeIn = (!vehicle.isCustomPrice && fullPriceEurForLoan > 0)
@@ -3459,7 +3465,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           : null;
         const baseInvoiceTl = selectedModalVeh?.currency === 'EUR'
           ? Math.round(((modalPartnerPricing ? modalPartnerPricing.finalEur : (selectedModalVeh.eurPrice || selectedModalVeh.cashPrice || 123000)) * tcmbEurRate) * 1.20)
-          : (modalPartnerPricing ? modalPartnerPricing.finalCash : (selectedModalVeh?.cashPrice || selectedModalVeh?.campaignPrice || 1850000));
+          : (modalPartnerPricing ? modalPartnerPricing.finalCash : (selectedModalVeh?.cashPrice || selectedModalVeh?.campaignPrice || 1925000));
         const activeInvoiceTl = customTaxInvoiceTl > 0 ? Number(customTaxInvoiceTl) : baseInvoiceTl;
         const netMatrahTl = Math.round(activeInvoiceTl / 1.20);
         const kdvAmountTl = activeInvoiceTl - netMatrahTl;
@@ -3478,10 +3484,10 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
           { label: 'Daily 35S16 / 35C16 Şasi (B Ehliyet)', gross: getCatalogPrice('daily-35s16-3450-h', 1925000), campaign: `${bankTag}800.000 TL • 8 Ay %0 Faiz (100.000 ₺/Ay)` },
           { label: 'Daily 35S16 Panelvan (12m³ - 16m³)', gross: getCatalogPrice('daily-35s16-van-3520l-h2', 2150000), campaign: `${bankTag}800.000 TL • 8 Ay %0 Faiz (100.000 ₺/Ay)` },
           { label: 'Daily 70C16 / 72C16 Şasi (7.2 Ton)', gross: getCatalogPrice('daily-70c16-3750-klima', 2390000), campaign: `${bankTag}1.000.000 TL • 12 Ay %0 Faiz (83.333 ₺/Ay)` },
-          { label: 'Eurocargo 150E21 / 180E25 Şasi', gross: Math.round(92000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Özel Ticari Kredisi` : 'Anlaşmalı Banka & Katılım Kredisi' },
-          { label: 'T-Way 12 Teker Beton Mikseri (8x4)', gross: 5750000, campaign: `${bankTag}5.750.000 TL Nakit / 6.075.000 TL Liste` },
-          { label: 'T-Way 12 Teker Hafriyat Damper (8x4)', gross: 5850000, campaign: `${bankTag}5.850.000 TL Nakit / 6.175.000 TL Liste` },
-          { label: 'S-Way 530 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Filo Finansmanı` : 'İhracatçı Euro & TL Filo Finansmanı' }
+          { label: 'Eurocargo 150E21 / 160E32 Şasi', gross: getCatalogPrice('eurocargo-mlc-150e21-4185', 4080000), campaign: lockedBank ? `${lockedBank.name} Özel Ticari Kredisi` : 'Anlaşmalı Banka & Katılım Kredisi' },
+          { label: 'T-Way 12 Teker Beton Mikseri (8x4)', gross: getCatalogPrice('tway-ad410t46-8x4', 5750000), campaign: `${bankTag}5.750.000 TL Nakit / 6.075.000 TL Liste` },
+          { label: 'T-Way 12 Teker Hafriyat Damper (8x4)', gross: getCatalogPrice('tway-ad410t54-8x4', 5850000), campaign: `${bankTag}5.850.000 TL Nakit / 6.175.000 TL Liste` },
+          { label: 'S-Way 500 / 580 4x2 Çekici (Euro + KDV)', gross: Math.round(123000 * tcmbEurRate * 1.20), campaign: lockedBank ? `${lockedBank.name} Filo Finansmanı` : 'İhracatçı Euro & TL Filo Finansmanı' }
         ];
 
         const activeLoanShareSummary = selectedModalVeh?.segment === 'Daily 35'

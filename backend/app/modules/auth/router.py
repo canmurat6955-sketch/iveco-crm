@@ -15,6 +15,7 @@ from app.modules.auth.schemas import (
     TokenResponse,
     UserCreate,
     UserUpdate,
+    UserSelfUpdate,
     UserResponse,
     PasswordChange,
 )
@@ -84,7 +85,7 @@ def login_with_passcode(
     """Giriş kodu ile doğrudan mobil hızlı giriş."""
     ip = _check_rate(request)
     service = AuthService(db)
-    user = service.authenticate_user(payload.code, payload.code)
+    user = service.authenticate_passcode(payload.code)
     if not user:
         _register_fail(ip)
         raise HTTPException(
@@ -119,11 +120,11 @@ def get_me(current_user=Depends(get_current_user)):
 
 @router.put("/me", response_model=UserResponse)
 def update_me(
-    user_data: UserUpdate,
+    user_data: UserSelfUpdate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    """Profil bilgilerini günceller."""
+    """Profil bilgilerini günceller (yalnızca ad-soyad; rol/aktiflik değiştirilemez)."""
     service = AuthService(db)
     return service.update_user(current_user.id, user_data)
 

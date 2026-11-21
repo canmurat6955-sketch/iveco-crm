@@ -318,7 +318,7 @@ const VIDEO_SCENARIOS = [
       },
       {
         badge: 'İHRACATÇI 3 / 4 • KUVEYT TÜRK %0 KÂR PAYI & 6 AY ÖDEMESİZ',
-        title: 'Kuveyt Türk %0 Kâr Payı • Garanti BBVA • BNP Paribas',
+        title: 'Kuveyt Türk %0 Kâr Payı • Garanti BBVA • Albaraka & DenizBank',
         subtitle: 'S-Way Çekici, Eurocargo, T-Way ve Daily serisinde 6 ay ödemesiz veya 60 aya varan Euro vade.',
         voiceover: "Kuveyt Türk'te sıfır kâr payı veya altı ay ödemesiz Euro finansmanı kullanın.",
         audioUrl: '/audio/wa-scenarios/ihracat_euro_3.mp3',
@@ -819,7 +819,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
           '🇪🇺  32 Sayılı Karar kapsamında İhracatçıya Özel Euro (€) Kredisi',
           '💶  Kart içinde "🇹🇷 TL Kredi | 💶 İhracatçı Euro Kredisi" sekmesi',
           '🔥  Kuveyt Türk 12-24 Ay %0 Kâr Payı veya 6 Ay Ertelemeli Euro',
-          '🏦  Garanti BBVA & BNP Paribas 12 - 24 - 36 - 48 Ay Euro Taksit',
+          '🏦  Garanti BBVA & Albaraka & DenizBank 12 - 24 - 36 - 48 Ay Euro Taksit',
           '💬  Euro ödeme planınızla birlikte özel filo dip fiyatını sorun'
         ],
         santiye_tway: [
@@ -1087,7 +1087,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.fillText('🇪🇺 32 SAYILI KARAR • İHRACATÇI & DÖVİZ GELİRLİ FİRMALARA ÖZEL EURO (€) KREDİSİ', contentX + 24, phoneY + 142);
       ctx.fillStyle = '#ffffff';
       ctx.font = '900 25px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('Kuveyt Türk %0 Kâr Payı & 6 Ay Erteleme • Garanti BBVA • BNP Paribas', contentX + 24, phoneY + 182);
+      ctx.fillText('Kuveyt Türk %0 Kâr Payı & 6 Ay Erteleme • Garanti BBVA • Albaraka & DenizBank', contentX + 24, phoneY + 182);
       ctx.fillStyle = '#fde047';
       ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
       ctx.fillText('S-Way Çekici, Eurocargo, T-Way ve Daily serisinde kart içi canlı Euro (€) taksit hesabı!', contentX + 24, phoneY + 214);
@@ -1168,7 +1168,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.fillText('NET EURO FİYATI: €123.000 (+KDV)', contentX + 26, cardY + 98);
       ctx.fillStyle = '#93c5fd';
       ctx.font = '700 18px "Segoe UI", Inter, Arial, sans-serif';
-      ctx.fillText('🇪🇺 Kuveyt Türk %0 Kâr Payı & 6 Ay Erteleme • Garanti BBVA • BNP Paribas', contentX + 26, cardY + 132);
+      ctx.fillText('🇪🇺 Kuveyt Türk %0 Kâr Payı & 6 Ay Erteleme • Garanti BBVA • Albaraka & DenizBank', contentX + 26, cardY + 132);
 
       const calcY = cardY + 158;
       drawRoundedRect(ctx, contentX + 22, calcY, contentW - 44, 662, 20);
@@ -1302,7 +1302,7 @@ export default function WhatsAppGuideVideoModal({ isOpen, onClose }) {
       ctx.fillText(
         isGraceEur
           ? '⏳ Aracı hemen teslim alıp çalıştırın, ilk Euro taksitini 6 ay sonra ödeyin!'
-          : '🇪🇺 Kuveyt Türk %0 Kâr Payı, Garanti BBVA & BNP Paribas Resmi Euro Tablosu',
+          : '🇪🇺 Kuveyt Türk %0 Kâr Payı, Garanti BBVA & Albaraka & DenizBank Resmi Euro Tablosu',
         contentX + 66,
         calcY + 492
       );

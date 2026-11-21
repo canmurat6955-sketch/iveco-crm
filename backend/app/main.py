@@ -149,33 +149,32 @@ def _seed_initial_data():
 
     db = SessionLocal()
     try:
-        # Varsayılan kullanıcılar yoksa oluştur (mevcut şifreler artık her açılışta SIFIRLANMAZ)
+        # Varsayılan kullanıcılar yoksa oluştur (mevcut şifreler her açılışta SIFIRLANMAZ)
+        initial_pwd = os.environ.get("INITIAL_ADMIN_PASSWORD", "barlas.1992")
         admin = db.query(User).filter(User.email == "admin@iveco-crm.local").first()
         if not admin:
             admin = User(
                 email="admin@iveco-crm.local",
-                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "barlas.1992")),
+                hashed_password=get_password_hash(initial_pwd),
                 full_name="Sistem Yöneticisi",
                 role="admin",
                 is_active=True,
             )
             db.add(admin)
-        else:
-            admin.hashed_password = get_password_hash("barlas.1992")
+        elif not admin.is_active:
             admin.is_active = True
 
         sales_rep = db.query(User).filter(User.email == "satis@iveco-crm.local").first()
         if not sales_rep:
             sales_rep = User(
                 email="satis@iveco-crm.local",
-                hashed_password=get_password_hash(os.environ.get("INITIAL_ADMIN_PASSWORD", "barlas.1992")),
-                full_name="King Temsilcisi",
+                hashed_password=get_password_hash(initial_pwd),
+                full_name="Can Murat Onay",
                 role="sales_rep",
                 is_active=True,
             )
             db.add(sales_rep)
-        else:
-            sales_rep.hashed_password = get_password_hash("barlas.1992")
+        elif not sales_rep.is_active:
             sales_rep.is_active = True
 
         db.commit()

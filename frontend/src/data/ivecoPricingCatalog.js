@@ -719,12 +719,13 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
   }
 
   if (vehicle.currency === 'EUR') {
-    // S-Way Çekici
+    // S-Way Çekici (EUR fiyatlar KDV hariç baz fiyat olup fatura/kredi TL karşılığı %20 KDV dahildir)
     const eurVal = vehicle.eurPrice || 123000;
     basePrice = eurVal;
     discount = 0;
     finalPrice = eurVal;
-    const tryEquivalent = Math.round(finalPrice * eurExchangeRate);
+    const tryNetMatrah = Math.round(finalPrice * eurExchangeRate);
+    const tryEquivalent = Math.round(finalPrice * eurExchangeRate * 1.20);
 
     return {
       currency: 'EUR',
@@ -733,6 +734,7 @@ export function calculatePricing(vehicle, paymentType = 'cash', options = {}) {
       basePrice,
       discount,
       finalPrice,
+      tryNetMatrah,
       tryEquivalent,
       paymentType,
       isCash: paymentType === 'cash'

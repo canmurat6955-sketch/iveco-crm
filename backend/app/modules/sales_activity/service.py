@@ -882,21 +882,23 @@ class SalesActivityService:
         now = datetime.now(timezone.utc)
 
         if existing_cust:
-            existing_cust.pipeline_stage = "lead"
-            existing_cust.pipeline_note = f"Yeni Kampanya Talebi: {vehicle_interest} ({notes[:120]})"
+            if not existing_cust.pipeline_stage:
+                existing_cust.pipeline_stage = "lead"
+            if not existing_cust.pipeline_note:
+                existing_cust.pipeline_note = f"Yeni Kampanya Talebi: {vehicle_interest} ({notes[:120]})"
             existing_cust.updated_at = now
             self.db.commit()
             cust_id = existing_cust.id
             is_new = False
         else:
             new_cust = Customer(
-                company_name=company_name,
-                phone=phone,
-                city=city,
-                district=district,
+                company_name=str(company_name)[:250],
+                phone=str(phone)[:48] if phone else None,
+                city=str(city)[:95],
+                district=str(district)[:95],
                 pipeline_stage="lead",
                 pipeline_note=f"Meta/Web Talebi: {vehicle_interest} ({notes[:120]})",
-                segment=vehicle_interest,
+                segment="A",
                 potential_score=75,
                 sector="Taşımacılık / Lojistik",
                 created_at=now,

@@ -4,6 +4,8 @@ Handles multi-device session pairing, status management,
 direct message dispatch, and sales rep lead notifications.
 """
 from datetime import datetime, timezone
+import os
+import re
 import secrets
 import urllib.parse
 import urllib.request
@@ -12,9 +14,27 @@ from sqlalchemy.orm import Session
 
 from app.modules.whatsapp.models import WhatsAppSession, WhatsAppMessageLog
 
-DEFAULT_CALLMEBOT_APIKEY = "6810148"
-DEFAULT_NTFY_TOPIC = "iveco_can_murat_5931"
+DEFAULT_CALLMEBOT_APIKEY = os.environ.get("CALLMEBOT_APIKEY", "6810148")
+DEFAULT_NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "iveco_can_murat_5931")
 _LAST_PORTAL_ALERT_TS: Dict[str, float] = {}
+
+
+def _mask_apikey(key: Optional[str]) -> str:
+    if not key:
+        return ""
+    if len(key) <= 3:
+        return "***"
+    return "***" + key[-2:]
+
+
+def _redact_phones_for_public_ntfy(text: str) -> str:
+    """Public ntfy.sh kanalına KVKK gereği müşteri telefon numarası gönderilmez."""
+    if not text:
+        return ""
+    # wa.me linklerini ve telefon numaralarını maskele
+    cleaned = re.sub(r"https?://wa\.me/\d+", "[CRM Panelinde]", text)
+    cleaned = re.sub(r"(?:\+?90|0)?\s*5\d{2}[\s\-]*\d{3}[\s\-]*\d{2}[\s\-]*\d{2}", "[Telefon CRM'de]", cleaned)
+    return cleaned
 
 
 class WhatsAppService:
@@ -147,7 +167,7 @@ class WhatsAppService:
             "display_name": session.display_name,
             "notify_phone": session.notify_phone,
             "auto_notify_rep": session.auto_notify_rep,
-            "callmebot_apikey": apikey,
+            "callmebot_apikey": _mask_apikey(apikey),
             "has_callmebot_key": bool(apikey),
             "ntfy_topic": DEFAULT_NTFY_TOPIC,
             "ntfy_url": f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}",
@@ -173,10 +193,12 @@ class WhatsAppService:
             session.auto_notify_rep = auto_notify_rep
         if callmebot_apikey is not None:
             clean_key = callmebot_apikey.strip()
-            session.qr_data = f"callmebot:{clean_key}" if clean_key else None
-            if clean_key:
-                session.status = "connected"
-                session.connected_at = datetime.now(timezone.utc)
+            # Maskeli değer geri gönderildiyse mevcut anahtarı ezme
+            if not clean_key.startswith("***"):
+                session.qr_data = f"callmebot:{clean_key}" if clean_key else None
+                if clean_key:
+                    session.status = "connected"
+                    session.connected_at = datetime.now(timezone.utc)
         session.updated_at = datetime.now(timezone.utc)
         self.db.commit()
         apikey = self._extract_apikey(session)
@@ -184,7 +206,7 @@ class WhatsAppService:
             "success": True,
             "notify_phone": session.notify_phone,
             "auto_notify_rep": session.auto_notify_rep,
-            "callmebot_apikey": apikey,
+            "callmebot_apikey": _mask_apikey(apikey),
             "has_callmebot_key": bool(apikey),
             "ntfy_topic": DEFAULT_NTFY_TOPIC,
             "ntfy_url": f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}",
@@ -192,11 +214,10 @@ class WhatsAppService:
 
     def _send_ntfy_push(self, content: str) -> bool:
         """
-        Sends an instant, unlimited, 100% free push notification via ntfy.sh
-        to Satış Sorumlusu Can Murat's dedicated topic channel.
+        Sends an instant push notification via ntfy.sh with phone numbers redacted (KVKK).
         """
         try:
-            clean_text = content.replace("*", "")
+            clean_text = _redact_phones_for_public_ntfy(content.replace("*", ""))
             ntfy_url = f"https://ntfy.sh/{DEFAULT_NTFY_TOPIC}"
             headers = {
                 "Title": "IVECO Canli Niyet Radari - Can Murat",

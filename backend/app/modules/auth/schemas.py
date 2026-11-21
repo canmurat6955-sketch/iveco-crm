@@ -31,6 +31,10 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
+class UserSelfUpdate(BaseModel):
+    full_name: Optional[str] = None
+
+
 class UserResponse(BaseModel):
     id: int
     email: str

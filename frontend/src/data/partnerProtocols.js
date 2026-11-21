@@ -167,9 +167,13 @@ export function resolvePartnerFromSearchParams(searchParams) {
       ? 'amount'
       : (matchedPreset?.discountType || 'amount');
 
-  const parsedDisc = discParam !== null && discParam !== '' && !isNaN(Number(discParam))
+  const rawParsedDisc = discParam !== null && discParam !== '' && !isNaN(Number(discParam))
     ? Number(discParam)
     : (matchedPreset?.discountValue ?? 50000);
+  // Güvenlik sınırı: URL parametresiyle aşırı/geçersiz indirim manipülasyonunu engelle
+  const parsedDisc = discountType === 'percent'
+    ? Math.min(10, Math.max(1, Math.round(rawParsedDisc)))
+    : Math.min(100000, Math.max(5000, Math.round(rawParsedDisc)));
 
   const shortName = customShort || matchedPreset?.shortName || customName || partnerCode.toUpperCase();
   const shortLower = shortName.toLocaleLowerCase('tr-TR');

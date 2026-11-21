@@ -26,7 +26,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
     try {
       const res = await whatsappApi.getStatus();
       setStatusData(res.data);
-      setApiKeyInput(res.data?.callmebot_apikey || '6810148');
+      setApiKeyInput(res.data?.callmebot_apikey || '');
     } catch (err) {
       console.error('WhatsApp status error:', err);
       setStatusData({
@@ -34,7 +34,7 @@ export default function WhatsAppIntegrationModal({ isOpen, onClose }) {
         phone_number: '0544 622 59 31',
         display_name: 'Can Murat Onay',
         auto_notify_rep: true,
-        callmebot_apikey: '6810148',
+        callmebot_apikey: '',
         has_callmebot_key: true,
         recent_messages: []
       });

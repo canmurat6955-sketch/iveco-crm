@@ -220,8 +220,9 @@ export default function CustomerSmartActionHub({
         matched_customer_id: !isNaN(parsedCid) ? parsedCid : undefined,
         notes
       });
+      return true;
     } catch {
-      // Sessizce devam et
+      return false;
     }
   };
 
@@ -313,7 +314,7 @@ export default function CustomerSmartActionHub({
     const hasAnyPhoto = Object.keys(photoPayload).length > 0;
     const serializedPhotos = hasAnyPhoto ? `\n||TRADEIN_PHOTOS_JSON:${JSON.stringify(photoPayload)}` : '';
 
-    await sendSignalToCrm({
+    const crmSaved = await sendSignalToCrm({
       tag: `📸 4 RESİMLE TAKAS FİYAT TALEBİ (${uploadedTradeInCount}/4 Resim)`,
       model: activeModelTitle,
       campaign: `Takas Ekspertizi (${uploadedTradeInCount}/4 Resim Yüklendi)`,
@@ -331,15 +332,19 @@ export default function CustomerSmartActionHub({
     const kmDesc = tradeInKmInput.trim() ? ` (*${tradeInKmInput.trim()} KM*)` : '';
     const msg =
       `Merhaba Can Murat Bey,\n\n` +
-      `2026 model *${activeModelTitle}* için elimdeki ${carDesc}${kmDesc} adına *Takasla Fiyat Almak* istiyorum.\n\n` +
-      `📸 *Takas Ekspertizi İçin Gerekli 4 Resim:*\n` +
-      `1️⃣ *Dışarıdan Görünüm Resmi (1 Adet)* ${tradeInPhotos.dis_gorunum ? '✅ (Yüklendi)' : '📷'}\n` +
-      `2️⃣ *İçeriden Kabin Resmi (1 Adet)* ${tradeInPhotos.ic_gorunum ? '✅ (Yüklendi)' : '📷'}\n` +
-      `3️⃣ *Kilometre (KM) Kadran Resmi (1 Adet)* ${tradeInPhotos.km_saati ? '✅ (Yüklendi)' : '📷'}\n` +
-      `4️⃣ *Araç Ruhsat Resmi (1 Adet)* ${tradeInPhotos.ruhsat ? '✅ (Yüklendi)' : '📷'}\n\n` +
+      `2026 model *${activeModelTitle}* için elimdeki ${carDesc}${kmDesc} adına *Takasla Ön Fiyat Almak* istiyorum.\n\n` +
+      `📸 *Takas Ekspertizi İçin 4 Resim (${crmSaved ? 'Portala Yüklendi' : 'WhatsApp’tan İletilecek'}):*\n` +
+      `1️⃣ *Dışarıdan Görünüm Resmi (1 Adet)* ${tradeInPhotos.dis_gorunum ? '✅' : '📷'}\n` +
+      `2️⃣ *İçeriden Kabin Resmi (1 Adet)* ${tradeInPhotos.ic_gorunum ? '✅' : '📷'}\n` +
+      `3️⃣ *Kilometre (KM) Kadran Resmi (1 Adet)* ${tradeInPhotos.km_saati ? '✅' : '📷'}\n` +
+      `4️⃣ *Araç Ruhsat Resmi (1 Adet)* ${tradeInPhotos.ruhsat ? '✅' : '📷'}\n\n` +
       `Tahmini takas bedelini ve kalan kredi ödeme planını çıkarabilir miyiz?`;
 
-    setSuccessMsg(`✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can Murat ekranına iletildi!`);
+    setSuccessMsg(
+      crmSaved
+        ? `✅ 4 resimlik takas ön değerleme talebiniz Satış Sorumlusu Can Murat ekranına iletildi!`
+        : `📲 Lütfen açılan WhatsApp sohbetinden 4 fotoğrafı doğrudan Can Murat Bey'e gönderin.`
+    );
 
     // Bilgisayar (WhatsApp Desktop) ve Mobil cihazlarda popup engelleyiciye takılmadan doğrudan aç
     openWhatsAppChat(cleanWhatsappPhone, msg);

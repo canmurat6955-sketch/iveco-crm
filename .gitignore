@@ -20,6 +20,8 @@ backend/data/
 backend/contact_groups.json
 backend/contact_match_report.json
 backend/mega_match_report.json
+backend/contact_review_report.md
+backend/bulk_import_data.json
 *.vcf
 
 # OS and IDE files

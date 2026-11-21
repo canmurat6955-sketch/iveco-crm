@@ -7,9 +7,14 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.core.database import get_db
+from app.core.security import get_current_user
 from app.modules.whatsapp.service import WhatsAppService
 
-router = APIRouter(prefix="/api/whatsapp", tags=["WhatsApp"])
+router = APIRouter(
+    prefix="/api/whatsapp",
+    tags=["WhatsApp"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 class SendMessageRequest(BaseModel):
