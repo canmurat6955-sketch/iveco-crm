@@ -3534,6 +3534,7 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
               inset: 0,
               background: 'rgba(2, 6, 23, 0.84)',
               backdropFilter: 'blur(5px)',
+              WebkitBackdropFilter: 'blur(5px)',
               zIndex: 9999,
               display: 'flex',
               alignItems: 'center',
@@ -3546,8 +3547,9 @@ export default function PricingCatalogTab({ initialSector = '', allowedGroups = 
               style={{
                 width: '100%',
                 maxWidth: '720px',
-                maxHeight: '90vh',
+                maxHeight: '88dvh',
                 overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
                 background: 'linear-gradient(165deg, #0f172a 0%, #172554 100%)',
                 border: '1.5px solid rgba(245, 158, 11, 0.55)',
                 borderRadius: '16px',

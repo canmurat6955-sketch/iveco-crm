@@ -104,7 +104,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       {activeSubTab === 'eurocargo_15t' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>⚙️ ŞANZIMAN & BASKI-BALATA</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>ZF 8AP Tam Otomatik</div>
@@ -326,7 +326,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       {activeSubTab === 'eurocargo_10t' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 PERİYODİK BAKIM ARALIĞI</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>40.000 km vs 20.000 km</div>
@@ -534,7 +534,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       {activeSubTab === 'daily_my26' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards for Daily MY26 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 700 }}>🔧 RESMİ BAKIM ARALIĞI</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>25.000 km / 1 Yıl Periyot</div>
@@ -796,7 +796,7 @@ export default function TcoCompetitorTab({ onDirectWhatsApp, salesRep }) {
       {activeSubTab === 'sway_heavy' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Highlight Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(56, 189, 248, 0.35)', borderRadius: '12px', padding: '14px' }}>
               <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 700 }}>🔥 HI-SCR (EGR'SİZ MOTOR)</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', margin: '4px 0' }}>EGR Valfi & Soğutucusu Yok</div>

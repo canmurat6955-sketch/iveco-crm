@@ -221,7 +221,7 @@ export default function BodyStructureTab({ onSelectBody, onDirectWhatsApp, sales
       </div>
 
       {/* Body Type Selection Buttons */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '10px', marginBottom: '22px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 180px), 1fr))', gap: '10px', marginBottom: '22px' }}>
         {BODY_STRUCTURE_LIST.map(b => (
           <button
             key={b.id}
@@ -320,7 +320,7 @@ export default function BodyStructureTab({ onSelectBody, onDirectWhatsApp, sales
         {/* Specs Table */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
           gap: '12px',
           background: 'rgba(2, 6, 23, 0.6)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -378,7 +378,7 @@ export default function BodyStructureTab({ onSelectBody, onDirectWhatsApp, sales
           <div style={{ fontSize: '0.74rem', color: '#cbd5e1', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
             🛡️ ÖNE ÇIKAN DONANIM VE KALİTE STANDARTLARI
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '6px' }}>
             {activeBody.features.map((feat, idx) => (
               <div key={idx} style={{ fontSize: '0.74rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FiCheck style={{ color: '#10b981', flexShrink: 0 }} /> {feat}

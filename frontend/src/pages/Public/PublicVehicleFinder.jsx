@@ -3688,7 +3688,7 @@ IVECO ERC Samsun Otomotiv
                 {loanCurrencyMode === 'EUR' ? (
                   <div>
                     {!lockedBank && (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobileView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
                         {visibleFinderEurBanks.map(bank => {
                           const isSelected = activeFinderEurBankId === bank.id;
                           return (
@@ -4694,6 +4694,7 @@ IVECO ERC Samsun Otomotiv
           zIndex: 9980,
           background: 'rgba(11, 21, 38, 0.97)',
           backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
           borderTop: '1.5px solid rgba(34, 197, 94, 0.5)',
           boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.65)',
           padding: '6px 10px calc(8px + env(safe-area-inset-bottom, 0px))',

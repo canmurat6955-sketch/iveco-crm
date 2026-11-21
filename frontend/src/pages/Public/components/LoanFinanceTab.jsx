@@ -280,7 +280,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
             <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
               🏛️ {lockedBank ? `${lockedBank.name.toUpperCase()} EURO FİNANSMAN PROGRAMI` : 'ANLAŞMALI EURO FİNANSMAN KURUMLARI'}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: '10px' }}>
               {visibleEurBanks.map(bank => {
                 const isSelected = effectiveEurBankId === bank.id;
                 return (
@@ -472,7 +472,7 @@ export default function LoanFinanceTab({ onDirectWhatsApp, salesRep, lockedBank 
               <div style={{ fontSize: '0.76rem', color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px' }}>
                 🏛️ ANLAŞMALI RESMİ FİNANSMAN KURUMLARI
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 220px), 1fr))', gap: '10px' }}>
                 {visibleBanks.map(bank => {
                   const isSelected = effectiveBankId === bank.id;
                   return (

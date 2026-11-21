@@ -525,7 +525,7 @@ export default function CustomerSmartActionHub({
           <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#38bdf8', marginBottom: '10px' }}>
             1. Görüşme Tercihinizi Seçin:
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px', marginBottom: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '8px', marginBottom: '14px' }}>
             {APPOINTMENT_TYPES.map(t => {
               const isSel = apptType.id === t.id;
               return (
@@ -551,7 +551,7 @@ export default function CustomerSmartActionHub({
             })}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '12px', marginBottom: '12px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '5px' }}>
                 2. Hangi Gün Uygun?
@@ -607,7 +607,7 @@ export default function CustomerSmartActionHub({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
@@ -646,7 +646,7 @@ export default function CustomerSmartActionHub({
           <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '0 0 12px', lineHeight: 1.45 }}>
             İncelediğiniz <strong>{activeModelTitle}</strong> modelinin mevcut kampanya fiyatını ve <strong>1.000.000 TL %0 Faiz</strong> kredi kontenjanını hiçbir kapora ödemeden <strong>24 saat boyunca</strong> rezerve etmek için sadece numaranızı yazın:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
@@ -710,7 +710,7 @@ export default function CustomerSmartActionHub({
           {/* 4 Resim Yükleme Kutuları */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(195px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 195px), 1fr))',
             gap: '10px',
             marginBottom: '12px'
           }}>
@@ -895,7 +895,7 @@ export default function CustomerSmartActionHub({
           <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#38bdf8', marginBottom: '8px' }}>
             🧾 Mali Müşavirinize Gönderebileceğiniz Resmi Vergi Avantajı Özeti ({activeModelTitle})
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '10px', marginBottom: '12px' }}>
             <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '10px 12px', borderRadius: '9px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>İndirilecek %20 KDV Avantajı</div>
               <div style={{ fontSize: '1rem', fontWeight: 900, color: '#34d399', marginTop: '2px' }}>
@@ -965,7 +965,7 @@ export default function CustomerSmartActionHub({
               </button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
@@ -1025,7 +1025,7 @@ export default function CustomerSmartActionHub({
               </button>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '8px', alignItems: 'center' }}>
             <input
               type="tel"
               value={phoneInput}
